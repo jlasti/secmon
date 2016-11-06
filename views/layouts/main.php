@@ -10,6 +10,27 @@ use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 
 AppAsset::register($this);
+
+if(Yii::$app->user->isGuest)
+{
+    $menuItems = [['label' => 'Login', 'url' => ['/site/login']]];
+}
+else
+{
+    $menuItems = [
+        ['label' => 'Eventy', 'url' => ['/event']],
+        ['label' => 'Typy eventov', 'url' => ['/event-type']],
+    ];
+
+    $menuItems[] = '<li>'
+        . Html::beginForm(['/site/logout'], 'post')
+        . Html::submitButton(
+            'Logout (' . Yii::$app->user->identity->username . ')',
+            ['class' => 'btn btn-link']
+        )
+        . Html::endForm()
+        . '</li>';
+}
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -35,10 +56,7 @@ AppAsset::register($this);
     ]);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
-        'items' => [
-            ['label' => 'Eventy', 'url' => ['/event']],
-            ['label' => 'Typy eventov', 'url' => ['/event-type']],
-        ],
+        'items' => $menuItems,
     ]);
     NavBar::end();
     ?>

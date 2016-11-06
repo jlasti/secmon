@@ -6,11 +6,25 @@ use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
-use app\models\LoginForm;
-use app\models\ContactForm;
+use app\models\forms\LoginForm;
 
 class SiteController extends Controller
 {
+	/**
+	 * @inheritdoc
+	 */
+	public function behaviors()
+	{
+		return [
+			'verbs' => [
+				'class' => VerbFilter::className(),
+				'actions' => [
+					'logout' => ['post'],
+				],
+			],
+		];
+	}
+
     /**
      * Displays homepage.
      *
@@ -20,4 +34,40 @@ class SiteController extends Controller
     {
         return $this->render('index');
     }
+
+	/**
+	 * Displays login form and eventually logs User is
+	 *
+	 * @return string|\yii\web\Response
+	 */
+    public function actionLogin()
+	{
+		if(!Yii::$app->user->isGuest)
+		{
+			return $this->goHome();
+		}
+
+		$model = new LoginForm();
+
+		if($model->load(Yii::$app->request->post()) && $model->login())
+		{
+			return $this->goBack();
+		}
+
+		return $this->render('login', [
+			'model' => $model,
+		]);
+	}
+
+	/**
+	 * Logs user out
+	 *
+	 * @return \yii\web\Response
+	 */
+	public function actionLogout()
+	{
+		Yii::$app->user->logout();
+
+		return $this->goHome();
+	}
 }
