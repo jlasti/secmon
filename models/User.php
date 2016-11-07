@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use frostealth\yii2\presenter\traits\PresentableTrait;
 use Yii;
 use yii\base\NotSupportedException;
 use app\models\User\UserRole;
@@ -21,6 +22,13 @@ use app\models\User\UserRole;
  */
 class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
+	use PresentableTrait;
+
+	const SCENARIO_CREATE = 1;
+	const SCENARIO_UPDATE = 2;
+
+	public $passwordText;
+
     /**
      * @inheritdoc
      */
@@ -35,6 +43,10 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function rules()
     {
         return [
+        	[['first_name', 'last_name', 'username', 'email'], 'required'],
+			['email', 'email'],
+			['passwordText', 'required', 'on' => static::SCENARIO_CREATE],
+			['passwordText', 'string', 'min' => 6],
             [['first_name', 'last_name', 'username', 'password', 'email', 'auth_key'], 'string', 'max' => 255],
         ];
     }
@@ -50,6 +62,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             'last_name' => Yii::t('app', 'Last Name'),
             'username' => Yii::t('app', 'Username'),
             'password' => Yii::t('app', 'Password'),
+			'passwordText' => Yii::t('app', 'Password'),
             'email' => Yii::t('app', 'Email'),
             'auth_key' => Yii::t('app', 'Auth Key'),
         ];
@@ -175,5 +188,37 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 	public function generateAuthKey()
 	{
 		$this->auth_key = Yii::$app->security->generateRandomString();
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function beforeSave($insert)
+	{
+		//could've done it with behavior but why create behavior for one thing
+		if(parent::beforeSave($insert))
+		{
+			switch($this->scenario)
+			{
+				case static::SCENARIO_CREATE:
+					$this->generateAuthKey();
+					break;
+			}
+		}
+
+		if(strlen($this->passwordText) != 0)
+		{
+			$this->setPassword($this->passwordText);
+		}
+
+		return true;
+	}
+
+	/**
+	 * @return string|array
+	 */
+	protected function getPresenterClass()
+	{
+		return 'app\models\User\Presenter';
 	}
 }

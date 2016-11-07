@@ -66,6 +66,11 @@ class Role extends \yii\db\ActiveRecord
 	 */
     public function hasPermission($permission)
 	{
-		return array_key_exists($permission, $this->permissions);
+		return $this->slug == $permission || array_key_exists($permission, $this->permissions);
+	}
+
+	public function __toString()
+	{
+		return $this->name;
 	}
 }

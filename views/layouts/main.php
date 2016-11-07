@@ -18,6 +18,7 @@ if(Yii::$app->user->isGuest)
 else
 {
     $menuItems = [
+        ['label' => 'Users', 'url' => ['/user']],
         ['label' => 'Eventy', 'url' => ['/event']],
         ['label' => 'Typy eventov', 'url' => ['/event-type']],
     ];
