@@ -2,6 +2,8 @@
 
 namespace app\models\Role;
 
+use app\models\Permission;
+use app\models\Role;
 use Yii;
 
 /**
@@ -30,8 +32,8 @@ class RolePermission extends \yii\db\ActiveRecord
     {
         return [
             [['role_id', 'permission_id'], 'integer'],
-            [['permission_id'], 'exist', 'skipOnError' => true, 'targetClass' => Permissions::className(), 'targetAttribute' => ['permission_id' => 'id']],
-            [['role_id'], 'exist', 'skipOnError' => true, 'targetClass' => Roles::className(), 'targetAttribute' => ['role_id' => 'id']],
+            [['permission_id'], 'exist', 'skipOnError' => true, 'targetClass' => Permission::className(), 'targetAttribute' => ['permission_id' => 'id']],
+            [['role_id'], 'exist', 'skipOnError' => true, 'targetClass' => Role::className(), 'targetAttribute' => ['role_id' => 'id']],
         ];
     }
 

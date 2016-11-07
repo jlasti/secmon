@@ -2,8 +2,10 @@
 
 namespace app\models;
 
+use frostealth\yii2\presenter\traits\PresentableTrait;
 use Yii;
 use app\models\Role\RolePermission;
+use yii\web\Linkable;
 
 /**
  * This is the model class for table "roles".
@@ -14,8 +16,25 @@ use app\models\Role\RolePermission;
  *
  * @property Permission[] $permissions
  */
-class Role extends \yii\db\ActiveRecord
+class Role extends \yii\db\ActiveRecord implements Linkable
 {
+	use PresentableTrait;
+
+	public $permissionList;
+
+	/**
+	 * @inheritdoc
+	 */
+	public function behaviors()
+	{
+		return [
+			[
+				'class' => \yii\behaviors\SluggableBehavior::className(),
+				'attribute' => 'name',
+			],
+		];
+	}
+
     /**
      * @inheritdoc
      */
@@ -72,5 +91,66 @@ class Role extends \yii\db\ActiveRecord
 	public function __toString()
 	{
 		return $this->name;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getLinks()
+	{
+		return [
+			'self' => ['/role/view', 'id' => $this->id],
+		];
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function load($data, $formName = null)
+	{
+		$result = parent::load($data, $formName);
+
+		$this->permissionList = $data['Role']['permissionList'] ?? $this->permissions;
+
+		return $result;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function save($runValidation = true, $attributeNames = null)
+	{
+		$transaction = Yii::$app->db->beginTransaction();
+
+		if(parent::save($runValidation, $attributeNames))
+		{
+			RolePermission::deleteAll(['role_id' => $this->id]);
+
+			foreach($this->permissionList as $permission)
+			{
+				$rolePermission = new RolePermission();
+				$rolePermission->permission_id = $permission->id ?? $permission;
+				$rolePermission->role_id = $this->id;
+
+				if(!$rolePermission->save())
+				{
+					$transaction->rollBack();
+					return false;
+				}
+			}
+
+			$transaction->commit();
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * @return string|array
+	 */
+	protected function getPresenterClass()
+	{
+		return 'app\models\Role\Presenter';
 	}
 }

@@ -16,13 +16,10 @@ class Presenter extends BasePresenter
 
 	public function getRoles()
 	{
-		//for future use, when there will be form for editing permissions on role
-		/*$roles = array_map(function($value)
+		$roles = array_map(function($value)
 		{
-			return Html::a($value, $value->url);
-		}, $this->entity->roles);*/
-
-		$roles = $this->entity->roles;
+			return Html::a($value, $value->links['self']);
+		}, $this->entity->roles);
 
 		return join('<br>', $roles);
 	}

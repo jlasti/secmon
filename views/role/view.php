@@ -1,16 +1,17 @@
 <?php
 
-use yii\helpers\Html;
 use app\components\PresenterDetailView;
+use yii\helpers\Html;
+use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\User */
+/* @var $model app\models\Role */
 
-$this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Users'), 'url' => ['index']];
+$this->title = $model->name;
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Roles'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="user-view">
+<div class="role-view">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
@@ -29,16 +30,12 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model->presenter(),
         'attributes' => [
             //'id',
-            'first_name',
-            'last_name',
-            'username',
-            //'password',
-            'email:email',
-            [
-            	'attribute' => 'roles',
+            'name',
+            //'slug',
+			[
+				'attribute' => 'permissions',
 				'format' => 'raw',
 			],
-            //'auth_key',
         ],
     ]) ?>
 
