@@ -2,6 +2,8 @@
 
 namespace app\models\User;
 
+use app\models\Role;
+use app\models\User;
 use Yii;
 
 /**
@@ -30,8 +32,8 @@ class UserRole extends \yii\db\ActiveRecord
     {
         return [
             [['user_id', 'role_id'], 'integer'],
-            [['role_id'], 'exist', 'skipOnError' => true, 'targetClass' => Roles::className(), 'targetAttribute' => ['role_id' => 'id']],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['user_id' => 'id']],
+            [['role_id'], 'exist', 'skipOnError' => true, 'targetClass' => Role::className(), 'targetAttribute' => ['role_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 

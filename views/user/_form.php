@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Role;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -21,6 +22,8 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'passwordText')->passwordInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'rolesList')->checkboxList(Role::find()->indexBy('id')->all()) ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

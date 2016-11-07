@@ -126,16 +126,20 @@ class Role extends \yii\db\ActiveRecord implements Linkable
 		{
 			RolePermission::deleteAll(['role_id' => $this->id]);
 
-			foreach($this->permissionList as $permission)
+			if(is_array($this->permissionList) && !empty($this->permissionList))
 			{
-				$rolePermission = new RolePermission();
-				$rolePermission->permission_id = $permission->id ?? $permission;
-				$rolePermission->role_id = $this->id;
-
-				if(!$rolePermission->save())
+				foreach($this->permissionList as $permission)
 				{
-					$transaction->rollBack();
-					return false;
+					$rolePermission = new RolePermission();
+					$rolePermission->permission_id = $permission->id ?? $permission;
+					$rolePermission->role_id = $this->id;
+
+					if(!$rolePermission->save())
+					{
+						$transaction->rollBack();
+
+						return false;
+					}
 				}
 			}
 

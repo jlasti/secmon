@@ -28,6 +28,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 	const SCENARIO_UPDATE = 2;
 
 	public $passwordText;
+	public $rolesList;
 
     /**
      * @inheritdoc
@@ -37,7 +38,18 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return 'users';
     }
 
-    /**
+	/**
+	 * @inheritdoc
+	 */
+    public function scenarios()
+	{
+		return array_merge(parent::scenarios(), [
+			static::SCENARIO_CREATE => [],
+			static::SCENARIO_UPDATE => [],
+		]);
+	}
+
+	/**
      * @inheritdoc
      */
     public function rules()
@@ -212,6 +224,57 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 		}
 
 		return true;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function load($data, $formName = null)
+	{
+		$result = parent::load($data, $formName);
+
+		$this->rolesList = $data['User']['rolesList'] ?? $this->roles;
+
+		if(!is_array($this->rolesList) || empty($this->rolesList))
+		{
+			//TODO: Global settings for default role....
+			$this->rolesList = [1];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function save($runValidation = true, $attributeNames = null)
+	{
+		//TODO: Refactor (3:00, really do not have energy to do it nicely), also in Role::save()
+		$transaction = Yii::$app->db->beginTransaction();
+
+		if(parent::save($runValidation, $attributeNames))
+		{
+			UserRole::deleteAll(['user_id' => $this->id]);
+
+			foreach($this->rolesList as $role)
+			{
+				$userRole = new UserRole();
+				$userRole->role_id = $role->id ?? $role;
+				$userRole->user_id = $this->id;
+
+				if(!$userRole->save())
+				{
+					$transaction->rollBack();
+
+					return false;
+				}
+			}
+
+			$transaction->commit();
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
