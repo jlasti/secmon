@@ -17,12 +17,7 @@ if(Yii::$app->user->isGuest)
 }
 else
 {
-    $menuItems = [
-        ['label' => 'Users', 'url' => ['/user']],
-        ['label' => 'Roles', 'url' => ['/role']],
-        ['label' => 'Eventy', 'url' => ['/event']],
-        ['label' => 'Typy eventov', 'url' => ['/event-type']],
-    ];
+    $menuItems = Yii::$app->navigation->getItems();
 
     $menuItems[] = '<li>'
         . Html::beginForm(['/site/logout'], 'post')
