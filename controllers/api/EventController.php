@@ -5,5 +5,5 @@ use Yii;
 
 class EventController extends \yii\rest\ActiveController
 {
-    public $modelClass = 'app\models\Event\Event';
+    public $modelClass = 'app\models\Event';
 }
