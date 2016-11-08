@@ -4,6 +4,7 @@ namespace app\models;
 
 use app\models\Event\EventType;
 use Yii;
+use app\models\Event\EventType;
 
 /**
  * This is the model class for table "events".
