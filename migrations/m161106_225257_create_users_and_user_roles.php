@@ -40,8 +40,8 @@ class m161106_225257_create_users_and_user_roles extends Migration
 			'permission_id' => $this->integer()->unsigned(),
 		]);
 
-		$this->createIndex('idx_role_id', 'rel_role_permission', 'role_id');
-		$this->createIndex('idx_permission_id', 'rel_role_permission', 'permission_id');
+		$this->createIndex('idx_RP_role_id', 'rel_role_permission', 'role_id');
+		$this->createIndex('idx_RP_permission_id', 'rel_role_permission', 'permission_id');
 
 		$this->addForeignKey('fk_RP_role_id', 'rel_role_permission', 'role_id', 'roles', 'id', 'CASCADE', 'CASCADE');
 		$this->addForeignKey('fk_RP_permission_id', 'rel_role_permission', 'permission_id', 'permissions', 'id', 'CASCADE', 'CASCADE');
@@ -64,8 +64,8 @@ class m161106_225257_create_users_and_user_roles extends Migration
 			'role_id' => $this->integer()->unsigned(),
 		]);
 
-		$this->createIndex('idx_user_id', 'rel_user_role', 'user_id');
-		$this->createIndex('idx_role_id', 'rel_user_role', 'role_id');
+		$this->createIndex('idx_UR_user_id', 'rel_user_role', 'user_id');
+		$this->createIndex('idx_UR_role_id', 'rel_user_role', 'role_id');
 
 		$this->addForeignKey('fk_UR_user_id', 'rel_user_role', 'user_id', 'users', 'id', 'CASCADE', 'CASCADE');
 		$this->addForeignKey('fk_UR_role_id', 'rel_user_role', 'role_id', 'roles', 'id', 'CASCADE', 'CASCADE');

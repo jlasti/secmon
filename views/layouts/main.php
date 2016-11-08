@@ -19,7 +19,7 @@ else
 {
     $menuItems = [
         ['label' => 'Users', 'url' => ['/user']],
-        ['label' => 'Roles', 'url' => ['/role']],
+        ['label' => 'Users', 'url' => ['/role']],
         ['label' => 'Eventy', 'url' => ['/event']],
         ['label' => 'Typy eventov', 'url' => ['/event-type']],
     ];

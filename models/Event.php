@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\models\Event\EventType;
 use Yii;
 
 /**
