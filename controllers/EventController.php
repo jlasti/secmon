@@ -3,7 +3,8 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\Event\Event;
+use app\models\Event;
+use app\models\Event\EventType;
 use app\models\Event\EventSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
