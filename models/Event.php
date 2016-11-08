@@ -1,7 +1,8 @@
 <?php
 
-namespace app\models\Event;
+namespace app\models;
 
+use app\models\Event\EventType;
 use Yii;
 
 /**

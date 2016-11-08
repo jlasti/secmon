@@ -55,7 +55,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function rules()
     {
         return [
-        	[['first_name', 'last_name', 'username', 'email'], 'required'],
+        	[['first_name', 'last_name', 'username', 'email'], 'required', 'on' => [static::SCENARIO_CREATE, static::SCENARIO_UPDATE]],
 			['email', 'email'],
 			['passwordText', 'required', 'on' => static::SCENARIO_CREATE],
 			['passwordText', 'string', 'min' => 6],
