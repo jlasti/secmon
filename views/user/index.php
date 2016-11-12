@@ -7,12 +7,10 @@ use yii\widgets\Pjax;
 /* @var $searchModel app\models\User\UserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('app', 'Users');
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['title'] = 'Create User';
 ?>
 <div class="user-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>

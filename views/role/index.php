@@ -7,12 +7,10 @@ use yii\widgets\Pjax;
 /* @var $searchModel app\models\RoleSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('app', 'Roles');
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['title'] = 'Roles';
 ?>
 <div class="role-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>

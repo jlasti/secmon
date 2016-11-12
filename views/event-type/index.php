@@ -7,12 +7,9 @@ use yii\widgets\Pjax;
 /* @var $searchModel app\models\Event\EventTypeSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('app', 'Event Types');
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['title'] = 'Event Types';
 ?>
 <div class="event-type-index">
-
-	<h1><?= Html::encode($this->title) ?></h1>
 	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
 	<p>
