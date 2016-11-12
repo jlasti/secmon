@@ -11,13 +11,8 @@ class DateFilterRule extends BaseFilterRule
 		return false;
 	}
 
-	public function apply(&$collection)
+	protected function _applyInternal(&$collection)
 	{
-		if(!($collection instanceof FilterQuery))
-		{
-			throw new InvalidParamException('Parameter $collection must be instance of \yii\db\Query');
-		}
-
 		if(!in_array($this->operator, static::operators()))
 		{
 			$this->_throwInvalidOperatorException(static::className());
