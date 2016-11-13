@@ -12,6 +12,11 @@ class OperatorValidator extends Validator
 {
 	public $ruleClass;
 
+	/**
+	 * @inheritdoc
+	 *
+	 * @throws InvalidConfigException
+	 */
 	public function validateValue($value)
 	{
 		if($this->ruleClass == null)
