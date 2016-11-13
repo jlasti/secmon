@@ -34,4 +34,15 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]) ?>
 
+	<table class="table table-striped table-bordered">
+		<tr><th>Rules</th></tr>
+
+		<?php
+		foreach($model->rules as $rule)
+		{
+			echo sprintf('<tr><td>%s %s %s</td></tr>', $rule->type, $rule->operator, $rule->value);
+		}
+		?>
+	</table>
+
 </div>
