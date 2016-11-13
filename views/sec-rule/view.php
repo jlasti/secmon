@@ -4,13 +4,13 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\SecRules */
+/* @var $model app\models\SecRule */
 
 $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'Sec Rules', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="sec-rules-view">
+<div class="sec-rule-view">
 
     <h1><?= Html::encode($this->title) ?></h1>
 

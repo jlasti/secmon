@@ -4,11 +4,11 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\SecRules */
+/* @var $model app\models\SecRule */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="sec-rules-form">
+<div class="sec-rule-form">
 
     <?php $form = ActiveForm::begin(); ?>
 

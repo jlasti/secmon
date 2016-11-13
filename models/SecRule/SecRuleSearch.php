@@ -1,16 +1,16 @@
 <?php
 
-namespace app\models\SecRules;
+namespace app\models\SecRule;
 
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\SecRules;
+use app\models\SecRule;
 
 /**
- * SecRulesSearch represents the model behind the search form about `app\models\SecRules`.
+ * SecRuleSearch represents the model behind the search form about `app\models\SecRule`.
  */
-class SecRulesSearch extends SecRules
+class SecRuleSearch extends SecRule
 {
     /**
      * @inheritdoc
@@ -41,7 +41,7 @@ class SecRulesSearch extends SecRules
      */
     public function search($params)
     {
-        $query = SecRules::find();
+        $query = SecRule::find();
 
         // add conditions that should always apply here
 

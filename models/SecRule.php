@@ -11,7 +11,7 @@ use Yii;
  * @property string $name
  * @property string $content
  */
-class SecRules extends \yii\db\ActiveRecord
+class SecRule extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc

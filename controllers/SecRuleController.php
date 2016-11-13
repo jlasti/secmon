@@ -3,16 +3,16 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\SecRules;
-use app\models\SecRules\SecRulesSearch;
+use app\models\SecRule;
+use app\models\SecRule\SecRuleSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * SecRulesController implements the CRUD actions for SecRules model.
+ * SecRuleController implements the CRUD actions for SecRule model.
  */
-class SecRulesController extends Controller
+class SecRuleController extends Controller
 {
     /**
      * @inheritdoc
@@ -30,12 +30,12 @@ class SecRulesController extends Controller
     }
 
     /**
-     * Lists all SecRules models.
+     * Lists all SecRule models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new SecRulesSearch();
+        $searchModel = new SecRuleSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -45,7 +45,7 @@ class SecRulesController extends Controller
     }
 
     /**
-     * Displays a single SecRules model.
+     * Displays a single SecRule model.
      * @param integer $id
      * @return mixed
      */
@@ -57,13 +57,13 @@ class SecRulesController extends Controller
     }
 
     /**
-     * Creates a new SecRules model.
+     * Creates a new SecRule model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new SecRules();
+        $model = new SecRule();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -75,7 +75,7 @@ class SecRulesController extends Controller
     }
 
     /**
-     * Updates an existing SecRules model.
+     * Updates an existing SecRule model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -94,7 +94,7 @@ class SecRulesController extends Controller
     }
 
     /**
-     * Deletes an existing SecRules model.
+     * Deletes an existing SecRule model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -107,15 +107,15 @@ class SecRulesController extends Controller
     }
 
     /**
-     * Finds the SecRules model based on its primary key value.
+     * Finds the SecRule model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return SecRules the loaded model
+     * @return SecRule the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = SecRules::findOne($id)) !== null) {
+        if (($model = SecRule::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

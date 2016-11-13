@@ -2,15 +2,15 @@
 
 use yii\helpers\Html;
 
-/* @var $this yii\web\View */
-/* @var $model app\models\SecRules */
 
-$this->title = 'Update Sec Rules: ' . $model->name;
+/* @var $this yii\web\View */
+/* @var $model app\models\SecRule */
+
+$this->title = 'Create Sec Rule';
 $this->params['breadcrumbs'][] = ['label' => 'Sec Rules', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = 'Update';
+$this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="sec-rules-update">
+<div class="sec-rule-create">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
