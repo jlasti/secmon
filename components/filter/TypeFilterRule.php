@@ -16,7 +16,7 @@ class TypeFilterRule extends BaseFilterRule
 	 */
 	protected function _applyInternal(&$collection)
 	{
-		$collection->where([$this->operator, 'type_id', $this->value]);
+		$collection->andWhere([$this->operator, 'type_id', $this->value]);
 	}
 
 	/**

@@ -19,7 +19,7 @@ class DateFilterRule extends BaseFilterRule
 	 */
 	protected function _applyInternal(&$collection)
 	{
-		$collection->where([$this->operator, 'timestamp', $this->value]);
+		$collection->andWhere([$this->operator, 'timestamp', $this->value]);
 	}
 
 	/**
@@ -33,7 +33,7 @@ class DateFilterRule extends BaseFilterRule
 			'>=',
 			'<=',
 			'!=',
-			'==',
+			'=',
 		];
 	}
 

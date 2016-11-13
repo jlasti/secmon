@@ -25,18 +25,26 @@ class FilterRule extends \yii\db\ActiveRecord
         return 'filter_rules';
     }
 
+    public static function types()
+	{
+		return [
+			'date' => 'Date',
+			'type' => 'Type',
+			'regex' => 'Regular expression',
+		];
+	}
+
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return array_merge(
-        	call_user_func($this->_getRuleClass() . '::rules'),
+        	$this->type ? call_user_func($this->_getRuleClass() . '::rules') : [],
         	[
 				[['filter_id'], 'integer'],
 				[['value'], 'string'],
 				[['type', 'operator'], 'string', 'max' => 255],
-				[['filter_id'], 'exist', 'skipOnError' => true, 'targetClass' => Filter::className(), 'targetAttribute' => ['filter_id' => 'id']],
         ]);
     }
 

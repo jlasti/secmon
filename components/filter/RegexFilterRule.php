@@ -28,6 +28,6 @@ class RegexFilterRule extends BaseFilterRule
 	 */
 	protected function _applyInternal(&$collection)
 	{
-		$collection->where([$this->operator, 'description', $this->value]);
+		$collection->andWhere([$this->operator, 'description', $this->value]);
 	}
 }
