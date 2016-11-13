@@ -16,6 +16,8 @@ use Yii;
  */
 class Filter extends \yii\db\ActiveRecord
 {
+	private $_rules;
+
     /**
      * @inheritdoc
      */
@@ -30,9 +32,10 @@ class Filter extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+        	['name', 'required'],
             [['user_id'], 'integer'],
             [['name'], 'string', 'max' => 255],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['user_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 
@@ -63,4 +66,35 @@ class Filter extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Users::className(), ['id' => 'user_id']);
     }
+
+    public function setRules($rules)
+	{
+		$this->_rules = $rules;
+	}
+
+	public function save($runValidation = true, $attributeNames = null)
+	{
+		$transaction = Yii::$app->db->beginTransaction();
+
+		if(parent::save($runValidation, $attributeNames))
+		{
+			foreach($this->_rules as $rule)
+			{
+				$rule->filter_id = $this->id;
+
+				if(!$rule->save())
+				{
+					$transaction->rollBack();
+
+					return false;
+				}
+			}
+
+			$transaction->commit();
+
+			return true;
+		}
+
+		return false;
+	}
 }

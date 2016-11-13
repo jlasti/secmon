@@ -11,6 +11,13 @@ class FilterQuery extends ActiveQuery
 		'dynamic' => [],
 	];
 
+	/**
+	 * Applies provided filter to this query
+	 *
+	 * @param Filter $filter Filter to be applied
+	 *
+	 * @return $this
+	 */
 	public function applyFilter(Filter $filter)
 	{
 		foreach($filter->rules as $rule)
@@ -21,6 +28,13 @@ class FilterQuery extends ActiveQuery
 		return $this;
 	}
 
+	/**
+	 * Applies provided rule to this query
+	 *
+	 * @param BaseFilterRule $rule Rule to be applied
+	 *
+	 * @return $this
+	 */
 	public function applyRule(BaseFilterRule $rule)
 	{
 		$this->_rules[$rule->isStatic()? 'static' : 'dynamic'][] = $rule;
@@ -28,6 +42,9 @@ class FilterQuery extends ActiveQuery
 		return $this;
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	public function all($db = null)
 	{
 		foreach($this->_rules['dynamic'] as $rule)

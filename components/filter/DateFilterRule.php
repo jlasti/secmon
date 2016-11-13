@@ -6,26 +6,25 @@ use yii\base\InvalidParamException;
 
 class DateFilterRule extends BaseFilterRule
 {
+	/**
+	 * @inheritdoc
+	 */
 	public function isStatic()
 	{
 		return false;
 	}
 
-	public function apply(&$collection)
+	/**
+	 * @inheritdoc
+	 */
+	protected function _applyInternal(&$collection)
 	{
-		if(!($collection instanceof FilterQuery))
-		{
-			throw new InvalidParamException('Parameter $collection must be instance of \yii\db\Query');
-		}
-
-		if(!in_array($this->operator, static::operators()))
-		{
-			$this->_throwInvalidOperatorException(static::className());
-		}
-
-		$collection->where([$this->operator, 'timestamp', $this->value]);
+		$collection->andWhere([$this->operator, 'timestamp', $this->value]);
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	public static function operators()
 	{
 		return [
@@ -34,15 +33,17 @@ class DateFilterRule extends BaseFilterRule
 			'>=',
 			'<=',
 			'!=',
-			'==',
+			'=',
 		];
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	public static function rules()
 	{
-		return [
-			['value', 'date'],
-			['operator', 'app\components\filter\OperatorValidator', 'ruleClass' => static::className()],
-		];
+		return array_merge(parent::rules(), [
+			['value', 'date', 'format' => 'yyyy-MM-dd HH:mm'],
+		]);
 	}
 }
