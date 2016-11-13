@@ -7,7 +7,7 @@ use yii\widgets\Pjax;
 /* @var $searchModel app\models\User\UserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->params['title'] = 'Create User';
+$this->params['title'] = 'Users';
 ?>
 <div class="user-index">
 
