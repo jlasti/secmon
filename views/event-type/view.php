@@ -10,16 +10,17 @@ $this->params['title'] = $model->name;
 ?>
 <div class="event-type-view">
 
-    <p>
-        <?= Html::a(Yii::t('app', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a(Yii::t('app', 'Delete'), ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
+    <div class="main-actions centered-horizontal">
+        <?= Html::a("<i class='material-icons'>edit</i>" . Yii::t('app', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn-floating waves-effect waves-light btn-large blue']) ?>
+        <?= Html::a("<i class='material-icons'>delete</i>" . Yii::t('app', 'Delete'), 
+            ['delete', 'id' => $model->id],
+            ['class' => 'btn-floating waves-effect waves-light btn-large red',
+             'data' => [
                 'confirm' => Yii::t('app', 'Are you sure you want to delete this item?'),
                 'method' => 'post',
             ],
         ]) ?>
-    </p>
+    </div>
 
     <?= DetailView::widget([
         'model' => $model,

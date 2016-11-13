@@ -58,21 +58,25 @@ a.desc:after {
 }
 
 header, main, footer {
-  padding-left: 300px;
+  margin-left: 300px;
 }
 .no-sidebar > header, .no-sidebar > main, .no-sidebar > footer {
-  padding-left: 0;
+  margin-left: 0;
 }
 
 @media only screen and (max-width : 992px) {
-  header, main, footer {
-    padding-left: 0;
-  }
+    header, main, footer {
+        padding-left: 0;
+    }
+
+    nav .nav-wrapper {
+        text-align: center;
+    }
+    nav .nav-wrapper a.page-title {
+        font-size: 36px !important;
+    }
 }
-nav.top-nav {
-    height: 122px;
-    box-shadow: none;
-}
+
 nav .nav-wrapper {
     position: relative;
     height: 100%;
@@ -81,6 +85,10 @@ nav.top-nav a.page-title {
     line-height: 122px;
     font-size: 48px;
 }
+nav, nav .nav-wrapper i, nav a.button-collapse, nav a.button-collapse i {
+    height: 122px;
+    line-height: 122px;
+}
 body {
     display: flex;
     min-height: 100vh;
@@ -88,9 +96,22 @@ body {
 }
 
 main {
+    position: relative;
     flex: 1 0 auto;
 }
-
+main > .container {
+    padding-top: 30px;
+}
+.centered-horizontal {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  /* bring your own prefixes */
+  transform: translate(-50%, -50%);
+}
+.main-actions > a {
+    margin: 0 5px;
+}
 @media only screen and (min-width: 993px) {
     .container {
         width: 85%;

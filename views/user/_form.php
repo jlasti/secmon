@@ -2,7 +2,7 @@
 
 use app\models\Role;
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+use macgyer\yii2materializecss\widgets\form\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\User */
@@ -26,7 +26,7 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'rolesList')->checkboxList(Role::find()->indexBy('id')->all()) ?>
 
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'waves-effect waves-light green btn' : 'waves-effect waves-light btn']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

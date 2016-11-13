@@ -39,6 +39,7 @@ else
 	  <nav class="top-nav">
 		    <div class="container">
 		      	<div class="nav-wrapper">
+		      		<a href="#" data-activates="slide-out" class="button-collapse top-nav full hide-on-large-only"><i class="material-icons">menu</i></a>
 		      		<a class="page-title"><?= isset($this->params['title']) ? $this->params['title'] : '' ?></a>
 		  		</div>
 		    </div>
@@ -71,7 +72,6 @@ else
 			}
 			?>
 		</ul>
-	    <a href="#" data-activates="slide-out" class="button-collapse top-nav full hide-on-large-only"><i class="material-icons">menu</i></a>
     <?php endif; ?>
 
     <!-- Main content -->
