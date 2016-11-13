@@ -3,75 +3,104 @@
 /* @var $this \yii\web\View */
 /* @var $content string */
 
-use yii\helpers\Html;
-use yii\bootstrap\Nav;
-use yii\bootstrap\NavBar;
-use yii\widgets\Breadcrumbs;
+use macgyer\yii2materializecss\lib\Html;
+use macgyer\yii2materializecss\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 
 AppAsset::register($this);
 
-if(Yii::$app->user->isGuest)
-{
-    $menuItems = [['label' => 'Login', 'url' => ['/site/login']]];
-}
-else
-{
-    $menuItems = Yii::$app->navigation->getItems();
-
-    $menuItems[] = '<li>'
-        . Html::beginForm(['/site/logout'], 'post')
-        . Html::submitButton(
-            'Logout (' . Yii::$app->user->identity->username . ')',
-            ['class' => 'btn btn-link']
-        )
-        . Html::endForm()
-        . '</li>';
-}
+$isGuest = Yii::$app->user->isGuest;
+$menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 ?>
+
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>">
 <head>
-    <meta charset="<?= Yii::$app->charset ?>">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <?= Html::csrfMetaTags() ?>
-    <title><?= Html::encode($this->title) ?></title>
-    <?php $this->head() ?>
+	<meta charset="<?= Yii::$app->charset ?>">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<?= Html::csrfMetaTags() ?>
+	<title><?= Html::encode($this->title) ?></title>
+	<?php $this->head() ?>
 </head>
-<body>
+
+<body class="<?= $isGuest ? 'no-sidebar':'' ?>">
 <?php $this->beginBody() ?>
 
-<div class="wrap">
-    <?php
-    NavBar::begin([
-        'brandLabel' => 'My Company',
-        'brandUrl' => Yii::$app->homeUrl,
-        'options' => [
-            'class' => 'navbar-inverse navbar-fixed-top',
-        ],
-    ]);
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav navbar-right'],
-        'items' => $menuItems,
-    ]);
-    NavBar::end();
-    ?>
+<header>
+	  <nav class="top-nav">
+		    <div class="container">
+		      	<div class="nav-wrapper">
+		      		<a href="#" data-activates="slide-out" class="button-collapse top-nav full hide-on-large-only"><i class="material-icons">menu</i></a>
+		      		<a class="page-title"><?= isset($this->params['title']) ? $this->params['title'] : '' ?></a>
+		  		</div>
+		    </div>
+	  </nav>
+</header>
 
-    <div class="container">
-        <?= Breadcrumbs::widget([
-            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-        ]) ?>
-        <?= $content ?>
-    </div>
-</div>
+<main>
+	<?php if(!$isGuest): ?>
+		<!-- Sidebar menu -->
+		<ul id="slide-out" class="side-nav fixed">
+			<!-- Username a login -->
+			<li>
+				<div class="userView">
+				    <div class="background purple accent-4">
+				    </div>
+				    <a><span class="white-text name"><?= Yii::$app->user->identity->username; ?></span></a>
+				    <a><span class="white-text email"><?= Yii::$app->user->identity->email; ?></span></a>
+					<?php
+						echo sprintf("<span>%s</span>", Html::beginForm(['/site/logout'], 'post')
+								. Html::submitButton(
+									'Logout',
+									['class' => 'white-text btn-flat']
+								)
+								. Html::endForm());
+					?>
+			    </div>
+    		</li>
 
-<footer class="footer">
-    <div class="container">
-        <p class="pull-left">&copy; My Company <?= date('Y') ?></p>
+			<!-- Polozky menu -->
+			<?php foreach($menuItems as $item)
+			{
+				if($item['visible'])
+				{  
+					echo sprintf("<li class='%s'>%s</li>",
+						($item['active'] == Yii::$app->controller->id) ? 'active' : '',
+						Html::a($item['label'], $item['url'], $options = ['class' => 'waves-effect' ]));
+				}
+			}
+			?>
+		</ul>
+    <?php endif; ?>
 
-        <p class="pull-right"><?= Yii::powered() ?></p>
-    </div>
+    <!-- Main content -->
+	<div class="container">
+		<?= $content ?>
+	</div>
+</main>
+
+<footer class="page-footer">
+	<div class="container">
+        <div class="row">
+		    <div class="col l6 s12">
+		        <h5 class="white-text">Footer Content</h5>
+		        <p class="grey-text text-lighten-4">You can use rows and columns here to organize your footer content.</p>
+		    </div>
+  			<div class="col l4 offset-l2 s12">
+	            <h5 class="white-text">Links</h5>
+	            <ul>
+	              <li><a class="grey-text text-lighten-3" href="https://team14-16.studenti.fiit.stuba.sk/">SecMon</a></li>
+	              <li><a class="grey-text text-lighten-3" href="mailto:talented-otters@googlegroups.com">talented-otters@googlegroups.com</a></li>
+	            </ul>
+          	</div>
+        </div>
+  	</div>
+  	<div class="footer-copyright">
+		<div class="container">
+			&copy; Tallented otters <?= date('Y') ?>
+		</div>
+	</div>
 </footer>
 
 <?php $this->endBody() ?>
