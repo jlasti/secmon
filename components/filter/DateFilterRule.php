@@ -43,7 +43,7 @@ class DateFilterRule extends BaseFilterRule
 	public static function rules()
 	{
 		return array_merge(parent::rules(), [
-			['value', 'date'],
+			['value', 'date', 'format' => 'yyyy-MM-dd HH:mm'],
 		]);
 	}
 }

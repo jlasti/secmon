@@ -68,22 +68,10 @@ class FilterController extends Controller
 
 		$rules = $this->_createRulesArray();
 
-		$loaded = true;
-
-		$loaded &= FilterRule::loadMultiple($rules, Yii::$app->request->post());
-		$loaded &= FilterRule::validateMultiple($rules);
-		$loaded &= $model->load(Yii::$app->request->post());
-		$loaded &= $model->validate();
-
-        if($loaded)
-        {
-        	$model->setRules($rules);
-
-			if($model->save())
-			{
-				return $this->redirect(['view', 'id' => $model->id]);
-			}
-        }
+		if($this->save($model, $rules))
+		{
+			return $this->redirect(['view', 'id' => $model->id]);
+		}
 
 		return $this->render('create', [
 			'model' => $model,
@@ -99,15 +87,19 @@ class FilterController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+		$model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
-        }
+		$rules = $this->_createRulesArray($model->rules);
+
+		if($this->save($model, $rules))
+		{
+			return $this->redirect(['view', 'id' => $model->id]);
+		}
+
+		return $this->render('update', [
+			'model' => $model,
+			'rules' => $rules,
+		]);
     }
 
     /**
@@ -123,13 +115,33 @@ class FilterController extends Controller
         return $this->redirect(['index']);
     }
 
-    protected function _createRulesArray()
+    protected function save($model, $rules)
 	{
-		$array = [
+		$loaded = true;
+
+		$loaded &= FilterRule::loadMultiple($rules, Yii::$app->request->post()) && FilterRule::validateMultiple($rules);
+		$loaded &= $model->load(Yii::$app->request->post()) && $model->validate();
+
+		if($loaded)
+		{
+			$model->setRules($rules);
+
+			if($model->save())
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+    protected function _createRulesArray($rules = null)
+	{
+		$array = $rules ?? [
 			new FilterRule(),
 		];
 
-		$count = count(Yii::$app->request->post('FilterRule')) - 1;
+		$count = count(Yii::$app->request->post('FilterRule')) - count($array);
 
 		for($i = 0; $i < $count; $i++)
 		{
