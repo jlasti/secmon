@@ -6,7 +6,7 @@ use app\components\PresenterDetailView;
 /* @var $this yii\web\View */
 /* @var $model app\models\User */
 
-$this->params['title'] = 'model->id';
+$this->params['title'] = 'User: ' . $model->id;
 ?>
 <div class="user-view">
 

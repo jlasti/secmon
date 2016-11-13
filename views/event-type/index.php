@@ -25,7 +25,7 @@ $this->params['title'] = 'Event Types';
 			'name',
 			'slug',
 
-			['class' => 'yii\grid\ActionColumn'],
+            ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn'],
 		],
 	]); ?>
 <?php Pjax::end(); ?></div>

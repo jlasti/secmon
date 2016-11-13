@@ -30,7 +30,7 @@ $this->params['title'] = 'Create User';
             'email:email',
             // 'auth_key',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn'],
         ],
     ]); ?>
 <?php Pjax::end(); ?></div>

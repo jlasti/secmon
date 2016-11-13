@@ -66,7 +66,7 @@ header, main, footer {
 
 @media only screen and (max-width : 992px) {
     header, main, footer {
-        padding-left: 0;
+        margin-left: 0;
     }
 
     nav .nav-wrapper {
@@ -116,4 +116,53 @@ main > .container {
     .container {
         width: 85%;
     }
+}
+.help-block {
+    color: #F44336;
+}
+
+.side-nav .userView {
+    position: relative;
+    padding: 20px 32px 0;
+    margin-bottom: 8px;
+    height: 122px;
+}
+.side-nav .userView .background {
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+}
+.side-nav .userView>a {
+    height: auto;
+    padding: 0;
+    pointer-events: none;
+}
+.side-nav .userView .name {
+    margin-top: 16px;
+    font-weight: 500;
+}
+.side-nav .userView .email {
+    padding-bottom: 16px;
+    font-weight: 400;
+}
+.side-nav .userView .name, .side-nav .userView .email {
+    font-size: 14px;
+    line-height: 24px;
+    display: block;
+}
+.side-nav .userView form {
+    display: flex;
+}
+button.white-text.btn-flat {
+    font-weight: bolder;
+    text-transform: none;
+    padding: 0 5px;
+    margin-top: -20px;
+    margin-left: -5px;
+    width: 100%;
+    text-align: left;
 }

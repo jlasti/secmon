@@ -7,7 +7,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model app\models\Role */
 
-$this->params['title'] = $model->name;
+$this->params['title'] = 'Role: ' . $model->name;
 ?>
 <div class="role-view">
     

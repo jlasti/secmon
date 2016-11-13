@@ -6,7 +6,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model app\models\Event\EventType */
 
-$this->params['title'] = $model->name;
+$this->params['title'] = 'Event type: ' . $model->name;
 ?>
 <div class="event-type-view">
 

@@ -10,15 +10,7 @@ use app\assets\AppAsset;
 AppAsset::register($this);
 
 $isGuest = Yii::$app->user->isGuest;
-
-if(Yii::$app->user->isGuest)
-{
-	$menuItems = [['label' => 'Login', 'url' => ['/site/login']]];
-}
-else
-{
-	$menuItems = Yii::$app->navigation->getItems();
-}
+$menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 ?>
 
 <?php $this->beginPage() ?>
@@ -51,14 +43,22 @@ else
 		<!-- Sidebar menu -->
 		<ul id="slide-out" class="side-nav fixed">
 			<!-- Username a login -->
-			<?php
-				echo sprintf("<li>%s</li>", Html::beginForm(['/site/logout'], 'post')
-						. Html::submitButton(
-							'Logout (' . Yii::$app->user->identity->username . ')',
-							['class' => 'btn btn-link']
-						)
-						. Html::endForm());
-			?>
+			<li>
+				<div class="userView">
+				    <div class="background purple accent-4">
+				    </div>
+				    <a><span class="white-text name"><?= Yii::$app->user->identity->username; ?></span></a>
+				    <a><span class="white-text email"><?= Yii::$app->user->identity->email; ?></span></a>
+					<?php
+						echo sprintf("<span>%s</span>", Html::beginForm(['/site/logout'], 'post')
+								. Html::submitButton(
+									'Logout',
+									['class' => 'white-text btn-flat']
+								)
+								. Html::endForm());
+					?>
+			    </div>
+    		</li>
 
 			<!-- Polozky menu -->
 			<?php foreach($menuItems as $item)
