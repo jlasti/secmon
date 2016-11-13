@@ -1,36 +1,3 @@
-html,
-body {
-    height: 100%;
-}
-
-.wrap {
-    min-height: 100%;
-    height: auto;
-    margin: 0 auto -60px;
-    padding: 0 0 60px;
-}
-
-.wrap > .container {
-    padding: 70px 15px 20px;
-}
-
-.footer {
-    height: 60px;
-    background-color: #f5f5f5;
-    border-top: 1px solid #ddd;
-    padding-top: 20px;
-}
-
-.jumbotron {
-    text-align: center;
-    background-color: transparent;
-}
-
-.jumbotron .btn {
-    font-size: 21px;
-    padding: 14px 24px;
-}
-
 .not-set {
     color: #c55;
     font-style: italic;
@@ -88,4 +55,114 @@ a.desc:after {
     border-left: 3px solid #eed3d7;
     padding: 10px 20px;
     margin: 0 0 15px 0;
+}
+
+header, main, footer {
+  margin-left: 300px;
+}
+.no-sidebar > header, .no-sidebar > main, .no-sidebar > footer {
+  margin-left: 0;
+}
+
+@media only screen and (max-width : 992px) {
+    header, main, footer {
+        margin-left: 0;
+    }
+
+    nav .nav-wrapper {
+        text-align: center;
+    }
+    nav .nav-wrapper a.page-title {
+        font-size: 36px !important;
+    }
+}
+
+nav .nav-wrapper {
+    position: relative;
+    height: 100%;
+}
+nav.top-nav a.page-title {
+    line-height: 122px;
+    font-size: 48px;
+}
+nav, nav .nav-wrapper i, nav a.button-collapse, nav a.button-collapse i {
+    height: 122px;
+    line-height: 122px;
+}
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+main {
+    position: relative;
+    flex: 1 0 auto;
+}
+main > .container {
+    padding-top: 30px;
+}
+.centered-horizontal {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  /* bring your own prefixes */
+  transform: translate(-50%, -50%);
+}
+.main-actions > a {
+    margin: 0 5px;
+}
+@media only screen and (min-width: 993px) {
+    .container {
+        width: 85%;
+    }
+}
+.help-block {
+    color: #F44336;
+}
+
+.side-nav .userView {
+    position: relative;
+    padding: 20px 32px 0;
+    margin-bottom: 8px;
+    height: 122px;
+}
+.side-nav .userView .background {
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+}
+.side-nav .userView>a {
+    height: auto;
+    padding: 0;
+    pointer-events: none;
+}
+.side-nav .userView .name {
+    margin-top: 16px;
+    font-weight: 500;
+}
+.side-nav .userView .email {
+    padding-bottom: 16px;
+    font-weight: 400;
+}
+.side-nav .userView .name, .side-nav .userView .email {
+    font-size: 14px;
+    line-height: 24px;
+    display: block;
+}
+.side-nav .userView form {
+    display: flex;
+}
+button.white-text.btn-flat {
+    font-weight: bolder;
+    text-transform: none;
+    padding: 0 5px;
+    margin-top: -20px;
+    margin-left: -5px;
+    width: 100%;
+    text-align: left;
 }
