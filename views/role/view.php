@@ -2,7 +2,7 @@
 
 use app\components\PresenterDetailView;
 use yii\helpers\Html;
-use yii\widgets\DetailView;
+use macgyer\yii2materializecss\widgets\data\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Role */

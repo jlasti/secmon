@@ -1,7 +1,7 @@
 <?php
 
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+use macgyer\yii2materializecss\widgets\form\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\SecRule\SecRuleSearch */
@@ -22,8 +22,8 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'content') ?>
 
     <div class="form-group">
-        <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
-        <?= Html::resetButton('Reset', ['class' => 'btn btn-default']) ?>
+        <?= Html::submitButton('Search', ['class' => 'waves-effect waves-light btn']) ?>
+        <?= Html::resetButton('Reset', ['class' => 'waves-effect waves-light red btn']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>
