@@ -10,7 +10,7 @@ use app\assets\AppAsset;
 AppAsset::register($this);
 
 $isGuest = Yii::$app->user->isGuest;
-$userRole = Yii::$app->user->identity->presenter()->getMainRole();
+$userRole = $isGuest ? '' : Yii::$app->user->identity->presenter()->getMainRole();
 $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 ?>
 
