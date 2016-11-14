@@ -31,7 +31,7 @@ $this->registerJsFile('@web/js/filter_form.js', ['depends' => 'yii\web\YiiAsset'
 	</div>
 
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'waves-effect waves-light green btn' : 'waves-effect waves-light btn']) ?>
+        <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'waves-effect waves-light green btn input-field' : 'waves-effect waves-light btn input-field']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

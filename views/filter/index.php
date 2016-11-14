@@ -26,7 +26,7 @@ $this->params['title'] = 'Filters';
             'user_id',
             'name',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn'],
         ],
     ]); ?>
 <?php Pjax::end(); ?></div>

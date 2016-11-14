@@ -17,5 +17,14 @@ $(document).ready(function()
 		newElement.find('input[type=text]').val('');
 
 		$('#rules').append(newElement);
+
+		// reactivate materialized select
+		newElement.find('.select-wrapper').each(function(i, e){
+			var e = $(e);
+			var sel = e.find('select');
+			e.parent().prepend(sel);
+			e.remove();
+			sel.material_select();
+		});
 	});
 });
