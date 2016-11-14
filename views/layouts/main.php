@@ -10,6 +10,7 @@ use app\assets\AppAsset;
 AppAsset::register($this);
 
 $isGuest = Yii::$app->user->isGuest;
+$userRole = Yii::$app->user->identity->presenter()->getMainRole();
 $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 ?>
 
@@ -47,7 +48,7 @@ $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 				<div class="userView">
 				    <div class="background purple accent-4">
 				    </div>
-				    <a><span class="white-text name"><?= Yii::$app->user->identity->username; ?></span></a>
+				    <a><span class="white-text name"><?= Yii::$app->user->identity->username . ' (' . $userRole . ')' ?></span></a>
 				    <a><span class="white-text email"><?= Yii::$app->user->identity->email; ?></span></a>
 					<?php
 						echo sprintf("<span>%s</span>", Html::beginForm(['/site/logout'], 'post')

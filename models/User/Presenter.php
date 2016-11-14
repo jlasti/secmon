@@ -23,4 +23,10 @@ class Presenter extends BasePresenter
 
 		return join('<br>', $roles);
 	}
+
+	#warning - TODO
+	public function getMainRole()
+	{
+		return 'rola'; 
+	}
 }
