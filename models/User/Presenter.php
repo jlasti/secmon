@@ -7,6 +7,9 @@ use yii\helpers\Html;
 
 class Presenter extends BasePresenter
 {
+	/**
+	 * @inheritdoc
+	 */
 	public function attributeLabels()
 	{
 		return [
@@ -14,6 +17,11 @@ class Presenter extends BasePresenter
 		];
 	}
 
+	/**
+	 * Returns list of HTML anchors to roles for current user
+	 *
+	 * @return string
+	 */
 	public function getRoles()
 	{
 		$roles = array_map(function($value)

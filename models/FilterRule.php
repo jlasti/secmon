@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\components\filter\BaseFilterRule;
 use Yii;
 
 /**
@@ -25,6 +26,11 @@ class FilterRule extends \yii\db\ActiveRecord
         return 'filter_rules';
     }
 
+	/**
+	 * Returns available filter types in associative format ['type' => 'type name']
+	 *
+	 * @return array
+	 */
     public static function types()
 	{
 		return [
@@ -70,6 +76,11 @@ class FilterRule extends \yii\db\ActiveRecord
         return $this->hasOne(Filter::className(), ['id' => 'filter_id']);
     }
 
+	/**
+	 * Creates actual filter rule based on this model
+	 *
+	 * @return BaseFilterRule
+	 */
     public function getRule()
 	{
 		$params = [
@@ -81,6 +92,11 @@ class FilterRule extends \yii\db\ActiveRecord
 		return Yii::createObject($params);
 	}
 
+	/**
+	 * Returns class name for actual rule
+	 *
+	 * @return string
+	 */
 	protected function _getRuleClass()
 	{
 		return sprintf('app\components\filter\%sFilterRule', ucfirst($this->type));
