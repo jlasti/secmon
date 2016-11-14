@@ -7,7 +7,7 @@ use macgyer\yii2materializecss\widgets\grid\GridView;
 /* @var $searchModel app\models\SecRule\SecRuleSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->params['title'] = 'Create Rules';
+$this->params['title'] = 'Sec Rules';
 ?>
 <div class="sec-rule-index">
 
@@ -16,9 +16,7 @@ $this->params['title'] = 'Create Rules';
     <div class="main-actions centered-horizontal">
         <?= Html::a("<i class='material-icons'>add</i>" . Yii::t('app', 'Create Sec Rule'), ['create'], ['class' => 'btn-floating waves-effect waves-light btn-large red']) ?>
     </div>
-    <p>
-        <?= Html::a('Create Sec Rule', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+    
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,

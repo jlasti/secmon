@@ -7,13 +7,10 @@ use yii\widgets\Pjax;
 /* @var $searchModel app\models\Filter\FilterSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->params['title'] = 'Create Sec Rule';
-$this->title = Yii::t('app', 'Filters');
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['title'] = 'Filters';
 ?>
 <div class="filter-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <div class="main-actions centered-horizontal">
