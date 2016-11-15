@@ -4,6 +4,7 @@ namespace app\models;
 
 use app\components\filter\BaseFilterRule;
 use Yii;
+use yii\base\Model;
 
 /**
  * This is the model class for table "filter_rules".
@@ -90,6 +91,23 @@ class FilterRule extends \yii\db\ActiveRecord
 		];
 
 		return Yii::createObject($params);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function validate($attributeNames = null, $clearErrors = true)
+	{
+		/**
+		 * need to regenerate validators, because they are generated based on actual rule class
+		 * so when updating model, it validates with previous rule type
+		 */
+		$reflection = new \ReflectionClass(get_class(new Model()));
+		$validators = $reflection->getProperty('_validators');
+		$validators->setAccessible(true);
+		$validators->setValue($this, null);
+
+		return parent::validate($attributeNames, $clearErrors);
 	}
 
 	/**
