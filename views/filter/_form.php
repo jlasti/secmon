@@ -9,6 +9,12 @@ use macgyer\yii2materializecss\widgets\form\ActiveForm;
 /* @var $rules app\models\FilterRule */
 
 $this->registerJsFile('@web/js/filter_form.js', ['depends' => 'yii\web\YiiAsset']);
+
+$types = \app\models\FilterRule::types();
+
+$typesDropdown = array_map(function($value) { return $value['name']; }, $types);
+
+$this->registerJs(sprintf('var ruleTypes = %s;', json_encode($types)));
 ?>
 
 <div class="filter-form">
@@ -21,7 +27,7 @@ $this->registerJsFile('@web/js/filter_form.js', ['depends' => 'yii\web\YiiAsset'
 		<?php
 		foreach($rules as $i => $rule)
 		{
-			echo $this->render('_ruleForm', ['form' => $form, 'rule' => $rule, 'index' => $i]);
+			echo $this->render('_ruleForm', ['form' => $form, 'rule' => $rule, 'index' => $i, 'types' => $typesDropdown]);
 		}
 		?>
 	</div>

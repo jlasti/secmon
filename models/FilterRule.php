@@ -3,6 +3,9 @@
 namespace app\models;
 
 use app\components\filter\BaseFilterRule;
+use app\components\filter\DateFilterRule;
+use app\components\filter\RegexFilterRule;
+use app\components\filter\TypeFilterRule;
 use Yii;
 use yii\base\Model;
 
@@ -35,9 +38,9 @@ class FilterRule extends \yii\db\ActiveRecord
     public static function types()
 	{
 		return [
-			'date' => 'Date',
-			'type' => 'Type',
-			'regex' => 'Regular expression',
+			'date' => ['name' => 'Date', 'operators' => DateFilterRule::operators()],
+			'type' => ['name' => 'Type', 'operators' => TypeFilterRule::operators()],
+			'regex' => ['name' => 'Regular Expression', 'operators' => RegexFilterRule::operators()],
 		];
 	}
 
