@@ -1,0 +1,10 @@
+[Unit]
+Description=SEC to DB
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/perl /home/st3lly/sec_test/secdb.pl
+
+[Install]
+WantedBy=multi-user.target
