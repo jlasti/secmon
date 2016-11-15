@@ -3,8 +3,11 @@ namespace app\components;
 
 use app\models\BasePresenter;
 
-class PresenterDetailView extends \yii\widgets\DetailView
+class PresenterDetailView extends \macgyer\yii2materializecss\widgets\data\DetailView
 {
+	/**
+	 * @inheritdoc
+	 */
 	protected function normalizeAttributes()
 	{
 		parent::normalizeAttributes();

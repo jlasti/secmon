@@ -88,6 +88,9 @@ class Role extends \yii\db\ActiveRecord implements Linkable
 		return $this->slug == $permission || array_key_exists($permission, $this->permissions);
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	public function __toString()
 	{
 		return $this->name;
@@ -151,7 +154,7 @@ class Role extends \yii\db\ActiveRecord implements Linkable
 	}
 
 	/**
-	 * @return string|array
+	 * @inheritdoc
 	 */
 	protected function getPresenterClass()
 	{

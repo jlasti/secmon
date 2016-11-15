@@ -21,13 +21,13 @@ $this->params['title'] = 'Sec Rules';
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+            ['class' => 'macgyer\yii2materializecss\widgets\grid\SerialColumn'],
 
             'id',
             'name',
             'content',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn'],
         ],
     ]); ?>
 </div>

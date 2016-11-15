@@ -2,7 +2,9 @@
 
 namespace app\models;
 
+use app\components\filter\BaseFilterRule;
 use Yii;
+use yii\base\Model;
 
 /**
  * This is the model class for table "filter_rules".
@@ -25,6 +27,11 @@ class FilterRule extends \yii\db\ActiveRecord
         return 'filter_rules';
     }
 
+	/**
+	 * Returns available filter types in associative format ['type' => 'type name']
+	 *
+	 * @return array
+	 */
     public static function types()
 	{
 		return [
@@ -70,6 +77,11 @@ class FilterRule extends \yii\db\ActiveRecord
         return $this->hasOne(Filter::className(), ['id' => 'filter_id']);
     }
 
+	/**
+	 * Creates actual filter rule based on this model
+	 *
+	 * @return BaseFilterRule
+	 */
     public function getRule()
 	{
 		$params = [
@@ -81,6 +93,28 @@ class FilterRule extends \yii\db\ActiveRecord
 		return Yii::createObject($params);
 	}
 
+	/**
+	 * @inheritdoc
+	 */
+	public function validate($attributeNames = null, $clearErrors = true)
+	{
+		/**
+		 * need to regenerate validators, because they are generated based on actual rule class
+		 * so when updating model, it validates with previous rule type
+		 */
+		$reflection = new \ReflectionClass(get_class(new Model()));
+		$validators = $reflection->getProperty('_validators');
+		$validators->setAccessible(true);
+		$validators->setValue($this, null);
+
+		return parent::validate($attributeNames, $clearErrors);
+	}
+
+	/**
+	 * Returns class name for actual rule
+	 *
+	 * @return string
+	 */
 	protected function _getRuleClass()
 	{
 		return sprintf('app\components\filter\%sFilterRule', ucfirst($this->type));
