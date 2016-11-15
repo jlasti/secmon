@@ -61,7 +61,7 @@ class EventController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
+    /*public function actionCreate()
     {
         $model = new Event();
 
@@ -72,7 +72,7 @@ class EventController extends Controller
                 'model' => $model,
             ]);
         }
-    }
+    }*/
 
     /**
      * Updates an existing Event model.
@@ -80,7 +80,7 @@ class EventController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionUpdate($id)
+    /*public function actionUpdate($id)
     {
         $model = $this->findModel($id);
 
@@ -91,7 +91,7 @@ class EventController extends Controller
                 'model' => $model,
             ]);
         }
-    }
+    }*/
 
     /**
      * Deletes an existing Event model.
@@ -99,12 +99,12 @@ class EventController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionDelete($id)
+    /*public function actionDelete($id)
     {
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
-    }
+    }*/
 
     /**
      * Finds the Event model based on its primary key value.
