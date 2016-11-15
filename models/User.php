@@ -39,17 +39,6 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     }
 
 	/**
-	 * @inheritdoc
-	 */
-    public function scenarios()
-	{
-		return array_merge(parent::scenarios(), [
-			static::SCENARIO_CREATE => [],
-			static::SCENARIO_UPDATE => [],
-		]);
-	}
-
-	/**
      * @inheritdoc
      */
     public function rules()
