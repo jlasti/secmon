@@ -11,8 +11,8 @@ use Yii;
  * @property integer $user_id
  * @property string $name
  *
- * @property FilterRules[] $filterRules
- * @property Users $user
+ * @property FilterRule[] $filterRules
+ * @property User $user
  */
 class Filter extends \yii\db\ActiveRecord
 {
@@ -67,11 +67,19 @@ class Filter extends \yii\db\ActiveRecord
         return $this->hasOne(Users::className(), ['id' => 'user_id']);
     }
 
+	/**
+	 * Sets specified rules to filter
+	 *
+	 * @param FilterRule[] $rules
+	 */
     public function setRules($rules)
 	{
 		$this->_rules = $rules;
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	public function save($runValidation = true, $attributeNames = null)
 	{
 		$transaction = Yii::$app->db->beginTransaction();

@@ -5,6 +5,9 @@ use app\models\BasePresenter;
 
 class PresenterDetailView extends \yii\widgets\DetailView
 {
+	/**
+	 * @inheritdoc
+	 */
 	protected function normalizeAttributes()
 	{
 		parent::normalizeAttributes();

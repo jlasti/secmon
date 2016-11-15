@@ -53,6 +53,9 @@ class Permission extends \yii\db\ActiveRecord
         return $this->hasMany(RelRolePermission::className(), ['permission_id' => 'id']);
     }
 
+	/**
+	 * @inheritdoc
+	 */
     public function __toString()
 	{
 		return $this->name;
