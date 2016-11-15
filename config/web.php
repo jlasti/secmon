@@ -41,12 +41,12 @@ $config = [
 			],
 		],
 		'db' => require(__DIR__ . '/db.php'),
-
 		'urlManager' => [
 			'enablePrettyUrl' => true,
 			'showScriptName' => false,
 			'rules' => include('urls.php'),
 		],
+		'navigation' => ['class' => 'app\components\Navigation'],
 	],
 	'params' => $params,
 ];

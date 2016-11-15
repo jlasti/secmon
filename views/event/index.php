@@ -1,36 +1,29 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
+use macgyer\yii2materializecss\widgets\grid\GridView;
 use yii\widgets\Pjax;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\Event\EventSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('app', 'Events');
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['title'] = 'Events';
 ?>
 <div class="event-index">
+    <?php Pjax::begin(); ?>    <?= GridView::widget([
+            'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
+            'columns' => [
+                ['class' => 'yii\grid\SerialColumn'],
 
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+                'id',
+                'title',
+                'description:ntext',
+                'timestamp',
+                'type_id',
 
-    <p>
-        <?= Html::a(Yii::t('app', 'Create Event'), ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
-<?php Pjax::begin(); ?>    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
-            'title',
-            'description:ntext',
-            'timestamp',
-            'type_id',
-
-            ['class' => 'yii\grid\ActionColumn'],
-        ],
-    ]); ?>
-<?php Pjax::end(); ?></div>
+                ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn'],
+            ],
+        ]); ?>
+    <?php Pjax::end(); ?>
+</div>
