@@ -21,7 +21,7 @@ $this->params['title'] = 'Sec Rules';
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'macgyer\yii2materializecss\widgets\grid\SerialColumn'],
+            ['class' => 'yii\grid\SerialColumn'],
 
             'id',
             'name',

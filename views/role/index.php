@@ -20,7 +20,7 @@ $this->params['title'] = 'Roles';
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'macgyer\yii2materializecss\widgets\grid\SerialColumn'],
+            ['class' => 'yii\grid\SerialColumn'],
 
             'id',
             'name',
