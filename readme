@@ -1,0 +1,9 @@
+Konfig:
+Zakladna konfiguracia je v subore config.ini. Nastavuje sa tam pristu do DB, nazov a umiestnenie named pipe, nazov a umiestnenie logovacieho suboru.
+
+Instalacia:
+	- vytvorenie named pipe: mkfifo nazov_pipe
+	- nakopirovanie suboru secdb.service do adresara /lib/systemd/system/ a treba v subore zmenit		umiestnenie skriptu.
+	- treba nastavit prava 644 (chmod 644 secdb.service)
+	- reloadnut daemona: systemctl daemon-reload
+	- zapnut service prikazom: systemctl enable secdb.service
