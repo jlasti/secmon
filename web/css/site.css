@@ -122,41 +122,13 @@ main > .container {
 }
 
 .side-nav .userView {
-    position: relative;
     padding: 20px 32px 0;
-    margin-bottom: 8px;
     height: 122px;
 }
-.side-nav .userView .background {
-    overflow: hidden;
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: -1;
-}
-.side-nav .userView>a {
-    height: auto;
-    padding: 0;
-    pointer-events: none;
-}
-.side-nav .userView .name {
-    margin-top: 16px;
-    font-weight: 500;
-}
 .side-nav .userView .email {
-    padding-bottom: 16px;
-    font-weight: 400;
+    padding-bottom: 0px;
 }
-.side-nav .userView .name, .side-nav .userView .email {
-    font-size: 14px;
-    line-height: 24px;
-    display: block;
-}
-.side-nav .userView form {
-    display: flex;
-}
+
 button.white-text.btn-flat {
     font-weight: bolder;
     text-transform: none;

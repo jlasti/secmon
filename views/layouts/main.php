@@ -67,9 +67,16 @@ $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 			{
 				if($item['visible'])
 				{  
+					// Oddelovac
+					if($item['active'] === 'divider') {
+						echo "<li><div class='divider'></div></li>";
+						echo sprintf("<li>%s</li>", Html::a($item['label'], '',$options = ['class' => 'subheader' ]));
+						continue;
+					}
+					// Bezna polozka menu
 					echo sprintf("<li class='%s'>%s</li>",
 						($item['active'] == Yii::$app->controller->id) ? 'active' : '',
-						Html::a($item['label'], $item['url'], $options = ['class' => 'waves-effect' ]));
+						Html::a("<i class='material-icons'>" . $item['icon'] . "</i>" . $item['label'], $item['url'], $options = ['class' => 'waves-effect' ]));
 				}
 			}
 			?>
