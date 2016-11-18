@@ -30,7 +30,7 @@ $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 <?php $this->beginBody() ?>
 
 <header>
-	  <nav class="top-nav">
+	  <nav class="top-nav light-blue accent-4">
 		    <div class="container">
 		      	<div class="nav-wrapper">
 		      		<a href="#" data-activates="slide-out" class="button-collapse top-nav full hide-on-large-only"><i class="material-icons">menu</i></a>
@@ -47,12 +47,13 @@ $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 			<!-- Username a login -->
 			<li>
 				<div class="userView">
-				    <div class="background purple accent-4">
-				    </div>
+				    <div class="background">
+				        <?=Html::img('@web/images/menu.png');?>
+			      	</div>
 				    <a><span class="white-text name"><?= $user->username . ' (' . $userRole . ')' ?></span></a>
 				    <a><span class="white-text email"><?= $user->email; ?></span></a>
 					<?php
-						echo sprintf("<span>%s</span>", Html::beginForm(['/site/logout'], 'post')
+						printf("<span>%s</span>", Html::beginForm(['/site/logout'], 'post')
 								. Html::submitButton(
 									'Logout',
 									['class' => 'white-text btn-flat']
@@ -67,9 +68,16 @@ $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 			{
 				if($item['visible'])
 				{  
-					echo sprintf("<li class='%s'>%s</li>",
+					// Oddelovac
+					if($item['active'] === 'divider') {
+						echo "<li><div class='divider'></div></li>";
+						printf("<li>%s</li>", Html::a($item['label'], '',$options = ['class' => 'subheader' ]));
+						continue;
+					}
+					// Bezna polozka menu
+					printf("<li class='%s'>%s</li>",
 						($item['active'] == Yii::$app->controller->id) ? 'active' : '',
-						Html::a($item['label'], $item['url'], $options = ['class' => 'waves-effect' ]));
+						Html::a("<i class='material-icons'>" . $item['icon'] . "</i>" . $item['label'], $item['url'], $options = ['class' => 'waves-effect' ]));
 				}
 			}
 			?>
@@ -82,7 +90,7 @@ $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 	</div>
 </main>
 
-<footer class="page-footer">
+<footer class="page-footer light-blue accent-4">
 	<div class="container">
         <div class="row">
 		    <div class="col l6 s12">

@@ -10,13 +10,57 @@ class Navigation extends \yii\base\Component
 
 	public function init()
 	{
-		$this->_items = [
-	        ['label' => 'Events', 'url' => ['/event'], 'visible' => true, 'active' => 'event'],
-	        ['label' => 'Filters', 'url' => ['/filter'], 'visible' => true, 'active' => 'filter'],
-	        ['label' => 'Event types', 'url' => ['/event-type'], 'visible' => Yii::$app->user->identity->can('create_users'), 'active' => 'event-type'],
-	        ['label' => 'Sec Rules', 'url' => ['/sec-rule'], 'visible' => Yii::$app->user->identity->can('create_users'), 'active' => 'sec-rule'],
-	        ['label' => 'Users', 'url' => ['/user'], 'visible' => Yii::$app->user->identity->can('create_users'), 'active' => 'user'],
-	        ['label' => 'Roles', 'url' => ['/role'], 'visible' => Yii::$app->user->identity->can('create_users'), 'active' => 'role'],
+		$this->_items = 
+		[
+	        [
+				'label' => 'Events',
+				'url' => ['/event'],
+				'visible' => true,
+				'active' => 'event',
+				'icon' => 'event'
+	        ],
+	        [ 
+				'label' => 'Filters', 
+				'url' => ['/filter'],
+				'visible' => true, 
+				'active' => 'filter',
+				'icon' => 'find_in_page'
+	        ],
+	        [
+				'label' => 'Administration',
+				'url' => [],
+				'visible' => Yii::$app->user->identity->can('create_users'),
+				'active' => 'divider',
+				'icon' => ''
+	        ],
+	        [
+				'label' => 'Event types',
+				'url' => ['/event-type'],
+				'visible' => Yii::$app->user->identity->can('create_users'),
+				'active' => 'event-type',
+				'icon' => 'event'
+	        ],
+	        [
+				'label' => 'Sec Rules', 
+				'url' => ['/sec-rule'],
+				'visible' => Yii::$app->user->identity->can('create_users'),
+				'active' => 'sec-rule',
+				'icon' => 'receipt'
+	        ],
+	        [
+				'label' => 'Users',
+				'url' => ['/user'], 
+				'visible' => Yii::$app->user->identity->can('create_users'), 
+				'active' => 'user',
+				'icon' => 'accessibility'
+	        ],
+	        [
+				'label' => 'Roles', 
+				'url' => ['/role'], 
+				'visible' => Yii::$app->user->identity->can('create_users'), 
+				'active' => 'role',
+				'icon' => 'perm_identity'
+	        ],
 	    ];
 	}
 
