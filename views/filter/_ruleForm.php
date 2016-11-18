@@ -27,7 +27,7 @@ $selectedType = $rule->type ?? 'date';
 		])->dropDownList($r->getOperatorsForDropdown(), $opt);
 
 
-		if ($r->getValueType() == filter\FilterValueTypeEnum::Date)
+		if ($r->getValueType() == filter\FilterValueTypeEnum::DATE)
 			echo $form->field($rule, "[$index]value", [
 			'options' => [ 'class' => sprintf('input-field col m5%s',  $additionalClass), 'data-type' => $i ]
 				])->textInput(array_merge($opt, [ 'class' => 'datepicker' ]));
