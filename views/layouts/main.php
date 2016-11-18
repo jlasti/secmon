@@ -52,7 +52,7 @@ $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 				    <a><span class="white-text name"><?= $user->username . ' (' . $userRole . ')' ?></span></a>
 				    <a><span class="white-text email"><?= $user->email; ?></span></a>
 					<?php
-						echo sprintf("<span>%s</span>", Html::beginForm(['/site/logout'], 'post')
+						printf("<span>%s</span>", Html::beginForm(['/site/logout'], 'post')
 								. Html::submitButton(
 									'Logout',
 									['class' => 'white-text btn-flat']
@@ -70,11 +70,11 @@ $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 					// Oddelovac
 					if($item['active'] === 'divider') {
 						echo "<li><div class='divider'></div></li>";
-						echo sprintf("<li>%s</li>", Html::a($item['label'], '',$options = ['class' => 'subheader' ]));
+						printf("<li>%s</li>", Html::a($item['label'], '',$options = ['class' => 'subheader' ]));
 						continue;
 					}
 					// Bezna polozka menu
-					echo sprintf("<li class='%s'>%s</li>",
+					printf("<li class='%s'>%s</li>",
 						($item['active'] == Yii::$app->controller->id) ? 'active' : '',
 						Html::a("<i class='material-icons'>" . $item['icon'] . "</i>" . $item['label'], $item['url'], $options = ['class' => 'waves-effect' ]));
 				}
