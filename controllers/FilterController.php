@@ -115,6 +115,17 @@ class FilterController extends Controller
         return $this->redirect(['index']);
     }
 
+    /**
+     * Deletes rule from filter.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionDeleteRule($id, $ruleId)
+    {
+        //todo - remove rule by $ruleId
+        return $this->redirect(['update', 'id' => $id]);
+    }
+
     protected function save($model, $rules)
 	{
 		$loaded = true;

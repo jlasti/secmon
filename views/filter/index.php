@@ -16,17 +16,20 @@ $this->params['title'] = 'Filters';
     <div class="main-actions centered-horizontal">
         <?= Html::a("<i class='material-icons'>add</i>" . Yii::t('app', 'Create Filter'), ['create'], ['class' => 'btn-floating waves-effect waves-light btn-large red']) ?>
     </div>
-<?php Pjax::begin(); ?>    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
 
-            'id',
-            'user_id',
-            'name',
+    <?php Pjax::begin(); ?>
+        <?= GridView::widget([
+            'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
+            'columns' => [
+                ['class' => 'yii\grid\SerialColumn'],
 
-            ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn'],
-        ],
-    ]); ?>
-<?php Pjax::end(); ?></div>
+                'id',
+                'user_id',
+                'name',
+
+                ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn'],
+            ],
+        ]); ?>
+    <?php Pjax::end(); ?>
+</div>
