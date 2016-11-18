@@ -30,7 +30,7 @@ $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 <?php $this->beginBody() ?>
 
 <header>
-	  <nav class="top-nav">
+	  <nav class="top-nav light-blue accent-4">
 		    <div class="container">
 		      	<div class="nav-wrapper">
 		      		<a href="#" data-activates="slide-out" class="button-collapse top-nav full hide-on-large-only"><i class="material-icons">menu</i></a>
@@ -47,8 +47,9 @@ $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 			<!-- Username a login -->
 			<li>
 				<div class="userView">
-				    <div class="background purple accent-4">
-				    </div>
+				    <div class="background">
+				        <?=Html::img('@web/images/menu.png');?>
+			      	</div>
 				    <a><span class="white-text name"><?= $user->username . ' (' . $userRole . ')' ?></span></a>
 				    <a><span class="white-text email"><?= $user->email; ?></span></a>
 					<?php
@@ -89,7 +90,7 @@ $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 	</div>
 </main>
 
-<footer class="page-footer">
+<footer class="page-footer light-blue accent-4">
 	<div class="container">
         <div class="row">
 		    <div class="col l6 s12">
