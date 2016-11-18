@@ -42,7 +42,7 @@ class DateFilterRule extends BaseFilterRule
      */
 	public static function getValueType()
     {
-        return FilterValueTypeEnum::Date;
+        return FilterValueTypeEnum::DATE;
     }
 
     /**

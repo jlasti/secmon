@@ -18,8 +18,8 @@ class RegexFilterRule extends BaseFilterRule
 	public static function operators()
 	{
 		return [
-			'MATCH',
-			'NOT MATCH',
+			'REGEXP',
+			'NOT REGEXP',
 		];
 	}
 

@@ -11,6 +11,6 @@ namespace app\components\filter;
 
 abstract class FilterValueTypeEnum
 {
-    const String = 0;
-    const Date = 1;
+    const STRING = 0;
+    const DATE = 1;
 }

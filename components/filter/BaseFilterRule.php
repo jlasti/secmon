@@ -65,7 +65,7 @@ abstract class BaseFilterRule extends Component
      */
     public static function getValueType()
     {
-        return FilterValueTypeEnum::String;
+        return FilterValueTypeEnum::STRING;
     }
 
 
