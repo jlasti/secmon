@@ -38,9 +38,9 @@ class FilterRule extends \yii\db\ActiveRecord
     public static function types()
 	{
 		return [
-			'date' => ['name' => 'Date', 'operators' => DateFilterRule::operators()],
-			'type' => ['name' => 'Type', 'operators' => TypeFilterRule::operators()],
-			'regex' => ['name' => 'Regular Expression', 'operators' => RegexFilterRule::operators()],
+			'date' => ['name' => 'Date', 'rule' => new DateFilterRule()],
+			'type' => ['name' => 'Type', 'rule' => new TypeFilterRule()],
+			'regex' => ['name' => 'Regular Expression', 'rule' => new RegexFilterRule()],
 		];
 	}
 

@@ -18,12 +18,12 @@ class RegexFilterRule extends BaseFilterRule
 	public static function operators()
 	{
 		return [
-			'REGEXP',
-			'NOT REGEXP',
+			'MATCH',
+			'NOT MATCH',
 		];
 	}
 
-	/**
+    /**
 	 * @inheritdoc
 	 */
 	protected function _applyInternal(&$collection)

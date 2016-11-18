@@ -13,6 +13,7 @@ abstract class BaseFilterRule extends Component
 
 	//region Private attributes
 	private $_collection;
+    private $_operatorsDropdown = null;
 	//endregion
 
 	//region Public attributes
@@ -44,7 +45,31 @@ abstract class BaseFilterRule extends Component
 	 */
 	public static abstract function operators();
 
-	/**
+    /**
+     * Return combined array of operators.
+     *
+     * @return array
+     */
+    public function getOperatorsForDropdown()
+    {
+        if ($this->_operatorsDropdown == null)
+            $this->_operatorsDropdown = array_combine($this->operators(), $this->operators());
+
+        return $this->_operatorsDropdown;
+    }
+
+    /**
+     * Returns type of value. View input value field can be changed by this value.
+     *
+     * @return int
+     */
+    public static function getValueType()
+    {
+        return FilterValueTypeEnum::String;
+    }
+
+
+        /**
 	 * Validation rules applied to \app\models\FilterRule class
 	 *
 	 * @return array
