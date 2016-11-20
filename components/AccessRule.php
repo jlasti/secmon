@@ -17,7 +17,7 @@ class AccessRule extends \yii\filters\AccessRule
 		{
 			if(($role === '?' && $user->isGuest)
 				|| ($role === '@' && !$user->isGuest)
-				|| ($user->identity->can($role)))
+				|| ($user->identity != null && $user->identity->can($role)))
 			{
 				return true;
 			}
