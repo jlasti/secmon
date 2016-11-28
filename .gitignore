@@ -26,8 +26,8 @@ phpunit.phar
 # local phpunit config
 /phpunit.xml
 
-/config/db.php
 /runtime
-
+/config/db.php
+/secdb/config.ini
 composer.lock
 lastdepoy.txt
