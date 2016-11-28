@@ -12,7 +12,7 @@
 		'whoami',
 		'git pull',
 		'git status',
-		'composer update',
+		'composer update 2>&1',
 		'./yii migrate',
 	);
 	// Run the commands for output
