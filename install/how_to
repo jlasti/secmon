@@ -1,0 +1,62 @@
+Konfig:
+Zakladna konfiguracia je v subore config_secdb.ini. Nastavuje sa tam pristu do DB, nazov a umiestnenie named pipe, nazov a umiestnenie logovacieho suboru.
+
+Vzorovy config_secdb.ini (standardne ulozeny tam kde aj secdb.pl chmod 644):
+pre jeho aktivaciu len vymazat ".sample" na konci config/config_secdb.ini.sample a upravit obsah
+-----------------------------
+[db]
+host=localhost
+user=sec
+password=heslo
+dbname=secdev
+
+[log]
+dir=/var/log/secmon/
+file=secdb.log
+
+[fifo]
+dir=/tmp/secmon/
+file=SEC_fifo
+-----------------------------
+
+Na serveri
+Cast pre ukladanie eventov do databazku
+Nezabudnut na to abz bol vytvoreny typ ktoreho event vkladam lebo inak to neuklada. 
+
+ 	-yum install perl-DBD-Pg
+  		yum install perl-CPAN				mozno ani netreba
+  		cpan install Config::IniFiles 		mozno ani netreba
+	-yum install 'perl(Config::IniFiles)'
+
+	-mkdir /tmp/secmon/
+	-mkfifo /tmp/secmon/SEC_fifo
+	- vytvorenie named pipe: mkfifo nazov_pipe
+	- nakopirovanie suboru secdb.service do adresara so su systemd servicami a treba v subore zmenit umiestnenie skriptu.
+	- treba nastavit prava 644 (chmod 644 secdb.service)
+	- nezabudnut na vytvorenie config_secdb.ini 
+	- reloadnut daemona: systemctl daemon-reload
+	- zapnut startovanie service prikazom: systemctl enable secdb.service
+	- zapnut service prikazom: systemctl start secdb.service
+
+
+
+
+
+
+
+
+
+
+momentalne to spustam tymto...
+ sec -conf=/root/simple_sec.conf -input /var/log/yweb/sshd.log --bufsize=1 --notail; less vvv; rm -f vvv
+
+a takto vyzera to pravidlo			nefachci podla mna uplne ako by malo ale daco vypise aj do db...
+--------------------------------
+type=SingleWithThreshold
+ptype=RegExp
+pattern=(\S+) sshd\[\d+\]: Failed .+ for (\S+).+from (\d.+.)+ port (\d+) ssh2
+desc=Three SSH login failures within 1m for user $1
+action=pipe '$2 fail logged in to $1 from $3 port 3 times in last 60seconds' /bin/cat > /tmp/secmon/SEC_fifo
+window=60
+thresh=3
+---------------------------------

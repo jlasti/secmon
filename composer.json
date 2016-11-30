@@ -19,7 +19,12 @@
         "yiisoft/yii2-bootstrap": "*",
         "yiisoft/yii2-swiftmailer": "*",
         "frostealth/yii2-presenter": "@stable",
+<<<<<<< HEAD
         "macgyer/yii2-materializecss": "*"
+=======
+        "macgyer/yii2-materializecss": "*",
+        "bower-asset/materialize": "0.97.8"
+>>>>>>> 626c9dc215ba8f253c7725338640064a18fc2159
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",

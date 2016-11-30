@@ -10,6 +10,7 @@ use yii\widgets\Pjax;
 $this->params['title'] = 'Events';
 ?>
 <div class="event-index">
+<<<<<<< HEAD
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <div class="main-actions centered-horizontal">
@@ -31,3 +32,22 @@ $this->params['title'] = 'Events';
         ],
     ]); ?>
 <?php Pjax::end(); ?></div>
+=======
+    <?php Pjax::begin(); ?>    <?= GridView::widget([
+            'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
+            'columns' => [
+                ['class' => 'yii\grid\SerialColumn'],
+
+                'id',
+                'title',
+                'description:ntext',
+                'timestamp',
+                'type_id',
+
+                ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn'],
+            ],
+        ]); ?>
+    <?php Pjax::end(); ?>
+</div>
+>>>>>>> 626c9dc215ba8f253c7725338640064a18fc2159

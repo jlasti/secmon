@@ -37,13 +37,21 @@ class DateFilterRule extends BaseFilterRule
 		];
 	}
 
-	/**
+    /**
+     * @inheritdoc
+     */
+	public static function getValueType()
+    {
+        return FilterValueTypeEnum::DATE;
+    }
+
+    /**
 	 * @inheritdoc
 	 */
 	public static function rules()
 	{
 		return array_merge(parent::rules(), [
-			['value', 'date', 'format' => 'yyyy-MM-dd HH:mm'],
+			['value', 'date', 'format' => 'yyyy-MM-dd'],
 		]);
 	}
 }

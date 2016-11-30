@@ -1,0 +1,22 @@
+
+*** These modified files were found in JOE when it aborted on Wed Nov 30 16:48:14 2016
+*** JOE was aborted because the terminal closed
+
+*** File '(Unnamed)'
+000-default.conf
+/etc/apache2/sites-available/000-default.conf
+db.php
+apache2.conf
+/home/matej/secmon_backend/.git/COMMIT_EDITMSG
+/home/matej/secmon_backend/.git/COMMIT_EDITMSG
+/home/matej/secmon_backend/.git/MERGE_MSG
+db.php
+bla
+test.tex
+/home/matej/secmon_backend/.git/COMMIT_EDITMSG
+
+*** File '* Startup Log *'
+Processing '/etc/joe/editorrc'...
+Processing '/etc/joe/ftyperc'...
+Finished processing /etc/joe/ftyperc
+Finished processing /etc/joe/editorrc

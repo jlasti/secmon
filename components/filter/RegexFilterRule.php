@@ -23,7 +23,7 @@ class RegexFilterRule extends BaseFilterRule
 		];
 	}
 
-	/**
+    /**
 	 * @inheritdoc
 	 */
 	protected function _applyInternal(&$collection)

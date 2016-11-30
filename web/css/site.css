@@ -122,6 +122,7 @@ main > .container {
 }
 
 .side-nav .userView {
+<<<<<<< HEAD
     position: relative;
     padding: 20px 32px 0;
     margin-bottom: 8px;
@@ -157,6 +158,15 @@ main > .container {
 .side-nav .userView form {
     display: flex;
 }
+=======
+    padding: 20px 32px 0;
+    height: 122px;
+}
+.side-nav .userView .email {
+    padding-bottom: 0px;
+}
+
+>>>>>>> 626c9dc215ba8f253c7725338640064a18fc2159
 button.white-text.btn-flat {
     font-weight: bolder;
     text-transform: none;
