@@ -12,7 +12,7 @@
 		'whoami',
 		'git pull',
 		'git status',
-		'export HOME=/usr/share/httpd && COMPOSER_HOME=/var/www/develop && composer update 2>&1',
+		'export HOME=/usr/share/httpd && COMPOSER_HOME=/usr/share/httpd/.composer && composer update 2>&1',
 		'./yii migrate',
 	);
 	// Run the commands for output
