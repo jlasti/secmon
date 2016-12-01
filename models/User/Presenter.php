@@ -39,6 +39,6 @@ class Presenter extends BasePresenter
 	 */
 	public function getMainRole()
 	{
-		return 'rola'; 
+        return array_values($this->entity->roles)[0]['name'];
 	}
 }
