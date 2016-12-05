@@ -23,13 +23,17 @@ use DBI();
 # Pridavna kniznica na spracovanie konfiguracneho suboru
 use Config::IniFiles;
 
+# Zistenie aktualneho priecinka
+use File::Basename;
+my $dirname = dirname(__FILE__);
+
 my $fileName;
 my $inputLine;
 my $title;
 my $type_id;
 
 # Otvorenie konfigu
-my $cfg = Config::IniFiles->new(-file => "/home/st3lly/sec_test/config.ini") or die $!;
+my $cfg = Config::IniFiles->new(-file => $dirname . "/../config/config_secdb.ini") or die $!;
 
 # Nacitanie nastaveni z konfigu
 my $dbHost = $cfg->val('db', 'host');
@@ -54,13 +58,15 @@ sub getLogTime
 open(my $log, '>>', $logDir . $logFile) or die "Log file error: $!";
 
 # Otvorim named pipe kam SEC zapisuje
-if(!open(FIFO, '+<', $fifoDir . $fifoFile)) {
+#if(!open(FIFO, '+<', $fifoDir . $fifoFile)) {
+if(!open(FIFO, '+<', "/tmp/secmon/SEC_fifo")) {
 	printf $log "%s: %s%s: %s\n", &getLogTime(), $fifoDir, $fifoFile, $!;
 	exit 1;
 }
 
+
 # Handle pre pripojenie k DB
-my $dbConnectionHandle = DBI->connect("DBI:mysql:database=$dbDatabase;host=$dbHost", "$dbUser", "$dbPassword", {PrintError => 0, RaiseError => 0});
+my $dbConnectionHandle = DBI->connect("DBI:Pg:database=$dbDatabase;host=$dbHost", "$dbUser", "$dbPassword", {PrintError => 0, RaiseError => 0});
 if(!$dbConnectionHandle)
 {
 	printf $log "%s: Could not connect to database!\n", &getLogTime();
@@ -81,13 +87,13 @@ while (<FIFO>)
 
 	# Odstrani posledny znak z retazca. V tomto pripade \n 
 	chop $inputLine;
-	
+
 	# Insert do DB
 	$insertHandle->execute($title, $inputLine, $type_id);
-	#if(!)
-	#{
-	#	printf $log "%s: Inserting error: %s\n", &getLogTime(), $insertHandle->errstr;
-	#}
+	if(!$insertHandle)
+	{
+		printf $log "%s: Inserting error: %s\n", &getLogTime(), $insertHandle->errstr;
+	}
 }
 
 exit;
