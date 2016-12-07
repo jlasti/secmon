@@ -13,7 +13,7 @@
 		'git pull',
 		'git status',
 		'export HOME=/usr/share/httpd && COMPOSER_HOME=/usr/share/httpd/.composer && composer update 2>&1',
-		'./yii migrate',
+		'./yii migrate --interactive=0',
 	);
 	// Run the commands for output
 	$output = '';
