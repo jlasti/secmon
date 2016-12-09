@@ -27,7 +27,8 @@ $this->params['title'] = 'Sec Rule: ' . $model->name;
         'attributes' => [
             'id',
             'name',
-            'content',
+            'link',
+            'state',
         ],
     ]) ?>
 

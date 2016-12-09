@@ -9,7 +9,8 @@ use Yii;
  *
  * @property integer $id
  * @property string $name
- * @property string $content
+ * @property string $link
+ * @property string $state
  */
 class SecRule extends \yii\db\ActiveRecord
 {
@@ -27,7 +28,8 @@ class SecRule extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'content'], 'string', 'max' => 255],
+            [['name', 'link'], 'string', 'max' => 255],
+            [['state'], 'boolean'],
         ];
     }
 
@@ -39,7 +41,8 @@ class SecRule extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Name',
-            'content' => 'Content',
+            'link' => 'Link',
+            'state' => 'State',
         ];
     }
 }
