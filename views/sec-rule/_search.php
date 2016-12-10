@@ -19,7 +19,9 @@ use macgyer\yii2materializecss\widgets\form\ActiveForm;
 
     <?= $form->field($model, 'name') ?>
 
-    <?= $form->field($model, 'content') ?>
+    <?= $form->field($model, 'link') ?>
+    
+    <?= $form->field($model, 'state') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Search', ['class' => 'waves-effect waves-light btn']) ?>
