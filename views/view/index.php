@@ -16,6 +16,12 @@ $this->params['title'] = 'Dashboard';
     <div class="main-actions centered-horizontal">
         <?= Html::a("<i class='material-icons'>add</i>" . Yii::t('app', 'Create View'), ['create'], ['class' => 'btn-floating waves-effect waves-light btn-large red']) ?>
     </div>
+
+    <div class="grid">
+      <div class="blue lighten-4 grid-item">...</div>
+      <div class="blue lighten-4 grid-item width2">...</div>
+      <div class="blue lighten-4 grid-item">...</div>
+    </div>
     
 <?php Pjax::begin(); ?>    <?= GridView::widget([
         'dataProvider' => $dataProvider,

@@ -21,6 +21,8 @@ class AppAsset extends AssetBundle
         'css/site.css',
     ];
     public $js = [
+        'js/packery.min.js',
+        'js/draggabilly.min.js',
         'js/site.js',
     ];
     public $depends = [

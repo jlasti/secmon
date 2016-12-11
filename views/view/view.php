@@ -20,7 +20,7 @@ $this->params['title'] = 'Dashboard: ' . $model->name;
             ],
         ]) ?>
     </div>
-
+    
     <?= PresenterDetailView::widget([
         'model' => $model,
         'attributes' => [

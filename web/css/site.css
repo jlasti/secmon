@@ -140,3 +140,29 @@ button.white-text.btn-flat {
     width: 100%;
     text-align: left;
 }
+
+.grid {
+  width: 100%;
+}
+.grid-item {
+  float: left;
+  width: 60px;
+  height: 60px;
+  border: 1px solid #2196f3 ;
+}
+.grid-item { width: 25%; }
+.grid-item.width2 { width: 50%; }
+/* Draggabilly adds is-dragging */
+.grid-item.is-dragging,
+/* Packery adds class while transitioning to drop position */
+.grid-item.is-positioning-post-drag {
+  background: #C90;
+  z-index: 2; /* keep dragged item on top */
+}
+.packery-drop-placeholder {
+  outline: 3px dashed #444;
+  outline-offset: -6px;
+  /* transition position changing */
+  -webkit-transition: -webkit-transform 0.2s;
+          transition: transform 0.2s;
+}
