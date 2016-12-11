@@ -1,16 +1,16 @@
 <?php
 
-namespace app\models\SecRule;
+namespace app\models\View;
 
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\SecRule;
+use app\models\View;
 
 /**
- * SecRuleSearch represents the model behind the search form about `app\models\SecRule`.
+ * Search represents the model behind the search form about `app\models\View`.
  */
-class SecRuleSearch extends SecRule
+class Search extends View
 {
     /**
      * @inheritdoc
@@ -18,9 +18,8 @@ class SecRuleSearch extends SecRule
     public function rules()
     {
         return [
-            [['id'], 'integer'],
-            [['name', 'link'], 'safe'],
-            [['state'], 'boolean'],
+            [['id', 'user_id', 'active'], 'integer'],
+            [['name'], 'safe'],
         ];
     }
 
@@ -42,7 +41,7 @@ class SecRuleSearch extends SecRule
      */
     public function search($params)
     {
-        $query = SecRule::find();
+        $query = View::find();
 
         // add conditions that should always apply here
 
@@ -61,11 +60,11 @@ class SecRuleSearch extends SecRule
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'user_id' => $this->user_id,
+            'active' => $this->active,
         ]);
 
-        $query->andFilterWhere(['like', 'name', $this->name])
-            ->andFilterWhere(['like', 'link', $this->link])
-            ->andFilterWhere(['state' => $this->state]);
+        $query->andFilterWhere(['like', 'name', $this->name]);
 
         return $dataProvider;
     }

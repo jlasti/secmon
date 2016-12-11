@@ -25,7 +25,8 @@ $this->params['title'] = 'Sec Rules';
 
             'id',
             'name',
-            'content',
+            'link',
+            'state',
 
             ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn'],
         ],
