@@ -58,7 +58,7 @@ a.desc:after {
 }
 
 header, main, footer {
-  margin-left: 300px;
+  margin-left: 250px;
 }
 .no-sidebar > header, .no-sidebar > main, .no-sidebar > footer {
   margin-left: 0;
@@ -102,7 +102,7 @@ main {
     flex: 1 0 auto;
 }
 main > .container {
-    padding-top: 30px;
+    padding-top: 35px;
 }
 .centered-horizontal {
   position: absolute;
