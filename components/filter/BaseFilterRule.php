@@ -68,6 +68,19 @@ abstract class BaseFilterRule extends Component
         return FilterValueTypeEnum::STRING;
     }
 
+    /**
+     * Returns logical operators for filter rules
+     *
+     * @return array
+     */
+    public static function getLogicalOperators()
+    {
+        return [
+            'OR',
+            'AND'
+        ];
+    }
+
 
         /**
 	 * Validation rules applied to \app\models\FilterRule class

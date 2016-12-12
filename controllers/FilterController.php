@@ -141,10 +141,12 @@ class FilterController extends Controller
 			new FilterRule(),
 		];
 
-		$postCount = count(Yii::$app->request->post('FilterRule'));
-		$count = $postCount - count($array);
+//		$postCount = count(Yii::$app->request->post('FilterRule'));
+//		$count = $postCount - count($array);
 
-		for($i = 0; $i < $count; $i++)
+        $count = count(Yii::$app->request->post('FilterRule')) - count($array);
+
+        for($i = 0; $i < $count; $i++)
 		{
 			$array[] = new FilterRule();
 		}
@@ -154,26 +156,26 @@ class FilterController extends Controller
 		 * it means that a single or multiple rules were deleted,
 		 * so slice the array and return only so many rules as defined in POST
 		 */
-		if($rules != null && $count < 0)
-		{
-			$delete = array_slice($array, $postCount);
-
-			$transaction = Yii::$app->db->beginTransaction();
-
-			foreach($delete as $rule)
-			{
-				if(!$rule->delete())
-				{
-					$transaction->rollBack();
-
-					throw new \yii\db\Exception('Cannot delete rule');
-				}
-			}
-
-			$transaction->commit();
-
-			$array = array_slice($array, 0, $postCount);
-		}
+//		if($rules != null && $count < 0)
+//		{
+//			$delete = array_slice($array, $postCount);
+//
+//			$transaction = Yii::$app->db->beginTransaction();
+//
+//			foreach($delete as $rule)
+//			{
+//				if(!$rule->delete())
+//				{
+//					$transaction->rollBack();
+//
+//					throw new \yii\db\Exception('Cannot delete rule');
+//				}
+//			}
+//
+//			$transaction->commit();
+//
+//			$array = array_slice($array, 0, $postCount);
+//		}
 
 		return $array;
 	}
