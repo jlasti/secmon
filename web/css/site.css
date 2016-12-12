@@ -183,3 +183,13 @@ button.white-text.btn-flat {
   -webkit-transition: -webkit-transform 0.2s;
           transition: transform 0.2s;
 }
+/* Line graph axis*/
+.axis--x path {
+    display: none;
+}
+/* Line graph LINE*/
+.line {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 1.5px;
+}

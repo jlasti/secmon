@@ -24,7 +24,8 @@ class AppAsset extends AssetBundle
         'js/packery.min.js',
         'js/draggabilly.min.js',
         'js/site.js',
-        'js/d3.v4.min.js'
+        'js/d3.v4.min.js',
+        'js/customGraphs.js'
     ];
     public $depends = [
         'yii\web\YiiAsset',
