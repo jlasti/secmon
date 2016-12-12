@@ -8,7 +8,7 @@ a.asc:after, a.desc:after {
     position: relative;
     top: 1px;
     display: inline-block;
-    font-family: 'Glyphicons Halflings';
+    font-family: 'Material Icons';
     font-style: normal;
     font-weight: normal;
     line-height: 1;
@@ -16,14 +16,14 @@ a.asc:after, a.desc:after {
 }
 
 a.asc:after {
-    content: /*"\e113"*/ "\e151";
+    content: /*"\e113"*/ "\E5DB";
 }
 
 a.desc:after {
-    content: /*"\e114"*/ "\e152";
+    content: /*"\e114"*/ "\E5D8";
 }
 
-.sort-numerical a.asc:after {
+/*.sort-numerical a.asc:after {
     content: "\e153";
 }
 
@@ -37,7 +37,7 @@ a.desc:after {
 
 .sort-ordinal a.desc:after {
     content: "\e156";
-}
+}*/
 
 .grid-view th {
     white-space: nowrap;
@@ -141,14 +141,33 @@ button.white-text.btn-flat {
     text-align: left;
 }
 
+/*
+ * Draggabilly
+ */
 .grid {
   width: 100%;
 }
 .grid-item {
   float: left;
-  width: 60px;
-  height: 60px;
-  border: 1px solid #2196f3 ;
+  min-width: 60px;
+  min-height: 60px;
+  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+}
+.card .card-content,
+.card .card-reveal{
+  padding: 0;
+}
+.card .card-header,
+.card .card-body{
+  padding: 10px;
+}
+.grid-item .card-header {
+  border-bottom: 1px solid #ddd;
+}
+.grid-item .card-header .card-title {
+  font-size: 1.3rem;
+  line-height: initial;
+  font-weight: normal;
 }
 .grid-item { width: 25%; }
 .grid-item.width2 { width: 50%; }
@@ -156,12 +175,11 @@ button.white-text.btn-flat {
 .grid-item.is-dragging,
 /* Packery adds class while transitioning to drop position */
 .grid-item.is-positioning-post-drag {
-  background: #C90;
+  background-color: rgba(0,0,0,0.05);
   z-index: 2; /* keep dragged item on top */
 }
 .packery-drop-placeholder {
-  outline: 3px dashed #444;
-  outline-offset: -6px;
+  background-color: rgba(0,0,0,0.05);
   /* transition position changing */
   -webkit-transition: -webkit-transform 0.2s;
           transition: transform 0.2s;
