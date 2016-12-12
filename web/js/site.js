@@ -16,10 +16,9 @@ $(function () {
     });
 
     var grid = $('.grid').packery({
-      // options
       itemSelector: '.grid-item',
       gutter: 10,
-      columnWidth: 100
+      columnWidth: 20
     });
 
     // make all items draggable
