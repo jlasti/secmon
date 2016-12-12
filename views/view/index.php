@@ -18,7 +18,9 @@ $this->params['title'] = 'Dashboard';
     </div>
 
     <div class="grid">
-      <div class="blue lighten-4 grid-item">...</div>
+      <div class="blue lighten-4 grid-item">
+          <svg width="960" height="500"></svg>
+      </div>
       <div class="blue lighten-4 grid-item width2">...</div>
       <div class="blue lighten-4 grid-item">...</div>
     </div>
