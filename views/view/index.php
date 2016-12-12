@@ -10,6 +10,7 @@ use yii\widgets\Pjax;
 $this->registerJsFile('@web/js/packery.min.js', ['depends' => 'yii\web\YiiAsset']);
 $this->registerJsFile('@web/js/d3.v4.min.js', ['depends' => 'yii\web\YiiAsset']);
 $this->registerJsFile('@web/js/draggabilly.min.js', ['depends' => 'yii\web\YiiAsset']);
+$this->registerJsFile('@web/js/view.js', ['depends' => 'yii\web\YiiAsset']);
 $this->params['title'] = 'Dashboard';
 ?>
 <div class="view-index">
