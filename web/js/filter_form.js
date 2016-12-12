@@ -52,9 +52,9 @@ function removeRule(element) {
 	var ruleId = el.attr('data-rule-remove');
 	var index = el.attr('data-rule-index');
 	var filterId = el.attr('data-filter-id');
-	if (ruleId != -1) {
-		window.location = 'delete-rule?id='+ filterId +'&ruleId=' + ruleId;
-	} else {
+	// if (ruleId != -1) {
+	// 	window.location = 'delete-rule?id='+ filterId +'&ruleId=' + ruleId;
+	// } else {
 		var rule = $('*[data-rule=\''+ index +'\']');
 		if (rule.length > 0) {
 			rule.remove();
@@ -65,7 +65,7 @@ function removeRule(element) {
 		}
 		else
 			console.log('Failed to found rule ' + index);
-	}
+	// }
 }
 
 function changeRuleIndex(ruleElement, newIndex, removeId) {
