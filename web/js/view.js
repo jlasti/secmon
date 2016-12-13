@@ -1,30 +1,4 @@
-$(function () {
-  /*
-   * Inicializacia boxov.
-   */
-  var grid = $('.grid').packery({
-    itemSelector: '.grid-item',
-    gutter: 10,
-    columnWidth: 20
-  });
 
-  // make all items draggable
-  grid.find('.grid-item').each( function( i, gridItem ) {
-    var draggie = new Draggabilly( gridItem );
-    // bind drag events to Packery
-    grid.packery( 'bindDraggabillyEvents', draggie );
-  });
-
-
-  /*
-    var data =
-   [
-      {"time":"13-07","count":25.24},
-      {"time":"14-07","count":13.24},
-      {"time":"15-07","count":48},
-      {"time":"16-07","count":50}
-   ];
-   */
 
   /*
    * Funckia na vykreslenie ciary grafu
@@ -79,4 +53,32 @@ $(function () {
         .attr("class", "line")
         .attr("d", line);
     }
+
+$(function () {
+  /*
+   * Inicializacia boxov.
+   */
+  var grid = $('.grid').packery({
+    itemSelector: '.grid-item',
+    gutter: 10,
+    columnWidth: 20
+  });
+
+  // make all items draggable
+  grid.find('.grid-item').each( function( i, gridItem ) {
+    var draggie = new Draggabilly( gridItem );
+    // bind drag events to Packery
+    grid.packery( 'bindDraggabillyEvents', draggie );
+  });
+
+
+  /*
+    var data =
+   [
+      {"time":"13-07","count":25.24},
+      {"time":"14-07","count":13.24},
+      {"time":"15-07","count":48},
+      {"time":"16-07","count":50}
+   ];
+   */
 });

@@ -11,6 +11,9 @@ $this->registerJsFile('@web/js/packery.min.js', ['depends' => 'yii\web\YiiAsset'
 $this->registerJsFile('@web/js/d3.v4.min.js', ['depends' => 'yii\web\YiiAsset']);
 $this->registerJsFile('@web/js/draggabilly.min.js', ['depends' => 'yii\web\YiiAsset']);
 $this->registerJsFile('@web/js/view.js', ['depends' => 'yii\web\YiiAsset']);
+
+$this->registerJs(sprintf('$(document).ready(function(){DrawLineGraph(%s);});', $graph), \yii\web\View::POS_END);
+
 $this->params['title'] = 'Dashboard';
 ?>
 <div class="view-index">
@@ -47,9 +50,23 @@ $this->params['title'] = 'Dashboard';
                 <span class="card-title activator grey-text text-darken-4">Second<i class="material-icons right">more_vert</i></span>
             </div>
             <div class="card-body">
-                <p>Obsah hocijaky <a href="#">This is a link</a></p>
-                <p>Obsah hocijaky <a href="#">This is a link</a></p>
-                <p>Obsah hocijaky <a href="#">This is a link</a></p>
+	            <?php Pjax::begin(); ?>
+	            	<?= GridView::widget([
+			            'dataProvider' => $dataProvider,
+			            'filterModel' => $searchModel,
+			            'columns' => [
+			                ['class' => 'yii\grid\SerialColumn'],
+
+			                'id',
+			                'title',
+			                'description:ntext',
+			                'timestamp',
+			                'type_id',
+
+			                ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn'],
+			            ],
+			        ]); ?>
+			    <?php Pjax::end(); ?>
             </div>
         </div>
         <div class="card-reveal">
@@ -83,21 +100,5 @@ $this->params['title'] = 'Dashboard';
         </div>
       </div>
     </div>
-    
-<!--<?php Pjax::begin(); ?>    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
-            'name',
-            'user_id',
-            'active',
-
-            ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn'],
-        ],
-    ]); ?>
-<?php Pjax::end(); ?>*-->
 
 </div>
