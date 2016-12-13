@@ -19,23 +19,13 @@ $(function () {
     grid.packery( 'bindDraggabillyEvents', draggie );
   });
 
-
   dashboard.on('change', function() {
     activeGrid.hide();
     activeGrid = $('#' + this.value);
     activeGrid.show();
   });
+});
 
-
-  /*
-    var data =
-   [
-      {"time":"13-07","count":25.24},
-      {"time":"14-07","count":13.24},
-      {"time":"15-07","count":48},
-      {"time":"16-07","count":50}
-   ];
-   */
 
   /*
    * Funckia na vykreslenie ciary grafu
@@ -90,4 +80,3 @@ $(function () {
         .attr("class", "line")
         .attr("d", line);
     }
-});
