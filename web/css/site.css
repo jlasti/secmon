@@ -62,6 +62,13 @@ body .side-nav {
 header, main, footer {
   margin-left: 250px;
 }
+body footer.page-footer {
+  padding-top: 0px;
+}
+body footer .material-icons {
+  vertical-align: middle;
+  margin-right: 5px;
+}
 .no-sidebar > header, .no-sidebar > main, .no-sidebar > footer {
   margin-left: 0;
 }
@@ -86,12 +93,12 @@ nav .nav-wrapper {
     height: 100%;
 }
 nav.top-nav a.page-title {
-    line-height: 122px;
-    font-size: 48px;
+    line-height: 102px;
+    font-size: 36px;
 }
 nav, nav .nav-wrapper i, nav a.button-collapse, nav a.button-collapse i {
-    height: 122px;
-    line-height: 122px;
+    height: 102px;
+    line-height: 102px;
 }
 body {
     display: flex;
@@ -125,8 +132,8 @@ main > .container {
 }
 
 .side-nav .userView {
-    padding: 20px 32px 0;
-    height: 122px;
+    padding: 1px 32px 0;
+    height: 102px;
 }
 .side-nav .userView .email {
     padding-bottom: 0px;

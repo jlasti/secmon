@@ -6,13 +6,24 @@ $(function () {
     itemSelector: '.grid-item',
     gutter: 10,
     columnWidth: 20
-  });
+  }).hide();
+
+  var dashboard = $('#dashboard');
+  var activeGrid = $('#' + dashboard[0].value);
+  activeGrid.show();
 
   // make all items draggable
   grid.find('.grid-item').each( function( i, gridItem ) {
     var draggie = new Draggabilly( gridItem );
     // bind drag events to Packery
     grid.packery( 'bindDraggabillyEvents', draggie );
+  });
+
+
+  dashboard.on('change', function() {
+    activeGrid.hide();
+    activeGrid = $('#' + this.value);
+    activeGrid.show();
   });
 
 
