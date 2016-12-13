@@ -31,7 +31,7 @@ $this->params['title'] = 'Dashboard';
                 <span class="card-title activator grey-text text-darken-4">First with graph<i class="material-icons right">more_vert</i></span>
             </div>
             <div class="card-body">
-                <svg width="960" height="500"></svg>
+                <svg width="400" height="500"></svg>
             </div>
         </div>
         <div class="card-reveal">

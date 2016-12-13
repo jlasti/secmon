@@ -40,11 +40,12 @@ class ViewController extends Controller
         $searchModel = new EventSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        $graph = Event::find()->select(['time' => 'timestamp', 'count' => 'count(*)'])->groupBy('timestamp')->asArray()->all();
+        $dateExpression = new \yii\db\Expression("DATE_FORMAT(`timestamp`, '%H-%i')");
+
+        $graph = Event::find()->select(['time' => $dateExpression, 'count' => 'count(*)'])->groupBy($dateExpression)->asArray()->all();
 
         $graph = array_map(function($value)
         {
-            $value['time'] = date('H-m', strtotime($value['time']));
             $value['count'] *= rand(1, 5);
 
             return $value;
