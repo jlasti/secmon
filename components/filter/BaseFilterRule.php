@@ -19,6 +19,7 @@ abstract class BaseFilterRule extends Component
 	//region Public attributes
 	public $value;
 	public $operator;
+	public $logic_operator;
 	//endregion
 
 	//region Constructor and init
@@ -75,10 +76,12 @@ abstract class BaseFilterRule extends Component
      */
     public static function getLogicalOperators()
     {
-        return [
+        $operators = [
             'OR',
             'AND'
         ];
+
+        return array_combine($operators, $operators);
     }
 
 

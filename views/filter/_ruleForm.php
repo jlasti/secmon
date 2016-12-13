@@ -47,6 +47,8 @@ if ($rulesCount == $index + 1)
 
     <div class="row<?= $hideLogic ?>" id="logic">
         <?php
+            $index += 1;
+
             echo $form->field($rule, "[$index]logic_operator", [
                 'options' => [ 'class' => 'input-field col m2', 'data-type' => 'global' ]
             ])->dropDownList($logicOperators);
