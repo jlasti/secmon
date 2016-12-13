@@ -93,8 +93,7 @@ function changeRuleIndex(ruleElement, newIndex, removeId) {
 	}
 }
 
-$(document).ready(function()
-{
+$(document).ready(function () {
 	$('#new-rule').click(function() {
 		var rules = $('.rule');
 		var nr = rules.length;
