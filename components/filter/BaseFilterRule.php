@@ -85,7 +85,7 @@ abstract class BaseFilterRule extends Component
     }
 
 
-        /**
+    /**
 	 * Validation rules applied to \app\models\FilterRule class
 	 *
 	 * @return array

@@ -115,6 +115,26 @@ class FilterController extends Controller
         return $this->redirect(['index']);
     }
 
+
+    /**
+     * Deletes rule from filter.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionDeleteRule($id, $ruleId)
+    {
+        //todo - remove rule by $ruleId
+        return $this->redirect(['update', 'id' => $id]);
+    }
+
+    /**
+     * Saves filter model and its rules. Used in update and create
+     *
+     * @param Filter $model Filter to be saved
+     * @param FilterRule[] $rules Filters rules
+     *
+     * @return boolean
+     */
     protected function save($model, $rules)
 	{
 		$loaded = true;
@@ -135,6 +155,13 @@ class FilterController extends Controller
 		return false;
 	}
 
+    /**
+     * Prepares rules from $_POST
+     *
+     * @param FilterRule[] $rules Already existing rules, used in update
+     *
+     * @return FilterRule[]
+     */
     protected function _createRulesArray($rules = null)
 	{
 		$array = $rules ?? [

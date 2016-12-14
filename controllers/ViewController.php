@@ -5,6 +5,8 @@ namespace app\controllers;
 use Yii;
 use app\models\View;
 use app\models\View\Search;
+use app\models\Event\EventSearch;
+use app\models\Event;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -35,12 +37,26 @@ class ViewController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new Search();
+        $searchModel = new EventSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        $dateExpression = new \yii\db\Expression("DATE_FORMAT(`timestamp`, '%H-%i')");
+
+        $graph = Event::find()->select(['time' => $dateExpression, 'count' => 'count(*)'])->groupBy($dateExpression)->asArray()->all();
+
+        $graph = array_map(function($value)
+        {
+            $value['count'] *= rand(1, 5);
+
+            return $value;
+        }, $graph);
+
+        $graph = \yii\helpers\Json::encode($graph);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'graph' => $graph,
         ]);
     }
 

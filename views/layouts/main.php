@@ -91,24 +91,19 @@ $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 </main>
 
 <footer class="page-footer light-blue accent-4">
-	<div class="container">
-        <div class="row">
-		    <div class="col l6 s12">
-		        <h5 class="white-text">Footer Content</h5>
-		        <p class="grey-text text-lighten-4">You can use rows and columns here to organize your footer content.</p>
-		    </div>
-  			<div class="col l4 offset-l2 s12">
-	            <h5 class="white-text">Links</h5>
-	            <ul>
-	              <li><a class="grey-text text-lighten-3" href="https://team14-16.studenti.fiit.stuba.sk/">SecMon</a></li>
-	              <li><a class="grey-text text-lighten-3" href="mailto:talented-otters@googlegroups.com">talented-otters@googlegroups.com</a></li>
-	            </ul>
-          	</div>
-        </div>
-  	</div>
   	<div class="footer-copyright">
 		<div class="container">
-			&copy; Tallented otters <?= date('Y') ?>
+	        <div class="row">
+			    <div class="col l4 s12">
+					&copy; Tallented otters <?= date('Y') ?>
+			    </div>
+	  			<div class="col l4 s12">
+	  				<a class="grey-text text-lighten-3" href="https://team14-16.studenti.fiit.stuba.sk/"><i class="material-icons">insert_link</i>SecMon</a>
+	  			</div>
+	  			<div class="col l4 s12">
+		            <a class="grey-text text-lighten-3" href="mailto:talented-otters@googlegroups.com"><i class="material-icons">mail</i>talented-otters@googlegroups.com</a>
+	          	</div>
+	        </div>
 		</div>
 	</div>
 </footer>

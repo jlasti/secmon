@@ -20,6 +20,13 @@ class Navigation extends \yii\base\Component
 				'icon' => 'event'
 	        ],
 	        [ 
+				'label' => 'Dashboard', 
+				'url' => ['/view'],
+				'visible' => true, 
+				'active' => 'view',
+				'icon' => 'dashboard'
+	        ],
+	        [ 
 				'label' => 'Filters', 
 				'url' => ['/filter'],
 				'visible' => true, 
