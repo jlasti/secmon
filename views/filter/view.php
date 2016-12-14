@@ -35,9 +35,13 @@ $this->params['title'] = 'Filter: ' . $model->name;
 		<tr><th>Rules</th></tr>
 
 		<?php
+        $i = 0;
+
 		foreach($model->rules as $rule)
 		{
-			echo sprintf('<tr><td>%s %s %s</td></tr>', $rule->type, $rule->operator, $rule->value);
+			echo sprintf('<tr><td>%s %s %s %s</td></tr>', $i == 0 ? '' : $rule->logic_operator, $rule->type, $rule->operator, $rule->value);
+
+            $i++;
 		}
 		?>
 	</table>
