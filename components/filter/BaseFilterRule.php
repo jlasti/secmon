@@ -19,6 +19,7 @@ abstract class BaseFilterRule extends Component
 	//region Public attributes
 	public $value;
 	public $operator;
+	public $logic_operator;
 	//endregion
 
 	//region Constructor and init
@@ -66,6 +67,21 @@ abstract class BaseFilterRule extends Component
     public static function getValueType()
     {
         return FilterValueTypeEnum::STRING;
+    }
+
+    /**
+     * Returns logical operators for filter rules
+     *
+     * @return array
+     */
+    public static function getLogicalOperators()
+    {
+        $operators = [
+            'OR',
+            'AND'
+        ];
+
+        return array_combine($operators, $operators);
     }
 
 

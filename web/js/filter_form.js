@@ -10,37 +10,40 @@ function OnFilterTypeChanged(element) {
 			var root = $(e);
 			var type = root.attr('data-type');
 
-			// show/hide root element
-			if (type == newType) {
-				root.removeClass('hide');
-			}
-			else {
-				root.addClass('hide');
-			}
+			if (type != 'global') {
+                // show/hide root element
+                if (type == newType) {
+                    root.removeClass('hide');
+                }
+                else {
+                    root.addClass('hide');
+                }
 
-			// enable/disable and update selects
-			root.find('select').each(function(i, e) {
-				var sel = $(e);
-				if (type == newType){
-					sel.removeAttr('disabled');
-				}
-				else {
-					sel.attr('disabled', 'disabled');
-				}
+				// enable/disable and update selects
+				root.find('select').each(function(i, e) {
+					var sel = $(e);
+					if (type == newType){
+						sel.removeAttr('disabled');
+					}
+					else {
+						sel.attr('disabled', 'disabled');
+					}
 
-				sel.material_select('destroy');
-				sel.material_select();
-			});
-			// enable/disable inputs
-			root.find('input').each(function(i, e) {
-				var input = $(e);
-				if (type == newType) {
-					input.removeAttr('disabled');
-				}
-				else{
-					input.attr('disabled', 'disalbed');
-				}
-			});
+					sel.material_select('destroy');
+					sel.material_select();
+				});
+
+				// enable/disable inputs
+				root.find('input').each(function(i, e) {
+					var input = $(e);
+					if (type == newType) {
+						input.removeAttr('disabled');
+					}
+					else{
+						input.attr('disabled', 'disalbed');
+					}
+				});
+            }
 		});
 	}
 	else
@@ -52,9 +55,9 @@ function removeRule(element) {
 	var ruleId = el.attr('data-rule-remove');
 	var index = el.attr('data-rule-index');
 	var filterId = el.attr('data-filter-id');
-	if (ruleId != -1) {
-		window.location = 'delete-rule?id='+ filterId +'&ruleId=' + ruleId;
-	} else {
+	// if (ruleId != -1) {
+	// 	window.location = 'delete-rule?id='+ filterId +'&ruleId=' + ruleId;
+	// } else {
 		var rule = $('*[data-rule=\''+ index +'\']');
 		if (rule.length > 0) {
 			rule.remove();
@@ -62,10 +65,15 @@ function removeRule(element) {
 			$('#rules').find('.rule').each(function(i, e) {
 				changeRuleIndex(e, index++, -1);
 			});
+
+			// hide last logical operator
+            rule = $('*[data-rule=\''+ (index - 1) +'\']');
+            var ruleLogic = rule.find('#logic');
+            ruleLogic.addClass('hide');
 		}
 		else
 			console.log('Failed to found rule ' + index);
-	}
+	// }
 }
 
 function changeRuleIndex(ruleElement, newIndex, removeId) {
@@ -85,12 +93,18 @@ function changeRuleIndex(ruleElement, newIndex, removeId) {
 	}
 }
 
-$(document).ready(function()
-{
+$(document).ready(function () {
 	$('#new-rule').click(function() {
 		var rules = $('.rule');
 		var nr = rules.length;
 		var newElement = newFilterTemplate.clone();
+
+		var lastRule = $('*[data-rule=\''+ (nr - 1) +'\']');
+		var lastRuleLogic = lastRule.find('#logic');
+		lastRuleLogic.removeClass('hide');
+
+		var newRuleLogic = newElement.find('#logic');
+		newRuleLogic.addClass('hide');
 
 		changeRuleIndex(newElement, nr, -1);
 
@@ -107,6 +121,8 @@ $(document).ready(function()
 			sel.material_select('destroy');
 			sel.material_select();
 		});
+
+		activateDatePicker(newElement);
 	});
 
 	$("#rules").find('select[data-rule-type]').each(function(i, e) {

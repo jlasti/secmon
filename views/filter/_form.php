@@ -1,5 +1,4 @@
 <?php
-
 use yii\helpers\Html;
 use macgyer\yii2materializecss\widgets\form\ActiveForm;
 
@@ -11,11 +10,12 @@ use macgyer\yii2materializecss\widgets\form\ActiveForm;
 $this->registerJsFile('@web/js/filter_form.js', ['depends' => 'yii\web\YiiAsset']);
 
 $types = \app\models\FilterRule::types();
+$rulesCount = count($rules);
+$logicOperators = \app\components\filter\BaseFilterRule::getLogicalOperators();
 $typesDropDown = array_map(function($value) { return $value['name']; }, $types);
 ?>
 
 <div class="filter-form">
-
     <?php $form = ActiveForm::begin(['enableClientValidation' => false]); ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
@@ -23,9 +23,16 @@ $typesDropDown = array_map(function($value) { return $value['name']; }, $types);
 	<div id="rules">
 		<?php
 		foreach($rules as $i => $rule)
-		{
-			echo $this->render('_ruleForm', ['form' => $form, 'rule' => $rule, 'index' => $i, 'types' => $types, 'typesDown' => $typesDropDown, 'model' => $model]);
-		}
+			echo $this->render('_ruleForm', [
+			    'form' => $form,
+                'rule' => $rule,
+                'index' => $i,
+                'types' => $types,
+                'typesDown' => $typesDropDown,
+                'model' => $model,
+                'logicOperators' => $logicOperators,
+                'rulesCount' => $rulesCount
+            ]);
 		?>
 	</div>
 
@@ -38,5 +45,4 @@ $typesDropDown = array_map(function($value) { return $value['name']; }, $types);
     </div>
 
     <?php ActiveForm::end(); ?>
-
 </div>

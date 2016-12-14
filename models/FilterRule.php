@@ -52,6 +52,7 @@ class FilterRule extends \yii\db\ActiveRecord
         return array_merge(
         	$this->type ? call_user_func($this->_getRuleClass() . '::rules') : [],
         	[
+            	['logic_operator', 'safe'],
 				[['filter_id'], 'integer'],
 				[['value'], 'string'],
 				[['type', 'operator'], 'string', 'max' => 255],
@@ -91,6 +92,7 @@ class FilterRule extends \yii\db\ActiveRecord
 			'class' => $this->_getRuleClass(),
 			'operator' => $this->operator,
 			'value' => $this->value,
+			'logic_operator' => $this->logic_operator,
 		];
 
 		return Yii::createObject($params);
