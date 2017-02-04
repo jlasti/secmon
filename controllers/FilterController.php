@@ -115,6 +115,7 @@ class FilterController extends Controller
         return $this->redirect(['index']);
     }
 
+
     /**
      * Deletes rule from filter.
      * @param integer $id
@@ -126,6 +127,14 @@ class FilterController extends Controller
         return $this->redirect(['update', 'id' => $id]);
     }
 
+    /**
+     * Saves filter model and its rules. Used in update and create
+     *
+     * @param Filter $model Filter to be saved
+     * @param FilterRule[] $rules Filters rules
+     *
+     * @return boolean
+     */
     protected function save($model, $rules)
 	{
 		$loaded = true;
@@ -146,18 +155,54 @@ class FilterController extends Controller
 		return false;
 	}
 
+    /**
+     * Prepares rules from $_POST
+     *
+     * @param FilterRule[] $rules Already existing rules, used in update
+     *
+     * @return FilterRule[]
+     */
     protected function _createRulesArray($rules = null)
 	{
 		$array = $rules ?? [
 			new FilterRule(),
 		];
 
-		$count = count(Yii::$app->request->post('FilterRule')) - count($array);
+//		$postCount = count(Yii::$app->request->post('FilterRule'));
+//		$count = $postCount - count($array);
 
-		for($i = 0; $i < $count; $i++)
+        $count = count(Yii::$app->request->post('FilterRule')) - count($array);
+
+        for($i = 0; $i < $count; $i++)
 		{
 			$array[] = new FilterRule();
 		}
+
+		/**
+		 * if rules are already loaded and there are less rules in POST,
+		 * it means that a single or multiple rules were deleted,
+		 * so slice the array and return only so many rules as defined in POST
+		 */
+//		if($rules != null && $count < 0)
+//		{
+//			$delete = array_slice($array, $postCount);
+//
+//			$transaction = Yii::$app->db->beginTransaction();
+//
+//			foreach($delete as $rule)
+//			{
+//				if(!$rule->delete())
+//				{
+//					$transaction->rollBack();
+//
+//					throw new \yii\db\Exception('Cannot delete rule');
+//				}
+//			}
+//
+//			$transaction->commit();
+//
+//			$array = array_slice($array, 0, $postCount);
+//		}
 
 		return $array;
 	}

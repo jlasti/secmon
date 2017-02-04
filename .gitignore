@@ -31,3 +31,4 @@ phpunit.phar
 /secdb/config.ini
 composer.lock
 lastdepoy.txt
+output/

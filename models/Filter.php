@@ -56,7 +56,7 @@ class Filter extends \yii\db\ActiveRecord
      */
     public function getRules()
     {
-        return $this->hasMany(FilterRule::className(), ['filter_id' => 'id']);
+        return $this->hasMany(FilterRule::className(), ['filter_id' => 'id'])->orderBy('position ASC');
     }
 
     /**
@@ -86,9 +86,12 @@ class Filter extends \yii\db\ActiveRecord
 
 		if(parent::save($runValidation, $attributeNames))
 		{
+            $i = 0;
+
 			foreach($this->_rules as $rule)
 			{
 				$rule->filter_id = $this->id;
+                $rule->position = $i;
 
 				if(!$rule->save())
 				{
@@ -96,6 +99,8 @@ class Filter extends \yii\db\ActiveRecord
 
 					return false;
 				}
+
+                $i++;
 			}
 
 			$transaction->commit();
