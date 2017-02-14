@@ -16,51 +16,19 @@ a.asc:after, a.desc:after {
 }
 
 a.asc:after {
-    content: /*"\e113"*/ "\E5DB";
+    content: "\E5DB";
 }
 
 a.desc:after {
-    content: /*"\e114"*/ "\E5D8";
+    content: "\E5D8";
 }
 
-/*.sort-numerical a.asc:after {
-    content: "\e153";
-}
-
-.sort-numerical a.desc:after {
-    content: "\e154";
-}
-
-.sort-ordinal a.asc:after {
-    content: "\e155";
-}
-
-.sort-ordinal a.desc:after {
-    content: "\e156";
-}*/
-
-.grid-view th {
-    white-space: nowrap;
-}
-
-.hint-block {
-    display: block;
-    margin-top: 5px;
-    color: #999;
-}
-
-.error-summary {
-    color: #a94442;
-    background: #fdf7f7;
-    border-left: 3px solid #eed3d7;
-    padding: 10px 20px;
-    margin: 0 0 15px 0;
-}
 body .side-nav {
-    width: 250px;
+  width: 250px;
 }
 header, main, footer {
   margin-left: 250px;
+  transition: all 0.2s ease;
 }
 body footer.page-footer {
   padding-top: 0px;
@@ -77,9 +45,11 @@ body footer .material-icons {
 }
 @media only screen and (max-width : 992px) {
     header, main, footer {
-        margin-left: 0;
+        margin-left: 0 !important;
     }
-
+    .compact-button {
+      display: none;
+    }
     nav .nav-wrapper {
         text-align: center;
     }
@@ -132,21 +102,68 @@ main > .container {
 }
 
 .side-nav .userView {
-    padding: 1px 32px 0;
+    padding: 1px 16px 0;
     height: 102px;
 }
 .side-nav .userView .email {
     padding-bottom: 0px;
 }
+.side-nav > li > a {
+  padding: 0 16px;
+}
+.side-nav.compact {
+    width: 56px !important;
+    transition: all 0.2s ease;
+}
+.side-nav.compact .userView > a,
+.side-nav.compact .subheader {
+    display: none;
+}
 
-button.white-text.btn-flat {
+.side-nav.compact .userView {
+    padding: 0;
+}
+.compact header,
+.compact main,
+.compact footer {
+    margin-left: 56px; 
+    transition: all 0.2s ease;
+}
+.side-nav {
+  transition: all 0.2s ease;
+}
+
+button.white-text.btn-flat.logout-button {
     font-weight: bolder;
     text-transform: none;
     padding: 0 5px;
     margin-top: -20px;
     margin-left: -5px;
-    width: 100%;
+    width: 218px;
     text-align: left;
+}
+button.white-text.btn-flat.logout-button:before {
+    content: "\e879";
+    font-family: 'Material Icons';
+    font-style: normal;
+    font-weight: normal;
+    float: left;
+    font-size: 24px;
+    margin: 0 32px 0 0;
+}
+.side-nav.compact button.white-text.btn-flat.logout-button {
+    margin-top: 64px;
+    padding-left: 22px;
+}
+.compact-button i {
+    position: absolute;
+    top: 33px;
+    color: white;
+    font-size: 36px;
+    outline: 1px solid;
+}
+.compact-button.full i {
+    transform: rotate(180deg);
 }
 
 /*

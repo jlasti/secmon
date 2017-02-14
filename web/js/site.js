@@ -8,6 +8,8 @@ $(function () {
     $('select').material_select();
 
     activateDatePicker();
+
+    $(".compact-button").on("click", _compactBtn_onClick);
 });
 
 function activateDatePicker(element) {
@@ -23,4 +25,11 @@ function activateDatePicker(element) {
         closeOnSelect: true,
         firstDay: 1
     });
+}
+
+function _compactBtn_onClick (e) {
+    event.preventDefault();
+
+    $("body, .side-nav").toggleClass("compact");
+    $(".compact-button").toggleClass("full");
 }
