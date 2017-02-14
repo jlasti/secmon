@@ -30,14 +30,17 @@ $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 <?php $this->beginBody() ?>
 
 <header>
-	  <nav class="top-nav light-blue accent-4">
-		    <div class="container">
-		      	<div class="nav-wrapper">
-		      		<a href="#" data-activates="slide-out" class="button-collapse top-nav full hide-on-large-only"><i class="material-icons">menu</i></a>
-		      		<a class="page-title"><?= isset($this->params['title']) ? $this->params['title'] : '' ?></a>
-		  		</div>
-		    </div>
-	  </nav>
+	<a href="#" data-activates="sidebar-compact" class="compact-button">
+		<i class="material-icons">keyboard_arrow_left</i>
+	</a>
+	<nav class="top-nav light-blue accent-4">
+	    <div class="container">
+	      	<div class="nav-wrapper">
+	      		<a href="#" data-activates="slide-out" class="button-collapse top-nav full hide-on-large-only"><i class="material-icons">menu</i></a>
+	      		<a class="page-title"><?= isset($this->params['title']) ? $this->params['title'] : '' ?></a>
+	  		</div>
+	    </div>
+	</nav>
 </header>
 
 <main>
@@ -56,7 +59,7 @@ $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 						printf("<span>%s</span>", Html::beginForm(['/site/logout'], 'post')
 								. Html::submitButton(
 									'Logout',
-									['class' => 'white-text btn-flat']
+									['class' => 'white-text btn-flat logout-button']
 								)
 								. Html::endForm());
 					?>
