@@ -22,7 +22,6 @@ a.asc:after {
 a.desc:after {
     content: "\E5D8";
 }
-
 body .side-nav {
   width: 250px;
 }
@@ -111,23 +110,27 @@ main > .container {
 .side-nav > li > a {
   padding: 0 16px;
 }
-.side-nav.compact {
+body.compact .side-nav {
     width: 56px !important;
-    transition: all 0.2s ease;
 }
-.side-nav.compact .userView > a,
-.side-nav.compact .subheader {
+body.compact .side-nav .userView > a {
+  visibility: hidden;
+}
+.side-nav .userView > a {
+  white-space: nowrap;
+}
+
+body.compact .side-nav .subheader {
     display: none;
 }
 
-.side-nav.compact .userView {
-    padding: 0;
+body.compact .side-nav .userView {
+    padding: 1px 0;
 }
-.compact header,
-.compact main,
-.compact footer {
+body.compact header,
+body.compact main,
+body.compact footer {
     margin-left: 56px; 
-    transition: all 0.2s ease;
 }
 .side-nav {
   transition: all 0.2s ease;
@@ -138,7 +141,7 @@ button.white-text.btn-flat.logout-button {
     text-transform: none;
     padding: 0 5px;
     margin-top: -20px;
-    margin-left: -5px;
+    margin-left: -21px;
     width: 218px;
     text-align: left;
 }
@@ -149,21 +152,25 @@ button.white-text.btn-flat.logout-button:before {
     font-weight: normal;
     float: left;
     font-size: 24px;
-    margin: 0 32px 0 0;
+    margin: 0 16px;
 }
-.side-nav.compact button.white-text.btn-flat.logout-button {
-    margin-top: 64px;
+body.compact .side-nav button.white-text.btn-flat.logout-button {
     padding-left: 22px;
 }
 .compact-button i {
     position: absolute;
-    top: 33px;
-    color: white;
-    font-size: 36px;
-    outline: 1px solid;
+    top: 36px;
+    color: rgba(0,0,0,0.54);
+    background-color: #fff;
+    font-size: 30px;
+    box-shadow: 1px 2px 4px 0 rgba(0,0,0,0.16), 4px 2px 6px 0 rgba(0,0,0,0.12);
 }
-.compact-button.full i {
+.compact-button i:hover {
+    background-color: #F3F3F3;
+}
+body.compact .compact-button i {
     transform: rotate(180deg);
+    box-shadow: -1px -2px 4px 0 rgba(0,0,0,0.16), -4px -2px 6px 0 rgba(0,0,0,0.12);
 }
 
 /*
@@ -218,4 +225,12 @@ button.white-text.btn-flat.logout-button:before {
     fill: none;
     stroke: steelblue;
     stroke-width: 1.5px;
+}
+
+.preload * {
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  -ms-transition: none !important;
+  -o-transition: none !important;
+  transition: none !important;
 }

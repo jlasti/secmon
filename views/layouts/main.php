@@ -26,12 +26,19 @@ $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 	<?php $this->head() ?>
 </head>
 
-<body class="<?= $isGuest ? 'no-sidebar':'' ?>">
+<body class="<?= $isGuest ? 'no-sidebar':'' ?> preload">
 <?php $this->beginBody() ?>
 
+<script>
+	// Inicializovanie kompaktneho modu sidebaru
+	if (window.localStorage["isCompact"] === "true") {
+		document.body.classList.add("compact");
+	}
+</script>
+
 <header>
-	<a href="#" data-activates="sidebar-compact" class="compact-button">
-		<i class="material-icons">keyboard_arrow_left</i>
+	<a href="#" class="compact-button preload">
+		<i class="material-icons waves-effect">keyboard_arrow_left</i>
 	</a>
 	<nav class="top-nav light-blue accent-4">
 	    <div class="container">
@@ -59,7 +66,7 @@ $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 						printf("<span>%s</span>", Html::beginForm(['/site/logout'], 'post')
 								. Html::submitButton(
 									'Logout',
-									['class' => 'white-text btn-flat logout-button']
+									['class' => 'white-text btn-flat logout-button', 'title' => 'Logout']
 								)
 								. Html::endForm());
 					?>
@@ -80,7 +87,7 @@ $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 					// Bezna polozka menu
 					printf("<li class='%s'>%s</li>",
 						($item['active'] == Yii::$app->controller->id) ? 'active' : '',
-						Html::a("<i class='material-icons'>" . $item['icon'] . "</i>" . $item['label'], $item['url'], $options = ['class' => 'waves-effect' ]));
+						Html::a("<i class='material-icons'>" . $item['icon'] . "</i>" . $item['label'], $item['url'], $options = ['class' => 'waves-effect', 'title' => $item['label']]));
 				}
 			}
 			?>

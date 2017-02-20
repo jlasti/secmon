@@ -1,17 +1,22 @@
 $(function () {
-	// Initialize collapse button
+    // Initialize collapse button
     $('.button-collapse').sideNav({
-	    menuWidth: 250, // Default is 240
-	    draggable: true // Choose whether you can drag to open on touch screens
+        menuWidth: 250, // Default is 240
+        draggable: true // Choose whether you can drag to open on touch screens
     });
-
+    
+    $(".compact-button").on("click", _compactBtn_onClick);
+    // Inicializovanie selectov.
     $('select').material_select();
-
+    // Aktivovanie datepickera
     activateDatePicker();
 
-    $(".compact-button").on("click", _compactBtn_onClick);
+    $("body").removeClass("preload");
 });
 
+/*
+ * Inicializovanie datepickera.
+ */
 function activateDatePicker(element) {
     if (element !== undefined)
         element = $(element).find('.datepicker');
@@ -27,9 +32,14 @@ function activateDatePicker(element) {
     });
 }
 
+/*
+ * Event handler pre zmensenie/zvacsenie siderbaru.
+ */
 function _compactBtn_onClick (e) {
-    event.preventDefault();
-
-    $("body, .side-nav").toggleClass("compact");
-    $(".compact-button").toggleClass("full");
+    event.preventDefault(e);
+    
+    $("body").toggleClass("compact");
+    
+    // ulozenie stavu sidebaru
+    window.localStorage.setItem("isCompact", $("body").hasClass("compact"));
 }
