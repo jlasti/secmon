@@ -35,8 +35,8 @@ function activateDatePicker(element) {
 /*
  * Event handler pre zmensenie/zvacsenie siderbaru.
  */
-function _compactBtn_onClick (e) {
-    event.preventDefault(e);
+function _compactBtn_onClick (event) {
+    event.preventDefault();
     
     $("body").toggleClass("compact");
     
