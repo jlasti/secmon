@@ -10,6 +10,7 @@ use app\models\Event;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\Json;
 
 /**
  * ViewController implements the CRUD actions for View model.
@@ -37,26 +38,20 @@ class ViewController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new EventSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $params = Yii::$app->getRequest()->getQueryParams();
+        $userId = $params['id'];
 
-        $dateExpression = new \yii\db\Expression("DATE_FORMAT(`timestamp`, '%H-%i')");
+        $dashboards = View::findAll(['user_id' => $userId]);
+        $activeViewId = array_filter($dashboards, function($temp) {
+                            return $temp['active'] == 1;
+                        })[0]->getAttribute('id');
 
-        $graph = Event::find()->select(['time' => $dateExpression, 'count' => 'count(*)'])->groupBy($dateExpression)->asArray()->all();
-
-        $graph = array_map(function($value)
-        {
-            $value['count'] *= rand(1, 5);
-
-            return $value;
-        }, $graph);
-
-        $graph = \yii\helpers\Json::encode($graph);
+        $components = View\Component::findAll(['view_id' => $activeViewId]);
 
         return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'graph' => $graph,
+            'dashboards' => Json::encode($dashboards),
+            'activeViewId' => $activeViewId,
+            'components' => Json::encode($components)
         ]);
     }
 
