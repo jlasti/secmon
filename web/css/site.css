@@ -203,6 +203,8 @@ body.compact .compact-button i {
 }
 .grid-item { width: 25%; }
 .grid-item.width2 { width: 50%; }
+.grid-item.width3 { width: 75%; }
+.grid-item.width4 { width: 100%; }
 /* Draggabilly adds is-dragging */
 .grid-item.is-dragging,
 /* Packery adds class while transitioning to drop position */
