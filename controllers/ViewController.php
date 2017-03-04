@@ -35,10 +35,20 @@ class ViewController extends Controller
      */
     public function actionIndex()
     {
-        $params = Yii::$app->getRequest()->getQueryParams();
-        $userId = $params['id'];
+        $userId = Yii::$app->user->getId();
 
         $views = View::findAll(['user_id' => $userId]);
+
+        // No view was created, create default
+        if (count($views) == 0) {
+            $view = new View();
+            $view->name = 'Default';
+            $view->user_id = $userId;
+            $view->active = true;
+            $view->save();
+            array_push($views,$view);
+        }
+
         $activeViewId = array_filter($views, function($temp) {
                             return $temp['active'] == 1;
                         })[0]->getAttribute('id');
@@ -46,7 +56,7 @@ class ViewController extends Controller
         $components = View\Component::findAll(['view_id' => $activeViewId]);
 
         return $this->render('index', [
-            'views' => Json::encode($views),
+            'views' => $views,
             'activeViewId' => $activeViewId,
             'components' => Json::encode($components)
         ]);
@@ -74,7 +84,7 @@ class ViewController extends Controller
         $model = new View();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index']);
         } else {
             return $this->render('create', [
                 'model' => $model,
@@ -93,7 +103,7 @@ class ViewController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index']);
         } else {
             return $this->render('update', [
                 'model' => $model,
@@ -130,12 +140,8 @@ class ViewController extends Controller
         }
     }
 
-    public function actionChangeView()
+    public function actionChangeView($viewId, $activeViewId)
     {
-        $params = Yii::$app->getRequest()->getQueryParams();
-        $viewId = $params['viewId'];
-        $activeViewId = $params['activeViewId'];
-
         $components = $this->getComponentsOfView($viewId);
 
         $this->changeActiveAttributeOfView($viewId, 1);
