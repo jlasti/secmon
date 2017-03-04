@@ -182,7 +182,7 @@ class ViewController extends Controller
         $component = View\Component::findOne($componentId);
         $component->config = $config;
 
-        return $component->update() ? $component->id : false;
+        return !empty($component) ? ($component->update() ? $component->id : false) : false;
     }
 
     public function actionDeleteComponent()
@@ -192,6 +192,6 @@ class ViewController extends Controller
 
         $component = View\Component::findOne($componentId);
 
-        return $component->delete() ? true : false;
+        return !empty($component) ? ($component->delete() ? true : false) : false;
     }
 }
