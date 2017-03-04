@@ -49,9 +49,13 @@ class ViewController extends Controller
             array_push($views,$view);
         }
 
-        $activeViewId = array_filter($views, function($temp) {
-                            return $temp['active'] == 1;
-                        })[0]->getAttribute('id');
+        foreach ($views as $temp)
+        {
+            if ($temp->getAttribute('active') == 1)
+            {
+                $activeViewId = $temp->getAttribute('id');
+            }
+        }
 
         $components = View\Component::findAll(['view_id' => $activeViewId]);
 
@@ -140,12 +144,15 @@ class ViewController extends Controller
         }
     }
 
-    public function actionChangeView($viewId, $activeViewId)
+    public function actionChangeView($viewId)
     {
+        $userId = Yii::$app->user->getId();
         $components = $this->getComponentsOfView($viewId);
+        $activeViewId = View::findOne(['user_id' => $userId, 'active' => 1])->getAttribute('id');
 
         $this->changeActiveAttributeOfView($viewId, 1);
-        $this->changeActiveAttributeOfView($activeViewId, 0);
+
+        if ($activeViewId != $viewId) $this->changeActiveAttributeOfView($activeViewId, 0);
 
         return Json::encode($components);
     }
@@ -166,12 +173,8 @@ class ViewController extends Controller
         return $viewId;
     }
 
-    public function actionCreateComponent()
+    public function actionCreateComponent($viewId, $config)
     {
-        $params = Yii::$app->getRequest()->getQueryParams();
-        $viewId = $params['viewId'];
-        $config = $params['config'];
-
         $component = new View\Component();
         $component->view_id = $viewId;
         $component->config = $config;
@@ -179,23 +182,16 @@ class ViewController extends Controller
         return $component->save() ? $component->id : false;
     }
 
-    public function actionUpdateComponent()
+    public function actionUpdateComponent($componentId, $config)
     {
-        $params = Yii::$app->getRequest()->getQueryParams();
-        $componentId = $params['componentId'];
-        $config = $params['config'];
-
         $component = View\Component::findOne($componentId);
         $component->config = $config;
 
         return !empty($component) ? ($component->update() ? $component->id : false) : false;
     }
 
-    public function actionDeleteComponent()
+    public function actionDeleteComponent($componentId)
     {
-        $params = Yii::$app->getRequest()->getQueryParams();
-        $componentId = $params['componentId'];
-
         $component = View\Component::findOne($componentId);
 
         return !empty($component) ? ($component->delete() ? true : false) : false;
