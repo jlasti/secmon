@@ -10,18 +10,30 @@ $this->params['title'] = 'Login';
 ?>
 <div class="site-login">
 	<div class="row">
+		<div class="col s12 m4 l4">
 			<?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
 
-			<?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
+			<div class="row">
+				<?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
+			</div>
 
-			<?= $form->field($model, 'password')->passwordInput() ?>
+			<div class="row">
+				<?= $form->field($model, 'password')->passwordInput() ?>
+			</div>
 
-			<?= $form->field($model, 'rememberMe')->checkbox() ?>
+			<div class="row">
+				<?= $form->field($model, 'rememberMe')->checkbox() ?>
+			</div>
 
-			<div class="form-group">
-				<?= Html::submitButton(Yii::t('app', 'Login'), ['class' => 'btn waves-effect waves-light', 'name' => 'login-button']) ?>
+			<div class="row"></div>
+				
+			<div class="row">
+				<div class="form-group">
+					<?= Html::submitButton(Yii::t('app', 'Login'), ['class' => 'btn waves-effect waves-light', 'name' => 'login-button']) ?>
+				</div>
 			</div>
 
 			<?php ActiveForm::end(); ?>
+		</div>
 	</div>
 </div>
