@@ -41,15 +41,15 @@ class ViewController extends Controller
         $params = Yii::$app->getRequest()->getQueryParams();
         $userId = $params['id'];
 
-        $dashboards = View::findAll(['user_id' => $userId]);
-        $activeViewId = array_filter($dashboards, function($temp) {
+        $views = View::findAll(['user_id' => $userId]);
+        $activeViewId = array_filter($views, function($temp) {
                             return $temp['active'] == 1;
                         })[0]->getAttribute('id');
 
         $components = View\Component::findAll(['view_id' => $activeViewId]);
 
         return $this->render('index', [
-            'dashboards' => Json::encode($dashboards),
+            'views' => Json::encode($views),
             'activeViewId' => $activeViewId,
             'components' => Json::encode($components)
         ]);
@@ -131,5 +131,35 @@ class ViewController extends Controller
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    public function actionChangeView()
+    {
+        $params = Yii::$app->getRequest()->getQueryParams();
+        $viewId = $params['viewId'];
+        $activeViewId = $params['activeViewId'];
+
+        $components = $this->getComponentsOfView($viewId);
+
+        $this->changeActiveAttributeOfView($viewId, 1);
+        $this->changeActiveAttributeOfView($activeViewId, 0);
+
+        return Json::encode($components);
+    }
+
+    protected function getComponentsOfView($viewId)
+    {
+        $components = View\Component::findAll(['view_id' => $viewId]);
+
+        return $components;
+    }
+
+    protected function changeActiveAttributeOfView($viewId, $active)
+    {
+        $view = View::findOne($viewId);
+        $view->active = $active;
+        $view->update();
+
+        return $viewId;
     }
 }
