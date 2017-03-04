@@ -3,6 +3,8 @@
 namespace app\models\View;
 
 use Yii;
+use app\models\Filter;
+use app\models\View;
 
 /**
  * This is the model class for table "view_components".
@@ -10,13 +12,10 @@ use Yii;
  * @property integer $id
  * @property integer $view_id
  * @property integer $filter_id
- * @property integer $column
- * @property integer $row
- * @property integer $width
- * @property integer $height
+ * @property string $config
  *
- * @property Filters $filter
- * @property Views $view
+ * @property Filter $filter
+ * @property View $view
  */
 class Component extends \yii\db\ActiveRecord
 {
@@ -35,9 +34,10 @@ class Component extends \yii\db\ActiveRecord
     {
         return [
             [['view_id'], 'required'],
-            [['view_id', 'filter_id', 'column', 'row', 'width', 'height'], 'integer'],
-            [['filter_id'], 'exist', 'skipOnError' => true, 'targetClass' => Filters::className(), 'targetAttribute' => ['filter_id' => 'id']],
-            [['view_id'], 'exist', 'skipOnError' => true, 'targetClass' => Views::className(), 'targetAttribute' => ['view_id' => 'id']],
+            [['view_id', 'filter_id'], 'integer'],
+            [['config'], 'string'],
+            [['filter_id'], 'exist', 'skipOnError' => true, 'targetClass' => Filter::className(), 'targetAttribute' => ['filter_id' => 'id']],
+            [['view_id'], 'exist', 'skipOnError' => true, 'targetClass' => View::className(), 'targetAttribute' => ['view_id' => 'id']],
         ];
     }
 
@@ -50,10 +50,7 @@ class Component extends \yii\db\ActiveRecord
             'id' => Yii::t('app', 'ID'),
             'view_id' => Yii::t('app', 'View ID'),
             'filter_id' => Yii::t('app', 'Filter ID'),
-            'column' => Yii::t('app', 'Column'),
-            'row' => Yii::t('app', 'Row'),
-            'width' => Yii::t('app', 'Width'),
-            'height' => Yii::t('app', 'Height'),
+            'config' => Yii::t('app', 'Config')
         ];
     }
 

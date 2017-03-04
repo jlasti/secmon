@@ -4,9 +4,6 @@ namespace app\controllers;
 
 use Yii;
 use app\models\View;
-use app\models\View\Search;
-use app\models\Event\EventSearch;
-use app\models\Event;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -161,5 +158,40 @@ class ViewController extends Controller
         $view->update();
 
         return $viewId;
+    }
+
+    public function actionCreateComponent()
+    {
+        $params = Yii::$app->getRequest()->getQueryParams();
+        $viewId = $params['viewId'];
+        $config = $params['config'];
+
+        $component = new View\Component();
+        $component->view_id = $viewId;
+        $component->config = $config;
+
+        return $component->save() ? $component->id : false;
+    }
+
+    public function actionUpdateComponent()
+    {
+        $params = Yii::$app->getRequest()->getQueryParams();
+        $componentId = $params['componentId'];
+        $config = $params['config'];
+
+        $component = View\Component::findOne($componentId);
+        $component->config = $config;
+
+        return $component->update() ? $component->id : false;
+    }
+
+    public function actionDeleteComponent()
+    {
+        $params = Yii::$app->getRequest()->getQueryParams();
+        $componentId = $params['componentId'];
+
+        $component = View\Component::findOne($componentId);
+
+        return $component->delete() ? true : false;
     }
 }
