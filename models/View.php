@@ -4,7 +4,7 @@ namespace app\models;
 
 use Yii;
 use app\models\View\Component;
-use app\models\user;
+use app\models\User;
 
 /**
  * This is the model class for table "views".
