@@ -58,10 +58,11 @@ class ViewController extends Controller
         }
 
         // no active view was found, select default view returned by reset
-        if (!isset($activeViewId) && reset($views))
+        if (!isset($activeViewId) && !empty($views))
         {
-            reset($views)->active = 1;
-            reset($views)->save();
+            $defaultView = reset($views);
+            $defaultView->active = 1;
+            $defaultView->save();
         }
 
         return $this->render('index', [
@@ -94,12 +95,12 @@ class ViewController extends Controller
         // setting currently active view to false
         $userId = Yii::$app->user->getId();
         $views = View::findAll(['user_id' => $userId]);
-        foreach ($views as $temp)
+        foreach ($views as $view)
         {
-            if ($temp->getAttribute('active') == 1)
+            if ($view->getAttribute('active') == 1)
             {
-                $temp->active = 0;
-                $temp->save();
+                $view->active = 0;
+                $view->save();
             }
         }
 
