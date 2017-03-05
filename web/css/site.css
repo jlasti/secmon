@@ -212,6 +212,11 @@ body.compact .compact-button i {
   background-color: rgba(0,0,0,0.05);
   z-index: 2; /* keep dragged item on top */
 }
+
+.grid-item.card .card-body {
+    min-height: 300px;
+    overflow: hidden;
+}
 .packery-drop-placeholder {
   background-color: rgba(0,0,0,0.05);
   /* transition position changing */

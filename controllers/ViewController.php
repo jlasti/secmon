@@ -125,22 +125,6 @@ class ViewController extends Controller
         return $this->redirect(['index']);
     }
 
-    /**
-     * Finds the View model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return View the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = View::findOne($id)) !== null) {
-            return $model;
-        } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
-        }
-    }
-
     public function actionChangeView($viewId)
     {
         $userId = Yii::$app->user->getId();
@@ -152,22 +136,6 @@ class ViewController extends Controller
         if ($activeViewId != $viewId) $this->changeActiveAttributeOfView($activeViewId, 0);
 
         return Json::encode($components);
-    }
-
-    protected function getComponentsOfView($viewId)
-    {
-        $components = View\Component::findAll(['view_id' => $viewId]);
-
-        return $components;
-    }
-
-    protected function changeActiveAttributeOfView($viewId, $active)
-    {
-        $view = View::findOne($viewId);
-        $view->active = $active;
-        $view->update();
-
-        return $viewId;
     }
 
     public function actionCreateComponent($viewId, $config)
@@ -192,5 +160,39 @@ class ViewController extends Controller
         $component = View\Component::findOne($componentId);
 
         return !empty($component) ? ($component->delete() ? true : false) : false;
+    }
+
+
+
+    /**
+     * Finds the View model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return View the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id)
+    {
+        if (($model = View::findOne($id)) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+    }
+
+    protected function getComponentsOfView($viewId)
+    {
+        $components = View\Component::findAll(['view_id' => $viewId]);
+
+        return $components;
+    }
+
+    protected function changeActiveAttributeOfView($viewId, $active)
+    {
+        $view = View::findOne($viewId);
+        $view->active = $active;
+        $view->update();
+
+        return $viewId;
     }
 }
