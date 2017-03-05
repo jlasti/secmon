@@ -44,7 +44,7 @@ class ViewController extends Controller
             $view = new View();
             $view->name = 'Default';
             $view->user_id = $userId;
-            $view->active = true;
+            $view->active = 1;
             $view->save();
             array_push($views,$view);
         }
@@ -55,6 +55,13 @@ class ViewController extends Controller
             {
                 $activeViewId = $temp->getAttribute('id');
             }
+        }
+
+        // no active view was found, select default view returned by reset
+        if (!isset($activeViewId) && reset($views))
+        {
+            reset($views)->active = 1;
+            reset($views)->save();
         }
 
         return $this->render('index', [
@@ -83,6 +90,18 @@ class ViewController extends Controller
     public function actionCreate()
     {
         $model = new View();
+
+        // setting currently active view to false
+        $userId = Yii::$app->user->getId();
+        $views = View::findAll(['user_id' => $userId]);
+        foreach ($views as $temp)
+        {
+            if ($temp->getAttribute('active') == 1)
+            {
+                $temp->active = 0;
+                $temp->save();
+            }
+        }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index']);
@@ -125,9 +144,23 @@ class ViewController extends Controller
         return $this->redirect(['index']);
     }
 
+    /**
+     * Change of currently selected view to one selected from drop down with views.
+     *
+     * @param $viewId - id of currently selected view
+     * @return $components - components of new selected view
+     */
     public function actionChangeView($viewId)
     {
         $userId = Yii::$app->user->getId();
+
+        // requested view does not exist
+        $view = View::findOne(['user_id' => $userId, 'id' => $viewId]);
+        if (empty($view))
+        {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
         $components = $this->getComponentsOfView($viewId);
         $activeViewId = View::findOne(['user_id' => $userId, 'active' => 1])->getAttribute('id');
 
@@ -162,8 +195,6 @@ class ViewController extends Controller
         return !empty($component) ? ($component->delete() ? true : false) : false;
     }
 
-
-
     /**
      * Finds the View model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
@@ -187,6 +218,13 @@ class ViewController extends Controller
         return $components;
     }
 
+    /**
+     * Change attribute active for view.
+     *
+     * @param $viewId - id of view for attribute change
+     * @param $active - attribute active - 0/1
+     * @return $viewId - id of view for attribute change
+     */
     protected function changeActiveAttributeOfView($viewId, $active)
     {
         $view = View::findOne($viewId);
