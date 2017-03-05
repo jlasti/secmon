@@ -36,7 +36,7 @@ class ViewController extends Controller
     public function actionIndex()
     {
         $userId = Yii::$app->user->getId();
-
+        $activeViewId = null;
         $views = View::findAll(['user_id' => $userId]);
 
         // No view was created, create default
@@ -57,12 +57,9 @@ class ViewController extends Controller
             }
         }
 
-        $components = View\Component::findAll(['view_id' => $activeViewId]);
-
         return $this->render('index', [
             'views' => $views,
-            'activeViewId' => $activeViewId,
-            'components' => Json::encode($components)
+            'activeViewId' => $activeViewId
         ]);
     }
 
