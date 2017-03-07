@@ -4,14 +4,41 @@
   $options =  Json::decode($component->config);
   printf("<div class='grid-item card %s' id='component_%s'>", $options['width'], $component->id);
         ?>
-
+                <!--Main content of component-->
                 <div class="card-content">
                     <div class="card-header">
                         <span class="card-title activator grey-text text-darken-4"><?php  echo $options['name']; ?><i class="material-icons right">more_vert</i></span>
                     </div>
                     <div class="card-body">
+
+                        <!--If no filter was added to component-->
+                        <?php if ($component->filter_id == null): ?>
+                        <div class="section center-align">
+                            <a class="waves-effect waves-light btn-large" <?php printf("href='#modal%s'", $component->id) ?>><i class="material-icons right">add_circle_outline</i>Add content</a>
+
+                            <!-- Modal Structure -->
+                            <div class="modal" <?php printf("id='modal%s'", $component->id) ?> >
+                                <div class="modal-content">
+                                    <h4>Content settings</h4>
+                                    <div class="row">
+                                        <div class="col s12">
+                                            <select>
+                                                <option value="1">Filter 1</option>
+                                            </select>
+                                            <label>Filter Select</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Save</a>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endif; ?>
                     </div>
                 </div>
+
+                <!--Component options-->
                 <div class="card-reveal">
                     <div class="card-header light-blue accent-4">
                         <span class="card-title white-text"><?php  echo $options['name']; ?> - options<i class="material-icons right">close</i></span>
