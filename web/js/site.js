@@ -8,6 +8,7 @@ $(function () {
     $(".compact-button").on("click", _compactBtn_onClick);
     // Inicializovanie selectov.
     $('select').material_select();
+    $('.modal').modal();
     // Aktivovanie datepickera
     activateDatePicker();
 

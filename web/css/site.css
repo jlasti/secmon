@@ -32,6 +32,9 @@ header, main, footer {
 body footer.page-footer {
   padding-top: 0px;
 }
+body footer.page-footer .row {
+  margin-bottom: 0px;
+}
 body footer .material-icons {
   vertical-align: middle;
   margin-right: 5px;
@@ -64,6 +67,16 @@ nav .nav-wrapper {
 nav.top-nav a.page-title {
     line-height: 102px;
     font-size: 36px;
+}
+nav.top-nav a.page-title .col {
+    padding-top: 27px;
+}
+nav.top-nav a.page-title .select-wrapper input {
+    font-size: 36px;    
+    border-bottom: 1px solid #fff;
+}
+nav.top-nav a.page-title .select-wrapper .caret {
+    color: #fff;
 }
 nav, nav .nav-wrapper i, nav a.button-collapse, nav a.button-collapse i {
     height: 102px;
@@ -203,12 +216,19 @@ body.compact .compact-button i {
 }
 .grid-item { width: 25%; }
 .grid-item.width2 { width: 50%; }
+.grid-item.width3 { width: 75%; }
+.grid-item.width4 { width: 100%; }
 /* Draggabilly adds is-dragging */
 .grid-item.is-dragging,
 /* Packery adds class while transitioning to drop position */
 .grid-item.is-positioning-post-drag {
   background-color: rgba(0,0,0,0.05);
   z-index: 2; /* keep dragged item on top */
+}
+
+.grid-item.card .card-body {
+    min-height: 300px;
+    overflow: hidden;
 }
 .packery-drop-placeholder {
   background-color: rgba(0,0,0,0.05);

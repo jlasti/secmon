@@ -29,17 +29,21 @@ $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 <body class="<?= $isGuest ? 'no-sidebar':'' ?> preload">
 <?php $this->beginBody() ?>
 
-<script>
-	// Inicializovanie kompaktneho modu sidebaru
-	if (window.localStorage["isCompact"] === "true") {
-		document.body.classList.add("compact");
-	}
-</script>
+<?php if(!$isGuest): ?>
+	<script>
+		// Inicializovanie kompaktneho modu sidebaru
+		if (window.localStorage["isCompact"] === "true") {
+			document.body.classList.add("compact");
+		}
+	</script>
+<?php endif; ?>
 
 <header>
-	<a href="#" class="compact-button preload">
-		<i class="material-icons waves-effect">keyboard_arrow_left</i>
-	</a>
+	<?php if(!$isGuest): ?>
+		<a href="#" class="compact-button preload">
+			<i class="material-icons waves-effect">keyboard_arrow_left</i>
+		</a>
+	<?php endif; ?>
 	<nav class="top-nav light-blue accent-4">
 	    <div class="container">
 	      	<div class="nav-wrapper">
