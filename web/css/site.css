@@ -32,6 +32,9 @@ header, main, footer {
 body footer.page-footer {
   padding-top: 0px;
 }
+body footer.page-footer .row {
+  margin-bottom: 0px;
+}
 body footer .material-icons {
   vertical-align: middle;
   margin-right: 5px;
@@ -64,6 +67,16 @@ nav .nav-wrapper {
 nav.top-nav a.page-title {
     line-height: 102px;
     font-size: 36px;
+}
+nav.top-nav a.page-title .col {
+    padding-top: 27px;
+}
+nav.top-nav a.page-title .select-wrapper input {
+    font-size: 36px;    
+    border-bottom: 1px solid #fff;
+}
+nav.top-nav a.page-title .select-wrapper .caret {
+    color: #fff;
 }
 nav, nav .nav-wrapper i, nav a.button-collapse, nav a.button-collapse i {
     height: 102px;

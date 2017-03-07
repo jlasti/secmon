@@ -21,6 +21,7 @@ $(function () {
 
 
     //#region [ Methods ]
+    
     if (typeof (global.views) !== "function") {
         global.views = function (args) {
             $.extend(options, args || {});
@@ -89,7 +90,7 @@ $(function () {
         var selectNode = $(this);
         var gridItemNode = $("#" + selectNode.attr('data-id'));
         gridItemNode.attr('class', 'grid-item card ' + this.value);
-        grid.packery( 'fit', gridItemNode[0]);
+        grid.packery('fit', gridItemNode[0]);
     };
 
     /*
@@ -106,7 +107,18 @@ $(function () {
                 })
             },
         }).done(function (data) {
-            window.location.reload(true);
+            if (!data) {
+                Materialize.toast("Couldn't add component.", 4000);
+                return;
+            }
+
+            var gridItemNode = $(data.html);
+            activeGrid
+                .append(gridItemNode)
+                .packery( 'appended', gridItemNode );
+
+            var draggie = new Draggabilly( gridItemNode[0] );
+            activeGrid.packery( 'bindDraggabillyEvents', draggie );
         });
     };
 
@@ -114,13 +126,20 @@ $(function () {
      * Event handler pre vymazanie komponentu
      */
     function deleteComponentBtn_onClick (e) {
+        var componentId = $(this).attr('data-id');
+        
         $.ajax({
             url: hostUrl + options.deleteComponent,
             data : { 
-                componentId : $(this).attr('data-id')
+                componentId : componentId
             },
         }).done(function (data) {
-            window.location.reload(true);
+            if (!data) {
+                Materialize.toast("Couldn't delete component.", 4000);
+                return;
+            }
+
+            activeGrid.packery('remove', $("#component_" + componentId));
         });
     };
 
@@ -142,6 +161,11 @@ $(function () {
                 })
             },
         }).done(function (data) {
+            if (!data) {
+                Materialize.toast("Couldn't update component.", 4000);
+                return;
+            }
+
             window.location.reload(true);
         });
 

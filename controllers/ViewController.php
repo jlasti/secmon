@@ -48,7 +48,7 @@ class ViewController extends Controller
             $view->save();
             array_push($views,$view);
         }
-
+       
         foreach ($views as $temp)
         {
             if ($temp->getAttribute('active') == 1)
@@ -174,11 +174,21 @@ class ViewController extends Controller
 
     public function actionCreateComponent($viewId, $config)
     {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
         $component = new View\Component();
         $component->view_id = $viewId;
         $component->config = $config;
 
-        return $component->save() ? $component->id : false;
+        if($component->save())
+        {
+            return [
+                'html' => \app\widgets\ComponentWidget::widget(['data' => compact('component')]),
+                'id' => $component->id,
+            ];
+         }
+
+         return false;
     }
 
     public function actionUpdateComponent($componentId, $config)
