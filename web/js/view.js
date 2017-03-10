@@ -59,6 +59,9 @@ $(function () {
             addComponentBtn.on('click', addComponentBtn_onClick);
             deleteComponentBtn.on('click', deleteComponentBtn_onClick);
             componentForm.on('submit', componentForm_onSubmit);
+
+            // Show grid after js inicialization
+            $('.grid').removeClass("invisible");
         }
     };
 
@@ -116,9 +119,13 @@ $(function () {
             activeGrid
                 .append(gridItemNode)
                 .packery( 'appended', gridItemNode );
-
+            
+            // Inicializacia noveho grid itemu
             var draggie = new Draggabilly( gridItemNode[0] );
             activeGrid.packery( 'bindDraggabillyEvents', draggie );
+            gridItemNode.find('select').material_select();
+            gridItemNode.find('select.widthSelect').on("change", widthSelect_onChange);
+            gridItemNode.find('.modal').modal();
         });
     };
 

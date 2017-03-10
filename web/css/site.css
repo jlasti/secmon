@@ -214,8 +214,8 @@ body.compact .compact-button i {
   line-height: initial;
   font-weight: normal;
 }
-.grid-item { width: 25%; }
-.grid-item.width2 { width: 50%; }
+.grid-item { width: 24%; }
+.grid-item.width2 { width: 49%; }
 .grid-item.width3 { width: 75%; }
 .grid-item.width4 { width: 100%; }
 /* Draggabilly adds is-dragging */
@@ -253,4 +253,8 @@ body.compact .compact-button i {
   -ms-transition: none !important;
   -o-transition: none !important;
   transition: none !important;
+}
+
+.invisible {
+    visibility: hidden;
 }
