@@ -60,7 +60,8 @@ class View extends \yii\db\ActiveRecord
      */
     public function getViewComponents()
     {
-        return $this->hasMany(Component::className(), ['view_id' => 'id']);
+        return $this->hasMany(Component::className(), ['view_id' => 'id'])
+                    ->orderBy(['order' => SORT_ASC]);
     }
 
     /**

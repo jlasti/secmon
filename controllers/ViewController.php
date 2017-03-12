@@ -31,6 +31,7 @@ class ViewController extends Controller
 
     /**
      * Lists all View models.
+     *
      * @return mixed
      */
     public function actionIndex()
@@ -73,6 +74,7 @@ class ViewController extends Controller
 
     /**
      * Displays a single View model.
+     *
      * @param integer $id
      * @return mixed
      */
@@ -86,6 +88,7 @@ class ViewController extends Controller
     /**
      * Creates a new View model.
      * If creation is successful, the browser will be redirected to the 'view' page.
+     *
      * @return mixed
      */
     public function actionCreate()
@@ -116,6 +119,7 @@ class ViewController extends Controller
     /**
      * Updates an existing View model.
      * If update is successful, the browser will be redirected to the 'view' page.
+     *
      * @param integer $id
      * @return mixed
      */
@@ -135,6 +139,7 @@ class ViewController extends Controller
     /**
      * Deletes an existing View model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
+     *
      * @param integer $id
      * @return mixed
      */
@@ -172,13 +177,14 @@ class ViewController extends Controller
         return Json::encode($components);
     }
 
-    public function actionCreateComponent($viewId, $config)
+    public function actionCreateComponent($viewId, $config, $order)
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
         $component = new View\Component();
         $component->view_id = $viewId;
         $component->config = $config;
+        $component->order = $order;
 
         if($component->save())
         {
@@ -207,11 +213,27 @@ class ViewController extends Controller
     }
 
     /*
-     * Updates order of components in view
+     * Updates order of components in view.
      */ 
-    public function actionUpdateOrder($viewId, $componentOrder)
+    public function actionUpdateOrderOfComponents($viewId, $componentOrder)
     {
-        //$order je JSON vo formate [{id = 12,  order = 1}, {id = 13, order = 2}]
+        $userId = Yii::$app->user->getId();
+        $componentOrder = Json::decode($componentOrder);
+        $view = View::findOne(['id' => $viewId]);;
+
+        // if view not exist or not belong to logged user
+        if ( empty($view) || $view->user_id != $userId ) return null;
+
+        foreach ( $componentOrder as $value )
+        {
+            $component =  View\Component::findOne(['id' => $value['id'], 'view_id' => $viewId]);
+
+            if ( !empty($component) )
+            {
+                $component->order = $value['order'];
+                $component->update();
+            }
+        }
 
         return true;
     }
@@ -219,6 +241,7 @@ class ViewController extends Controller
     /**
      * Finds the View model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
+     *
      * @param integer $id
      * @return View the loaded model
      * @throws NotFoundHttpException if the model cannot be found
