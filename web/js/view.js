@@ -59,6 +59,7 @@ $(function () {
             addComponentBtn.on('click', addComponentBtn_onClick);
             deleteComponentBtn.on('click', deleteComponentBtn_onClick);
             componentForm.on('submit', componentForm_onSubmit);
+            grid.on( 'dragItemPositioned', saveOrder_onDragItemPositioned );
 
             // Show grid after js inicialization
             $('.grid').removeClass("invisible");
@@ -147,6 +148,32 @@ $(function () {
             }
 
             activeGrid.packery('remove', $("#component_" + componentId));
+        });
+    };
+
+    /*
+     * Event handler pre ulozenie poradia komponentov
+     */
+    function saveOrder_onDragItemPositioned (e) {
+        var itemElems = activeGrid.packery('getItemElements');
+        var order = itemElems.map(function (item, index) {
+            return {
+                id: item.id.replace("component_", ""),
+                order: index
+            }
+        });
+
+        $.ajax({
+            url: hostUrl + options.updateOrder,
+            data : { 
+                viewId : dashboardSelect.val(),
+                componentOrder : JSON.stringify(order)
+            },
+        }).done(function (data) {
+            if (!data) {
+                Materialize.toast("Couldn't update order of components.", 4000);
+                return;
+            }
         });
     };
 
