@@ -7,7 +7,7 @@
                 <!--Main content of component-->
                 <div class="card-content">
                     <div class="card-header">
-                        <span class="card-title activator grey-text text-darken-4"><?php  echo $options['name']; ?><i class="material-icons right">more_vert</i></span>
+                        <span class="card-title activator grey-text text-darken-4"><span class="nameTitle"><?php  echo $options['name']; ?></span><i class="material-icons right">more_vert</i></span>
                     </div>
                     <div class="card-body">
 
@@ -41,13 +41,13 @@
                 <!--Component options-->
                 <div class="card-reveal">
                     <div class="card-header light-blue accent-4">
-                        <span class="card-title white-text"><?php  echo $options['name']; ?> - options<i class="material-icons right">close</i></span>
+                        <span class="card-title white-text"><span class="nameTitle"><?php  echo $options['name']; ?></span> - options<i class="material-icons right">close</i></span>
                     </div>
                     <div class="card-body">
                         <form class="row componentForm"  data-id="<?php  echo $component->id; ?>">
                             <div class="input-field col s12">
                                 <label class="active" for="name">Name</label>
-                                <input onfocus="this.select();" onmouseup="return false;" id="name<?php  echo $component->id; ?>" type="text" value="<?php  echo $options['name']; ?>">
+                                <input class="nameInput" data-id="component_<?php  echo $component->id; ?>" onfocus="this.select();" onmouseup="return false;" id="name<?php  echo $component->id; ?>" type="text" value="<?php  echo $options['name']; ?>">
                             </div>
 
                             <div class="input-field col s12">
@@ -64,10 +64,6 @@
                                 <button type="button" class="deleteComponentBtn btn waves-effect waves-light red" data-id="<?php  echo $component->id; ?>">
                                     Delete
                                     <i class="material-icons right">delete</i>
-                                </button>
-                                <button class="btn waves-effect waves-light green" type="submit">
-                                    Save
-                                    <i class="material-icons right">save</i>
                                 </button>
                             </div>
                         </form>

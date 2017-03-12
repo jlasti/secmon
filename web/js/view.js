@@ -35,6 +35,7 @@ $(function () {
             addComponentBtn = $("#addComponentBtn");
             deleteComponentBtn = $(".deleteComponentBtn");
             componentForm = $(".componentForm");
+            nameInputs = $(".nameInput");
 
             // Inicializacia boxov.
             grid = $('.grid').packery({
@@ -60,6 +61,7 @@ $(function () {
             deleteComponentBtn.on('click', deleteComponentBtn_onClick);
             componentForm.on('submit', componentForm_onSubmit);
             grid.on( 'dragItemPositioned', saveOrder_onDragItemPositioned );
+            nameInputs.on('focusout blur', name_onFocusOut);
 
             // Show grid after js inicialization
             $('.grid').removeClass("invisible");
@@ -95,6 +97,7 @@ $(function () {
         var gridItemNode = $("#" + selectNode.attr('data-id'));
         gridItemNode.attr('class', 'grid-item card ' + this.value);
         grid.packery('fit', gridItemNode[0]);
+        gridItemNode.find("form").submit();
     };
 
     /*
@@ -178,6 +181,16 @@ $(function () {
     };
 
     /*
+     * Event handler pre zmenu mena komponentu
+     */
+    function name_onFocusOut (e) {
+        var input = $(this);
+        var gridItemNode = $("#" + input.attr('data-id'));
+        gridItemNode.find(".nameTitle").html(input.val());
+        gridItemNode.find("form").submit();
+    }
+
+    /*
      * Event handler pre update komponentu
      */
     function componentForm_onSubmit (e) {
@@ -199,8 +212,6 @@ $(function () {
                 Materialize.toast("Couldn't update component.", 4000);
                 return;
             }
-
-            window.location.reload(true);
         });
 
         return false;
