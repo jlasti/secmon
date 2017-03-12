@@ -206,6 +206,16 @@ class ViewController extends Controller
         return !empty($component) ? ($component->delete() ? true : false) : false;
     }
 
+    /*
+     * Updates order of components in view
+     */ 
+    public function actionUpdateOrder($viewId, $componentOrder)
+    {
+        //$order je JSON vo formate [{id = 12,  order = 1}, {id = 13, order = 2}]
+
+        return true;
+    }
+
     /**
      * Finds the View model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.

@@ -20,12 +20,14 @@ $this->registerJs(
                 changeView: '%s',
                 createComponent: '%s',
                 deleteComponent: '%s',
-                updateComponent: '%s'
+                updateComponent: '%s',
+                updateOrder: '%s'
             });",
             Url::to(["view/change-view"]),
             Url::to(["view/create-component"]),
             Url::to(["view/delete-component"]),
-            Url::to(["view/update-component"])
+            Url::to(["view/update-component"]),
+            Url::to(["view/update-order"])
         )
 );
 
