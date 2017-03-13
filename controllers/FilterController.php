@@ -9,6 +9,7 @@ use app\models\Filter\FilterSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\Json;
 
 /**
  * FilterController implements the CRUD actions for Filter model.
@@ -128,6 +129,11 @@ class FilterController extends Controller
     }
 
     public function actionGetFiltersOfUser($userId)
+    {
+        return Json::encode(self::getFiltersOfUser($userId));
+    }
+
+    public static function getFiltersOfUser($userId)
     {
         $loggedUserId = Yii::$app->user->getId();
 
