@@ -21,13 +21,17 @@ $this->registerJs(
                 createComponent: '%s',
                 deleteComponent: '%s',
                 updateComponent: '%s',
-                updateOrder: '%s'
+                updateOrder: '%s',
+                updateComponentSettings: '%s',
+                deleteComponentSettings: '%s'
             });",
             Url::to(["view/change-view"]),
             Url::to(["view/create-component"]),
             Url::to(["view/delete-component"]),
             Url::to(["view/update-component"]),
-            Url::to(["view/update-order-of-components"])
+            Url::to(["view/update-order-of-components"]),
+            Url::to(["view/remove-filter-from-component"]),
+            Url::to(["view/add-filter-to-component"])
         )
 );
 
