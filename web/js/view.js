@@ -13,6 +13,8 @@ $(function () {
     var grid;
     var deleteComponentBtn;
     var componentForm;
+    var saveContentBtn;
+    var deleteContentBtn;
 
     var hostUrl;
     var newComponentName = "New Component";
@@ -35,7 +37,11 @@ $(function () {
             addComponentBtn = $("#addComponentBtn");
             deleteComponentBtn = $(".deleteComponentBtn");
             componentForm = $(".componentForm");
+            saveContentBtn = $("#saveComponentContentBtn");
+            deleteContentBtn = $("#removeComponentContentBtn");
             nameInputs = $(".nameInput");
+
+
 
             // Inicializacia boxov.
             grid = $('.grid').packery({
@@ -61,6 +67,8 @@ $(function () {
             deleteComponentBtn.on('click', deleteComponentBtn_onClick);
             componentForm.on('submit', componentForm_onSubmit);
             grid.on( 'dragItemPositioned', saveOrder_onDragItemPositioned );
+            saveContentBtn.on('click', saveContentBtn_onClick);
+            deleteContentBtn.on('click', deleteContentBtn_onClick)
             nameInputs.on('focusout blur', name_onFocusOut);
 
             // Show grid after js inicialization
@@ -72,6 +80,34 @@ $(function () {
 
 
     //#region [ Event Handlers ]
+
+    /*
+     * Event handler na ulozenie konfiguracie obsahu
+     */
+    function saveContentBtn_onClick() {
+         var compId = $(this).attr('data-id');
+         var data = $('#contentSettingsForm' + compId).serialize();
+         $.ajax({
+             url: hostUrl + options.updateComponentSettings,
+             data: data
+         }).done(function(html) {
+             $("#componentContentBody" + compId).html(html);
+         });
+    }
+
+    /*
+     * Event handler na vymazanie konfiguracie obsahu
+     */
+    function deleteContentBtn_onClick() {
+        var compId = $(this).attr('data-id');
+        var data = $('#contentSettingsForm' + compId).serialize();
+        $.ajax({
+            url: hostUrl + options.deleteComponentSettings,
+            data: data
+        }).done(function(html) {
+            $("#componentContentBody" + compId).html(html);
+        });
+    }
 
     /*
      * Event handler na zmenu dashboardu
@@ -111,7 +147,8 @@ $(function () {
                 config : JSON.stringify({
                     name: newComponentName,
                     width: '',
-                })
+                }),
+                order : 0
             },
         }).done(function (data) {
             if (!data) {
@@ -129,7 +166,6 @@ $(function () {
             activeGrid.packery( 'bindDraggabillyEvents', draggie );
             gridItemNode.find('select').material_select();
             gridItemNode.find('select.widthSelect').on("change", widthSelect_onChange);
-            gridItemNode.find('.nameInput').on('focusout blur', name_onFocusOut);
             gridItemNode.find('.modal').modal();
         });
     };
