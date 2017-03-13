@@ -127,6 +127,17 @@ class FilterController extends Controller
         return $this->redirect(['update', 'id' => $id]);
     }
 
+    public function actionGetFiltersOfUser($userId)
+    {
+        $loggedUserId = Yii::$app->user->getId();
+
+        if ( $loggedUserId != intval($userId)) return null;
+
+        $filters = Filter::findAll(['user_id' => $userId]);
+
+        return $filters;
+    }
+
     /**
      * Saves filter model and its rules. Used in update and create
      *
