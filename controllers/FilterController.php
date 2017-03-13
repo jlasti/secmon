@@ -153,7 +153,6 @@ class FilterController extends Controller
 
         if ( empty($filter) || $filter->user_id != $loggedUserId ) return null;
 
-
         if ( !empty($component) )
         {
             $component->filter_id = $filterId;
@@ -162,7 +161,27 @@ class FilterController extends Controller
             return true;
         }
         else return null;
-        
+    }
+
+    public function actionRemoveFilterFromComponent($componentId)
+    {
+        $loggedUserId = Yii::$app->user->getId();
+        $component = View\Component::findOne(['id' => $componentId]);
+
+        if (empty($component)) return null;
+
+        $filter = Filter::findOne(['id' => $component->filter_id]);
+
+        if ( empty($filter) || $filter->user_id != $loggedUserId ) return null;
+
+        if ( !empty($component) )
+        {
+            $component->filter_id = null;
+            $component->update();
+
+            return true;
+        }
+        else return null;
     }
 
     /**
