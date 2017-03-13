@@ -148,7 +148,7 @@ $(function () {
                     name: newComponentName,
                     width: '',
                 }),
-                order : 0
+                order : activeGrid.packery("getItemElements").length
             },
         }).done(function (data) {
             if (!data) {
@@ -232,7 +232,6 @@ $(function () {
      */
     function componentForm_onSubmit (e) {
         e.preventDefault();
-        
         var componentId = $(this).attr('data-id');
         var name = $(this).find("#name" + componentId).val();
         $.ajax({
@@ -247,7 +246,7 @@ $(function () {
         }).done(function (data) {
             if (!data) {
                 Materialize.toast("Couldn't update component.", 4000);
-                return;
+                return false;
             }
         });
 
