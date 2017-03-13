@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\FilterRule;
+use app\models\View;
 use Yii;
 use app\models\Filter;
 use app\models\Filter\FilterSearch;
@@ -142,6 +143,45 @@ class FilterController extends Controller
         $filters = Filter::findAll(['user_id' => $userId]);
 
         return $filters;
+    }
+
+    public function actionAddFilterToComponent($filterId, $componentId)
+    {
+        $loggedUserId = Yii::$app->user->getId();
+        $filter = Filter::findOne(['id' => $filterId]);
+        $component = View\Component::findOne(['id' => $componentId]);
+
+        if ( empty($filter) || $filter->user_id != $loggedUserId ) return null;
+
+        if ( !empty($component) )
+        {
+            $component->filter_id = $filterId;
+            $component->update();
+
+            return true;
+        }
+        else return null;
+    }
+
+    public function actionRemoveFilterFromComponent($componentId)
+    {
+        $loggedUserId = Yii::$app->user->getId();
+        $component = View\Component::findOne(['id' => $componentId]);
+
+        if (empty($component)) return null;
+
+        $filter = Filter::findOne(['id' => $component->filter_id]);
+
+        if ( empty($filter) || $filter->user_id != $loggedUserId ) return null;
+
+        if ( !empty($component) )
+        {
+            $component->filter_id = null;
+            $component->update();
+
+            return true;
+        }
+        else return null;
     }
 
     /**

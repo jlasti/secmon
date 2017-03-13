@@ -202,14 +202,14 @@ class ViewController extends Controller
         $component = View\Component::findOne($componentId);
         $component->config = $config;
 
-        return !empty($component) ? ($component->update() ? $component->id : false) : false;
+        return !empty($component) ? ($component->update() ? $component->id : null) : null;
     }
 
     public function actionDeleteComponent($componentId)
     {
         $component = View\Component::findOne($componentId);
 
-        return !empty($component) ? ($component->delete() ? true : false) : false;
+        return !empty($component) ? ($component->delete() ? true : null) : null;
     }
 
     /*
@@ -217,12 +217,12 @@ class ViewController extends Controller
      */ 
     public function actionUpdateOrderOfComponents($viewId, $componentOrder)
     {
-        $userId = Yii::$app->user->getId();
+        $loggedUserId = Yii::$app->user->getId();
         $componentOrder = Json::decode($componentOrder);
         $view = View::findOne(['id' => $viewId]);;
 
         // if view not exist or not belong to logged user
-        if ( empty($view) || $view->user_id != $userId ) return null;
+        if ( empty($view) || $view->user_id != $loggedUserId ) return null;
 
         foreach ( $componentOrder as $value )
         {
