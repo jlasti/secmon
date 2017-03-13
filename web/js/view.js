@@ -36,7 +36,7 @@ $(function () {
             activeGrid = $('#grid_' + dashboardSelect.val());
             addComponentBtn = $("#addComponentBtn");
             deleteComponentBtn = $(".deleteComponentBtn");
-            componentForm = $(".componentForm");
+            componentForm = $("form.componentForm");
             saveContentBtn = $("#saveComponentContentBtn");
             deleteContentBtn = $("#removeComponentContentBtn");
             nameInputs = $(".nameInput");
@@ -133,7 +133,7 @@ $(function () {
         var gridItemNode = $("#" + selectNode.attr('data-id'));
         gridItemNode.attr('class', 'grid-item card ' + this.value);
         grid.packery('fit', gridItemNode[0]);
-        gridItemNode.find("form").submit();
+        gridItemNode.find("form.componentForm").submit();
     };
 
     /*
@@ -224,7 +224,7 @@ $(function () {
         var input = $(this);
         var gridItemNode = $("#" + input.attr('data-id'));
         gridItemNode.find(".nameTitle").html(input.val());
-        gridItemNode.find("form").submit();
+        gridItemNode.find("form.componentForm").submit();
     }
 
     /*
@@ -232,6 +232,7 @@ $(function () {
      */
     function componentForm_onSubmit (e) {
         e.preventDefault();
+
         var componentId = $(this).attr('data-id');
         var name = $(this).find("#name" + componentId).val();
         $.ajax({
