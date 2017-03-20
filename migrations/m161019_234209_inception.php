@@ -16,7 +16,7 @@ class m161019_234209_inception extends Migration
             'id' => $this->primaryKey()->unsigned(),
             'name' => $this->string(),
             'slug' => $this->string(),
-        ]);
+        ], 'ENGINE=InnoDB');
     }
 
     private function createEventsTable()
@@ -27,7 +27,7 @@ class m161019_234209_inception extends Migration
             'description' => $this->text(),
             'timestamp' => $this->timestamp(),
             'type_id' => $this->integer()->unsigned()->null(),
-        ]);
+        ], 'ENGINE=InnoDB');
 
         $this->createIndex('idx_events_type_id', 'events', 'type_id');
 

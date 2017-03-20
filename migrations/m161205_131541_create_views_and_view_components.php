@@ -11,7 +11,7 @@ class m161205_131541_create_views_and_view_components extends Migration
 			'name' => $this->string(),
 			'user_id' => $this->integer()->unsigned(),
 			'active' => $this->boolean(),
-		]);
+		], 'ENGINE=InnoDB');
 
 		$this->createIndex('idx_VIEW_user', 'views', 'user_id');
 
@@ -25,7 +25,7 @@ class m161205_131541_create_views_and_view_components extends Migration
 			'row' => $this->smallInteger()->unsigned(),
 			'width' => $this->smallInteger()->unsigned(),
 			'height' => $this->smallInteger()->unsigned(),
-		]);
+		], 'ENGINE=InnoDB');
 
 		$this->createIndex('idx_VC_view', 'view_components', 'view_id');
 		$this->createIndex('idx_VC_filter', 'view_components', 'filter_id');
