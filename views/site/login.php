@@ -36,4 +36,8 @@ $this->params['title'] = 'Login';
 			<?php ActiveForm::end(); ?>
 		</div>
 	</div>
+	<pre>
+		Username: emile.wiegand<br>
+		Password: password_0		
+	</pre>
 </div>
