@@ -30,8 +30,8 @@ $this->registerJs(
             Url::to(["view/delete-component"]),
             Url::to(["view/update-component"]),
             Url::to(["view/update-order-of-components"]),
-            Url::to(["view/remove-filter-from-component"]),
-            Url::to(["view/add-filter-to-component"])
+            Url::to(["filter/add-filter-to-component"]),
+            Url::to(["filter/remove-filter-from-component"])
         )
 );
 

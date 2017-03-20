@@ -37,8 +37,8 @@ $(function () {
             addComponentBtn = $("#addComponentBtn");
             deleteComponentBtn = $(".deleteComponentBtn");
             componentForm = $("form.componentForm");
-            saveContentBtn = $("#saveComponentContentBtn");
-            deleteContentBtn = $("#removeComponentContentBtn");
+            saveContentBtn = $("[data-action='saveComponentContent']");
+            deleteContentBtn = $("[data-action='removeComponentContent']");
             nameInputs = $(".nameInput");
 
 
@@ -68,7 +68,7 @@ $(function () {
             componentForm.on('submit', componentForm_onSubmit);
             grid.on( 'dragItemPositioned', saveOrder_onDragItemPositioned );
             saveContentBtn.on('click', saveContentBtn_onClick);
-            deleteContentBtn.on('click', deleteContentBtn_onClick)
+            deleteContentBtn.on('click', deleteContentBtn_onClick);
             nameInputs.on('focusout blur', name_onFocusOut);
 
             // Show grid after js inicialization
@@ -86,12 +86,29 @@ $(function () {
      */
     function saveContentBtn_onClick() {
          var compId = $(this).attr('data-id');
+         var comp = $('#component_' + compId);
          var data = $('#contentSettingsForm' + compId).serialize();
+         var remBtn = $("#removeComponentContentBtn" + compId);
+         var cont = $("#componentContentBody" + compId);
+         var contNew = $("#componentContentBodyNew" + compId);
+         var loader = cont.find("#componentLoader");
+         var body = cont.find("#componentBody");
+         var edit = comp.find("#contentEdit");
          $.ajax({
              url: hostUrl + options.updateComponentSettings,
              data: data
          }).done(function(html) {
-             $("#componentContentBody" + compId).html(html);
+             remBtn.css('display', 'block');
+             cont.css('display', 'block');
+             contNew.css('display', 'none');
+             loader.css('display', 'inline-block');
+             body.css('display', 'none');
+             edit.css('display', 'block');
+             setTimeout(function(){
+                 body.html(html);
+                 loader.css('display', 'none');
+                 body.css('display', 'block');
+             }, 2000);
          });
     }
 
@@ -100,12 +117,25 @@ $(function () {
      */
     function deleteContentBtn_onClick() {
         var compId = $(this).attr('data-id');
+        var comp = $('#component_' + compId);
         var data = $('#contentSettingsForm' + compId).serialize();
+        var remBtn = $("#removeComponentContentBtn" + compId);
+        var cont = $("#componentContentBody" + compId);
+        var contNew = $("#componentContentBodyNew" + compId);
+        var loader = cont.find("#componentLoader");
+        var body = cont.find("#componentBody");
+        var edit = comp.find("#contentEdit");
         $.ajax({
             url: hostUrl + options.deleteComponentSettings,
             data: data
         }).done(function(html) {
-            $("#componentContentBody" + compId).html(html);
+            remBtn.css('display', 'none');
+            cont.css('display', 'none');
+            loader.css('display', 'none');
+            body.css('display', 'none');
+            edit.css('display', 'none');
+            body.html('');
+            contNew.css('display', 'block');
         });
     }
 
@@ -167,6 +197,8 @@ $(function () {
             gridItemNode.find('select').material_select();
             gridItemNode.find('select.widthSelect').on("change", widthSelect_onChange);
             gridItemNode.find('.modal').modal();
+            gridItemNode.find("[data-action='saveComponentContent']").on('click', saveContentBtn_onClick);
+            gridItemNode.find("[data-action='removeComponentContent']").on('click', deleteContentBtn_onClick);
         });
     };
 
