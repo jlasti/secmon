@@ -6,6 +6,7 @@ use app\models\FilterRule;
 use app\models\View;
 use Yii;
 use app\models\Filter;
+use app\models\Event;
 use app\models\Filter\FilterSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -182,6 +183,15 @@ class FilterController extends Controller
             return true;
         }
         else return null;
+    }
+
+    public function actionGetFilteredEvents($filterId)
+    {
+        $query = Event::find();
+        $filter = $this->findModel($filterId);
+        $filteredData = $query->applyFilter($filter)->all();
+
+        return Json::encode($filteredData);
     }
 
     /**
