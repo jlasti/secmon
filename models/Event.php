@@ -24,7 +24,7 @@ class Event extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'events';
+        return 'events_correlated';
     }
 
     /**
