@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\web\UploadedFile;
 
 /**
  * This is the model class for table "sec_rules".
@@ -14,6 +15,11 @@ use Yii;
  */
 class SecRule extends \yii\db\ActiveRecord
 {
+    /**
+     * @var UploadedFile
+     */
+    public $secConfigFile;
+
     /**
      * @inheritdoc
      */
@@ -30,6 +36,7 @@ class SecRule extends \yii\db\ActiveRecord
         return [
             [['name', 'link'], 'string', 'max' => 255],
             [['state'], 'boolean'],
+            [['secConfigFile'], 'file', 'skipOnEmpty' => false, 'extensions' => 'txt']
         ];
     }
 
@@ -43,6 +50,17 @@ class SecRule extends \yii\db\ActiveRecord
             'name' => 'Name',
             'link' => 'Link',
             'state' => 'State',
+            'secConfigFile' => ''
         ];
+    }
+
+    public function upload()
+    {
+        if ($this->validate()) {
+            $this->secConfigFile->saveAs('uploads/' . $this->secConfigFile->baseName . '.' . $this->secConfigFile->extension);
+            return true;
+        } else {
+            return false;
+        }
     }
 }

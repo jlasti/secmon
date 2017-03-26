@@ -9,27 +9,20 @@ use macgyer\yii2materializecss\widgets\form\ActiveForm;
 
 <div class="sec-rule-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
     <div class="row">
         <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
     </div>
 
     <div class="row">
-        <div class="file-field input-field">
-        <div class="btn">
-            <span>File</span>
-            <input type="file" accept=".txt">
-        </div>
-        <div class="file-path-wrapper">
-            <input class="file-path validate" type="text"  placeholder="Upload .txt file">
-        </div>
-        </div>
+        <?= $form->field($model, 'secConfigFile')->fileInput() ?>
     </div>
 
     <div class="row">
         <?= $form->field($model, 'state')->checkbox() ?>
     </div>
+
     <div class="row"></div>
 			
     <div class="row">
