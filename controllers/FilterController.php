@@ -148,6 +148,7 @@ class FilterController extends Controller
 
     public function actionAddFilterToComponent($filterId, $componentId)
     {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $loggedUserId = Yii::$app->user->getId();
         $filter = Filter::findOne(['id' => $filterId]);
         $component = View\Component::findOne(['id' => $componentId]);
@@ -158,8 +159,12 @@ class FilterController extends Controller
         {
             $component->filter_id = $filterId;
             $component->update();
+            $filteredData = $this->getFilteredEvents($filterId);
 
-            return true;
+            return [
+                'html' => \app\widgets\FilterWidget::widget(['data' => compact('component', 'filter')]),
+                'filteredData' => $filteredData
+            ];
         }
         else return null;
     }
@@ -186,6 +191,11 @@ class FilterController extends Controller
     }
 
     public function actionGetFilteredEvents($filterId)
+    {
+        return $this->getFilteredEvents($filterId);
+    }
+
+    protected function getFilteredEvents($filterId)
     {
         $query = Event::find();
         $filter = $this->findModel($filterId);
