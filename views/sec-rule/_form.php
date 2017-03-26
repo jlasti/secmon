@@ -11,14 +11,31 @@ use macgyer\yii2materializecss\widgets\form\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+    <div class="row">
+        <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+    </div>
 
-    <?= $form->field($model, 'link')->textInput(['maxlength' => true]) ?>
+    <div class="row">
+        <div class="file-field input-field">
+        <div class="btn">
+            <span>File</span>
+            <input type="file" accept=".txt">
+        </div>
+        <div class="file-path-wrapper">
+            <input class="file-path validate" type="text"  placeholder="Upload .txt file">
+        </div>
+        </div>
+    </div>
 
-    <?= $form->field($model, 'state')->textInput(['maxlength' => true]) ?>
-
-    <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'waves-effect waves-light green btn' : 'waves-effect waves-light btn']) ?>
+    <div class="row">
+        <?= $form->field($model, 'state')->checkbox() ?>
+    </div>
+    <div class="row"></div>
+			
+    <div class="row">
+        <div class="form-group">
+            <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'waves-effect waves-light green btn' : 'waves-effect waves-light btn']) ?>
+        </div>
     </div>
 
     <?php ActiveForm::end(); ?>
