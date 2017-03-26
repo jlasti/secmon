@@ -33,11 +33,11 @@ class Event extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['description'], 'string'],
+            /*[['description'], 'string'],
             [['timestamp'], 'safe'],
             [['type_id'], 'integer'],
             [['title'], 'string', 'max' => 255],
-            [['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => EventType::className(), 'targetAttribute' => ['type_id' => 'id']],
+            [['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => EventType::className(), 'targetAttribute' => ['type_id' => 'id']],*/
         ];
     }
 
