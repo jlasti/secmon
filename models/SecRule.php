@@ -36,7 +36,7 @@ class SecRule extends \yii\db\ActiveRecord
         return [
             [['name', 'link'], 'string', 'max' => 255],
             [['state'], 'boolean'],
-            [['secConfigFile'], 'file', 'skipOnEmpty' => false, 'extensions' => 'txt']
+            [['secConfigFile'], 'file', 'skipOnEmpty' => false, 'extensions' => 'txt', 'checkExtensionByMimeType' => false],
         ];
     }
 
@@ -56,11 +56,24 @@ class SecRule extends \yii\db\ActiveRecord
 
     public function upload()
     {
-        if ($this->validate()) {
-            $this->secConfigFile->saveAs('uploads/' . $this->secConfigFile->baseName . '.' . $this->secConfigFile->extension);
-            return true;
-        } else {
-            return false;
+    	$transaction = Yii::$app->db->beginTransaction();
+
+        if($this->save())
+        {
+        	$path = sprintf(Yii::getAlias('@app/uploads/%s.%s'), $this->secConfigFile->baseName, $this->secConfigFile->extension);
+
+            if($this->secConfigFile->saveAs($path))
+			{
+				$transaction->commit();
+
+				return true;
+			}
+
+			$this->addError('secConfigFile', 'Error while saving file.');
         }
+
+        $transaction->rollBack();
+
+		return false;
     }
 }
