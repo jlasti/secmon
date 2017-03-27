@@ -24,7 +24,7 @@ class m161106_225257_create_users_and_user_roles extends Migration
 			'id' => $this->primaryKey()->unsigned(),
 			'name' => $this->string(),
 			'slug' => $this->string(),
-		], 'ENGINE=InnoDB');
+		]);
 	}
 
 	private function createPermissionsTable()
@@ -33,12 +33,12 @@ class m161106_225257_create_users_and_user_roles extends Migration
 			'id' => $this->primaryKey()->unsigned(),
 			'name' => $this->string(),
 			'slug' => $this->string(),
-		], 'ENGINE=InnoDB');
+		]);
 
 		$this->createTable('rel_role_permission', [
 			'role_id' => $this->integer()->unsigned(),
 			'permission_id' => $this->integer()->unsigned(),
-		], 'ENGINE=InnoDB');
+		]);
 
 		$this->createIndex('idx_RP_role_id', 'rel_role_permission', 'role_id');
 		$this->createIndex('idx_RP_permission_id', 'rel_role_permission', 'permission_id');
@@ -57,12 +57,12 @@ class m161106_225257_create_users_and_user_roles extends Migration
 			'password' => $this->string(),
 			'email' => $this->string(),
 			'auth_key' => $this->string(),
-		], 'ENGINE=InnoDB');
+		]);
 
 		$this->createTable('rel_user_role', [
 			'user_id' => $this->integer()->unsigned(),
 			'role_id' => $this->integer()->unsigned(),
-		], 'ENGINE=InnoDB');
+		]);
 
 		$this->createIndex('idx_UR_user_id', 'rel_user_role', 'user_id');
 		$this->createIndex('idx_UR_role_id', 'rel_user_role', 'role_id');
