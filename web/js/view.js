@@ -2,8 +2,10 @@ $(function () {
     //#region [ Fields ]
 
     var global = (function () { return this; })();
-    var options = {};
 
+    var hostUrl;
+    var options = {};
+    var activeComponentIds = [];
     var dashboardSelect;
     var widthSelect;
     var editBtn;
@@ -16,7 +18,6 @@ $(function () {
     var saveContentBtn;
     var deleteContentBtn;
 
-    var hostUrl;
     var newComponentName = "New Component";
 
     //#endregion
@@ -27,6 +28,7 @@ $(function () {
     if (typeof (global.views) !== "function") {
         global.views = function (args) {
             $.extend(options, args || {});
+            $.extend(activeComponentIds, args.activeComponentIds || []);
 
             hostUrl = location.protocol + "//" + location.hostname + (location.port ? ":" + location.port : "");
             dashboardSelect = $('#dashboard');
@@ -73,11 +75,37 @@ $(function () {
 
             // Show grid after js inicialization
             $('.grid').removeClass("invisible");
+
+            setInterval(componentUpdate, 5000);
+            componentUpdate();
         }
     };
 
     //#endregion
 
+    function componentUpdate() {
+        activeComponentIds.forEach(function(item, index) {
+            $.ajax({
+                url: hostUrl + options.updateComponentContent,
+                data: { componentId : item },
+                async: true,
+                cache: false
+            }).done(function(data) {
+                if (!data) {
+                    Materialize.toast("Couldn't add filter to component.", 4000);
+                    return;
+                }
+                var cont = $("#componentContentBody" + item);
+                var loader = cont.find("#componentLoader");
+                var body = cont.find("#componentBody");
+                body.html(data.html);
+                loader.css('display', 'none');
+                body.css('display', 'block');
+            }).fail(function(){
+                Materialize.toast("Couldn't update component content!", 4000);
+            });
+        });
+    }
 
     //#region [ Event Handlers ]
 
@@ -97,18 +125,27 @@ $(function () {
          $.ajax({
              url: hostUrl + options.updateComponentSettings,
              data: data
-         }).done(function(html) {
+         }).done(function(data) {
+             if (!data){
+                 Materialize.toast("Couldn't add filter to component!", 4000);
+                 return;
+             }
+
              remBtn.css('display', 'block');
              cont.css('display', 'block');
              contNew.css('display', 'none');
              loader.css('display', 'inline-block');
              body.css('display', 'none');
              edit.css('display', 'block');
-             setTimeout(function(){
-                 body.html(html);
-                 loader.css('display', 'none');
-                 body.css('display', 'block');
-             }, 2000);
+
+             activeComponentIds.push(compId);
+
+             body.html(data.html);
+             loader.css('display', 'none');
+             body.css('display', 'block');
+
+         }).fail(function(){
+             Materialize.toast("Couldn't add filter to component!", 4000);
          });
     }
 
@@ -134,6 +171,11 @@ $(function () {
             loader.css('display', 'none');
             body.css('display', 'none');
             edit.css('display', 'none');
+
+            var index = activeComponentIds.indexOf(compId);
+            if (index != -1)
+                activeComponentIds.splice(index, 1);
+
             body.html('');
             contNew.css('display', 'block');
         });

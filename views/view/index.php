@@ -14,28 +14,6 @@ $this->registerJsFile('@web/js/d3.v4.min.js', ['depends' => 'yii\web\YiiAsset'])
 $this->registerJsFile('@web/js/draggabilly.min.js', ['depends' => 'yii\web\YiiAsset']);
 $this->registerJsFile('@web/js/view.js', ['depends' => 'yii\web\YiiAsset']);
 //$this->registerJs(sprintf('$(document).ready(function(){DrawLineGraph(%s);});', $graph), \yii\web\View::POS_END);
-$this->registerJs(
-        sprintf("var global = (function () { return this; })();
-            global.views({
-                changeView: '%s',
-                createComponent: '%s',
-                deleteComponent: '%s',
-                updateComponent: '%s',
-                updateOrder: '%s',
-                updateComponentSettings: '%s',
-                deleteComponentSettings: '%s'
-            });",
-            Url::to(["view/change-view"]),
-            Url::to(["view/create-component"]),
-            Url::to(["view/delete-component"]),
-            Url::to(["view/update-component"]),
-            Url::to(["view/update-order-of-components"]),
-            Url::to(["filter/add-filter-to-component"]),
-            Url::to(["filter/remove-filter-from-component"])
-        )
-);
-
-
 $select = '<div class="row"><div class="col s12 m6 l4"><select id="dashboard">';
 
 foreach($views as $view) 
@@ -43,6 +21,7 @@ foreach($views as $view)
     $select .= sprintf("<option value='%s' %s>%s</option>", $view->id, ($view->active == 1 ? 'selected' : ''), $view->name );
 }
 
+$comps = "";
 $select .= '</select></div></div>';
 
 $this->params['title'] = $select;
@@ -81,9 +60,48 @@ $this->params['title'] = $select;
             
             foreach ($components as $component) 
             {
+                if ($component->filter_id != null)
+                {
+                    if ($comps != "")
+                        $comps .= ", ";
+
+                    $comps .= $component->id;
+                }
+
                 echo \app\widgets\ComponentWidget::widget(['data' => compact('component')]);    
             }
         ?>
         </div>
     <?php endforeach; ?>
 </div>
+
+<?php
+
+$this->registerJs(
+    sprintf("var global = (function () { return this; })();
+        var comps = [ %s ];
+    
+        global.views({
+            changeView: '%s',
+            createComponent: '%s',
+            deleteComponent: '%s',
+            updateComponent: '%s',
+            updateOrder: '%s',
+            updateComponentSettings: '%s',
+            deleteComponentSettings: '%s',
+            updateComponentContent: '%s',
+            activeComponentIds: comps
+        });",
+        $comps,
+        Url::to(["view/change-view"]),
+        Url::to(["view/create-component"]),
+        Url::to(["view/delete-component"]),
+        Url::to(["view/update-component"]),
+        Url::to(["view/update-order-of-components"]),
+        Url::to(["filter/add-filter-to-component"]),
+        Url::to(["filter/remove-filter-from-component"]),
+        Url::to(["filter/get-component-content"])
+    )
+);
+
+?>

@@ -153,20 +153,42 @@ class FilterController extends Controller
         $filter = Filter::findOne(['id' => $filterId]);
         $component = View\Component::findOne(['id' => $componentId]);
 
-        if ( empty($filter) || $filter->user_id != $loggedUserId ) return null;
+        if ( empty($filter) || $filter->user_id != $loggedUserId )
+            return null;
 
         if ( !empty($component) )
         {
             $component->filter_id = $filterId;
             $component->update();
-            $filteredData = $this->getFilteredEvents($filterId);
+            $filteredData = $this->getFilteredEvents($filter->id);
 
             return [
-                'html' => \app\widgets\FilterWidget::widget(['data' => compact('component', 'filter')]),
-                'filteredData' => $filteredData
+                'html' => \app\widgets\FilterWidget::widget(['data' => compact('component', 'filter', 'filteredData')])
             ];
         }
         else return null;
+    }
+
+    public function actionGetComponentContent($componentId)
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $loggedUserId = Yii::$app->user->getId();
+        $component = View\Component::findOne(['id' => $componentId]);
+        $filter = Filter::findOne(['id' => $component->filter_id]);
+
+        if ( empty($filter) || $filter->user_id != $loggedUserId )
+            return null;
+
+        if ( !empty($component) )
+        {
+            $filteredData = $this->getFilteredEvents($filter->id);
+
+            return [
+                'html' => \app\widgets\FilterWidget::widget(['data' => compact('component', 'filter', 'filteredData')])
+            ];
+        }
+        else
+            return null;
     }
 
     public function actionRemoveFilterFromComponent($componentId)
@@ -192,7 +214,7 @@ class FilterController extends Controller
 
     public function actionGetFilteredEvents($filterId)
     {
-        return $this->getFilteredEvents($filterId);
+        return Json::encode($this->getFilteredEvents($filterId));
     }
 
     protected function getFilteredEvents($filterId)
@@ -201,7 +223,7 @@ class FilterController extends Controller
         $filter = $this->findModel($filterId);
         $filteredData = $query->applyFilter($filter)->all();
 
-        return Json::encode($filteredData);
+        return $filteredData;
     }
 
     /**

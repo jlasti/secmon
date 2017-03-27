@@ -59,7 +59,7 @@
 
                             <div class="input-field col s1">
                                 <div class="help-block left-align">
-                                    <a href="<?= Url::to(["filter/create"]) ?>" class="btn-floating btn-small waves-effect waves-light blue"
+                                    <a href="<?= Url::to(["filter/create"]) ?>" class="btn-floating btn-small waves-effect waves-light red"
                                         title="Create new filter">
                                         <i class="material-icons">add</i>
                                     </a>
@@ -71,7 +71,7 @@
                             <div class="input-field col s11">
                                 <select id="componenContentTypeId<?= $component->id ?>" name="contentTypeId">
                                 <?php foreach ($contentTypes as $key => $type): ?>
-                                    <option value="<?= $key ?>"<?= $options["contentType"] ?? "" == $key ? " selected='selected'" : "" ?>><?= $type ?></option>
+                                    <option value="<?= $key ?>"<?= ($options["contentType"] ?? "") == $key ? " selected='selected'" : "" ?>><?= $type ?></option>
                                 <?php endforeach; ?>
                                 </select>
                                 <label for="componenContentTypeId<?php print($component->id); ?>">Content type visualisation</label>
@@ -128,3 +128,6 @@
         </div>
     </div>
 </div>
+<script type="text/javascript">
+
+</script>
