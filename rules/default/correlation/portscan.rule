@@ -54,6 +54,6 @@ action=lcall %ports $+{ip} -> ( sub { my($ip) = $_[0]; \
 			return "TCP: $tcp\nUDP: $udp"; } ); \
 	create COUNTING_OFF_$+{ip} 300; \
 	obsolete COUNTING_$+{ip}; \
-	write - CEF:0|Device Vendor|Device Product|Device Version|0|Portscan|0|src=$+{ip}
+	write  ../../../__secInput CEF:0|SECMON|iptables|ver|0|Portscan|0|src=$+{ip}
 
 # === END - Portscan detection ===
