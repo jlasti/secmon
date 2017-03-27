@@ -16,31 +16,29 @@ class Normalized extends Event
 	{
 		$event = new static();
 
-		$data = explode('|', $cefString);
+		$correlated = Event::fromCef($cefString);
 
-		$dateHost = explode(' ', strrev(array_shift($data)), 3);
+		$event->cef_version = $correlated->cef_version;
+		$event->host = $correlated->host;
+		$event->datetime = $correlated->datetime;
 
-		$event->cef_version = str_replace('CEF:', '', strrev(array_shift($dateHost)));
-		$event->host = strrev(array_shift($dateHost));
-		$event->dateTime = strrev(array_shift($dateHost));
-
-		$event->cef_vendor = array_shift($data);
-		$event->cef_dev_prod = array_shift($data);
-		$event->cef_dev_version = array_shift($data);
-		$event->cef_event_class_id = array_shift($data);
-		$event->cef_name = array_shift($data);
-		$event->cef_severity = array_shift($data);
+		$event->cef_vendor = $correlated->cef_vendor;
+		$event->cef_dev_prod = $correlated->cef_dev_prod;
+		$event->cef_dev_version = $correlated->cef_dev_version;
+		$event->cef_event_class_id = $correlated->cef_event_class_id;
+		$event->cef_name = $correlated->cef_name;
+		$event->cef_severity = $correlated->cef_severity;
 
 		preg_match_all('/\s*([^=]+)=(\S+)\s*/', array_shift($data), $matches);
 
 		$values = array_combine($matches[0], $matches[1]);
 
-		$event->src_ip = $matches['src'] ?? null;
-		$event->dst_ip = $matches['dst'] ?? null;
-		$event->src_port = $matches['spt'] ?? null;
-		$event->dst_port = $matches['dpt'] ?? null;
-		$event->protocol = $matches['proto'] ?? $matches['app'] ?? null;
-		$event->raw = $matches['rawEvent'] ?? null;
+		$event->src_ip = $values['src'] ?? null;
+		$event->dst_ip = $values['dst'] ?? null;
+		$event->src_port = $values['spt'] ?? null;
+		$event->dst_port = $values['dpt'] ?? null;
+		$event->protocol = $values['proto'] ?? $values['app'] ?? null;
+		$event->raw = $values['rawEvent'] ?? null;
 
 		return $event;
 	}
