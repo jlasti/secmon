@@ -24,20 +24,44 @@ class Event extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'events';
+        return 'events_correlated';
     }
 
-    /**
+	public static function fromCef($cefString)
+	{
+		$event = new static();
+
+		$data = explode('|', $cefString);
+
+		$dateHost = explode(' ', strrev(array_shift($data)), 3);
+
+		$event->cef_version = str_replace('CEF:', '', strrev(array_shift($dateHost)));
+		$event->host = strrev(array_shift($dateHost));
+		$event->datetime = strrev(array_shift($dateHost));
+
+		$event->cef_vendor = array_shift($data);
+		$event->cef_dev_prod = array_shift($data);
+		$event->cef_dev_version = array_shift($data);
+		$event->cef_event_class_id = array_shift($data);
+		$event->cef_name = array_shift($data);
+		$event->cef_severity = array_shift($data);
+
+		$event->raw = $cefString;
+
+		return $event;
+	}
+
+	/**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['description'], 'string'],
+            /*[['description'], 'string'],
             [['timestamp'], 'safe'],
             [['type_id'], 'integer'],
             [['title'], 'string', 'max' => 255],
-            [['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => EventType::className(), 'targetAttribute' => ['type_id' => 'id']],
+            [['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => EventType::className(), 'targetAttribute' => ['type_id' => 'id']],*/
         ];
     }
 
