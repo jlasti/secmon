@@ -60,7 +60,7 @@ class SecRule extends \yii\db\ActiveRecord
 
         if($this->save())
         {
-            $path = sprintf(Yii::getAlias('@app/uploads/%s_%s.%s'), $this->secConfigFile->baseName, $this->id, $this->secConfigFile->extension);
+            $path = sprintf(Yii::getAlias('@app/rules/uploads/%s_%s.%s'), $this->secConfigFile->baseName, $this->id, $this->secConfigFile->extension);
             $this->link = $path;
 
             if($this->secConfigFile->saveAs($path) && $this->save())
