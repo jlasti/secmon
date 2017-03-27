@@ -22,7 +22,7 @@ $this->params['title'] = 'Events';
                 'timestamp',
                 'type_id',
 
-                ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn'],
+                ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}'],
             ],
         ]); ?>
     <?php Pjax::end(); ?>
