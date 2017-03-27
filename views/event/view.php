@@ -25,10 +25,7 @@ $this->params['title'] = 'Event: ' . $model->title;
         'model' => $model,
         'attributes' => [
             'id',
-            'title',
-            'description:ntext',
-            'timestamp',
-            'type_id',
+            'raw'
         ],
     ]) ?>
 

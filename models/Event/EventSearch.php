@@ -18,8 +18,7 @@ class EventSearch extends Event
     public function rules()
     {
         return [
-            [['id', 'type_id'], 'integer'],
-            [['title', 'description', 'timestamp'], 'safe'],
+
         ];
     }
 
@@ -60,12 +59,9 @@ class EventSearch extends Event
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'timestamp' => $this->timestamp,
-            'type_id' => $this->type_id,
         ]);
 
-        $query->andFilterWhere(['like', 'title', $this->title])
-            ->andFilterWhere(['like', 'description', $this->description]);
+        $query->andFilterWhere(['like', 'raw', $this->raw]);
 
         return $dataProvider;
     }
