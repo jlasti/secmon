@@ -258,3 +258,7 @@ body.compact .compact-button i {
 .invisible {
     visibility: hidden;
 }
+
+.input-field.field-secrule-secconfigfile  {
+    position: static;
+}

@@ -16,7 +16,16 @@ use macgyer\yii2materializecss\widgets\form\ActiveForm;
     </div>
 
     <div class="row">
+
+    <div class="file-field input-field">
+      <div class="btn">
+        <span>File</span>
         <?= $form->field($model, 'secConfigFile')->fileInput() ?>
+      </div>
+      <div class="file-path-wrapper">
+        <input class="file-path validate" type="text" placeholder="Upload sec rule file">
+      </div>
+    </div>
     </div>
 
     <div class="row">
