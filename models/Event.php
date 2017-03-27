@@ -27,7 +27,12 @@ class Event extends \yii\db\ActiveRecord
         return 'events_correlated';
     }
 
-    /**
+	public static function fromCef($line)
+	{
+		//TODO: spravit?
+	}
+
+	/**
      * @inheritdoc
      */
     public function rules()

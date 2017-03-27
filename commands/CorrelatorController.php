@@ -1,6 +1,9 @@
 <?php
 namespace app\commands;
 
+use app\models\Event;
+use app\models\Event\Normalized;
+use Yii;
 use yii\console\Controller;
 use yii\console\Exception;
 
@@ -18,26 +21,32 @@ class CorrelatorController extends Controller
 			throw new Exception('Log path is not directory');
 		}
 
-		$secOutputFile = $logPath . '/__secOutput';
-		$secInputFile = $logPath . '/__secInput';
+		$normOutputFile = $logPath . '/__secOutput';
+		$normInputFile = $logPath . '/__secInput';
+
+		$corrOutputFile = Yii::getAlias('@app/__secOutput');
+		$corrInputFile = Yii::getAlias('@app/__secInput');
 
 		$streams = [];
 
-		$secOutputStream = $this->openPipe($secOutputFile);
-		$secInputStream = $this->openPipe($secInputFile);
+		$normOutputStream = $this->openPipe($normOutputFile);
+		$normInputStream = $this->openPipe($normInputFile);
 
-		if($secOutputStream == null || $secInputStream == null)
+		$corrOutputStream = $this->openPipe($corrOutputFile);
+		$corrInputStream = $this->openPipe($corrInputFile);
+
+		if($normOutputStream == null || $normInputStream == null)
 		{
 			$msg = 'Cannot open SEC pipes' . PHP_EOL;
-			$msg .= 'Output: ' . ($secOutputStream == null ? 'error' : 'open') . PHP_EOL;
-			$msg .= 'Input: ' . ($secInputStream == null ? 'error' : 'open') . PHP_EOL;
+			$msg .= 'Output: ' . ($normOutputStream == null ? 'error' : 'open') . PHP_EOL;
+			$msg .= 'Input: ' . ($normInputStream == null ? 'error' : 'open') . PHP_EOL;
 
 			throw new Exception($msg);
 		}
 
 		while(1)
 		{
-			$this->openStreams($streams, $logPath, [$secOutputFile, $secInputFile]);
+			$this->openStreams($streams, $logPath, [$normOutputFile, $normInputFile]);
 
 			foreach($streams as $file => $stream)
 			{
@@ -45,15 +54,29 @@ class CorrelatorController extends Controller
 
 				if(!empty($line))
 				{
-					fwrite($secOutputStream, $line);
+					fwrite($normOutputStream, $line);
 				}
 			}
 
-			$line = fgets($secInputStream);
+			$line = fgets($normInputStream);
 
 			if(!empty($line))
 			{
-				$this->saveToDatabase($line);
+				$event = Normalized::fromCef($line);
+
+				if($event->save())
+				{
+					fwrite($corrOutputStream, $event->id . ':' . $line);
+				}
+			}
+
+			$line = fgets($corrInputStream);
+
+			if(!empty($line))
+			{
+				$event = Event::fromCef($line);
+
+				$event->save();
 			}
 		}
 	}
@@ -108,10 +131,5 @@ class CorrelatorController extends Controller
 		$pipe = posix_mkfifo($file, 0666);
 
 		return fopen($file, 'r+');
-	}
-
-	function saveToDatabase($line)
-	{
-		//TODO: implementovat
 	}
 }
