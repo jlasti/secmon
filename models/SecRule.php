@@ -49,7 +49,7 @@ class SecRule extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Name',
             'link' => 'Link',
-            'state' => 'State',
+            'state' => 'Active rule',
             'secConfigFile' => ''
         ];
     }

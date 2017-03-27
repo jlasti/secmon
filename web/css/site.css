@@ -262,3 +262,9 @@ body.compact .compact-button i {
 .input-field.field-secrule-secconfigfile  {
     position: static;
 }
+.file-field .help-block {
+    font-size: .8rem;
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+    margin-left: -30px;
+}

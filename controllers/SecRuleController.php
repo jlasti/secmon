@@ -76,6 +76,7 @@ class SecRuleController extends Controller
 			}
         }
 
+        $model->state = true;
 		return $this->render('create', [
 			'model' => $model,
 		]);
