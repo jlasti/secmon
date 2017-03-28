@@ -37,7 +37,7 @@ class Event extends \yii\db\ActiveRecord
 
 		$event->cef_version = str_replace('CEF:', '', strrev(array_shift($dateHost)));
 		$event->host = strrev(array_shift($dateHost));
-		$event->datetime = strrev(array_shift($dateHost));
+		$event->datetime = date('Y-m-d H:i:s', strtotime(strrev(array_shift($dateHost))));
 
 		$event->cef_vendor = array_shift($data);
 		$event->cef_dev_prod = array_shift($data);
