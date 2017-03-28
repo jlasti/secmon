@@ -10,7 +10,7 @@ class m161112_213206_create_filters extends Migration
 			'id' => $this->primaryKey()->unsigned(),
 			'user_id' => $this->integer()->unsigned(),
 			'name' => $this->string(),
-		], 'ENGINE=InnoDB');
+		]);
 
 		$this->createIndex('idx_FLT_user', 'filters', 'user_id');
 
@@ -22,7 +22,7 @@ class m161112_213206_create_filters extends Migration
 			'type' => $this->string(),
 			'value' => $this->text(),
 			'operator' => $this->string(),
-		], 'ENGINE=InnoDB');
+		]);
 
 		$this->createIndex('idx_FR_filter', 'filter_rules', 'filter_id');
 

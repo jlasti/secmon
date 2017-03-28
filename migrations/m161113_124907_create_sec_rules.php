@@ -15,7 +15,7 @@ class m161113_124907_create_sec_rules extends Migration
             'id' => $this->primaryKey()->unsigned(),
             'name' => $this->string(),
             'content' => $this->string(),
-        ], 'ENGINE=InnoDB');
+        ]);
     }
 
     public function down()
