@@ -64,6 +64,8 @@ class CorrelatorController extends Controller
 
 			if(!empty($line))
 			{
+				Yii::info(sprintf("Normalized:\n%s\n", $line));
+
 				$event = Normalized::fromCef($line);
 
 				if($event->save())
@@ -76,6 +78,8 @@ class CorrelatorController extends Controller
 
 			if(!empty($line))
 			{
+				Yii::info(sprintf("Correlated:\n%s\n", $line));
+
 				$event = Event::fromCef($line);
 
 				$event->save();
