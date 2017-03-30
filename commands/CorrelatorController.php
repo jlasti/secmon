@@ -56,6 +56,8 @@ class CorrelatorController extends Controller
 
 				if(!empty($line))
 				{
+					echo '|';
+
 					fwrite($normOutputStream, $line);
 				}
 			}
@@ -64,6 +66,8 @@ class CorrelatorController extends Controller
 
 			if(!empty($line))
 			{
+				echo '$';
+
 				Yii::info(sprintf("Normalized:\n%s\n", $line));
 
 				$event = Normalized::fromCef($line);
@@ -78,6 +82,8 @@ class CorrelatorController extends Controller
 
 			if(!empty($line))
 			{
+				echo '%';
+
 				Yii::info(sprintf("Correlated:\n%s\n", $line));
 
 				$event = Event::fromCef($line);
