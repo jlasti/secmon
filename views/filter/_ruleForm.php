@@ -4,13 +4,29 @@ use \macgyer\yii2materializecss\widgets\form\DatePicker;
 
 $selectedType = $rule->type ?? 'date';
 $hideLogic = '';
-if ($rulesCount == $index + 1)
+$options = ['data-value-type' => 'filter_rule_logic_operator'];
+if ($index == 0)
+{
     $hideLogic = ' hide';
+    $options['disabled'] = 'disabled';
+}
+
 ?>
 
 <div class="rule" data-rule="<?= $index ?>">
+    <div class="row<?= $hideLogic ?>" id="logic">
+        <?php
+            echo $form->field($rule, "[$index]logic_operator", [
+                'options' => ['class' => 'input-field col m2', 'data-type' => 'global']
+            ])->dropDownList($logicOperators, $options);
+        ?>
+    </div>
+
     <div class="row">
-	    <?= $form->field($rule, "[$index]type", [ 'options' => [ 'class' => 'input-field col m4' ]])->dropDownList($typesDown, [ 'data-rule-type' => $index ]) ?>
+        <?= $form->field($rule, "[$index]id", ['options' => [ 'class' => 'hide' ]])->hiddenInput([ 'data-value-type' => 'filter_rule_id' ]) ?>
+
+        <?= $form->field($rule, "[$index]type", [ 'options' => [ 'class' => 'input-field col m4' ]])
+            ->dropDownList($typesDown, [ 'data-rule-type' => $index ]) ?>
 
         <?php
         foreach ($types as $typeName => $type)
@@ -43,15 +59,5 @@ if ($rulesCount == $index + 1)
             <a href="#" class="btn-floating waves-effect waves-light red" data-rule-remove="<?= $rule->id ?? -1 ?>"
                data-rule-index="<?= $index ?>" data-filter-id="<?= $model->id ?>" onclick="removeRule(this);"><i class="material-icons">remove</i></a>
         </div>
-    </div>
-
-    <div class="row<?= $hideLogic ?>" id="logic">
-        <?php
-            $index += 1;
-
-            echo $form->field($rule, "[$index]logic_operator", [
-                'options' => [ 'class' => 'input-field col m2', 'data-type' => 'global' ]
-            ])->dropDownList($logicOperators);
-        ?>
     </div>
 </div>

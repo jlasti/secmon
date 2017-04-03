@@ -92,17 +92,25 @@ class FilterController extends Controller
     {
 		$model = $this->findModel($id);
 
-		$rules = $this->_createRulesArray($model->rules);
+        $postRules = Yii::$app->request->post('FilterRule');
+        if (Yii::$app->request->isPost && ($postRules === null || count($postRules) === 0)) {
+            $model->delete();
+            return $this->redirect('');
+        }
+        else
+        {
+            $rules = $this->_createRulesArray($model->rules, $postRules);
 
-		if($this->save($model, $rules))
-		{
-			return $this->redirect(['view', 'id' => $model->id]);
-		}
+            if ($this->save($model, $rules))
+            {
+      			return $this->redirect(['view', 'id' => $model->id]);
+            }
 
-		return $this->render('update', [
-			'model' => $model,
-			'rules' => $rules,
-		]);
+            return $this->render('update', [
+                'model' => $model,
+                'rules' => $rules,
+            ]);
+        }
     }
 
     /**
@@ -258,50 +266,55 @@ class FilterController extends Controller
      * Prepares rules from $_POST
      *
      * @param FilterRule[] $rules Already existing rules, used in update
-     *
+     * @param FilterRule[] $postFilters Rulest sent from view
      * @return FilterRule[]
+     * @throws \yii\db\Exception
      */
-    protected function _createRulesArray($rules = null)
+    protected function _createRulesArray($rules = null, $postFilters = null)
 	{
 		$array = $rules ?? [
 			new FilterRule(),
 		];
 
-//		$postCount = count(Yii::$app->request->post('FilterRule'));
-//		$count = $postCount - count($array);
-
-        $count = count(Yii::$app->request->post('FilterRule')) - count($array);
-
-        for($i = 0; $i < $count; $i++)
-		{
-			$array[] = new FilterRule();
-		}
+		if ($postFilters === null)
+		    $postFilters = Yii::$app->request->post('FilterRule');
 
 		/**
 		 * if rules are already loaded and there are less rules in POST,
 		 * it means that a single or multiple rules were deleted,
 		 * so slice the array and return only so many rules as defined in POST
 		 */
-//		if($rules != null && $count < 0)
-//		{
-//			$delete = array_slice($array, $postCount);
-//
-//			$transaction = Yii::$app->db->beginTransaction();
-//
-//			foreach($delete as $rule)
-//			{
-//				if(!$rule->delete())
-//				{
-//					$transaction->rollBack();
-//
-//					throw new \yii\db\Exception('Cannot delete rule');
-//				}
-//			}
-//
-//			$transaction->commit();
-//
-//			$array = array_slice($array, 0, $postCount);
-//		}
+		if(Yii::$app->request->isPost && $rules != null && $postFilters != null)
+		{
+			$transaction = Yii::$app->db->beginTransaction();
+
+			foreach($array as $deleteKey => $rule)
+			{
+			    if ($rule->id != null)
+			    {
+                    $key = array_search($rule->id, array_column($postFilters, 'id'));
+                    if ($key === false)
+                    {
+                        if (!$rule->delete())
+                        {
+                            $transaction->rollBack();
+
+                            throw new \yii\db\Exception('Cannot delete rule');
+                        }
+                        array_splice($array, $deleteKey, 1);
+                    }
+                }
+			}
+
+			$transaction->commit();
+		}
+
+		// fit the length of array
+        $count = count($postFilters) - count($array);
+        for($i = 0; $i < $count; $i++)
+        {
+            $array[] = new FilterRule();
+        }
 
 		return $array;
 	}
