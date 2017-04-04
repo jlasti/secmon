@@ -29,6 +29,14 @@ class Normalized extends Event
 		$event->cef_name = $correlated->cef_name;
 		$event->cef_severity = $correlated->cef_severity;
 
+		$data = explode('|', $cefString);
+
+		//jak pan
+		for($i = 0; $i < 10; $i++)
+		{
+			array_shift($data);
+		}
+
 		preg_match_all('/\s*([^=]+)=(\S+)\s*/', array_shift($data), $matches);
 
 		$values = array_combine($matches[0], $matches[1]);
