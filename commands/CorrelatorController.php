@@ -35,11 +35,13 @@ class CorrelatorController extends Controller
 		$corrOutputStream = $this->openPipe($corrOutputFile);
 		$corrInputStream = $this->openPipe($corrInputFile);
 
-		if($normOutputStream == null || $normInputStream == null)
+		if($normOutputStream == null || $normInputStream == null || $corrOutputStream == null || $corrInputStream == null)
 		{
 			$msg = 'Cannot open SEC pipes' . PHP_EOL;
-			$msg .= 'Output: ' . ($normOutputStream == null ? 'error' : 'open') . PHP_EOL;
-			$msg .= 'Input: ' . ($normInputStream == null ? 'error' : 'open') . PHP_EOL;
+			$msg .= 'Normalizer Output: ' . ($normOutputStream == null ? 'error' : 'open') . PHP_EOL;
+			$msg .= 'Normalizer Input: ' . ($normInputStream == null ? 'error' : 'open') . PHP_EOL;
+			$msg .= 'Global SEC output: ' . ($corrOutputStream == null ? 'error' : 'open') . PHP_EOL;
+			$msg .= 'Global SEC input: ' . ($corrInputStream == null ? 'error' : 'open') . PHP_EOL;
 
 			throw new Exception($msg);
 		}
@@ -54,6 +56,8 @@ class CorrelatorController extends Controller
 
 				if(!empty($line))
 				{
+					echo '|';
+
 					fwrite($normOutputStream, $line);
 				}
 			}
@@ -62,6 +66,10 @@ class CorrelatorController extends Controller
 
 			if(!empty($line))
 			{
+				echo '$';
+
+				Yii::info(sprintf("Normalized:\n%s\n", $line));
+
 				$event = Normalized::fromCef($line);
 
 				if($event->save())
@@ -74,6 +82,10 @@ class CorrelatorController extends Controller
 
 			if(!empty($line))
 			{
+				echo '%';
+
+				Yii::info(sprintf("Correlated:\n%s\n", $line));
+
 				$event = Event::fromCef($line);
 
 				$event->save();
