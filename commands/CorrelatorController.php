@@ -21,6 +21,7 @@ class CorrelatorController extends Controller
 			throw new Exception('Log path is not directory');
 		}
 
+		
 		$normOutputFile = $logPath . '/__secOutput';
 		$normInputFile = $logPath . '/__secInput';
 
@@ -46,24 +47,38 @@ class CorrelatorController extends Controller
 			throw new Exception($msg);
 		}
 
+		$streamPosition = [];
+
 		while(1)
 		{
 			$this->openStreams($streams, $logPath, [$normOutputFile, $normInputFile]);
 
 			foreach($streams as $file => $stream)
 			{
-				$line = fgets($stream);
-
-				if(!empty($line))
+				if(!array_key_exists($file, $streamPosition))
 				{
-					echo '|';
-
-					fwrite($normOutputStream, $line);
+					$streamPosition[$file] = 0;
 				}
+				usleep(300000); // nutne kvoli vytazeniu CPU
+				clearstatcache(false, $logPath . "/" . $file);
+				fseek($stream, $streamPosition[$file]);
+				while(($line = fgets($stream)) != FALSE)
+				{
+					if(!empty($line))
+					{
+						fwrite($normOutputStream, $line);
+						flush();
+					}
+				}
+				$streamPosition[$file] = ftell($stream);
+				fclose($stream);
 			}
 
-			$line = fgets($normInputStream);
 
+			socket_set_blocking($normInputStream, false);
+			$line = fgets($normInputStream);
+			
+			
 			if(!empty($line))
 			{
 				echo '$';
@@ -77,13 +92,12 @@ class CorrelatorController extends Controller
 					fwrite($corrOutputStream, $event->id . ':' . $line);
 				}
 			}
-
+			
+			socket_set_blocking($corrInputStream, false);
 			$line = fgets($corrInputStream);
-
+			
 			if(!empty($line))
 			{
-				echo '%';
-
 				Yii::info(sprintf("Correlated:\n%s\n", $line));
 
 				$event = Event::fromCef($line);
@@ -106,11 +120,12 @@ class CorrelatorController extends Controller
 				continue;
 			}
 
+			/*
 			if(array_key_exists($file, $streams))
 			{
 				continue;
 			}
-
+			*/
 			$stream = $this->openNonBlockingStream($fullPath);
 
 			if($stream == null)

@@ -21,7 +21,7 @@ class m170326_200254_update_events_to_cef extends Migration
 			'cef_event_class_id' => $this->integer()->notNull(),
 			'cef_name' => $this->string()->notNull(),
 			'cef_severity' => $this->integer()->notNull(),
-			'parent_events' => 'integer[]',
+			'parent_events' => 'integer',
 			'raw' => $this->text(),
 		]);
 
@@ -44,8 +44,8 @@ class m170326_200254_update_events_to_cef extends Migration
 			'cef_name' => $this->string()->notNull(),
 			'cef_severity' => $this->integer()->notNull(),
 
-			'src_ip' => 'inet',
-			'dst_ip' => 'inet',
+			'src_ip' => 'varchar(255)',
+			'dst_ip' => 'varchar(255)',
 			'src_port' => $this->smallInteger()->unsigned(),
 			'dst_port' => $this->smallInteger()->unsigned(),
 			'protocol' => $this->string(),
