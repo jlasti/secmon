@@ -190,6 +190,10 @@ $(function () {
      * Funckia na vykreslenie ciary grafu
      */
     function DrawLineGraph(data){
+        if (!data) {
+            return;
+        }
+        
         var svg = d3.select("svg"),
             margin = {top: 20, right: 20, bottom: 30, left: 50},
             width = +svg.attr("width") - margin.left - margin.right,
