@@ -31,22 +31,42 @@ class Normalized extends Event
 
 		$data = explode('|', $cefString);
 
-		//jak pan
-		for($i = 0; $i < 10; $i++)
+		for($i = 0; $i < 7; $i++)
 		{
 			array_shift($data);
 		}
 
-		preg_match_all('/\s*([^=]+)=(\S+)\s*/', array_shift($data), $matches);
+		$data = array_shift($data);
+	
+		preg_match('/rawEvent=(.*)/', $data, $matches);
 
-		$values = array_combine($matches[0], $matches[1]);
+		$raw = "";
+		if(empty($matches))
+		{
+			$raw = null;
+		}
+		else
+		{
+			$raw = $matches[1];
+		}
+
+		$exData = explode(" ", $data);
+		$values = [];
+		foreach($exData as $val) {
+			$tmp = explode("=", $val);
+			if($tmp[0] == "rawEvent")
+				break;
+			$values[$tmp[0]] = $tmp[1];
+		}
 
 		$event->src_ip = $values['src'] ?? null;
 		$event->dst_ip = $values['dst'] ?? null;
+		$event->src_mac = $values['smac'] ?? null;
+		$event->dst_mac = $values['dmac'] ?? null;
 		$event->src_port = $values['spt'] ?? null;
 		$event->dst_port = $values['dpt'] ?? null;
 		$event->protocol = $values['proto'] ?? $values['app'] ?? null;
-		$event->raw = $values['rawEvent'] ?? null;
+		$event->raw = $raw;
 
 		return $event;
 	}
