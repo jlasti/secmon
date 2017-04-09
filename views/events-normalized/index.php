@@ -9,35 +9,36 @@ use yii\widgets\Pjax;
 $this->params['title'] = 'Normalized Events';
 
 ?>
-<div class="events-normalized-index">
+<div class="events-normalized-index clickable-table">
 
-<?php Pjax::begin(); ?>    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+    <?php Pjax::begin(); ?>    <?= GridView::widget([
+            'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
+            'columns' => [
+                ['class' => 'yii\grid\SerialColumn'],
 
-            'id',
-            'datetime',
-            'host',
-            'cef_version',
-            'cef_vendor',
-            'cef_dev_prod',
-            'cef_dev_version',
-            'cef_event_class_id',
-            'cef_name',
-            'cef_severity',
-            'src_ip',
-            'dst_ip',
-            'src_port',
-            'dst_port',
-            'protocol',
-            'src_mac',
-            'dst_mac',
-            'extensions:ntext',
-            'raw:ntext',
+                // 'id',
+                'datetime',
+                'host',
+                // 'cef_version',
+                // 'cef_vendor',
+                // 'cef_dev_prod',
+                // 'cef_dev_version',
+                // 'cef_event_class_id',
+                'cef_name',
+                'cef_severity',
+                'src_ip',
+                'dst_ip',
+                'src_port',
+                'dst_port',
+                'protocol',
+                'src_mac',
+                'dst_mac',
+                // 'extensions:ntext',
+                // 'raw:ntext',
 
-            ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}'],
-        ],
-    ]); ?>
-<?php Pjax::end(); ?></div>
+                ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}'],
+            ],
+        ]); ?>
+    <?php Pjax::end(); ?>
+</div>

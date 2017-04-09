@@ -9,28 +9,29 @@ use yii\widgets\Pjax;
 $this->params['title'] = 'Correlated Events';
 
 ?>
-<div class="events-correlated-index">
+<div class="events-correlated-index clickable-table">
 
-<?php Pjax::begin(); ?>    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+    <?php Pjax::begin(); ?>    <?= GridView::widget([
+            'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
+            'columns' => [
+                ['class' => 'yii\grid\SerialColumn'],
 
-            'id',
-            'datetime',
-            'host',
-            'cef_version',
-            'cef_vendor',
-            'cef_dev_prod',
-            'cef_dev_version',
-            'cef_event_class_id',
-            'cef_name',
-            'cef_severity',
-            'parent_events',
-            'raw:ntext',
+                // 'id',
+                'datetime',
+                'host',
+                // 'cef_version',
+                // 'cef_vendor',
+                // 'cef_dev_prod',
+                // 'cef_dev_version',
+                // 'cef_event_class_id',
+                'cef_name',
+                'cef_severity',
+                'parent_events',
+                'raw:ntext',
 
-            ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}'],
-        ],
-    ]); ?>
-<?php Pjax::end(); ?></div>
+                ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}'],
+            ],
+        ]); ?>
+    <?php Pjax::end(); ?>
+</div>

@@ -254,3 +254,10 @@ body.compact .compact-button i {
   -o-transition: none !important;
   transition: none !important;
 }
+
+.clickable-table table tbody tr {
+    cursor: pointer;
+}
+.clickable-table table tbody tr:hover {
+    background-color: rgba(0,0,0,0.1);
+}
