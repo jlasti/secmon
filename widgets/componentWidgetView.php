@@ -34,9 +34,6 @@
                         <div class="circle-clipper right"><div class="circle"></div></div>
                     </div>
                 </div>
-                <div id="componentBody" style="display: none">
-
-                </div>
             </div>
 
             <!-- Modal Structure -->
