@@ -44,6 +44,10 @@ if ($index == 0)
                 'options' => [ 'class' => sprintf('input-field col m2%s', $additionalClass), 'data-type' => $typeName ]
             ])->dropDownList($r->getOperatorsForDropdown(), $opt);
 
+            echo $form->field($rule, "[$index]column", [
+                'options' => [ 'class' => sprintf('input-field col m2%s', $additionalClass), 'data-type' => $typeName ]
+            ])->dropDownList($r->getColumnsForDropdown(), $opt);
+
             if ($r->getValueType() == filter\FilterValueTypeEnum::DATE)
                 echo $form->field($rule, "[$index]value", [
                     'options' => [ 'class' => sprintf('input-field col m5%s',  $additionalClass), 'data-type' => $typeName ]

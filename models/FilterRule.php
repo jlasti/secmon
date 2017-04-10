@@ -54,7 +54,7 @@ class FilterRule extends \yii\db\ActiveRecord
         	[
             	['logic_operator', 'safe'],
 				[['filter_id'], 'integer'],
-				[['value'], 'string'],
+				[['value', 'column'], 'string'],
 				[['type', 'operator'], 'string', 'max' => 255],
         ]);
     }
@@ -70,6 +70,7 @@ class FilterRule extends \yii\db\ActiveRecord
             'type' => Yii::t('app', 'Type'),
             'value' => Yii::t('app', 'Value'),
             'operator' => Yii::t('app', 'Operator'),
+            'column' => Yii::t('app', 'Column'),
         ];
     }
 
@@ -93,6 +94,7 @@ class FilterRule extends \yii\db\ActiveRecord
 			'operator' => $this->operator,
 			'value' => $this->value,
 			'logic_operator' => $this->logic_operator,
+            'column' => $this->column,
 		];
 
 		return Yii::createObject($params);

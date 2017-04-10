@@ -14,12 +14,14 @@ abstract class BaseFilterRule extends Component
 	//region Private attributes
 	private $_collection;
     private $_operatorsDropdown = null;
+    private $_columnsDropdown = null;
 	//endregion
 
 	//region Public attributes
 	public $value;
 	public $operator;
 	public $logic_operator;
+    public $column;
 	//endregion
 
 	//region Constructor and init
@@ -46,6 +48,8 @@ abstract class BaseFilterRule extends Component
 	 */
 	public static abstract function operators();
 
+    public static abstract function columns();
+
     /**
      * Return combined array of operators.
      *
@@ -57,6 +61,14 @@ abstract class BaseFilterRule extends Component
             $this->_operatorsDropdown = array_combine($this->operators(), $this->operators());
 
         return $this->_operatorsDropdown;
+    }
+
+    public function getColumnsForDropdown()
+    {
+        if ($this->_columnsDropdown == null)
+            $this->_columnsDropdown = array_combine($this->columns(), $this->columns());
+
+        return $this->_columnsDropdown;
     }
 
     /**

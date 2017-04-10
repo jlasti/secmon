@@ -19,11 +19,11 @@ class TypeFilterRule extends BaseFilterRule
 		switch($this->logic_operator)
 		{
 			case 'OR':
-				$collection->orWhere([$this->operator, 'type_id', $this->value]);
+				$collection->orWhere([$this->operator, $this->column, $this->value]);
 				break;
 			case 'AND':
 			default:
-				$collection->andWhere([$this->operator, 'type_id', $this->value]);
+				$collection->andWhere([$this->operator, $this->column, $this->value]);
 				break;
 		}
 	}
@@ -38,4 +38,13 @@ class TypeFilterRule extends BaseFilterRule
 			'!=',
 		];
 	}
+
+    public static function columns()
+    {
+        return [
+            'cef_severity',
+            'src_port',
+            'dst_port',
+        ];
+    }
 }

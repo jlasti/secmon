@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use app\components\filter\FilterQuery;
 
 /**
  * This is the model class for table "events_normalized".
@@ -77,5 +78,13 @@ class EventsNormalized extends \yii\db\ActiveRecord
             'extensions' => 'Extensions',
             'raw' => 'Raw',
         ];
+    }
+
+    /**
+     * @return FilterQuery
+     */
+    public static function find()
+    {
+        return Yii::createObject(FilterQuery::className(), [get_called_class()]);
     }
 }
