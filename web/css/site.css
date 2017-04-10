@@ -214,8 +214,8 @@ body.compact .compact-button i {
   line-height: initial;
   font-weight: normal;
 }
-.grid-item { width: 25%; }
-.grid-item.width2 { width: 50%; }
+.grid-item { width: 24%; }
+.grid-item.width2 { width: 49%; }
 .grid-item.width3 { width: 75%; }
 .grid-item.width4 { width: 100%; }
 /* Draggabilly adds is-dragging */
@@ -260,4 +260,18 @@ body.compact .compact-button i {
 }
 .clickable-table table tbody tr:hover {
     background-color: rgba(0,0,0,0.1);
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.input-field.field-secrule-secconfigfile  {
+    position: static;
+}
+.file-field .help-block {
+    font-size: .8rem;
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+    margin-left: -30px;
 }

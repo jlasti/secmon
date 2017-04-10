@@ -13,6 +13,7 @@ use app\models\View;
  * @property integer $view_id
  * @property integer $filter_id
  * @property string $config
+ * @property integer $order
  *
  * @property Filter $filter
  * @property View $view
@@ -34,7 +35,7 @@ class Component extends \yii\db\ActiveRecord
     {
         return [
             [['view_id'], 'required'],
-            [['view_id', 'filter_id'], 'integer'],
+            [['view_id', 'filter_id', 'order'], 'integer'],
             [['config'], 'string'],
             [['filter_id'], 'exist', 'skipOnError' => true, 'targetClass' => Filter::className(), 'targetAttribute' => ['filter_id' => 'id']],
             [['view_id'], 'exist', 'skipOnError' => true, 'targetClass' => View::className(), 'targetAttribute' => ['view_id' => 'id']],
@@ -50,7 +51,8 @@ class Component extends \yii\db\ActiveRecord
             'id' => Yii::t('app', 'ID'),
             'view_id' => Yii::t('app', 'View ID'),
             'filter_id' => Yii::t('app', 'Filter ID'),
-            'config' => Yii::t('app', 'Config')
+            'config' => Yii::t('app', 'Config'),
+            'order' => Yii::t('app', 'Order')
         ];
     }
 

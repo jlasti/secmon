@@ -8,6 +8,7 @@ use app\models\SecRule\SecRuleSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 /**
  * SecRuleController implements the CRUD actions for SecRule model.
@@ -65,13 +66,20 @@ class SecRuleController extends Controller
     {
         $model = new SecRule();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+        if($model->load(Yii::$app->request->post()))
+        {
+			$model->secConfigFile = UploadedFile::getInstance($model, 'secConfigFile');
+
+			if($model->upload())
+			{
+				return $this->redirect(['view', 'id' => $model->id]);
+			}
         }
+
+        $model->state = true;
+		return $this->render('create', [
+			'model' => $model,
+		]);
     }
 
     /**
@@ -101,7 +109,14 @@ class SecRuleController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+
+        if (file_exists($model->link))
+        {
+            unlink($model->link);
+        }
+
+        $model->delete();
 
         return $this->redirect(['index']);
     }
