@@ -3,12 +3,15 @@
 namespace app\controllers;
 
 use app\models\FilterRule;
+use app\models\View;
 use Yii;
 use app\models\Filter;
+use app\models\Event;
 use app\models\Filter\FilterSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\Json;
 
 /**
  * FilterController implements the CRUD actions for Filter model.
@@ -89,17 +92,25 @@ class FilterController extends Controller
     {
 		$model = $this->findModel($id);
 
-		$rules = $this->_createRulesArray($model->rules);
+        $postRules = Yii::$app->request->post('FilterRule');
+        if (Yii::$app->request->isPost && ($postRules === null || count($postRules) === 0)) {
+            $model->delete();
+            return $this->redirect('');
+        }
+        else
+        {
+            $rules = $this->_createRulesArray($model->rules, $postRules);
 
-		if($this->save($model, $rules))
-		{
-			return $this->redirect(['view', 'id' => $model->id]);
-		}
+            if ($this->save($model, $rules))
+            {
+      			return $this->redirect(['view', 'id' => $model->id]);
+            }
 
-		return $this->render('update', [
-			'model' => $model,
-			'rules' => $rules,
-		]);
+            return $this->render('update', [
+                'model' => $model,
+                'rules' => $rules,
+            ]);
+        }
     }
 
     /**
@@ -125,6 +136,102 @@ class FilterController extends Controller
     {
         //todo - remove rule by $ruleId
         return $this->redirect(['update', 'id' => $id]);
+    }
+
+    public function actionGetFiltersOfUser($userId)
+    {
+        return Json::encode(self::getFiltersOfUser($userId));
+    }
+
+    public static function getFiltersOfUser($userId)
+    {
+        $loggedUserId = Yii::$app->user->getId();
+
+        if ( $loggedUserId != intval($userId)) return null;
+
+        $filters = Filter::findAll(['user_id' => $userId]);
+
+        return $filters;
+    }
+
+    public function actionAddFilterToComponent($filterId, $componentId)
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $loggedUserId = Yii::$app->user->getId();
+        $filter = Filter::findOne(['id' => $filterId]);
+        $component = View\Component::findOne(['id' => $componentId]);
+
+        if ( empty($filter) || $filter->user_id != $loggedUserId )
+            return null;
+
+        if ( !empty($component) )
+        {
+            $component->filter_id = $filterId;
+            $component->update();
+            $filteredData = $this->getFilteredEvents($filter->id);
+
+            return [
+                'html' => \app\widgets\FilterWidget::widget(['data' => compact('component', 'filter', 'filteredData')])
+            ];
+        }
+        else return null;
+    }
+
+    public function actionGetComponentContent($componentId)
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $loggedUserId = Yii::$app->user->getId();
+        $component = View\Component::findOne(['id' => $componentId]);
+        $filter = Filter::findOne(['id' => $component->filter_id]);
+
+        if ( empty($filter) || $filter->user_id != $loggedUserId )
+            return null;
+
+        if ( !empty($component) )
+        {
+            $filteredData = $this->getFilteredEvents($filter->id);
+
+            return [
+                'html' => \app\widgets\FilterWidget::widget(['data' => compact('component', 'filter', 'filteredData')])
+            ];
+        }
+        else
+            return null;
+    }
+
+    public function actionRemoveFilterFromComponent($componentId)
+    {
+        $loggedUserId = Yii::$app->user->getId();
+        $component = View\Component::findOne(['id' => $componentId]);
+
+        if (empty($component)) return null;
+
+        $filter = Filter::findOne(['id' => $component->filter_id]);
+
+        if ( empty($filter) || $filter->user_id != $loggedUserId ) return null;
+
+        if ( !empty($component) )
+        {
+            $component->filter_id = null;
+            $component->update();
+
+            return true;
+        }
+        else return null;
+    }
+
+    public function actionGetFilteredEvents($filterId)
+    {
+        return Json::encode($this->getFilteredEvents($filterId));
+    }
+
+    protected function getFilteredEvents($filterId)
+    {
+        $query = Event::find();
+        $filter = $this->findModel($filterId);
+        $filteredData = $query->applyFilter($filter)->all();
+
+        return $filteredData;
     }
 
     /**
@@ -159,50 +266,55 @@ class FilterController extends Controller
      * Prepares rules from $_POST
      *
      * @param FilterRule[] $rules Already existing rules, used in update
-     *
+     * @param FilterRule[] $postFilters Rulest sent from view
      * @return FilterRule[]
+     * @throws \yii\db\Exception
      */
-    protected function _createRulesArray($rules = null)
+    protected function _createRulesArray($rules = null, $postFilters = null)
 	{
 		$array = $rules ?? [
 			new FilterRule(),
 		];
 
-//		$postCount = count(Yii::$app->request->post('FilterRule'));
-//		$count = $postCount - count($array);
-
-        $count = count(Yii::$app->request->post('FilterRule')) - count($array);
-
-        for($i = 0; $i < $count; $i++)
-		{
-			$array[] = new FilterRule();
-		}
+		if ($postFilters === null)
+		    $postFilters = Yii::$app->request->post('FilterRule');
 
 		/**
 		 * if rules are already loaded and there are less rules in POST,
 		 * it means that a single or multiple rules were deleted,
 		 * so slice the array and return only so many rules as defined in POST
 		 */
-//		if($rules != null && $count < 0)
-//		{
-//			$delete = array_slice($array, $postCount);
-//
-//			$transaction = Yii::$app->db->beginTransaction();
-//
-//			foreach($delete as $rule)
-//			{
-//				if(!$rule->delete())
-//				{
-//					$transaction->rollBack();
-//
-//					throw new \yii\db\Exception('Cannot delete rule');
-//				}
-//			}
-//
-//			$transaction->commit();
-//
-//			$array = array_slice($array, 0, $postCount);
-//		}
+		if(Yii::$app->request->isPost && $rules != null && $postFilters != null)
+		{
+			$transaction = Yii::$app->db->beginTransaction();
+
+			foreach($array as $deleteKey => $rule)
+			{
+			    if ($rule->id != null)
+			    {
+                    $key = array_search($rule->id, array_column($postFilters, 'id'));
+                    if ($key === false)
+                    {
+                        if (!$rule->delete())
+                        {
+                            $transaction->rollBack();
+
+                            throw new \yii\db\Exception('Cannot delete rule');
+                        }
+                        array_splice($array, $deleteKey, 1);
+                    }
+                }
+			}
+
+			$transaction->commit();
+		}
+
+		// fit the length of array
+        $count = count($postFilters) - count($array);
+        for($i = 0; $i < $count; $i++)
+        {
+            $array[] = new FilterRule();
+        }
 
 		return $array;
 	}

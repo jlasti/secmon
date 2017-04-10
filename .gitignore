@@ -32,3 +32,6 @@ phpunit.phar
 composer.lock
 lastdepoy.txt
 output/
+
+# sec rules folder
+rules/uploads/

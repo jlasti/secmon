@@ -2,8 +2,10 @@ $(function () {
     //#region [ Fields ]
 
     var global = (function () { return this; })();
-    var options = {};
 
+    var hostUrl;
+    var options = {};
+    var activeComponentIds = [];
     var dashboardSelect;
     var widthSelect;
     var editBtn;
@@ -13,8 +15,9 @@ $(function () {
     var grid;
     var deleteComponentBtn;
     var componentForm;
+    var saveContentBtn;
+    var deleteContentBtn;
 
-    var hostUrl;
     var newComponentName = "New Component";
 
     //#endregion
@@ -25,6 +28,7 @@ $(function () {
     if (typeof (global.views) !== "function") {
         global.views = function (args) {
             $.extend(options, args || {});
+            $.extend(activeComponentIds, args.activeComponentIds || []);
 
             hostUrl = location.protocol + "//" + location.hostname + (location.port ? ":" + location.port : "");
             dashboardSelect = $('#dashboard');
@@ -34,7 +38,12 @@ $(function () {
             activeGrid = $('#grid_' + dashboardSelect.val());
             addComponentBtn = $("#addComponentBtn");
             deleteComponentBtn = $(".deleteComponentBtn");
-            componentForm = $(".componentForm");
+            componentForm = $("form.componentForm");
+            saveContentBtn = $("[data-action='saveComponentContent']");
+            deleteContentBtn = $("[data-action='removeComponentContent']");
+            nameInputs = $(".nameInput");
+
+
 
             // Inicializacia boxov.
             grid = $('.grid').packery({
@@ -59,13 +68,118 @@ $(function () {
             addComponentBtn.on('click', addComponentBtn_onClick);
             deleteComponentBtn.on('click', deleteComponentBtn_onClick);
             componentForm.on('submit', componentForm_onSubmit);
+            grid.on( 'dragItemPositioned', saveOrder_onDragItemPositioned );
+            saveContentBtn.on('click', saveContentBtn_onClick);
+            deleteContentBtn.on('click', deleteContentBtn_onClick);
+            nameInputs.on('focusout blur', name_onFocusOut);
+
+            // Show grid after js inicialization
+            $('.grid').removeClass("invisible");
+
+            setInterval(componentUpdate, 5000);
+            componentUpdate();
         }
     };
 
     //#endregion
 
+    function componentUpdate() {
+        activeComponentIds.forEach(function(item, index) {
+            $.ajax({
+                url: hostUrl + options.updateComponentContent,
+                data: { componentId : item },
+                async: true,
+                cache: false
+            }).done(function(data) {
+                if (!data) {
+                    Materialize.toast("Couldn't add filter to component.", 4000);
+                    return;
+                }
+                var cont = $("#componentContentBody" + item);
+                var loader = cont.find("#componentLoader");
+                var body = cont.find("#componentBody");
+                body.html(data.html);
+                loader.css('display', 'none');
+                body.css('display', 'block');
+            }).fail(function(){
+                Materialize.toast("Couldn't update component content!", 4000);
+            });
+        });
+    }
 
     //#region [ Event Handlers ]
+
+    /*
+     * Event handler na ulozenie konfiguracie obsahu
+     */
+    function saveContentBtn_onClick() {
+         var compId = $(this).attr('data-id');
+         var comp = $('#component_' + compId);
+         var data = $('#contentSettingsForm' + compId).serialize();
+         var remBtn = $("#removeComponentContentBtn" + compId);
+         var cont = $("#componentContentBody" + compId);
+         var contNew = $("#componentContentBodyNew" + compId);
+         var loader = cont.find("#componentLoader");
+         var body = cont.find("#componentBody");
+         var edit = comp.find("#contentEdit");
+         $.ajax({
+             url: hostUrl + options.updateComponentSettings,
+             data: data
+         }).done(function(data) {
+             if (!data){
+                 Materialize.toast("Couldn't add filter to component!", 4000);
+                 return;
+             }
+
+             remBtn.css('display', 'block');
+             cont.css('display', 'block');
+             contNew.css('display', 'none');
+             loader.css('display', 'inline-block');
+             body.css('display', 'none');
+             edit.css('display', 'block');
+
+             activeComponentIds.push(compId);
+
+             body.html(data.html);
+             loader.css('display', 'none');
+             body.css('display', 'block');
+
+         }).fail(function(){
+             Materialize.toast("Couldn't add filter to component!", 4000);
+         });
+    }
+
+    /*
+     * Event handler na vymazanie konfiguracie obsahu
+     */
+    function deleteContentBtn_onClick() {
+        var compId = $(this).attr('data-id');
+        var comp = $('#component_' + compId);
+        var data = $('#contentSettingsForm' + compId).serialize();
+        var remBtn = $("#removeComponentContentBtn" + compId);
+        var cont = $("#componentContentBody" + compId);
+        var contNew = $("#componentContentBodyNew" + compId);
+        var loader = cont.find("#componentLoader");
+        var body = cont.find("#componentBody");
+        var edit = comp.find("#contentEdit");
+        $.ajax({
+            url: hostUrl + options.deleteComponentSettings,
+            data: data
+        }).done(function(html) {
+            remBtn.css('display', 'none');
+            cont.css('display', 'none');
+            loader.css('display', 'none');
+            body.css('display', 'none');
+            edit.css('display', 'none');
+
+            var index = activeComponentIds.indexOf(compId);
+            if (index != -1)
+                activeComponentIds.splice(index, 1);
+
+            body.html('');
+            contNew.css('display', 'block');
+        });
+    }
 
     /*
      * Event handler na zmenu dashboardu
@@ -91,6 +205,7 @@ $(function () {
         var gridItemNode = $("#" + selectNode.attr('data-id'));
         gridItemNode.attr('class', 'grid-item card ' + this.value);
         grid.packery('fit', gridItemNode[0]);
+        gridItemNode.find("form.componentForm").submit();
     };
 
     /*
@@ -104,7 +219,8 @@ $(function () {
                 config : JSON.stringify({
                     name: newComponentName,
                     width: '',
-                })
+                }),
+                order : activeGrid.packery("getItemElements").length
             },
         }).done(function (data) {
             if (!data) {
@@ -116,9 +232,15 @@ $(function () {
             activeGrid
                 .append(gridItemNode)
                 .packery( 'appended', gridItemNode );
-
+            
+            // Inicializacia noveho grid itemu
             var draggie = new Draggabilly( gridItemNode[0] );
             activeGrid.packery( 'bindDraggabillyEvents', draggie );
+            gridItemNode.find('select').material_select();
+            gridItemNode.find('select.widthSelect').on("change", widthSelect_onChange);
+            gridItemNode.find('.modal').modal();
+            gridItemNode.find("[data-action='saveComponentContent']").on('click', saveContentBtn_onClick);
+            gridItemNode.find("[data-action='removeComponentContent']").on('click', deleteContentBtn_onClick);
         });
     };
 
@@ -144,11 +266,47 @@ $(function () {
     };
 
     /*
+     * Event handler pre ulozenie poradia komponentov
+     */
+    function saveOrder_onDragItemPositioned (e) {
+        var itemElems = activeGrid.packery('getItemElements');
+        var order = itemElems.map(function (item, index) {
+            return {
+                id: item.id.replace("component_", ""),
+                order: index
+            }
+        });
+
+        $.ajax({
+            url: hostUrl + options.updateOrder,
+            data : { 
+                viewId : dashboardSelect.val(),
+                componentOrder : JSON.stringify(order)
+            },
+        }).done(function (data) {
+            if (!data) {
+                Materialize.toast("Couldn't update order of components.", 4000);
+                return;
+            }
+        });
+    };
+
+    /*
+     * Event handler pre zmenu mena komponentu
+     */
+    function name_onFocusOut (e) {
+        var input = $(this);
+        var gridItemNode = $("#" + input.attr('data-id'));
+        gridItemNode.find(".nameTitle").html(input.val());
+        gridItemNode.find("form.componentForm").submit();
+    }
+
+    /*
      * Event handler pre update komponentu
      */
     function componentForm_onSubmit (e) {
         e.preventDefault();
-        
+
         var componentId = $(this).attr('data-id');
         var name = $(this).find("#name" + componentId).val();
         $.ajax({
@@ -163,10 +321,8 @@ $(function () {
         }).done(function (data) {
             if (!data) {
                 Materialize.toast("Couldn't update component.", 4000);
-                return;
+                return false;
             }
-
-            window.location.reload(true);
         });
 
         return false;
@@ -190,6 +346,10 @@ $(function () {
      * Funckia na vykreslenie ciary grafu
      */
     function DrawLineGraph(data){
+        if (!data) {
+            return;
+        }
+        
         var svg = d3.select("svg"),
             margin = {top: 20, right: 20, bottom: 30, left: 50},
             width = +svg.attr("width") - margin.left - margin.right,

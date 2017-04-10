@@ -13,12 +13,19 @@ class Navigation extends \yii\base\Component
 		$this->_items = 
 		[
 	        [
-				'label' => 'Events',
-				'url' => ['/event'],
+				'label' => 'Correlated Events',
+				'url' => ['/events-correlated'],
 				'visible' => true,
-				'active' => 'event',
+				'active' => 'events-correlated',
 				'icon' => 'event'
 	        ],
+            [
+                'label' => 'Normalized Events',
+                'url' => ['/events-normalized'],
+                'visible' => true,
+                'active' => 'events-normalized',
+                'icon' => 'event'
+            ],
 	        [ 
 				'label' => 'Dashboard', 
 				'url' => ['/view'],

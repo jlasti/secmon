@@ -13,6 +13,14 @@ $(function () {
     activateDatePicker();
 
     $("body").removeClass("preload");
+
+    // Kliknutie na riadok tabulky zobrazi detail
+    $(".clickable-table table tbody tr").one( "singleclick", function() {
+        $(this).find('a > i').click();
+    });
+
+    //Vlozenie search ikonky do riadku flitrov
+    $("table tr.filters td").first().html("<i class='material-icons'>search</i>");    
 });
 
 /*

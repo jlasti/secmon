@@ -3,17 +3,16 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\SecRule;
-use app\models\SecRule\SecRuleSearch;
+use app\models\EventsNormalized;
+use app\models\EventsNormalizedSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii\web\UploadedFile;
 
 /**
- * SecRuleController implements the CRUD actions for SecRule model.
+ * EventsNormalizedController implements the CRUD actions for EventsNormalized model.
  */
-class SecRuleController extends Controller
+class EventsNormalizedController extends Controller
 {
     /**
      * @inheritdoc
@@ -31,12 +30,12 @@ class SecRuleController extends Controller
     }
 
     /**
-     * Lists all SecRule models.
+     * Lists all EventsNormalized models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new SecRuleSearch();
+        $searchModel = new EventsNormalizedSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -46,8 +45,8 @@ class SecRuleController extends Controller
     }
 
     /**
-     * Displays a single SecRule model.
-     * @param integer $id
+     * Displays a single EventsNormalized model.
+     * @param string $id
      * @return mixed
      */
     public function actionView($id)
@@ -58,34 +57,27 @@ class SecRuleController extends Controller
     }
 
     /**
-     * Creates a new SecRule model.
+     * Creates a new EventsNormalized model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new SecRule();
+        $model = new EventsNormalized();
 
-        if($model->load(Yii::$app->request->post()))
-        {
-			$model->secConfigFile = UploadedFile::getInstance($model, 'secConfigFile');
-
-			if($model->upload())
-			{
-				return $this->redirect(['view', 'id' => $model->id]);
-			}
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        } else {
+            return $this->render('create', [
+                'model' => $model,
+            ]);
         }
-
-        $model->state = true;
-		return $this->render('create', [
-			'model' => $model,
-		]);
     }
 
     /**
-     * Updates an existing SecRule model.
+     * Updates an existing EventsNormalized model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
+     * @param string $id
      * @return mixed
      */
     public function actionUpdate($id)
@@ -102,35 +94,28 @@ class SecRuleController extends Controller
     }
 
     /**
-     * Deletes an existing SecRule model.
+     * Deletes an existing EventsNormalized model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
+     * @param string $id
      * @return mixed
      */
     public function actionDelete($id)
     {
-        $model = $this->findModel($id);
-
-        if (file_exists($model->link))
-        {
-            unlink($model->link);
-        }
-
-        $model->delete();
+        $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
     }
 
     /**
-     * Finds the SecRule model based on its primary key value.
+     * Finds the EventsNormalized model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return SecRule the loaded model
+     * @param string $id
+     * @return EventsNormalized the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = SecRule::findOne($id)) !== null) {
+        if (($model = EventsNormalized::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
