@@ -22,11 +22,11 @@ class DateFilterRule extends BaseFilterRule
 		switch($this->logic_operator)
 		{
 			case 'OR':
-				$collection->orWhere([$this->operator, 'timestamp', $this->value]);
+				$collection->orWhere([$this->operator, 'datetime', $this->value]);
 				break;
 			case 'AND':
 			default:
-				$collection->andWhere([$this->operator, 'timestamp', $this->value]);
+				$collection->andWhere([$this->operator, 'datetime', $this->value]);
 				break;
 		}
 	}

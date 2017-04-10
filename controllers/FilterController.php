@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\EventsNormalized;
 use app\models\FilterRule;
 use app\models\View;
 use Yii;
@@ -227,7 +228,7 @@ class FilterController extends Controller
 
     protected function getFilteredEvents($filterId)
     {
-        $query = Event::find();
+        $query = EventsNormalized::find();
         $filter = $this->findModel($filterId);
         $filteredData = $query->applyFilter($filter)->all();
 

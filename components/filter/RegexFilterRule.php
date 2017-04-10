@@ -31,11 +31,11 @@ class RegexFilterRule extends BaseFilterRule
 		switch($this->logic_operator)
 		{
 			case 'OR':
-				$collection->orWhere([$this->operator, 'description', $this->value]);
+				$collection->orWhere([$this->operator, 'raw', $this->value]);
 				break;
 			case 'AND':
 			default:
-				$collection->andWhere([$this->operator, 'description', $this->value]);
+				$collection->andWhere([$this->operator, 'raw', $this->value]);
 				break;
 		}
 	}

@@ -19,11 +19,11 @@ class TypeFilterRule extends BaseFilterRule
 		switch($this->logic_operator)
 		{
 			case 'OR':
-				$collection->orWhere([$this->operator, 'type_id', $this->value]);
+				$collection->orWhere([$this->operator, 'dst_port', $this->value]);
 				break;
 			case 'AND':
 			default:
-				$collection->andWhere([$this->operator, 'type_id', $this->value]);
+				$collection->andWhere([$this->operator, 'dst_port', $this->value]);
 				break;
 		}
 	}
