@@ -223,6 +223,7 @@ class FilterController extends Controller
 
     public function actionGetFilteredEvents($filterId)
     {
+
         return Json::encode($this->getFilteredEvents($filterId));
     }
 
@@ -230,8 +231,7 @@ class FilterController extends Controller
     {
         $query = EventsNormalized::find();
         $filter = $this->findModel($filterId);
-        $filteredData = $query->applyFilter($filter)->all();
-
+        $filteredData = $query->applyFilter($filter);
         return $filteredData;
     }
 
