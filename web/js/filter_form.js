@@ -65,11 +65,6 @@ function removeRule(element) {
 			$('#rules').find('.rule').each(function(i, e) {
 				changeRuleIndex(e, index++, -1);
 			});
-
-			// hide last logical operator
-            rule = $('*[data-rule=\''+ (index - 1) +'\']');
-            var ruleLogic = rule.find('#logic');
-            ruleLogic.addClass('hide');
 		}
 		else
 			console.log('Failed to found rule ' + index);
@@ -80,6 +75,17 @@ function changeRuleIndex(ruleElement, newIndex, removeId) {
 	var element = $(ruleElement);
 	var oldIndex = element.attr('data-rule');
 	if (oldIndex != newIndex) {
+		var logic = element.find('#logic');
+        var logicSelect = logic.find('[data-value-type="filter_rule_logic_operator"]');
+		if (newIndex == 0) {
+            logic.addClass('hide');
+            logicSelect.attr('disabled', 'disabled');
+        }
+		else {
+            logic.removeClass('hide');
+            logicSelect.removeAttr('disabled');
+        }
+
 		element.attr('data-rule', newIndex);
 		element.find('input, select').each(function(i, e) {
 			var el = $(e);
@@ -99,14 +105,14 @@ $(document).ready(function () {
 		var nr = rules.length;
 		var newElement = newFilterTemplate.clone();
 
-		var lastRule = $('*[data-rule=\''+ (nr - 1) +'\']');
-		var lastRuleLogic = lastRule.find('#logic');
-		lastRuleLogic.removeClass('hide');
-
 		var newRuleLogic = newElement.find('#logic');
-		newRuleLogic.addClass('hide');
+		newRuleLogic.removeClass('hide');
+		var newRuleId = newElement.find('[data-value-type="filter_rule_id"]');
+		newRuleId.attr('disabled', 'disabled');
 
 		changeRuleIndex(newElement, nr, -1);
+
+
 
 		newElement.find('input[type=text]').val('');
 
