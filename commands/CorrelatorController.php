@@ -57,7 +57,9 @@ class CorrelatorController extends Controller
 			{
 				if(!array_key_exists($file, $streamPosition))
 				{
-					$streamPosition[$file] = 0;
+					$pathToFile = $logPath . "/" . $file;
+					$totalLines = intval(exec("wc -l '$pathToFile'"));
+					$streamPosition[$file] = $totalLines;
 				}
 				usleep(300000); // nutne kvoli vytazeniu CPU
 				clearstatcache(false, $logPath . "/" . $file);
@@ -70,11 +72,11 @@ class CorrelatorController extends Controller
 						flush();
 					}
 				}
+
 				$streamPosition[$file] = ftell($stream);
 				fclose($stream);
 			}
-
-
+			
 			socket_set_blocking($normInputStream, false);
 			$line = fgets($normInputStream);
 			
