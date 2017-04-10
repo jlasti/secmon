@@ -223,8 +223,40 @@ class FilterController extends Controller
         if ( !empty($component) )
         {
             $filteredData = $this->getFilteredEvents($filter->id);
+            $contentTypeId =  Json::decode($component->config)['dataType'];
+
+            if ($contentTypeId == 'lineChart') {
+                return [
+                    'contentTypeId' => $contentTypeId,
+                    'data' => '[{"hour":"0","count":33},
+                        {"hour":"1","count":12},
+                        {"hour":"2","count":41},
+                        {"hour":"3","count":59},
+                        {"hour":"4","count":38},
+                        {"hour":"5","count":21},
+                        {"hour":"6","count":25},
+                        {"hour":"7","count":21},
+                        {"hour":"8","count":25},
+                        {"hour":"9","count":33},
+                        {"hour":"10","count":12},
+                        {"hour":"11","count":41},
+                        {"hour":"12","count":16},
+                        {"hour":"13","count":59},
+                        {"hour":"14","count":38},
+                        {"hour":"15","count":21},
+                        {"hour":"16","count":25},
+                        {"hour":"17","count":30},
+                        {"hour":"18","count":47},
+                        {"hour":"19","count":5},
+                        {"hour":"20","count":20},
+                        {"hour":"21","count":13},
+                        {"hour":"22","count":29},
+                        {"hour":"23","count":29}]'
+                ];
+            }
 
             return [
+                'contentTypeId' => $contentTypeId,
                 'html' => \app\widgets\FilterWidget::widget(['data' => compact('component', 'filter', 'filteredData')])
             ];
         }

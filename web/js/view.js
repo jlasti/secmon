@@ -76,8 +76,8 @@ $(function () {
             // Show grid after js inicialization
             $('.grid').removeClass("invisible");
 
-            //setInterval(componentUpdate, 5000);
-            //componentUpdate();
+            setInterval(componentUpdate, 5000);
+            componentUpdate();
         }
     };
 
@@ -100,7 +100,15 @@ $(function () {
                     var loader = cont.find("#componentLoader");
                     var body = cont.find("#componentBody");
                     loader.css('display', 'none');
-                    cont.html(data.html);
+
+                    if (data.contentTypeId == "table") {
+                        cont.html(data.html);
+                    }
+                    if (data.contentTypeId == "lineChart") {
+                        var width = parseInt(cont.css("width").replace("px",""));
+                        cont.empty();
+                        DrawBarGraph(JSON.parse(data.data), width/2, width, "#componentContentBody" + item);
+                    }
                 }).fail(function () {
                     Materialize.toast("Couldn't update component content!", 4000);
                 });
@@ -132,6 +140,20 @@ $(function () {
                  Materialize.toast("Couldn't add filter to component!", 4000);
                  return;
              }
+             
+             // Update komponentu
+             $("#componentContentBody" + compId).attr('data-type', data.contentTypeId);
+             $.ajax({
+                url: hostUrl + options.updateComponent,
+                data : { 
+                    componentId : compId,
+                    config : JSON.stringify({
+                        name: comp.find("#name" + compId).val(),
+                        width: comp.find("#width" + compId).val(),
+                        dataType: data.contentTypeId
+                    })
+                },
+            });
 
              remBtn.css('display', 'block');
              cont.css('display', 'block');
@@ -230,6 +252,7 @@ $(function () {
                 config : JSON.stringify({
                     name: newComponentName,
                     width: '',
+                    dataType: 'table'
                 }),
                 order : activeGrid.packery("getItemElements").length
             },
@@ -319,7 +342,7 @@ $(function () {
         e.preventDefault();
 
         var componentId = $(this).attr('data-id');
-        var name = $(this).find("#name" + componentId).val();
+        
         $.ajax({
             url: hostUrl + options.updateComponent,
             data : { 
@@ -327,6 +350,7 @@ $(function () {
                 config : JSON.stringify({
                     name: $(this).find("#name" + componentId).val(),
                     width: $(this).find("#width" + componentId).val(),
+                    dataType: $("#componentContentBody" + componentId).attr('data-type')
                 })
             },
         }).done(function (data) {

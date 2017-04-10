@@ -26,7 +26,7 @@
             </div>
 
             <!--Visible: If filter was added to component-->
-            <div class="section center-align" id="componentContentBody<?= $component->id ?>" style="display: <?= $component->filter_id != null ? 'block' : 'none' ?>">
+            <div class="section center-align" id="componentContentBody<?= $component->id ?>" data-type='<?= $options['dataType'] ?>' style="display: <?= $component->filter_id != null ? 'block' : 'none' ?>">
                 <div id="componentLoader" class="preloader-wrapper active" style="display: inline-block">
                     <div class="spinner-layer spinner-blue-only">
                         <div class="circle-clipper left"><div class="circle"></div></div>
