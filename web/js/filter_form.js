@@ -74,7 +74,7 @@ function removeRule(element) {
 function changeRuleIndex(ruleElement, newIndex, removeId) {
 	var element = $(ruleElement);
 	var oldIndex = element.attr('data-rule');
-	if (oldIndex != newIndex) {
+	// if (oldIndex != newIndex) {
 		var logic = element.find('#logic');
         var logicSelect = logic.find('[data-value-type="filter_rule_logic_operator"]');
 		if (newIndex == 0) {
@@ -96,7 +96,7 @@ function changeRuleIndex(ruleElement, newIndex, removeId) {
 		element.find('select[data-rule-type]').each(function(i, e) {
 			$(e).attr('data-rule-type', newIndex);
 		});
-	}
+	// }
 }
 
 $(document).ready(function () {
@@ -111,8 +111,6 @@ $(document).ready(function () {
 		newRuleId.attr('disabled', 'disabled');
 
 		changeRuleIndex(newElement, nr, -1);
-
-
 
 		newElement.find('input[type=text]').val('');
 

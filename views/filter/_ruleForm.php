@@ -25,7 +25,7 @@ if ($index == 0)
     <div class="row">
         <?= $form->field($rule, "[$index]id", ['options' => [ 'class' => 'hide' ]])->hiddenInput([ 'data-value-type' => 'filter_rule_id' ]) ?>
 
-        <?= $form->field($rule, "[$index]type", [ 'options' => [ 'class' => 'input-field col m4' ]])
+        <?= $form->field($rule, "[$index]type", [ 'options' => [ 'class' => 'input-field col m3' ]])
             ->dropDownList($typesDown, [ 'data-rule-type' => $index ]) ?>
 
         <?php
@@ -50,17 +50,17 @@ if ($index == 0)
 
             if ($r->getValueType() == filter\FilterValueTypeEnum::DATE)
                 echo $form->field($rule, "[$index]value", [
-                    'options' => [ 'class' => sprintf('input-field col m5%s',  $additionalClass), 'data-type' => $typeName ]
+                    'options' => [ 'class' => sprintf('input-field col m4%s',  $additionalClass), 'data-type' => $typeName ]
                 ])->textInput(array_merge($opt, [ 'class' => 'datepicker' ]));
             else
                 echo $form->field($rule, "[$index]value", [
-                    'options' => [ 'class' => sprintf('input-field col m5%s',  $additionalClass), 'data-type' => $typeName ]
+                    'options' => [ 'class' => sprintf('input-field col m4%s',  $additionalClass), 'data-type' => $typeName ]
                 ])->textInput($opt);
         }
         ?>
 
         <div class="input-field col m1">
-            <a href="#" class="btn-floating waves-effect waves-light red" data-rule-remove="<?= $rule->id ?? -1 ?>"
+            <a href="#" class="btn-floating waves-effect waves-light red" data-rule-remove="<?= $rule->id ?? -1 ?>" data-type="remove-btn"
                data-rule-index="<?= $index ?>" data-filter-id="<?= $model->id ?>" onclick="removeRule(this);"><i class="material-icons">remove</i></a>
         </div>
     </div>
