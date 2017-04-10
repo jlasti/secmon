@@ -76,8 +76,8 @@ $(function () {
             // Show grid after js inicialization
             $('.grid').removeClass("invisible");
 
-            setInterval(componentUpdate, 5000);
-            componentUpdate();
+            //setInterval(componentUpdate, 5000);
+            //componentUpdate();
         }
     };
 
@@ -99,9 +99,8 @@ $(function () {
                     var cont = $("#componentContentBody" + item);
                     var loader = cont.find("#componentLoader");
                     var body = cont.find("#componentBody");
-                    body.html(data.html);
                     loader.css('display', 'none');
-                    body.css('display', 'block');
+                    cont.html(data.html);
                 }).fail(function () {
                     Materialize.toast("Couldn't update component content!", 4000);
                 });
@@ -124,6 +123,7 @@ $(function () {
          var loader = cont.find("#componentLoader");
          var body = cont.find("#componentBody");
          var edit = comp.find("#contentEdit");
+
          $.ajax({
              url: hostUrl + options.updateComponentSettings,
              data: data
@@ -137,16 +137,20 @@ $(function () {
              cont.css('display', 'block');
              contNew.css('display', 'none');
              loader.css('display', 'inline-block');
-             body.css('display', 'none');
              edit.css('display', 'block');
 
-             if (activeComponentIds.indexOf(compId) == -1)
+             if (activeComponentIds.indexOf(compId) == -1) {
                 activeComponentIds.push(compId);
+             }
 
-             body.html(data.html);
-             loader.css('display', 'none');
-             body.css('display', 'block');
-
+             if (data.contentTypeId == "table") {
+                cont.html(data.html);
+             }
+             if (data.contentTypeId == "lineChart") {
+                var width = parseInt(cont.css("width").replace("px",""));
+                cont.empty();
+                DrawBarGraph(JSON.parse(data.data), width/2, width, "#componentContentBody" + compId);
+             }
          }).fail(function(){
              Materialize.toast("Couldn't add filter to component!", 4000);
          });
@@ -209,6 +213,10 @@ $(function () {
         gridItemNode.attr('class', 'grid-item card ' + this.value);
         grid.packery('fit', gridItemNode[0]);
         gridItemNode.find("form.componentForm").submit();
+
+        // Resize graph
+        var width = parseInt(gridItemNode.find(".card-content").css("width").replace("px",""));
+        UpdateBarGraph(width, width/2, "#componentContentBody" + gridItemNode.find("form.componentForm").attr('data-id'));
     };
 
     /*
@@ -346,9 +354,9 @@ $(function () {
     };
 
     /*
-     * Funckia na vykreslenie ciary grafu
+     * Funkcia na vykreslenie ciary grafu
      */
-    function DrawLineGraph(data){
+    function DrawLineGraph(data) {
         if (!data) {
             return;
         }
@@ -401,6 +409,179 @@ $(function () {
             .datum(data)
             .attr("class", "line")
             .attr("d", line);
+    };
+
+    /*
+     * Funkcia na vykreslenie bar grafu
+     */
+    function DrawBarGraph(data,outboundHeight,outboungWidth,node) {
+        if (!data || !outboundHeight || !outboungWidth || !node) {
+            return;
+        }
+
+        // set the dimensions and margins of the graph
+        var margin = {top: 20, right: 20, bottom: 30, left: 40},
+            width = outboungWidth - margin.left - margin.right,
+            height = outboundHeight - margin.top - margin.bottom;
+
+        // set the ranges
+        var x = d3.scaleBand()
+                    .range([0, width])
+                    .padding(0.1);
+        var y = d3.scaleLinear()
+                    .range([height, 0]);
+                    
+        // append the svg object to the body of the page
+        // append a 'group' element to 'svg'
+        // moves the 'group' element to the top left margin
+        var svg = d3.select(node).append("svg")
+            .attr("id","barChart")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", 
+                    "translate(" + margin.left + "," + margin.top + ")");
+
+        // format the data
+        data.forEach(function(d) {
+        d.count = +d.count;
+        });
+
+        // Scale the range of the data in the domains
+        x.domain(data.map(function(d) { return d.hour; }));
+        y.domain([0, d3.max(data, function(d) { return d.count; })]);
+
+        // append the rectangles for the bar chart
+        svg.selectAll(".bar")
+            .data(data)
+        .enter().append("rect")
+            .attr("class", "bar")
+            .attr("x", function(d) { return x(d.hour); })
+            .attr("width", x.bandwidth())
+            .attr("y", function(d) { return y(d.count); })
+            .attr("height", function(d) { return height - y(d.count); })
+            .attr("fill", "#039be5")
+            .on("mouseover", function() {
+                d3.select(this)
+                    .attr("fill", "#F44336");
+            })
+            .on("mouseout", function(d, i) {
+                d3.select(this).attr("fill", "#039be5");
+            })
+            .append("title")
+            .text(function(d) {
+                return d.hour;
+            });
+
+        // add the x Axis
+        svg.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(
+            d3.axisBottom(x)
+            );
+
+        // add the y Axis
+        svg.append("g")
+            .call(
+            d3.axisLeft(y)
+            );
+
+        var bars = svg.selectAll(".bar");
+
+        bars.on("mouseover", function() {
+            d3.select(this)
+            .attr("fill", "red");
+        });
+    };
+
+    /*
+    * Funkcia na update bar grafu
+    */
+    function UpdateBarGraph(outboundHeight,outboungWidth,node) {
+        if (!outboundHeight || !outboungWidth || !node) {
+            return;
+        }
+
+        var data = d3.select(node).selectAll("#barChart").data();
+
+        if (!data) {
+            return;
+        }
+
+        d3.select(node).selectAll("#barChart").remove();
+
+        // set the dimensions and margins of the graph
+        var margin = {top: 20, right: 20, bottom: 30, left: 40},
+            width = outboungWidth - margin.left - margin.right,
+            height = outboundHeight - margin.top - margin.bottom;
+
+        // set the ranges
+        var x = d3.scaleBand()
+                    .range([0, width])
+                    .padding(0.1);
+        var y = d3.scaleLinear()
+                    .range([height, 0]);
+                    
+        // append the svg object to the body of the page
+        // append a 'group' element to 'svg'
+        // moves the 'group' element to the top left margin
+        var svg = d3.select(node).append("svg")
+            .attr("id","barChart")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        // format the data
+        data.forEach(function(d) {
+            d.count = +d.count;
+        });
+
+        // Scale the range of the data in the domains
+        x.domain(data.map(function(d) { return d.hour; }));
+        y.domain([0, d3.max(data, function(d) { return d.count; })]);
+
+        // append the rectangles for the bar chart
+        svg.selectAll(".bar")
+            .data(data)
+        .enter().append("rect")
+            .attr("class", "bar")
+            .attr("x", function(d) { return x(d.hour); })
+            .attr("width", x.bandwidth())
+            .attr("y", function(d) { return y(d.count); })
+            .attr("height", function(d) { return height - y(d.count); })
+            .attr("fill", "#039be5")
+            .on("mouseover", function() {
+                d3.select(this)
+                    .attr("fill", "#F44336");
+            })
+            .on("mouseout", function(d, i) {
+                d3.select(this).attr("fill", "#039be5");
+            })
+            .append("title")
+            .text(function(d) {
+                return d.hour;
+            });
+
+        // add the x Axis
+        svg.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(
+            d3.axisBottom(x)
+        );
+
+        // add the y Axis
+        svg.append("g")
+            .call(
+            d3.axisLeft(y)
+        );
+
+        var bars = svg.selectAll(".bar");
+
+        bars.on("mouseover", function() {
+                d3.select(this)
+                    .attr("fill", "red");
+        });
     };
 
     //#endregion

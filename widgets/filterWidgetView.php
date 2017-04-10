@@ -1,15 +1,18 @@
 <table class="striped">
     <thead>
         <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Timestamp</th>
-            <th>TypeID</th>
+            <th>Datetime</th>
+            <th>Host</th>
+            <th>Protocol</th>
         </tr>
     </thead>
     <tbody>
         <?php foreach ($filteredData as $data): ?>
-        
+        <tr>
+            <td><?= $data->datetime ?></td>
+            <td><?= $data->host ?></td>
+            <td><?= $data->protocol ?></td>
+        </tr>
         <?php endforeach; ?>
     </tbody>
 </table>
