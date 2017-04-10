@@ -15,7 +15,7 @@ $(function () {
     $("body").removeClass("preload");
 
     // Kliknutie na riadok tabulky zobrazi detail
-    $(".clickable-table table tbody tr").one( "singleclick", function() {
+    $(".clickable-table table tbody tr").one( "click", function() {
         $(this).find('a > i').click();
     });
 
