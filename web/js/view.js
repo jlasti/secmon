@@ -381,17 +381,29 @@ $(function () {
     /*
      * Funkcia na vykreslenie ciary grafu
      */
-    function DrawLineGraph(data) {
-        if (!data) {
+    function DrawLineGraph(data,outboundHeight,outboundWidth,node) {
+        if (!data || !outboundHeight || !outboundWidth || !node) {
             return;
         }
-        
-        var svg = d3.select("svg"),
-            margin = {top: 20, right: 20, bottom: 30, left: 50},
-            width = +svg.attr("width") - margin.left - margin.right,
-            height = +svg.attr("height") - margin.top - margin.bottom;
 
-        svg.selectAll("*").remove();
+        // set the dimensions and margins of the graph
+        var margin = {top: 20, right: 20, bottom: 30, left: 40},
+            width = outboundWidth - margin.left - margin.right,
+            height = outboundHeight - margin.top - margin.bottom;
+
+
+        // append the svg object to the body of the page
+        // append a 'group' element to 'svg'
+        // moves the 'group' element to the top left margin
+        var svg = d3.select(node).append("svg")
+            .attr("id","barChart")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform",
+                "translate(" + margin.left + "," + margin.top + ")");
+
+
         var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
         var parseTime = d3.timeParse("%H-%M");
@@ -403,16 +415,95 @@ $(function () {
 
         var line = d3.line()
             .x(function(d) { return x(d.time); })
-            .y(function(d) { return y(d.count); });
+            .y(function(d) { return y(d.y); });
 
         for ( var i = 0 ; i < data.length ; i++ )
         {
             data[i].time = parseTime(data[i].time);
-            data[i].count = +data[i].count;
+            data[i].y = +data[i].y;
         }
 
         x.domain(d3.extent(data, function(d) { return d.time; }));
-        y.domain(d3.extent(data, function(d) { return d.count; }));
+        y.domain(d3.extent(data, function(d) { return d.y; }));
+
+        g.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+
+        g.append("g")
+            .attr("class", "axis axis--y")
+            .call(d3.axisLeft(y))
+            .append("text")
+            .attr("fill", "#000")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", "0.71em")
+            .style("text-anchor", "end")
+            .text("Number of fault logins");
+
+        g.append("path")
+            .datum(data)
+            .attr("class", "line")
+            .attr("d", line);
+    };
+
+    /*
+     *  Update funkcia ciaroveho grafu
+     *
+     */
+    function UpdateLineGraph(outboundHeight,outboundWidth,node) {
+        if (!outboundHeight || !outboundWidth || !node) {
+            return;
+        }
+
+        var data = d3.select(node).selectAll("svg").selectAll(".bar").data();
+
+        if (!data) {
+            return;
+        }
+
+        d3.select(node).selectAll("#lineChart").remove();
+
+        // set the dimensions and margins of the graph
+        var margin = {top: 20, right: 20, bottom: 30, left: 40},
+            width = outboundWidth - margin.left - margin.right,
+            height = outboundHeight - margin.top - margin.bottom;
+
+
+        // append the svg object to the body of the page
+        // append a 'group' element to 'svg'
+        // moves the 'group' element to the top left margin
+        var svg = d3.select(node).append("svg")
+            .attr("id","lineChart")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform",
+                "translate(" + margin.left + "," + margin.top + ")");
+
+
+        var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        var parseTime = d3.timeParse("%H-%M");
+        var x = d3.scaleTime()
+            .rangeRound([0, width]);
+
+        var y = d3.scaleLinear()
+            .rangeRound([height, 0]);
+
+        var line = d3.line()
+            .x(function(d) { return x(d.time); })
+            .y(function(d) { return y(d.y); });
+
+        for ( var i = 0 ; i < data.length ; i++ )
+        {
+            data[i].time = parseTime(data[i].time);
+            data[i].y = +data[i].y;
+        }
+
+        x.domain(d3.extent(data, function(d) { return d.time; }));
+        y.domain(d3.extent(data, function(d) { return d.y; }));
 
         g.append("g")
             .attr("class", "axis axis--x")
@@ -439,14 +530,14 @@ $(function () {
     /*
      * Funkcia na vykreslenie bar grafu
      */
-    function DrawBarGraph(data,outboundHeight,outboungWidth,node) {
-        if (!data || !outboundHeight || !outboungWidth || !node) {
+    function DrawBarGraph(data,outboundHeight,outboundWidth,node) {
+        if (!data || !outboundHeight || !outboundWidth || !node) {
             return;
         }
 
         // set the dimensions and margins of the graph
         var margin = {top: 20, right: 20, bottom: 30, left: 40},
-            width = outboungWidth - margin.left - margin.right,
+            width = outboundWidth - margin.left - margin.right,
             height = outboundHeight - margin.top - margin.bottom;
 
         // set the ranges
@@ -473,18 +564,18 @@ $(function () {
         });
 
         // Scale the range of the data in the domains
-        x.domain(data.map(function(d) { return d.hour; }));
-        y.domain([0, d3.max(data, function(d) { return d.count; })]);
+        x.domain(data.map(function(d) { return d.x; }));
+        y.domain([0, d3.max(data, function(d) { return d.y; })]);
 
         // append the rectangles for the bar chart
         svg.selectAll(".bar")
             .data(data)
         .enter().append("rect")
             .attr("class", "bar")
-            .attr("x", function(d) { return x(d.hour); })
+            .attr("x", function(d) { return x(d.x); })
             .attr("width", x.bandwidth())
-            .attr("y", function(d) { return y(d.count); })
-            .attr("height", function(d) { return height - y(d.count); })
+            .attr("y", function(d) { return y(d.y); })
+            .attr("height", function(d) { return height - y(d.y); })
             .attr("fill", "#039be5")
             .on("mouseover", function() {
                 d3.select(this)
@@ -495,7 +586,7 @@ $(function () {
             })
             .append("title")
             .text(function(d) {
-                return d.hour;
+                return d.x;
             });
 
         // add the x Axis
@@ -522,13 +613,12 @@ $(function () {
     /*
     * Funkcia na update bar grafu
     */
-    function UpdateBarGraph(outboundHeight,outboungWidth,node) {
-        if (!outboundHeight || !outboungWidth || !node) {
+    function UpdateBarGraph(outboundHeight,outboundWidth,node) {
+        if (!outboundHeight || !outboundWidth || !node) {
             return;
         }
 
         var data = d3.select(node).selectAll("svg").selectAll(".bar").data();
-        console.log(node);
 
         if (!data) {
             return;
@@ -538,7 +628,7 @@ $(function () {
 
         // set the dimensions and margins of the graph
         var margin = {top: 20, right: 20, bottom: 30, left: 40},
-            width = outboungWidth - margin.left - margin.right,
+            width = outboundWidth - margin.left - margin.right,
             height = outboundHeight - margin.top - margin.bottom;
 
         // set the ranges
@@ -564,18 +654,18 @@ $(function () {
         });
 
         // Scale the range of the data in the domains
-        x.domain(data.map(function(d) { return d.hour; }));
-        y.domain([0, d3.max(data, function(d) { return d.count; })]);
+        x.domain(data.map(function(d) { return d.x; }));
+        y.domain([0, d3.max(data, function(d) { return d.y; })]);
 
         // append the rectangles for the bar chart
         svg.selectAll(".bar")
             .data(data)
         .enter().append("rect")
             .attr("class", "bar")
-            .attr("x", function(d) { return x(d.hour); })
+            .attr("x", function(d) { return x(d.x); })
             .attr("width", x.bandwidth())
-            .attr("y", function(d) { return y(d.count); })
-            .attr("height", function(d) { return height - y(d.count); })
+            .attr("y", function(d) { return y(d.y); })
+            .attr("height", function(d) { return height - y(d.y); })
             .attr("fill", "#039be5")
             .on("mouseover", function() {
                 d3.select(this)
