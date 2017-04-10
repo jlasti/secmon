@@ -527,8 +527,8 @@ $(function () {
             return;
         }
 
-        var data = d3.selectAll("svg").selectAll(".bar").data();
-
+        var data = d3.select(node).selectAll("svg").selectAll(".bar").data();
+        console.log(node);
 
         if (!data) {
             return;
