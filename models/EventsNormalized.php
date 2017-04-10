@@ -2,6 +2,8 @@
 
 namespace app\models;
 
+use app\components\filter\FilterQuery;
+use app\models\Event\EventType;
 use Yii;
 use app\components\filter\FilterQuery;
 

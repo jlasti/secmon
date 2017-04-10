@@ -84,27 +84,29 @@ $(function () {
     //#endregion
 
     function componentUpdate() {
-        activeComponentIds.forEach(function(item, index) {
-            $.ajax({
-                url: hostUrl + options.updateComponentContent,
-                data: { componentId : item },
-                async: true,
-                cache: false
-            }).done(function(data) {
-                if (!data) {
-                    Materialize.toast("Couldn't add filter to component.", 4000);
-                    return;
-                }
-                var cont = $("#componentContentBody" + item);
-                var loader = cont.find("#componentLoader");
-                var body = cont.find("#componentBody");
-                body.html(data.html);
-                loader.css('display', 'none');
-                body.css('display', 'block');
-            }).fail(function(){
-                Materialize.toast("Couldn't update component content!", 4000);
+        if (activeComponentIds.length) {
+            activeComponentIds.forEach(function (item, index) {
+                $.ajax({
+                    url: hostUrl + options.updateComponentContent,
+                    data: {componentId: item},
+                    async: true,
+                    cache: false
+                }).done(function (data) {
+                    if (!data) {
+                        Materialize.toast("Couldn't add filter to component.", 4000);
+                        return;
+                    }
+                    var cont = $("#componentContentBody" + item);
+                    var loader = cont.find("#componentLoader");
+                    var body = cont.find("#componentBody");
+                    body.html(data.html);
+                    loader.css('display', 'none');
+                    body.css('display', 'block');
+                }).fail(function () {
+                    Materialize.toast("Couldn't update component content!", 4000);
+                });
             });
-        });
+        }
     }
 
     //#region [ Event Handlers ]
@@ -138,7 +140,8 @@ $(function () {
              body.css('display', 'none');
              edit.css('display', 'block');
 
-             activeComponentIds.push(compId);
+             if (activeComponentIds.indexOf(compId) == -1)
+                activeComponentIds.push(compId);
 
              body.html(data.html);
              loader.css('display', 'none');
