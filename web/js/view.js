@@ -76,7 +76,7 @@ $(function () {
             // Show grid after js inicialization
             $('.grid').removeClass("invisible");
 
-            setInterval(componentUpdate, 5000);
+            //setInterval(componentUpdate, 5000);
             componentUpdate();
         }
     };
@@ -238,7 +238,8 @@ $(function () {
 
         // Resize graph
         var width = parseInt(gridItemNode.find(".card-content").css("width").replace("px",""));
-        UpdateBarGraph(width, width/2, "#componentContentBody" + gridItemNode.find("form.componentForm").attr('data-id'));
+        var height = parseInt(gridItemNode.find(".card-content").css("height").replace("px",""));
+        UpdateBarGraph(height, width, "#componentContentBody" + gridItemNode.find("form.componentForm").attr('data-id'));
     };
 
     /*
@@ -526,7 +527,8 @@ $(function () {
             return;
         }
 
-        var data = d3.select(node).selectAll("#barChart").data();
+        var data = d3.selectAll("svg").selectAll(".bar").data();
+
 
         if (!data) {
             return;
