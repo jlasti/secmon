@@ -58,8 +58,8 @@ class CorrelatorController extends Controller
 				if(!array_key_exists($file, $streamPosition))
 				{
 					$pathToFile = $logPath . "/" . $file;
-					$totalLines = intval(exec("wc -l '$pathToFile'"));
-					$streamPosition[$file] = $totalLines;
+					$endOfFilePos = intval(exec("wc -l '$pathToFile'"));
+					$streamPosition[$file] = $endOfFilePos;
 				}
 				usleep(300000); // nutne kvoli vytazeniu CPU
 				clearstatcache(false, $logPath . "/" . $file);
@@ -78,31 +78,33 @@ class CorrelatorController extends Controller
 			}
 			
 			socket_set_blocking($normInputStream, false);
-			$line = fgets($normInputStream);
-			
-			
-			if(!empty($line))
+			while(($line = fgets($normInputStream)) != FALSE)
 			{
-				Yii::info(sprintf("Normalized:\n%s\n", $line));
-
-				$event = Normalized::fromCef($line);
-
-				if($event->save())
+				if(!empty($line))
 				{
-					fwrite($corrOutputStream, $event->id . ':' . $line);
+					Yii::info(sprintf("Normalized:\n%s\n", $line));
+
+					$event = Normalized::fromCef($line);
+
+					if($event->save())
+					{
+						fwrite($corrOutputStream, $event->id . ':' . $line);
+					}
 				}
 			}
 			
-			socket_set_blocking($corrInputStream, false);
-			$line = fgets($corrInputStream);
 			
-			if(!empty($line))
+			socket_set_blocking($corrInputStream, false);
+			while(($line = fgets($corrInputStream)) != FALSE)
 			{
-				Yii::info(sprintf("Correlated:\n%s\n", $line));
+				if(!empty($line))
+				{
+					Yii::info(sprintf("Correlated:\n%s\n", $line));
 
-				$event = Event::fromCef($line);
+					$event = Event::fromCef($line);
 
-				$event->save();
+					$event->save();
+				}
 			}
 		}
 	}
