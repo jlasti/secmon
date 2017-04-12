@@ -58,7 +58,7 @@ class CorrelatorController extends Controller
 				if(!array_key_exists($file, $streamPosition))
 				{
 					$pathToFile = $logPath . "/" . $file;
-					$endOfFilePos = intval(exec("wc -l '$pathToFile'"));
+					$endOfFilePos = intval(exec("wc -c '$pathToFile'"));
 					$streamPosition[$file] = $endOfFilePos;
 				}
 				usleep(300000); // nutne kvoli vytazeniu CPU
