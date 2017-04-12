@@ -9,10 +9,11 @@ use macgyer\yii2materializecss\widgets\form\ActiveForm;
 
 $this->registerJsFile('@web/js/filter_form.js', ['depends' => 'yii\web\YiiAsset']);
 
+$colsDown = \app\models\EventsNormalized::getColumnsDropdown();
+$colsDownOptions = \app\models\EventsNormalized::getColumnsDropdownOptions();
 $types = \app\models\FilterRule::types();
-$rulesCount = count($rules);
-$logicOperators = \app\components\filter\BaseFilterRule::getLogicalOperators();
-$typesDropDown = array_map(function($value) { return $value['name']; }, $types);
+$typesDown = \app\models\FilterRule::getTypesForDropdown();
+$logicalOperatorsDown = \app\models\FilterRule::getLogicalOperatorsForDropdown();
 ?>
 
 <div class="filter-form">
@@ -22,16 +23,17 @@ $typesDropDown = array_map(function($value) { return $value['name']; }, $types);
 
 	<div id="rules">
 		<?php
-		foreach($rules as $i => $rule)
+		foreach($rules as $index => $rule)
 			echo $this->render('_ruleForm', [
 			    'form' => $form,
                 'rule' => $rule,
-                'index' => $i,
-                'types' => $types,
-                'typesDown' => $typesDropDown,
+                'index' => $index,
                 'model' => $model,
-                'logicOperators' => $logicOperators,
-                'rulesCount' => $rulesCount
+                'types' => $types,
+                'colsDown' => $colsDown,
+                'colsDownOptions' => $colsDownOptions,
+                'typesDown' => $typesDown,
+                'logicalOperatorsDown' => $logicalOperatorsDown
             ]);
 		?>
 	</div>

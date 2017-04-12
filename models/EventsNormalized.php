@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\components\filter\FilterQuery;
+use app\components\filter\FilterTypeEnum;
 use app\models\Event\EventType;
 use Yii;
 
@@ -29,8 +30,10 @@ use Yii;
  * @property string $extensions
  * @property string $raw
  */
-class EventsNormalized extends \yii\db\ActiveRecord
+class EventsNormalized extends BaseEvent
 {
+    private static $_colsDropdown = null;
+
     /**
      * @inheritdoc
      */
@@ -53,10 +56,32 @@ class EventsNormalized extends \yii\db\ActiveRecord
         ];
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function attributeLabels()
+    public static function columns()
+    {
+        return [
+            'id' => [ FilterTypeEnum::COMPARE ],
+            'datetime' => [ FilterTypeEnum::DATE ],
+            'host' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'cef_version' => [ FilterTypeEnum::COMPARE ],
+            'cef_vendor' => [ FilterTypeEnum::COMPARE ],
+            'cef_dev_prod' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'cef_dev_version' => [ FilterTypeEnum::COMPARE ],
+            'cef_event_class_id' => [ FilterTypeEnum::COMPARE ],
+            'cef_name' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'cef_severity' => [ FilterTypeEnum::COMPARE ],
+            'src_ip' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'dst_ip' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'src_port' => [ FilterTypeEnum::COMPARE ],
+            'dst_port' => [ FilterTypeEnum::COMPARE ],
+            'protocol' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'src_mac' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'dst_mac' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'extensions' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'raw' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ]
+        ];
+    }
+
+    public static function labels()
     {
         return [
             'id' => 'ID',

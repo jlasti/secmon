@@ -12,7 +12,23 @@ class RegexFilterRule extends BaseFilterRule
 		return false;
 	}
 
-	/**
+    /**
+     * @inheritdoc
+     */
+	public static  function type()
+    {
+        return FilterTypeEnum::REGEX;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static  function title()
+    {
+        return 'Regular expression';
+    }
+
+    /**
 	 * @inheritdoc
 	 */
 	public static function operators()
@@ -22,20 +38,6 @@ class RegexFilterRule extends BaseFilterRule
 			'NOT REGEXP',
 		];
 	}
-
-    public static function columns()
-    {
-        return [
-            'host',
-            'cef_dev_prod',
-            'cef_name',
-            'src_ip',
-            'dst_ip',
-            'protocol',
-            'src_mac',
-            'dst_mac',
-        ];
-    }
 
     /**
 	 * @inheritdoc

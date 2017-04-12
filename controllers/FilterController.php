@@ -344,6 +344,8 @@ class FilterController extends Controller
 		if ($postFilters === null)
 		    $postFilters = Yii::$app->request->post('FilterRule');
 
+//		die(var_dump($postFilters) . "<br>". var_dump($array));
+
 		/**
 		 * if rules are already loaded and there are less rules in POST,
 		 * it means that a single or multiple rules were deleted,
@@ -352,6 +354,7 @@ class FilterController extends Controller
 		if(Yii::$app->request->isPost && $rules != null && $postFilters != null)
 		{
 			$transaction = Yii::$app->db->beginTransaction();
+			$deleteKeys = [];
 
 			foreach($array as $deleteKey => $rule)
 			{
@@ -366,10 +369,14 @@ class FilterController extends Controller
 
                             throw new \yii\db\Exception('Cannot delete rule');
                         }
-                        array_splice($array, $deleteKey, 1);
+                        $deleteKeys[] = $deleteKey;
                     }
                 }
 			}
+
+			rsort($deleteKeys);
+			foreach ($deleteKeys as $deleteKey)
+                array_splice($array, $deleteKey, 1);
 
 			$transaction->commit();
 		}

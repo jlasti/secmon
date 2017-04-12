@@ -1,6 +1,5 @@
 <?php
-use \app\components\filter;
-use \macgyer\yii2materializecss\widgets\form\DatePicker;
+use \app\components\filter\FilterTypeEnum;
 
 $selectedType = $rule->type ?? 'date';
 $hideLogic = '';
@@ -10,7 +9,6 @@ if ($index == 0)
     $hideLogic = ' hide';
     $options['disabled'] = 'disabled';
 }
-
 ?>
 
 <div class="rule" data-rule="<?= $index ?>">
@@ -18,49 +16,45 @@ if ($index == 0)
         <?php
             echo $form->field($rule, "[$index]logic_operator", [
                 'options' => ['class' => 'input-field col m2', 'data-type' => 'global']
-            ])->dropDownList($logicOperators, $options);
+            ])->dropDownList($logicalOperatorsDown, $options);
         ?>
     </div>
 
     <div class="row">
         <?= $form->field($rule, "[$index]id", ['options' => [ 'class' => 'hide' ]])->hiddenInput([ 'data-value-type' => 'filter_rule_id' ]) ?>
 
+        <?= $form->field($rule, "[$index]column", [ 'options' => [ 'class' => 'input-field col m3' ]])
+            ->dropDownList($colsDown, array_merge($colsDownOptions, [ 'data-rule-column' => $index ])) ?>
+
         <?= $form->field($rule, "[$index]type", [ 'options' => [ 'class' => 'input-field col m3' ]])
             ->dropDownList($typesDown, [ 'data-rule-type' => $index ]) ?>
 
         <?php
-        foreach ($types as $typeName => $type)
+        foreach ($types as $type)
         {
-            $additionalClass = '';
-            $opt = [];
-            if ($typeName != $selectedType)
-            {
-                $opt['disabled'] = 'disabled';
-                $additionalClass = ' hide';
-            }
+            $typeValue = $type->type();
 
-            $r = $type['rule'];
             echo $form->field($rule, "[$index]operator", [
-                'options' => [ 'class' => sprintf('input-field col m2%s', $additionalClass), 'data-type' => $typeName ]
-            ])->dropDownList($r->getOperatorsForDropdown(), $opt);
+                'options' => [ 'class' => 'input-field col m2', 'data-type' => $typeValue ]
+            ])->dropDownList($type->getOperatorsForDropdown());
 
-            echo $form->field($rule, "[$index]column", [
-                'options' => [ 'class' => sprintf('input-field col m2%s', $additionalClass), 'data-type' => $typeName ]
-            ])->dropDownList($r->getColumnsForDropdown(), $opt);
-
-            if ($r->getValueType() == filter\FilterValueTypeEnum::DATE)
+            if ($typeValue == FilterTypeEnum::DATE)
+            {
                 echo $form->field($rule, "[$index]value", [
-                    'options' => [ 'class' => sprintf('input-field col m4%s',  $additionalClass), 'data-type' => $typeName ]
-                ])->textInput(array_merge($opt, [ 'class' => 'datepicker' ]));
+                    'options' => ['class' => 'input-field col m3', 'data-type' => $typeValue]
+                ])->textInput(['class' => 'datepicker']);
+            }
             else
+            {
                 echo $form->field($rule, "[$index]value", [
-                    'options' => [ 'class' => sprintf('input-field col m4%s',  $additionalClass), 'data-type' => $typeName ]
-                ])->textInput($opt);
+                    'options' => ['class' => 'input-field col m3', 'data-type' => $typeValue]
+                ])->textInput();
+            }
         }
         ?>
 
         <div class="input-field col m1">
-            <a href="#" class="btn-floating waves-effect waves-light red" data-rule-remove="<?= $rule->id ?? -1 ?>" data-type="remove-btn"
+            <a href="#" class="btn-floating waves-effect waves-light red" data-rule-remove="<?= $rule->id ?? -1 ?>"
                data-rule-index="<?= $index ?>" data-filter-id="<?= $model->id ?>" onclick="removeRule(this);"><i class="material-icons">remove</i></a>
         </div>
     </div>

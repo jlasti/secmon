@@ -1,10 +1,7 @@
 <?php
 namespace app\components\filter;
 
-use app\components\filter\BaseFilterRule;
-use yii\base\InvalidParamException;
-
-class DateFilterRule extends BaseFilterRule
+class CompareFilterRule extends BaseFilterRule
 {
 	/**
 	 * @inheritdoc
@@ -17,42 +14,28 @@ class DateFilterRule extends BaseFilterRule
     /**
      * @inheritdoc
      */
-    public static function type()
+	public static  function type()
     {
-        return FilterTypeEnum::DATE;
+        return FilterTypeEnum::COMPARE;
     }
 
     /**
      * @inheritdoc
      */
-    public static function title()
+    public static  function title()
     {
-        return 'Date';
+        return 'Compare';
     }
 
-	/**
+    /**
 	 * @inheritdoc
 	 */
 	public static function operators()
 	{
 		return [
-			'>',
-			'<',
-			'>=',
-			'<=',
-			'!=',
 			'=',
+			'!=',
 		];
-	}
-
-    /**
-	 * @inheritdoc
-	 */
-	public static function rules()
-	{
-		return array_merge(parent::rules(), [
-			['value', 'date', 'format' => 'yyyy-MM-dd'],
-		]);
 	}
 
     /**

@@ -5,7 +5,8 @@ namespace app\models;
 use app\components\filter\BaseFilterRule;
 use app\components\filter\DateFilterRule;
 use app\components\filter\RegexFilterRule;
-use app\components\filter\TypeFilterRule;
+use app\components\filter\CompareFilterRule;
+use Symfony\Component\Finder\Expression\Regex;
 use Yii;
 use yii\base\Model;
 
@@ -22,6 +23,11 @@ use yii\base\Model;
  */
 class FilterRule extends \yii\db\ActiveRecord
 {
+    private static $_types = null;
+    private static $_logicalOperators = null;
+    private static $_logicalOperatorsDropdown = null;
+    private static $_typesDropdown = null;
+
     /**
      * @inheritdoc
      */
@@ -30,19 +36,76 @@ class FilterRule extends \yii\db\ActiveRecord
         return 'filter_rules';
     }
 
-	/**
-	 * Returns available filter types in associative format ['type' => 'type name']
-	 *
-	 * @return array
-	 */
+    /**
+     * Returns available filter types
+     *
+     * @return array of BaseFilterRule
+     */
     public static function types()
-	{
-		return [
-			'date' => ['name' => 'Date', 'rule' => new DateFilterRule()],
-			'type' => ['name' => 'Type', 'rule' => new TypeFilterRule()],
-			'regex' => ['name' => 'Regular Expression', 'rule' => new RegexFilterRule()],
-		];
-	}
+    {
+        if (self::$_types == null)
+        {
+            self::$_types = [
+                new CompareFilterRule(),
+                new DateFilterRule(),
+                new RegexFilterRule()
+            ];
+        }
+
+        return self::$_types;
+    }
+
+    /**
+     * Returns logical operators for filter rules
+     *
+     * @return array
+     */
+    public static function logicalOperators()
+    {
+        if (self::$_logicalOperators == null)
+        {
+            self::$_logicalOperators = [
+                'OR',
+                'AND'
+            ];
+        }
+
+        return self::$_logicalOperators;
+    }
+
+    /**
+     * Returns logical operators for dropdown
+     *
+     * @return array
+     */
+    public static function getLogicalOperatorsForDropdown()
+    {
+        if (self::$_logicalOperatorsDropdown == null)
+        {
+            $operators = self::logicalOperators();
+            self::$_logicalOperatorsDropdown = array_combine($operators, $operators);
+        }
+
+        return self::$_logicalOperatorsDropdown;
+    }
+
+    /**
+     * Returns types for dropdown
+     *
+     * @return array
+     */
+    public static function getTypesForDropdown()
+    {
+        if (self::$_typesDropdown == null)
+        {
+            $types = self::types();
+            self::$_typesDropdown = array_combine(
+                array_map(function($type) { return $type->type(); }, $types),
+                array_map(function($type) { return $type->title(); }, $types));
+        }
+
+        return self::$_typesDropdown;
+    }
 
     /**
      * @inheritdoc
