@@ -295,7 +295,7 @@ class FilterController extends Controller
         $query = EventsNormalized::find();
 
         $filter = $this->findModel($filterId);
-        $filteredData = $query->applyFilter($filter)->all();
+        $filteredData = $query->applyFilter($filter)->orderBy([ 'datetime' => SORT_DESC, 'id' => SORT_DESC ])->all();
         $filteredData = array_splice($filteredData, 0, 10);
         
         return $filteredData;
