@@ -54,8 +54,10 @@ class Normalized extends Event
 		$values = [];
 		foreach($exData as $val) {
 			$tmp = explode("=", $val);
-			if($tmp[0] == "rawEvent")
+			if($tmp[0] == "rawEvent" || $tmp[0] == "reason")
+			{
 				break;
+			}
 			$values[$tmp[0]] = $tmp[1];
 		}
 
