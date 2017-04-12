@@ -12,7 +12,23 @@ class RegexFilterRule extends BaseFilterRule
 		return false;
 	}
 
-	/**
+    /**
+     * @inheritdoc
+     */
+	public static  function type()
+    {
+        return FilterTypeEnum::REGEX;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static  function title()
+    {
+        return 'Regular expression';
+    }
+
+    /**
 	 * @inheritdoc
 	 */
 	public static function operators()
@@ -31,11 +47,11 @@ class RegexFilterRule extends BaseFilterRule
 		switch($this->logic_operator)
 		{
 			case 'OR':
-				$collection->orWhere([$this->operator, 'raw', $this->value]);
+				$collection->orWhere([$this->operator, $this->column, $this->value]);
 				break;
 			case 'AND':
 			default:
-				$collection->andWhere([$this->operator, 'raw', $this->value]);
+				$collection->andWhere([$this->operator, $this->column, $this->value]);
 				break;
 		}
 	}

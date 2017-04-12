@@ -20,6 +20,7 @@ abstract class BaseFilterRule extends Component
 	public $value;
 	public $operator;
 	public $logic_operator;
+    public $column;
 	//endregion
 
 	//region Constructor and init
@@ -47,43 +48,33 @@ abstract class BaseFilterRule extends Component
 	public static abstract function operators();
 
     /**
+     * Returns title of filter rule
+     *
+     * @return string
+     */
+    public static abstract function title();
+
+    /**
+     * Returns type of value. View input value field can be changed by this value.
+     *
+     * @return string
+     */
+    public static abstract function type();
+
+    /**
      * Return combined array of operators.
      *
      * @return array
      */
     public function getOperatorsForDropdown()
     {
+        $operators = $this->operators();
+
         if ($this->_operatorsDropdown == null)
-            $this->_operatorsDropdown = array_combine($this->operators(), $this->operators());
+            $this->_operatorsDropdown = array_combine($operators, $operators);
 
         return $this->_operatorsDropdown;
     }
-
-    /**
-     * Returns type of value. View input value field can be changed by this value.
-     *
-     * @return int
-     */
-    public static function getValueType()
-    {
-        return FilterValueTypeEnum::STRING;
-    }
-
-    /**
-     * Returns logical operators for filter rules
-     *
-     * @return array
-     */
-    public static function getLogicalOperators()
-    {
-        $operators = [
-            'OR',
-            'AND'
-        ];
-
-        return array_combine($operators, $operators);
-    }
-
 
     /**
 	 * Validation rules applied to \app\models\FilterRule class
@@ -93,8 +84,8 @@ abstract class BaseFilterRule extends Component
 	public static function rules()
 	{
 		return [
-			['operator', 'app\components\filter\OperatorValidator', 'ruleClass' => static::className()],
-		];
+            ['operator', 'app\components\filter\OperatorValidator', 'ruleClass' => static::className()]
+        ];
 	}
 
 	/**
