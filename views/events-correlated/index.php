@@ -41,7 +41,7 @@ $this->params['title'] = 'Correlated Events';
           function() {
             $.pjax.reload({container:"#pjaxContainer"});
           }
-          , 1000
+          , 5000
         );', \yii\web\VIEW::POS_HEAD);
     ?>
 </div>
