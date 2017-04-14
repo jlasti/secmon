@@ -76,7 +76,7 @@ $(function () {
             // Show grid after js inicialization
             $('.grid').removeClass("invisible");
 
-            setInterval(componentUpdate, 5000);
+            setInterval(componentUpdate, 10000);
             componentUpdate();
         }
     };
