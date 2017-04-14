@@ -292,7 +292,7 @@ class FilterController extends Controller
       $query = EventsNormalized::find();
       $filter = $this->findModel($filterId);
 
-      $filteredData = $query->select([new \yii\db\Expression("date_format(`datetime`,'%m-%d-%Y') as x"), new \yii\db\Expression("count(DATE_FORMAT(`datetime`,'%m-%d-%Y')) as y")])
+      $filteredData = $query->select([new \yii\db\Expression("date_format(`datetime`,'%H %m-%d-%Y') as x"), new \yii\db\Expression("count(DATE_FORMAT(`datetime`,'%H %m-%d-%Y')) as y")])
                             ->applyFilter($filter)
                             ->andWhere(['>', 'datetime', $date])
                             ->groupBy([new \yii\db\Expression("x")])
