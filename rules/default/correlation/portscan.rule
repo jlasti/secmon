@@ -1,7 +1,7 @@
 # ==================================
 # === BEGIN - Portscan detection ===
 # ==================================
-# pravidla deteguju ako portscan ak sa  z jednej IP v priebehu 60 sekund niekto pokusi
+# pravidla deteguju ako portscan ak sa z jednej IP v priebehu 60 sekund niekto pokusi
 # pripojit na 10 roznych privilegovanych portov, 20 roznych TCP portov alebo 40 roznych
 # UDP portov
 
@@ -54,6 +54,6 @@ action=lcall %ports $+{ip} -> ( sub { my($ip) = $_[0]; \
 			return "TCP: $tcp\nUDP: $udp"; } ); \
 	create COUNTING_OFF_$+{ip} 300; \
 	obsolete COUNTING_$+{ip}; \
-	write  ../../../__secInput CEF:0|SECMON|iptables|ver|0|Portscan|0|src=$+{ip}
+	write  /var/www/develop/__secInput CEF:0|SECMON|iptables|ver|0|Portscan|0|src=$+{ip}
 
 # === END - Portscan detection ===
