@@ -1,8 +1,6 @@
 <?php
 namespace app\components\filter;
 
-use Yii;
-
 class RegexFilterRule extends BaseFilterRule
 {
 	/**
@@ -48,19 +46,22 @@ class RegexFilterRule extends BaseFilterRule
 		switch($this->logic_operator)
 		{
 			case 'OR':
-				$collection->orWhere([$this->getDBOperator($this->operator), $this->column, $this->value]);
+				$collection->orWhere([$this->getDBOperator(), $this->column, $this->value]);
 				break;
 			case 'AND':
 			default:
-				$collection->andWhere([$this->getDBOperator($this->operator), $this->column, $this->value]);
+				$collection->andWhere([$this->getDBOperator(), $this->column, $this->value]);
 				break;
 		}
 	}
 
-	public function getDBOperator($operator)
+    /**
+     * @inheritdoc
+     */
+	public static function convertOperator(string $db, string $operator)
     {
-        $db = Yii::$app->db->getDriverName();
         $res = $operator;
+        $db = 'pgsql';
         if ($db == 'pgsql')
         {
             if ($operator == 'REGEXP')

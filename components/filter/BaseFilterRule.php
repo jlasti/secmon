@@ -1,6 +1,7 @@
 <?php
 namespace app\components\filter;
 
+use Yii;
 use yii\base\Component;
 use yii\base\InvalidParamException;
 
@@ -87,6 +88,29 @@ abstract class BaseFilterRule extends Component
             ['operator', 'app\components\filter\OperatorValidator', 'ruleClass' => static::className()]
         ];
 	}
+
+    /**
+     * Returns DB specific operator.
+     *
+     * @return string
+     */
+    public final function getDBOperator()
+    {
+        $db = Yii::$app->db->getDriverName();
+        return static::convertOperator($db, $this->operator);
+    }
+
+    /**
+     * Converts operator to DB specific operator.
+     *
+     * @param string $db - db name (mysql, pgsql)
+     * @param string $operator - base operator
+     * @return string
+     */
+    public static function convertOperator(string $db, string $operator)
+    {
+        return $operator;
+    }
 
 	/**
 	 * Applies rule to query or models collection.

@@ -39,7 +39,7 @@ $this->params['title'] = 'Filter: ' . $model->name;
 
 		foreach($model->rules as $rule)
 		{
-			echo sprintf('<tr><td>%s %s %s %s</td></tr>', $i == 0 ? '' : $rule->logic_operator, $rule->type, $rule->operator, $rule->value);
+			echo sprintf('<tr><td>%s %s %s %s</td></tr>', $i == 0 ? '' : $rule->logic_operator, $rule->column, $rule->getRule()->getDBOperator(), $rule->value);
 
             $i++;
 		}

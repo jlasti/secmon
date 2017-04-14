@@ -9,6 +9,7 @@ if ($index == 0)
     $hideLogic = ' hide';
     $options['disabled'] = 'disabled';
 }
+
 ?>
 
 <div class="rule" data-rule="<?= $index ?>">
@@ -27,7 +28,7 @@ if ($index == 0)
             ->dropDownList($colsDown, array_merge($colsDownOptions, [ 'data-rule-column' => $index ])) ?>
 
         <?= $form->field($rule, "[$index]type", [ 'options' => [ 'class' => 'input-field col m3' ]])
-            ->dropDownList($typesDown, [ 'data-rule-type' => $index ]) ?>
+            ->dropDownList($typesDown, [ 'data-rule-type' => $index]) ?>
 
         <?php
         foreach ($types as $type)

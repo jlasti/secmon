@@ -55,7 +55,7 @@ function OnColumnChanged(element) {
 	var index = select.attr('data-rule-column');
 	var types = select.find(':selected').attr('data-types').split(',');
 	var typeSelect = $('select[data-rule-type="' + index + '"]');
-	var selected = false;
+    var selectVal = null;
 
 	// enable and disable types allowed for the column
 	typeSelect.find('option').each(function(i, e) {
@@ -63,10 +63,8 @@ function OnColumnChanged(element) {
 		var val = option.val();
 		if (types.indexOf(val) != -1) {
             option.removeAttr('disabled');
-            if (selected === false) {
-            	selected = true;
-            	typeSelect.val(val);
-            	OnFilterTypeChanged(typeSelect);
+            if (selectVal === null || option.is(':selected')) {
+            	selectVal = val;
 			}
 		}
 		else {
@@ -77,6 +75,9 @@ function OnColumnChanged(element) {
 		typeSelect.material_select('destroy');
 		typeSelect.material_select();
     });
+
+    typeSelect.val(selectVal);
+    OnFilterTypeChanged(typeSelect);
 }
 
 function removeRule(element) {
