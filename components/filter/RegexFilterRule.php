@@ -61,7 +61,6 @@ class RegexFilterRule extends BaseFilterRule
 	public static function convertOperator(string $db, string $operator)
     {
         $res = $operator;
-        $db = 'pgsql';
         if ($db == 'pgsql')
         {
             if ($operator == 'REGEXP')
