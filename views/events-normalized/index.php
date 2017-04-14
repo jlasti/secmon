@@ -11,7 +11,7 @@ $this->params['title'] = 'Normalized Events';
 ?>
 <div class="events-normalized-index clickable-table">
 
-    <?php Pjax::begin(); ?>    <?= GridView::widget([
+    <?php Pjax::begin(['id' => 'pjaxContainer']); ?>    <?= GridView::widget([
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
             'columns' => [
@@ -41,4 +41,14 @@ $this->params['title'] = 'Normalized Events';
             ],
         ]); ?>
     <?php Pjax::end(); ?>
+
+    <?php
+      $this->registerJs('
+        setInterval(
+          function() {
+            $.pjax.reload({container:"#pjaxContainer"});
+          }
+          , 1000
+        );', \yii\web\VIEW::POS_HEAD);
+    ?>
 </div>

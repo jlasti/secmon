@@ -10,7 +10,7 @@ class Navigation extends \yii\base\Component
 
 	public function init()
 	{
-		$this->_items = 
+		$this->_items =
 		[
 	        [
 				'label' => 'Correlated Events',
@@ -19,24 +19,24 @@ class Navigation extends \yii\base\Component
 				'active' => 'events-correlated',
 				'icon' => 'event'
 	        ],
-            [
-                'label' => 'Normalized Events',
-                'url' => ['/events-normalized'],
-                'visible' => true,
-                'active' => 'events-normalized',
-                'icon' => 'event'
-            ],
-	        [ 
+          [
+        'label' => 'Normalized Events',
+        'url' => ['/events-normalized'],
+        'visible' => true,
+        'active' => 'events-normalized',
+        'icon' => 'event'
+          ],
+	        [
 				'label' => 'Dashboard', 
 				'url' => ['/view'],
-				'visible' => true, 
+				'visible' => true,
 				'active' => 'view',
 				'icon' => 'dashboard'
 	        ],
-	        [ 
-				'label' => 'Filters', 
+	        [
+				'label' => 'Filters',
 				'url' => ['/filter'],
-				'visible' => true, 
+				'visible' => true,
 				'active' => 'filter',
 				'icon' => 'find_in_page'
 	        ],
@@ -48,14 +48,7 @@ class Navigation extends \yii\base\Component
 				'icon' => ''
 	        ],
 	        [
-				'label' => 'Event types',
-				'url' => ['/event-type'],
-				'visible' => Yii::$app->user->identity->can('create_users'),
-				'active' => 'event-type',
-				'icon' => 'event'
-	        ],
-	        [
-				'label' => 'Sec Rules', 
+				'label' => 'Sec Rules',
 				'url' => ['/sec-rule'],
 				'visible' => Yii::$app->user->identity->can('create_users'),
 				'active' => 'sec-rule',
@@ -63,15 +56,15 @@ class Navigation extends \yii\base\Component
 	        ],
 	        [
 				'label' => 'Users',
-				'url' => ['/user'], 
-				'visible' => Yii::$app->user->identity->can('create_users'), 
+				'url' => ['/user'],
+				'visible' => Yii::$app->user->identity->can('create_users'),
 				'active' => 'user',
 				'icon' => 'accessibility'
 	        ],
 	        [
-				'label' => 'Roles', 
-				'url' => ['/role'], 
-				'visible' => Yii::$app->user->identity->can('create_users'), 
+				'label' => 'Roles',
+				'url' => ['/role'],
+				'visible' => Yii::$app->user->identity->can('create_users'),
 				'active' => 'role',
 				'icon' => 'perm_identity'
 	        ],
