@@ -295,12 +295,13 @@ class FilterController extends Controller
       $filteredData = $query->select([new \yii\db\Expression("date_format(`datetime`,'%m-%d-%Y') as x"), new \yii\db\Expression("count(DATE_FORMAT(`datetime`,'%m-%d-%Y')) as y")])
                             ->applyFilter($filter)
                             ->andWhere(['>', 'datetime', $date])
-                            ->groupBy([new \yii\db\Expression("DATE_FORMAT(`datetime`,'%m-%d-%Y')")])
-                            ->orderBy([ 'datetime' => SORT_DESC, 'id' => SORT_DESC ])
+                            ->groupBy([new \yii\db\Expression("x")])
+                            ->orderBy([ 'x' => SORT_DESC ])
                             ->all();
 
+      $graphData = array();
       foreach ($filteredData as $key => $value) {
-        $graphData[$value['x']] = intval($value['y']);
+          $graphData[] = [ 'x' => $value['x'], 'y' => intval($value['y']) ];
       }
 
       return $graphData;
