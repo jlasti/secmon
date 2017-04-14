@@ -21,7 +21,6 @@ class CorrelatorController extends Controller
 			throw new Exception('Log path is not directory');
 		}
 
-		
 		$normOutputFile = $logPath . '/__secOutput';
 		$normInputFile = $logPath . '/__secInput';
 
@@ -78,8 +77,6 @@ class CorrelatorController extends Controller
 				fclose($stream);
 			}
 			
-			//socket_set_blocking($normInputStream, false);
-			//stream_set_blocking($normInputStream, false);
 			while(($line = fgets($normInputStream)) != FALSE)
 			{
 				if(!empty($line))
@@ -96,9 +93,6 @@ class CorrelatorController extends Controller
 				}
 			}
 			
-			
-			//socket_set_blocking($corrInputStream, false);
-			//stream_set_blocking($corrInputStream, false);
 			while(($line = fgets($corrInputStream)) != FALSE)
 			{
 				if(!empty($line))
