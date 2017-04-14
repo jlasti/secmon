@@ -68,6 +68,7 @@ class CorrelatorController extends Controller
 				{
 					if(!empty($line))
 					{
+						echo "1";
 						fwrite($normOutputStream, $line);
 						flush();
 					}
@@ -77,7 +78,8 @@ class CorrelatorController extends Controller
 				fclose($stream);
 			}
 			
-			socket_set_blocking($normInputStream, false);
+			//socket_set_blocking($normInputStream, false);
+			//stream_set_blocking($normInputStream, false);
 			while(($line = fgets($normInputStream)) != FALSE)
 			{
 				if(!empty($line))
@@ -88,13 +90,15 @@ class CorrelatorController extends Controller
 
 					if($event->save())
 					{
+						echo "2";
 						fwrite($corrOutputStream, $event->id . ':' . $line);
 					}
 				}
 			}
 			
 			
-			socket_set_blocking($corrInputStream, false);
+			//socket_set_blocking($corrInputStream, false);
+			//stream_set_blocking($corrInputStream, false);
 			while(($line = fgets($corrInputStream)) != FALSE)
 			{
 				if(!empty($line))
@@ -102,7 +106,7 @@ class CorrelatorController extends Controller
 					Yii::info(sprintf("Correlated:\n%s\n", $line));
 
 					$event = Event::fromCef($line);
-
+					echo "3";
 					$event->save();
 				}
 			}
@@ -158,7 +162,9 @@ class CorrelatorController extends Controller
 	function openPipe($file)
 	{
 		$pipe = posix_mkfifo($file, 0666);
-
-		return fopen($file, 'r+');
+		$openPipe = fopen($file, 'r+');
+		stream_set_blocking($openPipe, false);
+		
+		return $openPipe;
 	}
 }
