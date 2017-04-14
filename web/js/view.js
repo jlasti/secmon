@@ -110,7 +110,7 @@ $(function () {
                 $.ajax({
                     url: hostUrl + options.updateComponentContent,
                     data: {componentId: item},
-                    async: false,
+                    async: true,
                     cache: false
                 }).done(function (data) {
                     if (!data) {
