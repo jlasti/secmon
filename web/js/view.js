@@ -81,8 +81,29 @@ $(function () {
         }
     };
 
-    //#endregion
+    /*
+     * Add component id to list of component ids for update.
+     */
+    function addActiveComponent(componentId) {
+        var compId = parseInt(componentId);
+        if (activeComponentIds.indexOf(compId) == -1) {
+            activeComponentIds.push(compId);
+        }
+    }
 
+    /*
+     * Remove component id from list of component ids for update.
+     */
+    function removeActiveComponent(componentId) {
+        var compId = parseInt(componentId);
+        var index = activeComponentIds.indexOf(compId);
+        if (index != -1)
+            activeComponentIds.splice(index, 1);
+    }
+
+    /*
+     * Updates components content
+     */
     function componentUpdate() {
         if (activeComponentIds.length) {
             activeComponentIds.forEach(function (item, index) {
@@ -115,6 +136,8 @@ $(function () {
             });
         }
     }
+
+    //#endregion
 
     //#region [ Event Handlers ]
 
@@ -161,9 +184,7 @@ $(function () {
              loader.css('display', 'inline-block');
              edit.css('display', 'block');
 
-             if (activeComponentIds.indexOf(compId) == -1) {
-                activeComponentIds.push(compId);
-             }
+             addActiveComponent(compId);
 
              if (data.contentTypeId == "table") {
                 cont.html(data.html);
@@ -201,9 +222,7 @@ $(function () {
             body.css('display', 'none');
             edit.css('display', 'none');
 
-            var index = activeComponentIds.indexOf(compId);
-            if (index != -1)
-                activeComponentIds.splice(index, 1);
+            removeActiveComponent(compId);
 
             body.html('');
             contNew.css('display', 'block');
@@ -271,9 +290,12 @@ $(function () {
             // Inicializacia noveho grid itemu
             var draggie = new Draggabilly( gridItemNode[0] );
             activeGrid.packery( 'bindDraggabillyEvents', draggie );
-            gridItemNode.find('select').material_select();
-            gridItemNode.find('select.widthSelect').on("change", widthSelect_onChange);
+
             gridItemNode.find('.modal').modal();
+            gridItemNode.find('select').material_select();
+            gridItemNode.find('.nameInput').on('focusout blur', name_onFocusOut);
+            gridItemNode.find('select.widthSelect').on("change", widthSelect_onChange);
+            gridItemNode.find(".deleteComponentBtn").on('click', deleteComponentBtn_onClick);
             gridItemNode.find("[data-action='saveComponentContent']").on('click', saveContentBtn_onClick);
             gridItemNode.find("[data-action='removeComponentContent']").on('click', deleteContentBtn_onClick);
         });
@@ -296,6 +318,7 @@ $(function () {
                 return;
             }
 
+            removeActiveComponent(componentId);
             activeGrid.packery('remove', $("#component_" + componentId));
         });
     };
