@@ -33,6 +33,7 @@ use Yii;
 class EventsNormalized extends BaseEvent
 {
     private static $_colsDropdown = null;
+    public $x, $y;
 
     /**
      * @inheritdoc

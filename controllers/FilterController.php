@@ -170,42 +170,30 @@ class FilterController extends Controller
         {
             $component->filter_id = $filterId;
             $component->update();
-            $filteredData = $this->getFilteredEvents($filter->id);
 
-            if ($contentTypeId == 'lineChart') {
-                return [
-                    'contentTypeId' => $contentTypeId,
-                    'data' => '[{"hour":"0","count":33},
-                        {"hour":"1","count":12},
-                        {"hour":"2","count":41},
-                        {"hour":"3","count":59},
-                        {"hour":"4","count":38},
-                        {"hour":"5","count":21},
-                        {"hour":"6","count":25},
-                        {"hour":"7","count":21},
-                        {"hour":"8","count":25},
-                        {"hour":"9","count":33},
-                        {"hour":"10","count":12},
-                        {"hour":"11","count":41},
-                        {"hour":"12","count":16},
-                        {"hour":"13","count":59},
-                        {"hour":"14","count":38},
-                        {"hour":"15","count":21},
-                        {"hour":"16","count":25},
-                        {"hour":"17","count":30},
-                        {"hour":"18","count":47},
-                        {"hour":"19","count":5},
-                        {"hour":"20","count":20},
-                        {"hour":"21","count":13},
-                        {"hour":"22","count":29},
-                        {"hour":"23","count":29}]'
-                ];
+            switch ($contentTypeId) {
+                case "lineChart":
+                    $filteredData = $this->getFilteredEventsBarGraph($filter->id);
+                    return [
+                      'contentTypeId' => $contentTypeId,
+                      'data' => Json::encode($filteredData)
+                    ];
+                    break;
+                case "barChart":
+                    $filteredData = $this->getFilteredEventsBarGraph($filter->id);
+                    return [
+                      'contentTypeId' => $contentTypeId,
+                      'data' => Json::encode($filteredData)
+                    ];
+                    break;
+                case "table":
+                    $filteredData = $this->getFilteredEvents($filter->id);
+                    return [
+                      'contentTypeId' => $contentTypeId,
+                      'html' => \app\widgets\FilterWidget::widget(['data' => compact('component', 'filter', 'filteredData')])
+                    ];
+                    break;
             }
-
-            return [
-                'contentTypeId' => $contentTypeId,
-                'html' => \app\widgets\FilterWidget::widget(['data' => compact('component', 'filter', 'filteredData')])
-            ];
         }
         else return null;
     }
@@ -225,43 +213,31 @@ class FilterController extends Controller
             $filteredData = $this->getFilteredEvents($filter->id);
             $contentTypeId =  Json::decode($component->config)['dataType'];
 
-            if ($contentTypeId == 'lineChart') {
-                return [
-                    'contentTypeId' => $contentTypeId,
-                    'data' => '[{"x":"0","y":33},
-                        {"x":"1","y":12},
-                        {"x":"2","y":41},
-                        {"x":"3","y":59},
-                        {"x":"4","y":38},
-                        {"x":"5","y":21},
-                        {"x":"6","y":25},
-                        {"x":"7","y":21},
-                        {"x":"8","y":25},
-                        {"x":"9","y":33},
-                        {"x":"10","y":12},
-                        {"x":"11","y":41},
-                        {"x":"12","y":16},
-                        {"x":"13","y":59},
-                        {"x":"14","y":38},
-                        {"x":"15","y":21},
-                        {"x":"16","y":25},
-                        {"x":"17","y":30},
-                        {"x":"18","y":47},
-                        {"x":"19","y":5},
-                        {"x":"20","y":20},
-                        {"x":"21","y":13},
-                        {"x":"22","y":29},
-                        {"x":"23","y":29}]'
-                ];
+            switch ($contentTypeId) {
+                case "lineChart":
+                    $filteredData = $this->getFilteredEventsBarGraph($filter->id);
+                    return [
+                      'contentTypeId' => $contentTypeId,
+                      'data' => Json::encode($filteredData)
+                    ];
+                    break;
+                case "barChart":
+                    $filteredData = $this->getFilteredEventsBarGraph($filter->id);
+                    return [
+                      'contentTypeId' => $contentTypeId,
+                      'data' => Json::encode($filteredData)
+                    ];
+                    break;
+                case "table":
+                    $filteredData = $this->getFilteredEvents($filter->id);
+                    return [
+                      'contentTypeId' => $contentTypeId,
+                      'html' => \app\widgets\FilterWidget::widget(['data' => compact('component', 'filter', 'filteredData')])
+                    ];
+                    break;
             }
-
-            return [
-                'contentTypeId' => $contentTypeId,
-                'html' => \app\widgets\FilterWidget::widget(['data' => compact('component', 'filter', 'filteredData')])
-            ];
         }
-        else
-            return null;
+        else return null;
     }
 
     public function actionRemoveFilterFromComponent($componentId)
@@ -297,8 +273,38 @@ class FilterController extends Controller
         $filter = $this->findModel($filterId);
         $filteredData = $query->applyFilter($filter)->orderBy([ 'datetime' => SORT_DESC, 'id' => SORT_DESC ])->all();
         $filteredData = array_splice($filteredData, 0, 10);
-        
+
         return $filteredData;
+    }
+
+    public function actionGetFilteredEventsBarGraph($filterId)
+    {
+        return Json::encode($this->getFilteredEventsBarGraph($filterId));
+    }
+
+    protected function getFilteredEventsBarGraph($filterId)
+    {
+      $date = new \DateTime();
+      $date->setTimezone(new \DateTimeZone('Europe/Bratislava'));
+      $date->sub(new \DateInterval('P1D'));
+      $date = date_format($date,"Y-m-d H:i:s");
+
+      $query = EventsNormalized::find();
+      $filter = $this->findModel($filterId);
+
+      $filteredData = $query->select([new \yii\db\Expression("date_format(`datetime`,'%H %m-%d-%Y') as x"), new \yii\db\Expression("count(DATE_FORMAT(`datetime`,'%H %m-%d-%Y')) as y")])
+                            ->applyFilter($filter)
+                            ->andWhere(['>', 'datetime', $date])
+                            ->groupBy([new \yii\db\Expression("x")])
+                            ->orderBy([ 'x' => SORT_DESC ])
+                            ->all();
+
+      $graphData = array();
+      foreach ($filteredData as $key => $value) {
+          $graphData[] = [ 'x' => $value['x'], 'y' => intval($value['y']) ];
+      }
+
+      return $graphData;
     }
 
     /**
