@@ -61,11 +61,16 @@ class RegexFilterRule extends BaseFilterRule
     {
         $db = Yii::$app->db->getDriverName();
         $res = $operator;
-        switch ($db)
+        if ($db == 'pgsql')
         {
-            case 'pgsql':
+            if ($operator == 'REGEXP')
+            {
                 $res = 'LIKE';
-                break;
+            }
+            else if ($operator == 'NOT REGEXP')
+            {
+                $res = 'NOT LIKE';
+            }
         }
         return $res;
     }
