@@ -301,6 +301,8 @@ class FilterController extends Controller
                             ->orderBy([ 'x' => SORT_ASC ])
                             ->all();
 
+      Yii::$app->cache->flush();
+
       $graphData = array();
       foreach ($filteredData as $key => $value) {
           $graphData[] = [ 'x' => $value['x'], 'y' => intval($value['y']) ];
