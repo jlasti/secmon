@@ -10,8 +10,8 @@
 	$commands = array(
 		'echo $PWD',
 		'whoami',
-		'git pull',
 		'git stash',
+		'git pull',
 		'git status',
 		'export HOME=/usr/share/httpd && COMPOSER_HOME=/usr/share/httpd/.composer && composer update 2>&1',
 		'./yii migrate --interactive=0',
