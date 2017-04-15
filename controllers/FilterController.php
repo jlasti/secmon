@@ -294,7 +294,7 @@ class FilterController extends Controller
 
       $filteredData = $query->select([new \yii\db\Expression("to_char(`datetime`,'HH MM-DD-YYYY') as x"), new \yii\db\Expression("count(to_char(`datetime`,'HH MM-DD-YYYY')) as y")])
                             ->applyFilter($filter)
-                            ->andWhere(['>', 'datetime', "to_char(`$date`,'HH MM-DD-YYYY')"])
+                            ->andWhere(['>', new \yii\db\Expression("to_char(`datetime`,'HH MM-DD-YYYY')"), new \yii\db\Expression("to_char(`date`,'HH MM-DD-YYYY')", ['date' => $date])])
                             ->groupBy([new \yii\db\Expression("x")])
                             ->orderBy([ 'x' => SORT_DESC ])
                             ->all();
