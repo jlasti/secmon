@@ -10,6 +10,7 @@
 	$commands = array(
 		'echo $PWD',
 		'whoami',
+		'git stash',
 		'git pull',
 		'git status',
 		'export HOME=/usr/share/httpd && COMPOSER_HOME=/usr/share/httpd/.composer && composer update 2>&1',
