@@ -180,10 +180,10 @@ class FilterController extends Controller
                     ];
                     break;
                 case "barChart":
-                    $filteredData = $this->getFilteredEventsBarGraph($filter->id);
+                    //$filteredData = $this->getFilteredEventsBarGraph($filter->id);
                     return [
                       'contentTypeId' => $contentTypeId,
-                      'data' => Json::encode($filteredData)
+                      'data' => Json::encode($filteredData = $this->getFilteredEventsBarGraph($filter->id))
                     ];
                     break;
                 case "table":
@@ -221,10 +221,10 @@ class FilterController extends Controller
                     ];
                     break;
                 case "barChart":
-                    $filteredData = $this->getFilteredEventsBarGraph($filter->id);
+                    //$filteredData = $this->getFilteredEventsBarGraph($filter->id);
                     return [
                       'contentTypeId' => $contentTypeId,
-                      'data' => Json::encode($filteredData)
+                      'data' => Json::encode($this->getFilteredEventsBarGraph($filter->id))
                     ];
                     break;
                 case "table":
@@ -283,6 +283,9 @@ class FilterController extends Controller
 
     protected function getFilteredEventsBarGraph($filterId)
     {
+      unset($filteredData);
+      unset($graphData);
+
       $date = new \DateTime();
       $date->setTimezone(new \DateTimeZone('Europe/Bratislava'));
       $date->sub(new \DateInterval('P1D'));
@@ -302,6 +305,8 @@ class FilterController extends Controller
       foreach ($filteredData as $key => $value) {
           $graphData[] = [ 'x' => $value['x'], 'y' => intval($value['y']) ];
       }
+
+      unset($filteredData);
 
       return $graphData;
     }
