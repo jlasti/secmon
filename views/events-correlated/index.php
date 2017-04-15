@@ -35,13 +35,13 @@ $this->params['title'] = 'Correlated Events';
         ]); ?>
     <?php Pjax::end(); ?>
 
-    <?php
-      $this->registerJs('
-        setInterval(
-          function() {
-            $.pjax.reload({container:"#pjaxContainer"});
-          }
-          , 5000
-        );', \yii\web\VIEW::POS_HEAD);
-    ?>
+<!--    --><?php
+//      $this->registerJs('
+//        setInterval(
+//          function() {
+//            $.pjax.reload({container:"#pjaxContainer"});
+//          }
+//          , 5000
+//        );', \yii\web\VIEW::POS_HEAD);
+//    ?>
 </div>
