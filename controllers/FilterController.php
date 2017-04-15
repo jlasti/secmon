@@ -296,7 +296,7 @@ class FilterController extends Controller
                             ->applyFilter($filter)
                             ->andWhere(['>', "CAST(datetime AS date)", $date])
                             ->groupBy([new \yii\db\Expression("x")])
-                            ->orderBy([ 'x' => SORT_DESC ])
+                            ->orderBy([ 'x' => SORT_ASC ])
                             ->all();
 
       $graphData = array();
