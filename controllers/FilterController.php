@@ -173,10 +173,10 @@ class FilterController extends Controller
 
             switch ($contentTypeId) {
                 case "lineChart":
-                    $filteredData = $this->getFilteredEventsBarGraph($filter->id);
+                    //$filteredData = $this->getFilteredEventsBarGraph($filter->id);
                     return [
                       'contentTypeId' => $contentTypeId,
-                      'data' => Json::encode($filteredData)
+                      'data' => Json::encode($this->getFilteredEventsBarGraph($filter->id))
                     ];
                     break;
                 case "barChart":
@@ -210,15 +210,14 @@ class FilterController extends Controller
 
         if ( !empty($component) )
         {
-            $filteredData = $this->getFilteredEvents($filter->id);
             $contentTypeId =  Json::decode($component->config)['dataType'];
 
             switch ($contentTypeId) {
                 case "lineChart":
-                    $filteredData = $this->getFilteredEventsBarGraph($filter->id);
+                    //$filteredData = $this->getFilteredEventsBarGraph($filter->id);
                     return [
                       'contentTypeId' => $contentTypeId,
-                      'data' => Json::encode($filteredData)
+                      'data' => Json::encode($this->getFilteredEventsBarGraph($filter->id))
                     ];
                     break;
                 case "barChart":
