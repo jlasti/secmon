@@ -273,6 +273,8 @@ class FilterController extends Controller
         $filteredData = $query->applyFilter($filter)->orderBy([ 'datetime' => SORT_DESC, 'id' => SORT_DESC ])->all();
         $filteredData = array_splice($filteredData, 0, 10);
 
+        Yii::$app->cache->flush();
+
         return $filteredData;
     }
 
