@@ -288,7 +288,7 @@ class FilterController extends Controller
 
       $date = new \DateTime();
       $date->setTimezone(new \DateTimeZone('Europe/Bratislava'));
-      $date->sub(new \DateInterval('P1D'));
+      $date->sub(new \DateInterval('P2D'));
       $date = date_format($date,"Y-m-d H:i:s");
 
       $query = EventsNormalized::find();
