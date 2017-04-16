@@ -1,3 +1,5 @@
+var viewUpdateInterval = 30000;
+
 $(function () {
     //#region [ Fields ]
 
@@ -76,7 +78,6 @@ $(function () {
             // Show grid after js inicialization
             $('.grid').removeClass("invisible");
 
-            setInterval(componentUpdate, 10000);
             componentUpdate();
         }
     };
@@ -102,38 +103,47 @@ $(function () {
     }
 
     /*
-     * Updates components content
+     * Updates specific component and after completion updates next component.
+     * When index is
      */
-    function componentUpdate() {
-        if (activeComponentIds.length) {
-            activeComponentIds.forEach(function (item, index) {
-                $.ajax({
-                    url: hostUrl + options.updateComponentContent,
-                    data: {componentId: item},
-                    async: false,
-                    cache: false
-                }).done(function (data) {
-                    if (!data) {
-                        Materialize.toast("Couldn't add filter to component.", 4000);
-                        return;
-                    }
-                    var cont = $("#componentContentBody" + item);
-                    var loader = cont.find("#componentLoader");
-                    var body = cont.find("#componentBody");
-                    loader.css('display', 'none');
+    function componentUpdate(index) {
+        if (index === undefined) {
+            index = 0;
+        }
 
-                    if (data.contentTypeId == "table") {
-                        cont.html(data.html);
-                    }
-                    if (data.contentTypeId == "lineChart") {
-                        var width = parseInt(cont.css("width").replace("px",""));
-                        cont.empty();
-                        DrawBarGraph(JSON.parse(data.data), width/2, width, "#componentContentBody" + item);
-                    }
-                }).fail(function () {
-                    Materialize.toast("Couldn't update component content!", 4000);
-                });
+        if (index < activeComponentIds.length) {
+            var item = activeComponentIds[index];
+            $.ajax({
+                url: hostUrl + options.updateComponentContent,
+                data: {componentId: item},
+                async: true,
+                cache: false
+            }).done(function (data) {
+                if (!data) {
+                    Materialize.toast("Couldn't add filter to component.", 4000);
+                    return;
+                }
+                var cont = $("#componentContentBody" + item);
+                var loader = cont.find("#componentLoader");
+                var body = cont.find("#componentBody");
+                loader.css('display', 'none');
+
+                if (data.contentTypeId == "table") {
+                    cont.html(data.html);
+                }
+                if (data.contentTypeId == "lineChart") {
+                    var width = parseInt(cont.css("width").replace("px", ""));
+                    cont.empty();
+                    DrawBarGraph(JSON.parse(data.data), width / 2, width, "#componentContentBody" + item);
+                }
+            }).fail(function () {
+                Materialize.toast("Couldn't update component content!", 4000);
+            }).complete(function (jqXHR, textStatus) {
+                componentUpdate(index + 1);
             });
+        }
+        else {
+            setTimeout(componentUpdate, viewUpdateInterval);
         }
     }
 
