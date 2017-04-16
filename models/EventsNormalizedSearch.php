@@ -83,6 +83,8 @@ class EventsNormalizedSearch extends EventsNormalized
 
         $query->orderBy(['datetime' => SORT_DESC]);
 
+        Yii::$app->cache->flush();
+
         return $dataProvider;
     }
 }
