@@ -74,7 +74,6 @@ class CorrelatorController extends Controller
 				}
 
 				$streamPosition[$file] = ftell($stream);
-				fclose($stream);
 			}
 			
 			while(($line = fgets($normInputStream)) != FALSE)
@@ -120,12 +119,12 @@ class CorrelatorController extends Controller
 				continue;
 			}
 
-			/*
+			
 			if(array_key_exists($file, $streams))
 			{
 				continue;
 			}
-			*/
+			
 			$stream = $this->openNonBlockingStream($fullPath);
 
 			if($stream == null)
