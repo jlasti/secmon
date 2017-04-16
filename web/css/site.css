@@ -275,3 +275,10 @@ body.compact .compact-button i {
     transform: translateY(-50%);
     margin-left: -30px;
 }
+
+/* Table style override */
+td, th {
+    padding: 5px;
+    font-size: 14px;
+    line-height: normal;
+}
