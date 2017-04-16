@@ -56,12 +56,16 @@ function OnColumnChanged(element) {
 	var types = select.find(':selected').attr('data-types').split(',');
 	var typeSelect = $('select[data-rule-type="' + index + '"]');
     var selectVal = null;
+    var firstSelectable = null;
 
 	// enable and disable types allowed for the column
 	typeSelect.find('option').each(function(i, e) {
 		var option = $(e);
 		var val = option.val();
 		if (types.indexOf(val) != -1) {
+			if (firstSelectable === null) {
+				firstSelectable = val;
+			}
             option.removeAttr('disabled');
             if (selectVal === null || option.is(':selected')) {
             	selectVal = val;
@@ -70,13 +74,18 @@ function OnColumnChanged(element) {
 		else {
             option.attr('disabled', 'disabled');
 		}
-
-		// reinitialize types select
-		typeSelect.material_select('destroy');
-		typeSelect.material_select();
     });
 
+	if (selectVal === null) {
+		selectVal = firstSelectable;
+	}
+
     typeSelect.val(selectVal);
+
+    // reinitialize types select
+    typeSelect.material_select('destroy');
+    typeSelect.material_select();
+
     OnFilterTypeChanged(typeSelect);
 }
 
