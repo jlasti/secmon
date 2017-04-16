@@ -37,7 +37,17 @@ class Event extends \yii\db\ActiveRecord
 
 		$event->cef_version = str_replace('CEF:', '', strrev(array_shift($dateHost)));
 		$event->host = strrev(array_shift($dateHost));
-		$event->datetime = date('Y-m-d H:i:s', strtotime(strrev(array_shift($dateHost))));
+        
+        // osetrenie ak na zaciatk logu nie je timestamp 
+        $strDate = array_shift($dateHost);
+        if(!empty($strDate))
+        {
+		  $event->datetime = date('Y-m-d H:i:s', strtotime(strrev($strDate)));
+        }
+        else
+        {
+            $event->datetime = date('Y-m-d H:i:s');
+        }
 
 		$event->cef_vendor = array_shift($data);
 		$event->cef_dev_prod = array_shift($data);
@@ -45,6 +55,27 @@ class Event extends \yii\db\ActiveRecord
 		$event->cef_event_class_id = array_shift($data);
 		$event->cef_name = array_shift($data);
 		$event->cef_severity = array_shift($data);
+
+        $data = array_shift($data);
+        $exData = explode(" ", $data);
+        $values = [];
+        foreach($exData as $val) {
+            $tmp = explode("=", $val);
+            if($tmp[0] == "rawEvent" || $tmp[0] == "reason")
+            {
+                break;
+            }
+            $values[$tmp[0]] = $tmp[1];
+        }
+
+        if(isset($values['cs1']))
+        {
+            $event->parent_events = explode(";", $values['cs1']);
+        }
+        else
+        {
+            $event->parent_events = null;
+        }
 
 		$event->raw = $cefString;
 
