@@ -187,6 +187,7 @@ class FilterController extends Controller
                     ];
                     break;
                 case "table":
+                    unset($filteredData);
                     $filteredData = $this->getFilteredEvents($filter->id);
                     return [
                       'contentTypeId' => $contentTypeId,
@@ -228,6 +229,7 @@ class FilterController extends Controller
                     ];
                     break;
                 case "table":
+                    unset($filteredData);
                     $filteredData = $this->getFilteredEvents($filter->id);
                     return [
                       'contentTypeId' => $contentTypeId,
@@ -267,6 +269,7 @@ class FilterController extends Controller
 
     protected function getFilteredEvents($filterId)
     {
+        unset($filteredData);
         $query = EventsNormalized::find();
 
         $filter = $this->findModel($filterId);
