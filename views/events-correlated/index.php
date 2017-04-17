@@ -27,8 +27,8 @@ $this->params['title'] = 'Correlated Events';
                 // 'cef_event_class_id',
                 'cef_name',
                 'cef_severity',
-                'parent_events',
-                'raw:ntext',
+                // 'parent_events',
+                // 'raw:ntext',
 
                 ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}'],
             ],
