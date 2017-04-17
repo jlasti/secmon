@@ -7,8 +7,8 @@
 
 type=Single
 ptype=RegExp
-pattern=(\d+).*src=([\d.]+).*proto=(TCP|UDP).*dpt=(\d+)
-varmap=iptables; id=1; ip=2; proto=3; port=4
+pattern=(\d+):\w{3} [\s\d]\d [\d:]+ (\S+).*src=([\d.]+).*proto=(TCP|UDP).*dpt=(\d+)
+varmap=iptables; id=1; host=2; ip=3; proto=4; port=5
 context=!COUNTING_$+{ip} && !COUNTING_OFF_$+{ip}
 desc=Create data structures for host $+{ip}
 action=create COUNTING_$+{ip} 60 lcall %o $+{ip} -> ( sub { delete $hosts{$_[0]}; } ); \
@@ -46,7 +46,7 @@ context=!COUNTING_OFF_$+{ip} && \
 			{ delete $hosts{$ip}->{"UDP"}->{$port}; } \
 		elsif ($port < 1024) { ++$priv; } \
 	} \
-	return ($priv == 10 || \
+	return ($priv == 2 || \
 			scalar(keys %{$hosts{$ip}->{"TCP"}}) == 20 || \
 			scalar(keys %{$hosts{$ip}->{"UDP"}}) == 40); } )
 desc=Host $+{ip} has accessed 10 privileged, 20 TCP or 40 UDP ports
@@ -58,6 +58,7 @@ action=lcall %ports $+{ip} -> ( sub { my($ip) = $_[0]; \
 	obsolete COUNTING_$+{ip}; \
 	lcall %ids -> \
 	( sub { return $ids; } ); \
-	write  /var/www/develop/__secInput CEF:0|SECMON|iptables|ver|0|Portscan|0|src=$+{ip} cs1Label=parentEvents cs1=%ids
+	write  /var/www/html/secmon_backend/__secInput $+{host} CEF:0|SECMON|iptables|ver|0|Portscan|0|src=$+{ip} cs1Label=parentEvents cs1=%ids
 
+# write  /var/www/develop/__secInput $+{host} CEF:0|SECMON|iptables|ver|0|Portscan|0|src=$+{ip} cs1Label=parentEvents cs1=%ids
 # === END - Portscan detection ===
