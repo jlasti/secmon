@@ -46,6 +46,7 @@ class Event extends \yii\db\ActiveRecord
         }
         else
         {
+            date_default_timezone_set('Europe/Bratislava');
             $event->datetime = date('Y-m-d H:i:s');
         }
 
