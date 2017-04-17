@@ -46,7 +46,7 @@ context=!COUNTING_OFF_$+{ip} && \
 			{ delete $hosts{$ip}->{"UDP"}->{$port}; } \
 		elsif ($port < 1024) { ++$priv; } \
 	} \
-	return ($priv == 2 || \
+	return ($priv == 10 || \
 			scalar(keys %{$hosts{$ip}->{"TCP"}}) == 20 || \
 			scalar(keys %{$hosts{$ip}->{"UDP"}}) == 40); } )
 desc=Host $+{ip} has accessed 10 privileged, 20 TCP or 40 UDP ports
@@ -58,7 +58,6 @@ action=lcall %ports $+{ip} -> ( sub { my($ip) = $_[0]; \
 	obsolete COUNTING_$+{ip}; \
 	lcall %ids -> \
 	( sub { return $ids; } ); \
-	write  /var/www/html/secmon_backend/__secInput $+{host} CEF:0|SECMON|iptables|ver|0|Portscan|0|src=$+{ip} cs1Label=parentEvents cs1=%ids
+	write  /var/www/develop/__secInput $+{host} CEF:0|SECMON|iptables|ver|0|Portscan|0|src=$+{ip} cs1Label=parentEvents cs1=%ids
 
-# write  /var/www/develop/__secInput $+{host} CEF:0|SECMON|iptables|ver|0|Portscan|0|src=$+{ip} cs1Label=parentEvents cs1=%ids
 # === END - Portscan detection ===
