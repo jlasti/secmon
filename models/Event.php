@@ -68,14 +68,7 @@ class Event extends \yii\db\ActiveRecord
             $values[$tmp[0]] = $tmp[1];
         }
 
-        if(isset($values['cs1']))
-        {
-            $event->parent_events = explode(";", $values['cs1']);
-        }
-        else
-        {
-            $event->parent_events = null;
-        }
+        $event->parent_events = $values['cs1'] ?? null;
 
 		$event->raw = $cefString;
 

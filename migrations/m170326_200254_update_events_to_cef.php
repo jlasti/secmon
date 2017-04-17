@@ -21,7 +21,7 @@ class m170326_200254_update_events_to_cef extends Migration
 			'cef_event_class_id' => $this->integer()->notNull(),
 			'cef_name' => $this->string()->notNull(),
 			'cef_severity' => $this->integer()->notNull(),
-			'parent_events' => 'integer',
+			'parent_events' => $this->text(),
 			'raw' => $this->text(),
 		]);
 
