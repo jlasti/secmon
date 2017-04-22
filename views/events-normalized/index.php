@@ -8,12 +8,19 @@ use yii\widgets\Pjax;
 
 $this->params['title'] = 'Normalized Events';
 
+$this->registerJs('
+    setInterval(function() {
+        $.pjax.reload({container:"#pjaxContainer table tbody", fragment:"table tbody"});
+    }, 5000);
+');
+
 ?>
 <div class="events-normalized-index clickable-table">
-
-    <?php Pjax::begin(['id' => 'pjaxContainer']); ?>    <?= GridView::widget([
+    <?php Pjax::begin(['id' => 'pjaxContainer']); ?>
+        <?= GridView::widget([
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
+            'layout' => '{items}{pager}',
             'columns' => [
                 ['class' => 'yii\grid\SerialColumn'],
 
@@ -28,12 +35,12 @@ $this->params['title'] = 'Normalized Events';
                 'cef_name',
                 'cef_severity',
                 'src_ip',
-//                'dst_ip',
+                // 'dst_ip',
                 'src_port',
                 'dst_port',
                 'protocol',
-//                'src_mac',
-//                'dst_mac',
+                // 'src_mac',
+                // 'dst_mac',
                 // 'extensions:ntext',
                 // 'raw:ntext',
 
@@ -41,14 +48,4 @@ $this->params['title'] = 'Normalized Events';
             ],
         ]); ?>
     <?php Pjax::end(); ?>
-
-<!--    --><?php
-//      $this->registerJs('
-//        setInterval(
-//          function() {
-//            $.pjax.reload({container:"#pjaxContainer"});
-//          }
-//          , 5000
-//        );', \yii\web\VIEW::POS_HEAD);
-//    ?>
 </div>

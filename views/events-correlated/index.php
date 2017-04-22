@@ -8,12 +8,19 @@ use yii\widgets\Pjax;
 
 $this->params['title'] = 'Correlated Events';
 
+$this->registerJs('
+    setInterval(function() {
+        $.pjax.reload({container:"#pjaxContainer table tbody", fragment:"table tbody"});
+    }, 5000);
+');
+
 ?>
 <div class="events-correlated-index clickable-table">
-
-    <?php Pjax::begin(['id' => 'pjaxContainer']); ?>    <?= GridView::widget([
+    <?php Pjax::begin(['id' => 'pjaxContainer']); ?>
+        <?= GridView::widget([
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
+            'layout' => '{items}{pager}',
             'columns' => [
                 ['class' => 'yii\grid\SerialColumn'],
 
@@ -34,14 +41,4 @@ $this->params['title'] = 'Correlated Events';
             ],
         ]); ?>
     <?php Pjax::end(); ?>
-
-<!--    --><?php
-//      $this->registerJs('
-//        setInterval(
-//          function() {
-//            $.pjax.reload({container:"#pjaxContainer"});
-//          }
-//          , 5000
-//        );', \yii\web\VIEW::POS_HEAD);
-//    ?>
 </div>
