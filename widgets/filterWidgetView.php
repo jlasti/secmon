@@ -1,18 +1,7 @@
-<table class="striped">
-    <thead>
-        <tr>
-            <th>Datetime</th>
-            <th>Host</th>
-            <th>Protocol</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($filteredData as $data): ?>
-        <tr>
-            <td><?= $data->datetime ?></td>
-            <td><?= $data->host ?></td>
-            <td><?= $data->protocol ?></td>
-        </tr>
-        <?php endforeach; ?>
-    </tbody>
-</table>
+<?= macgyer\yii2materializecss\widgets\grid\GridView::widget([
+    'dataProvider' => new \yii\data\ArrayDataProvider([
+        'allModels' => $filteredData
+    ]),
+    'layout' => '{items}',
+    'columns' => $columns,
+]); ?>

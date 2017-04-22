@@ -77,6 +77,8 @@ $this->params['title'] = $select;
 
 <?php
 
+$columns = array_keys(\app\models\EventsNormalized::columns());
+
 $this->registerJs(
     sprintf("var global = (function () { return this; })();
         var comps = [ %s ];
@@ -90,7 +92,8 @@ $this->registerJs(
             updateComponentSettings: '%s',
             deleteComponentSettings: '%s',
             updateComponentContent: '%s',
-            activeComponentIds: comps
+            activeComponentIds: comps,
+            tableColumns: { \"%s\" : null }
         });",
         $comps,
         Url::to(["view/change-view"]),
@@ -100,7 +103,8 @@ $this->registerJs(
         Url::to(["view/update-order-of-components"]),
         Url::to(["filter/add-filter-to-component"]),
         Url::to(["filter/remove-filter-from-component"]),
-        Url::to(["filter/get-component-content"])
+        Url::to(["filter/get-component-content"]),
+        join('" : null, "', $columns)
     )
 );
 

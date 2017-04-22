@@ -8,6 +8,7 @@ $(function () {
     var hostUrl;
     var options = {};
     var activeComponentIds = [];
+    var tableColumns = {};
     var dashboardSelect;
     var widthSelect;
     var editBtn;
@@ -31,21 +32,16 @@ $(function () {
         global.views = function (args) {
             $.extend(options, args || {});
             $.extend(activeComponentIds, args.activeComponentIds || []);
+            tableColumns = args.tableColumns;
 
             hostUrl = location.protocol + "//" + location.hostname + (location.port ? ":" + location.port : "");
             dashboardSelect = $('#dashboard');
-            widthSelect = $('select.widthSelect');
             editBtn = $("#editBtn");
             removeBtn = $("#removeBtn");
             activeGrid = $('#grid_' + dashboardSelect.val());
             addComponentBtn = $("#addComponentBtn");
-            deleteComponentBtn = $(".deleteComponentBtn");
-            componentForm = $("form.componentForm");
-            saveContentBtn = $("[data-action='saveComponentContent']");
-            deleteContentBtn = $("[data-action='removeComponentContent']");
-            nameInputs = $(".nameInput");
 
-
+            activateComponent();
 
             // Inicializacia boxov.
             grid = $('.grid').packery({
@@ -66,21 +62,93 @@ $(function () {
             UpdateBtnUrl(removeBtn, dashboardSelect.val());
 
             dashboardSelect.on('change', dashboardSelect_onChange);
-            widthSelect.on('change', widthSelect_onChange);
             addComponentBtn.on('click', addComponentBtn_onClick);
-            deleteComponentBtn.on('click', deleteComponentBtn_onClick);
-            componentForm.on('submit', componentForm_onSubmit);
             grid.on( 'dragItemPositioned', saveOrder_onDragItemPositioned );
-            saveContentBtn.on('click', saveContentBtn_onClick);
-            deleteContentBtn.on('click', deleteContentBtn_onClick);
-            nameInputs.on('focusout blur', name_onFocusOut);
 
             // Show grid after js inicialization
             $('.grid').removeClass("invisible");
 
             componentUpdate();
         }
-    };
+    }
+
+    /*
+     * Activates chips for table columns
+     */
+    function activateTableColumns(e) {
+        var chips;
+        if (e === undefined) {
+            chips = $('.chips-table');
+        }
+        else {
+            chips = $(e).find('.chips-table');
+        }
+
+        chips.each(function() {
+            var chip = $(this);
+            var columns = chip.attr('data-table-columns');
+            if (columns !== undefined && columns !== '') {
+                var cols = columns.split(',');
+                var data = $.map(cols, function (col) {
+                    return {tag: col};
+                });
+            }
+            else {
+                data = {};
+            }
+
+            chip.material_chip({
+                data: data,
+                autocompleteData: tableColumns,
+                autocompleteLimit: 4
+            });
+
+            var updateColumnsValue = function(e, target, action, chipObj) {
+                var compId = $(target).attr('data-id');
+                var val = $(target).material_chip('data');
+
+                if (action === 'add' && data.indexOf(chipObj.tag) === -1) {
+                    return false;
+                }
+                else {
+                    val = $.map(val, function (chip) {
+                        return chip.tag;
+                    });
+                    val = val.join(',');
+                    $('#componentDataTypeParameter' + compId).val(val);
+                    return true;
+                }
+            };
+
+            updateColumnsValue(undefined, chip, 'init');
+
+            chip.on('chip.add', function(e, chip) { return updateColumnsValue(e, e.target, 'add', chip); });
+            chip.on('chip.delete', function(e, chip) { return updateColumnsValue(e, e.target, 'delete', chip); });
+        });
+    }
+
+    function activateComponent(e) {
+        var element;
+        if (e === undefined) {
+            element = $(document);
+        }
+        else {
+            element = $(e);
+        }
+
+        element.find('.modal').modal();
+        element.find('select').material_select();
+        element.find('.nameInput').on('focusout blur', name_onFocusOut);
+        element.find('select.widthSelect').on("change", widthSelect_onChange);
+        element.find(".deleteComponentBtn").on('click', deleteComponentBtn_onClick);
+        element.find("[data-action='saveComponentContent']").on('click', saveContentBtn_onClick);
+        element.find("[data-action='removeComponentContent']").on('click', deleteContentBtn_onClick);
+        element.find("select[data-type='contentTypeSelect']").on('change', contentTypeChanged);
+        element.find("form.componentForm").on('submit', componentForm_onSubmit);
+
+        element.find('[data-type="contentTypeSelect"]').each(contentTypeChanged);
+        activateTableColumns(element);
+    }
 
     /*
      * Add component id to list of component ids for update.
@@ -183,9 +251,10 @@ $(function () {
                     config : JSON.stringify({
                         name: comp.find("#name" + compId).val(),
                         width: comp.find("#width" + compId).val(),
-                        dataType: data.contentTypeId
+                        dataType: data.contentTypeId,
+                        dataTypeParameter: data.dataTypeParameter
                     })
-                },
+                }
             });
 
              remBtn.css('display', 'block');
@@ -199,7 +268,7 @@ $(function () {
              if (data.contentTypeId == "table") {
                 cont.html(data.html);
              }
-             if (data.contentTypeId == "lineChart") {
+             else if (data.contentTypeId == "lineChart") {
                 var width = parseInt(cont.css("width").replace("px",""));
                 cont.empty();
                 DrawBarGraph(JSON.parse(data.data), width/2, width, "#componentContentBody" + compId);
@@ -253,7 +322,7 @@ $(function () {
             url: hostUrl + options.changeView,
             data : { viewId : this.value}
         });
-    };
+    }
 
     /*
      * Event handler na zmenu sirky komponentu
@@ -269,7 +338,7 @@ $(function () {
         var width = parseInt(gridItemNode.find(".card-content").css("width").replace("px",""));
         var height = parseInt(gridItemNode.find(".card-content").css("height").replace("px",""));
         UpdateBarGraph(height, width, "#componentContentBody" + gridItemNode.find("form.componentForm").attr('data-id'));
-    };
+    }
 
     /*
      * Event handler pre pridanie komponentu
@@ -282,10 +351,11 @@ $(function () {
                 config : JSON.stringify({
                     name: newComponentName,
                     width: '',
-                    dataType: 'table'
+                    dataType: 'table',
+                    dataTypeParameter: 'datetime,host,protocol'
                 }),
                 order : activeGrid.packery("getItemElements").length
-            },
+            }
         }).done(function (data) {
             if (!data) {
                 Materialize.toast("Couldn't add component.", 4000);
@@ -301,15 +371,9 @@ $(function () {
             var draggie = new Draggabilly( gridItemNode[0] );
             activeGrid.packery( 'bindDraggabillyEvents', draggie );
 
-            gridItemNode.find('.modal').modal();
-            gridItemNode.find('select').material_select();
-            gridItemNode.find('.nameInput').on('focusout blur', name_onFocusOut);
-            gridItemNode.find('select.widthSelect').on("change", widthSelect_onChange);
-            gridItemNode.find(".deleteComponentBtn").on('click', deleteComponentBtn_onClick);
-            gridItemNode.find("[data-action='saveComponentContent']").on('click', saveContentBtn_onClick);
-            gridItemNode.find("[data-action='removeComponentContent']").on('click', deleteContentBtn_onClick);
+            activateComponent(gridItemNode);
         });
-    };
+    }
 
     /*
      * Event handler pre vymazanie komponentu
@@ -321,7 +385,7 @@ $(function () {
             url: hostUrl + options.deleteComponent,
             data : { 
                 componentId : componentId
-            },
+            }
         }).done(function (data) {
             if (!data) {
                 Materialize.toast("Couldn't delete component.", 4000);
@@ -331,7 +395,7 @@ $(function () {
             removeActiveComponent(componentId);
             activeGrid.packery('remove', $("#component_" + componentId));
         });
-    };
+    }
 
     /*
      * Event handler pre ulozenie poradia komponentov
@@ -350,14 +414,14 @@ $(function () {
             data : { 
                 viewId : dashboardSelect.val(),
                 componentOrder : JSON.stringify(order)
-            },
+            }
         }).done(function (data) {
             if (!data) {
                 Materialize.toast("Couldn't update order of components.", 4000);
                 return;
             }
         });
-    };
+    }
 
     /*
      * Event handler pre zmenu mena komponentu
@@ -395,7 +459,27 @@ $(function () {
         });
 
         return false;
-    };
+    }
+
+    function contentTypeChanged() {
+        var compId = $(this).attr('data-id');
+        var val = $(this).val();
+        var comp = $('#component_' + compId);
+        var types = comp.find('[data-content-type]');
+        types.each(function(i, e) {
+            var element = $(e);
+            var type = element.attr('data-content-type');
+            var options = element.find('select, input');
+            if (type == val) {
+                element.show();
+                options.removeAttr('disabled');
+            }
+            else {
+                element.hide();
+                options.attr('disabled','disalbed');
+            }
+        });
+    }
 
     //#endregion
 
@@ -409,7 +493,7 @@ $(function () {
         var href = btn.attr('href').split('=');
         href[1] = id;
         btn.attr('href', href.join('='));
-    };
+    }
 
     /*
      * Funkcia na vykreslenie ciary grafu
@@ -479,7 +563,7 @@ $(function () {
             .datum(data)
             .attr("class", "line")
             .attr("d", line);
-    };
+    }
 
     /*
      *  Update funkcia ciaroveho grafu
@@ -558,7 +642,7 @@ $(function () {
             .datum(data)
             .attr("class", "line")
             .attr("d", line);
-    };
+    }
 
     /*
      * Funkcia na vykreslenie bar grafu
@@ -641,7 +725,7 @@ $(function () {
             d3.select(this)
             .attr("fill", "red");
         });
-    };
+    }
 
     /*
     * Funkcia na update bar grafu
@@ -731,7 +815,7 @@ $(function () {
                 d3.select(this)
                     .attr("fill", "red");
         });
-    };
+    }
 
     //#endregion
 });

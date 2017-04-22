@@ -5,7 +5,12 @@
   $loggedUserId = Yii::$app->user->getId();
   $options =  Json::decode($component->config);
   $filters = \app\controllers\FilterController::getFiltersOfUser($loggedUserId);
-  $contentTypes = array('table' => 'Table', 'lineChart' => 'Line chart', 'barChart' => 'Bar chart');
+  $contentTypes = [
+      'table' => 'Table',
+      'lineChart' => 'Line chart',
+      'barChart' => 'Bar chart'
+  ];
+  $columns = \app\models\EventsNormalized::getColumnsDropdown();
 ?>
 
 <div class='grid-item card <?= $options['width'] ?>' id='component_<?= $component->id ?>'>
@@ -66,13 +71,28 @@
 
                         <div class="row">
                             <div class="input-field col s11">
-                                <select id="componenContentTypeId<?= $component->id ?>" name="contentTypeId">
-                                <?php foreach ($contentTypes as $key => $type): ?>
-                                    <option value="<?= $key ?>"<?= ($options["contentType"] ?? "") == $key ? " selected='selected'" : "" ?>><?= $type ?></option>
-                                <?php endforeach; ?>
+                                <select id="componenContentTypeId<?= $component->id ?>" name="contentTypeId" data-type="contentTypeSelect" data-id="<?= $component->id ?>">
+                                    <?php foreach ($contentTypes as $key => $type): ?>
+                                        <option value="<?= $key ?>"<?= ($options["contentType"] ?? "") == $key ? " selected='selected'" : "" ?>><?= $type ?></option>
+                                    <?php endforeach; ?>
                                 </select>
                                 <label for="componenContentTypeId<?php print($component->id); ?>">Content type visualisation</label>
                             </div>
+                        </div>
+
+                        <div class="row">
+                            <?php foreach ($contentTypes as $key => $type): ?>
+                            <div data-content-type="<?= $key ?>" class="input-field col s11">
+                                <?php if ($key == 'table') : ?>
+                                    <input type="hidden" name="dataTypeParameter" id="componentDataTypeParameter<?= $component->id ?>" />
+                                    <p class="caption">Table columns</p>
+                                    <div id="chipsTable<?= $component->id ?>" class="chips chips-table" data-id="<?= $component->id ?>" data-table-columns="<?= $options['dataTypeParameter'] ?? 'datetime,host,protocol' ?>"></div>
+                                <?php else : ?>
+                                    <input type="text" id="componentContentParameter<?= $component->id ?>" name="dataTypeParameter" value="<?= $options['dataTypeParameter'] ?? "" ?>" />
+                                    <label for="componentContentParameter<?= $component->id ?>">Content parameter</label>
+                                <?php endif; ?>
+                            </div>
+                            <?php endforeach; ?>
                         </div>
                     </form>
                 </div>

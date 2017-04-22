@@ -156,7 +156,7 @@ class FilterController extends Controller
         return $filters;
     }
 
-    public function actionAddFilterToComponent($filterId, $componentId, $contentTypeId)
+    public function actionAddFilterToComponent($filterId, $componentId, $contentTypeId, $dataTypeParameter)
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $loggedUserId = Yii::$app->user->getId();
@@ -170,6 +170,11 @@ class FilterController extends Controller
         {
             $component->filter_id = $filterId;
             $component->update();
+
+            if (!empty($dataTypeParameter))
+                $columns = explode(',', $dataTypeParameter);
+            else
+                $columns = ['datetime', 'host', 'protocol'];
 
             switch ($contentTypeId) {
                 case "lineChart":
@@ -191,7 +196,8 @@ class FilterController extends Controller
                     $filteredData = $this->getFilteredEvents($filter->id);
                     return [
                       'contentTypeId' => $contentTypeId,
-                      'html' => \app\widgets\FilterWidget::widget(['data' => compact('component', 'filter', 'filteredData')])
+                      'dataTypeParameter' => $dataTypeParameter,
+                      'html' => \app\widgets\FilterWidget::widget(['data' => compact('component', 'filter', 'filteredData', 'columns')])
                     ];
                     break;
             }
@@ -212,6 +218,11 @@ class FilterController extends Controller
         if ( !empty($component) )
         {
             $contentTypeId =  Json::decode($component->config)['dataType'];
+            $dataTypeParameter =  Json::decode($component->config)['dataTypeParameter'] ?? "";
+            if (!empty($dataTypeParameter))
+                $columns = explode(',', $dataTypeParameter);
+            else
+                $columns = ['datetime', 'host', 'protocol'];
 
             switch ($contentTypeId) {
                 case "lineChart":
@@ -233,7 +244,8 @@ class FilterController extends Controller
                     $filteredData = $this->getFilteredEvents($filter->id);
                     return [
                       'contentTypeId' => $contentTypeId,
-                      'html' => \app\widgets\FilterWidget::widget(['data' => compact('component', 'filter', 'filteredData')])
+                      'dataTypeParameter' => $dataTypeParameter,
+                      'html' => \app\widgets\FilterWidget::widget(['data' => compact('component', 'filter', 'filteredData', 'columns')])
                     ];
                     break;
             }

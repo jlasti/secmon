@@ -35,6 +35,10 @@ class CompareFilterRule extends BaseFilterRule
 		return [
 			'=',
 			'!=',
+            '>',
+            '<',
+            '>=',
+            '<=',
 		];
 	}
 
