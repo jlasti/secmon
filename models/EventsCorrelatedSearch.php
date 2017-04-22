@@ -60,11 +60,13 @@ class EventsCorrelatedSearch extends EventsCorrelated
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'datetime' => $this->datetime,
+            // 'datetime' => $this->datetime,
             'cef_event_class_id' => $this->cef_event_class_id,
             'cef_severity' => $this->cef_severity,
             'parent_events' => $this->parent_events,
         ]);
+
+        $query->andFilterWhere(['>=', 'datetime', $this->datetime]);
 
         $query->andFilterWhere(['like', 'host', $this->host])
             ->andFilterWhere(['like', 'cef_version', $this->cef_version])

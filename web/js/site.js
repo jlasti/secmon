@@ -9,15 +9,14 @@ $(function () {
     // Inicializovanie selectov.
     $('select').material_select();
     $('.modal').modal();
+
     // Aktivovanie datepickera
     activateDatePicker();
+    // Aktivoavnie riadkov tabulky
+    activateEventsRows();
 
     $("body").removeClass("preload");
 
-    // Kliknutie na riadok tabulky zobrazi detail
-    $(".clickable-table table tbody tr").one( "click", function() {
-        $(this).find('a > i').click();
-    });
 
     //Vlozenie search ikonky do riadku flitrov
     $("table tr.filters td").first().html("<i class='material-icons'>search</i>");    
@@ -38,6 +37,16 @@ function activateDatePicker(element) {
         format: 'yyyy-mm-dd',
         closeOnSelect: true,
         firstDay: 1
+    });
+}
+
+/*
+ * Kliknutie na riadok tabulky zobrazi detail
+ */
+function activateEventsRows() {
+
+    $(".clickable-table table tbody tr").one( "click", function() {
+        $(this).find('a > i').click();
     });
 }
 

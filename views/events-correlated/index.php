@@ -10,7 +10,16 @@ $this->params['title'] = 'Correlated Events';
 
 $this->registerJs('
     setInterval(function() {
-        $.pjax.reload({container:"#pjaxContainer table tbody", fragment:"table tbody"});
+        $.pjax.reload({
+            container:"#pjaxContainer table#eventsContent tbody:last", 
+            fragment:"table#eventsContent tbody:last"})
+            .done(function() {
+                activateEventsRows();
+                $.pjax.reload({
+                    container:"#pjaxContainer #pagination", 
+                    fragment:"#pagination"
+                });
+            });
     }, 5000);
 ');
 
@@ -20,12 +29,28 @@ $this->registerJs('
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
-            'layout' => '{items}{pager}',
+            'layout' => '{items}<div id="pagination">{pager}</div>',
+            'tableOptions' => [
+                'id' => 'eventsContent',
+                'class' => 'responsive-table striped'
+            ],
             'columns' => [
                 ['class' => 'yii\grid\SerialColumn'],
 
-                // 'id',
-                'datetime',
+                //'id',
+                //'datetime',
+                [
+                    'attribute' => 'datetime',
+                    'value' => 'datetime',
+                    'format' => 'raw',
+                    'filter' => \macgyer\yii2materializecss\widgets\form\DatePicker::widget([
+                        'model' => $searchModel,
+                        'attribute' => 'datetime',
+                        'clientOptions' => [
+                            'format' => 'yyyy-mm-dd'
+                        ]
+                    ])
+                ],
                 'host',
                 // 'cef_version',
                 // 'cef_vendor',

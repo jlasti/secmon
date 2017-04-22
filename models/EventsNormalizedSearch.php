@@ -60,12 +60,14 @@ class EventsNormalizedSearch extends EventsNormalized
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'datetime' => $this->datetime,
+            // 'datetime' => $this->datetime,
             'cef_event_class_id' => $this->cef_event_class_id,
             'cef_severity' => $this->cef_severity,
             'src_port' => $this->src_port,
             'dst_port' => $this->dst_port,
         ]);
+
+        $query->andFilterWhere(['>=', 'datetime', $this->datetime]);
 
         $query->andFilterWhere(['like', 'host', $this->host])
             ->andFilterWhere(['like', 'cef_version', $this->cef_version])
