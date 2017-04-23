@@ -73,7 +73,7 @@
                             <div class="input-field col s11">
                                 <select id="componenContentTypeId<?= $component->id ?>" name="contentTypeId" data-type="contentTypeSelect" data-id="<?= $component->id ?>">
                                     <?php foreach ($contentTypes as $key => $type): ?>
-                                        <option value="<?= $key ?>"<?= ($options["contentType"] ?? "") == $key ? " selected='selected'" : "" ?>><?= $type ?></option>
+                                        <option value="<?= $key ?>"<?= ($options["dataType"] ?? "") == $key ? " selected='selected'" : "" ?>><?= $type ?></option>
                                     <?php endforeach; ?>
                                 </select>
                                 <label for="componenContentTypeId<?php print($component->id); ?>">Content type visualisation</label>
@@ -86,9 +86,12 @@
                                 <?php if ($key == 'table') : ?>
                                     <input type="hidden" name="dataTypeParameter" id="componentDataTypeParameter<?= $component->id ?>" />
                                     <p class="caption">Table columns</p>
-                                    <div id="chipsTable<?= $component->id ?>" class="chips chips-table" data-id="<?= $component->id ?>" data-table-columns="<?= $options['dataTypeParameter'] ?? 'datetime,host,protocol' ?>"></div>
+                                    <div id="chipsTable<?= $component->id ?>" class="chips chips-table" data-id="<?= $component->id ?>"
+                                         data-table-columns="<?= ($options["dataType"] ?? "") == $key && !empty($options['dataTypeParameter']) ? $options['dataTypeParameter'] : 'datetime,host,protocol'
+                                         ?>"></div>
                                 <?php else : ?>
-                                    <input type="text" id="componentContentParameter<?= $component->id ?>" name="dataTypeParameter" value="<?= $options['dataTypeParameter'] ?? "" ?>" />
+                                    <input type="text" id="componentContentParameter<?= $component->id ?>" name="dataTypeParameter"
+                                           value="<?= ($options["dataType"] ?? "") == $key && !empty($options['dataTypeParameter']) ? $options['dataTypeParameter'] : "" ?>" />
                                     <label for="componentContentParameter<?= $component->id ?>">Content parameter</label>
                                 <?php endif; ?>
                             </div>
