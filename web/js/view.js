@@ -9,6 +9,7 @@ $(function () {
     var options = {};
     var activeComponentIds = [];
     var tableColumns = {};
+    var tableColumnsNames = [];
     var dashboardSelect;
     var widthSelect;
     var editBtn;
@@ -18,8 +19,6 @@ $(function () {
     var grid;
     var deleteComponentBtn;
     var componentForm;
-    var saveContentBtn;
-    var deleteContentBtn;
 
     var newComponentName = "New Component";
 
@@ -33,6 +32,7 @@ $(function () {
             $.extend(options, args || {});
             $.extend(activeComponentIds, args.activeComponentIds || []);
             tableColumns = args.tableColumns;
+            tableColumnsNames = Object.keys(tableColumns);
 
             hostUrl = location.protocol + "//" + location.hostname + (location.port ? ":" + location.port : "");
             dashboardSelect = $('#dashboard');
@@ -87,14 +87,12 @@ $(function () {
         chips.each(function() {
             var chip = $(this);
             var columns = chip.attr('data-table-columns');
+            var data = [];
             if (columns !== undefined && columns !== '') {
                 var cols = columns.split(',');
-                var data = $.map(cols, function (col) {
+                data = $.map(cols, function (col) {
                     return {tag: col};
                 });
-            }
-            else {
-                data = {};
             }
 
             chip.material_chip({
@@ -106,17 +104,33 @@ $(function () {
             var updateColumnsValue = function(e, target, action, chipObj) {
                 var compId = $(target).attr('data-id');
                 var val = $(target).material_chip('data');
+                val = $.map(val, function (chip) {
+                    return chip.tag;
+                });
 
-                // if (action === 'add' && data.indexOf(chipObj.tag) === -1) {
-                //     return false;
-                // }
-                // else {
-                    val = $.map(val, function (chip) {
-                        return chip.tag;
+                var changed = false;
+                if (action === 'add' && tableColumnsNames.indexOf(chipObj.tag) === -1) {
+                    var idx = val.indexOf(chipObj.tag);
+                    if (idx !== -1) {
+                        val.splice(idx, 1);
+                        changed = true;
+                    }
+                    else {
+                        console.log('chip object index not found!');
+                    }
+                }
+
+                if (changed) {
+                    var newData = $.map(val, function(v) { return { tag: v }; });
+                    $(target).material_chip({
+                        data: newData,
+                        autocompleteData: tableColumns,
+                        autocompleteLimit: 4
                     });
-                    val = val.join(',');
-                    $('#componentDataTypeParameter' + compId).val(val);
-                // }
+                }
+
+                val = val.join(',');
+                $('#componentDataTypeParameter' + compId).val(val);
             };
 
             updateColumnsValue(undefined, chip, 'init');
@@ -126,6 +140,9 @@ $(function () {
         });
     }
 
+    /*
+     * Activates component controls
+     */
     function activateComponent(e) {
         var element;
         if (e === undefined) {

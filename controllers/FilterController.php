@@ -168,13 +168,27 @@ class FilterController extends Controller
 
         if ( !empty($component) )
         {
+            // check config
+            if (!empty($contentTypeId) && !empty($dataTypeParameter))
+            {
+                if ($contentTypeId == 'table')
+                {
+                    $dbCols = array_keys(EventsNormalized::columns());
+                    $cols = explode(',', $dataTypeParameter);
+                    $res = [];
+                    foreach ($cols as $idx => $col)
+                    {
+                        if (in_array($col, $dbCols))
+                        {
+                            $res[] = $col;
+                        }
+                    }
+                    $dataTypeParameter = implode(',', $res);
+                }
+            }
+
             $component->filter_id = $filterId;
             $component->update();
-
-            if (!empty($dataTypeParameter))
-                $columns = explode(',', $dataTypeParameter);
-            else
-                $columns = ['datetime', 'host', 'protocol'];
 
             switch ($contentTypeId) {
                 case "lineChart":
@@ -196,6 +210,12 @@ class FilterController extends Controller
                 case "table":
                     unset($filteredData);
                     $filteredData = $this->getFilteredEvents($filter->id);
+
+                    if (!empty($dataTypeParameter))
+                        $columns = explode(',', $dataTypeParameter);
+                    else
+                        $columns = ['datetime', 'host', 'protocol'];
+
                     return [
                       'contentTypeId' => $contentTypeId,
                       'dataTypeParameter' => $dataTypeParameter,
@@ -221,10 +241,6 @@ class FilterController extends Controller
         {
             $contentTypeId =  Json::decode($component->config)['dataType'];
             $dataTypeParameter =  Json::decode($component->config)['dataTypeParameter'] ?? "";
-            if (!empty($dataTypeParameter))
-                $columns = explode(',', $dataTypeParameter);
-            else
-                $columns = ['datetime', 'host', 'protocol'];
 
             switch ($contentTypeId) {
                 case "lineChart":
@@ -246,6 +262,12 @@ class FilterController extends Controller
                 case "table":
                     unset($filteredData);
                     $filteredData = $this->getFilteredEvents($filter->id);
+
+                    if (!empty($dataTypeParameter))
+                        $columns = explode(',', $dataTypeParameter);
+                    else
+                        $columns = ['datetime', 'host', 'protocol'];
+
                     return [
                       'contentTypeId' => $contentTypeId,
                       'dataTypeParameter' => $dataTypeParameter,
