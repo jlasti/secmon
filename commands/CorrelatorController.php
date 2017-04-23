@@ -67,7 +67,6 @@ class CorrelatorController extends Controller
 				{
 					if(!empty($line))
 					{
-						echo "1";
 						fwrite($normOutputStream, $line);
 						flush();
 					}
@@ -86,7 +85,6 @@ class CorrelatorController extends Controller
 
 					if($event->save())
 					{
-						echo "2";
 						fwrite($corrOutputStream, $event->id . ':' . $line);
 					}
 				}
@@ -99,7 +97,6 @@ class CorrelatorController extends Controller
 					Yii::info(sprintf("Correlated:\n%s\n", $line));
 
 					$event = Event::fromCef($line);
-					echo "3";
 					$event->save();
 				}
 			}
