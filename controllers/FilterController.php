@@ -181,6 +181,7 @@ class FilterController extends Controller
                     //$filteredData = $this->getFilteredEventsBarGraph($filter->id);
                     return [
                       'contentTypeId' => $contentTypeId,
+                      'dataTypeParameter' => $dataTypeParameter,
                       'data' => Json::encode($this->getFilteredEventsBarGraph($filter->id))
                     ];
                     break;
@@ -188,6 +189,7 @@ class FilterController extends Controller
                     //$filteredData = $this->getFilteredEventsBarGraph($filter->id);
                     return [
                       'contentTypeId' => $contentTypeId,
+                      'dataTypeParameter' => $dataTypeParameter,
                       'data' => Json::encode($filteredData = $this->getFilteredEventsBarGraph($filter->id))
                     ];
                     break;
@@ -229,6 +231,7 @@ class FilterController extends Controller
                     //$filteredData = $this->getFilteredEventsBarGraph($filter->id);
                     return [
                       'contentTypeId' => $contentTypeId,
+                      'dataTypeParameter' => $dataTypeParameter,
                       'data' => Json::encode($this->getFilteredEventsBarGraph($filter->id))
                     ];
                     break;
@@ -236,6 +239,7 @@ class FilterController extends Controller
                     //$filteredData = $this->getFilteredEventsBarGraph($filter->id);
                     return [
                       'contentTypeId' => $contentTypeId,
+                      'dataTypeParameter' => $dataTypeParameter,
                       'data' => Json::encode($this->getFilteredEventsBarGraph($filter->id))
                     ];
                     break;
