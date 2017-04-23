@@ -107,23 +107,22 @@ $(function () {
                 var compId = $(target).attr('data-id');
                 var val = $(target).material_chip('data');
 
-                if (action === 'add' && data.indexOf(chipObj.tag) === -1) {
-                    return false;
-                }
-                else {
+                // if (action === 'add' && data.indexOf(chipObj.tag) === -1) {
+                //     return false;
+                // }
+                // else {
                     val = $.map(val, function (chip) {
                         return chip.tag;
                     });
                     val = val.join(',');
                     $('#componentDataTypeParameter' + compId).val(val);
-                    return true;
-                }
+                // }
             };
 
             updateColumnsValue(undefined, chip, 'init');
 
-            chip.on('chip.add', function(e, chip) { return updateColumnsValue(e, e.target, 'add', chip); });
-            chip.on('chip.delete', function(e, chip) { return updateColumnsValue(e, e.target, 'delete', chip); });
+            chip.on('chip.add', function(e, chip) { updateColumnsValue(e, e.target, 'add', chip); });
+            chip.on('chip.delete', function(e, chip) { updateColumnsValue(e, e.target, 'delete', chip); });
         });
     }
 
