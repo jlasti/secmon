@@ -520,7 +520,7 @@ $(function () {
         }
 
         // set the dimensions and margins of the graph
-        var margin = {top: 20, right: 20, bottom: 30, left: 80},
+        var margin = {top: 20, right: 20, bottom: 40, left: 80},
             width = outboundWidth - margin.left - margin.right,
             height = outboundHeight - margin.top - margin.bottom;
 
@@ -599,7 +599,7 @@ $(function () {
         d3.select(node).selectAll("#lineChart").remove();
 
         // set the dimensions and margins of the graph
-        var margin = {top: 20, right: 20, bottom: 30, left: 40},
+        var margin = {top: 20, right: 20, bottom: 40, left: 40},
             width = outboundWidth - margin.left - margin.right,
             height = outboundHeight - margin.top - margin.bottom;
 
@@ -669,7 +669,7 @@ $(function () {
         }
 
         // set the dimensions and margins of the graph
-        var margin = {top: 20, right: 20, bottom: 30, left: 80},
+        var margin = {top: 20, right: 20, bottom: 40, left: 80},
             width = outboundWidth - margin.left - margin.right,
             height = outboundHeight - margin.top - margin.bottom;
 
@@ -775,7 +775,7 @@ $(function () {
         d3.select(node).selectAll("#barChart").remove();
 
         // set the dimensions and margins of the graph
-        var margin = {top: 20, right: 20, bottom: 30, left: 80},
+        var margin = {top: 20, right: 20, bottom: 40, left: 80},
             width = outboundWidth - margin.left - margin.right,
             height = outboundHeight - margin.top - margin.bottom;
 
