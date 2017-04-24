@@ -520,7 +520,7 @@ $(function () {
         }
 
         // set the dimensions and margins of the graph
-        var margin = {top: 20, right: 20, bottom: 30, left: 40},
+        var margin = {top: 20, right: 20, bottom: 30, left: 80},
             width = outboundWidth - margin.left - margin.right,
             height = outboundHeight - margin.top - margin.bottom;
 
@@ -669,7 +669,7 @@ $(function () {
         }
 
         // set the dimensions and margins of the graph
-        var margin = {top: 20, right: 20, bottom: 30, left: 40},
+        var margin = {top: 20, right: 20, bottom: 30, left: 80},
             width = outboundWidth - margin.left - margin.right,
             height = outboundHeight - margin.top - margin.bottom;
 
@@ -744,12 +744,12 @@ $(function () {
             .append("text")
                 .attr("fill","#000000")
                 .attr("transform", "rotate(-90)")
-                .attr("y",-30)
+                .attr("y",-50)
                 .attr("x",0)
                 .attr("font-size", "14px")
                 .style("text-anchor", "end")
                 .text("[COUNT]");
-        
+
         var bars = svg.selectAll(".bar");
 
         bars.on("mouseover", function() {
@@ -775,7 +775,7 @@ $(function () {
         d3.select(node).selectAll("#barChart").remove();
 
         // set the dimensions and margins of the graph
-        var margin = {top: 20, right: 20, bottom: 30, left: 40},
+        var margin = {top: 20, right: 20, bottom: 30, left: 80},
             width = outboundWidth - margin.left - margin.right,
             height = outboundHeight - margin.top - margin.bottom;
 
