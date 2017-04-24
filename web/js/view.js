@@ -726,15 +726,30 @@ $(function () {
         svg.append("g")
             .attr("transform", "translate(0," + height + ")")
             .call(
-            d3.axisBottom(x)
-            );
+                d3.axisBottom(x)
+            )
+            .append("text")
+                .attr("fill","#000000")
+                .attr("y", 30)
+                .attr("x",width)
+                .attr("font-size", "14px")
+                .style("text-anchor", "end")
+                .text("[TIME FRAME]");
 
         // add the y Axis
         svg.append("g")
             .call(
-            d3.axisLeft(y)
-            );
-
+                d3.axisLeft(y)
+            )
+            .append("text")
+                .attr("fill","#000000")
+                .attr("transform", "rotate(-90)")
+                .attr("y",-30)
+                .attr("x",0)
+                .attr("font-size", "14px")
+                .style("text-anchor", "end")
+                .text("[COUNT]");
+        
         var bars = svg.selectAll(".bar");
 
         bars.on("mouseover", function() {
@@ -817,13 +832,28 @@ $(function () {
             .attr("transform", "translate(0," + height + ")")
             .call(
             d3.axisBottom(x)
-        );
+            )
+            .append("text")
+                .attr("fill","#000000")
+                .attr("y", 30)
+                .attr("x",width)
+                .attr("font-size", "14px")
+                .style("text-anchor", "end")
+                .text("[TIME FRAME]");
 
         // add the y Axis
         svg.append("g")
             .call(
             d3.axisLeft(y)
-        );
+            )
+            .append("text")
+                .attr("fill","#000000")
+                .attr("transform", "rotate(-90)")
+                .attr("y",-30)
+                .attr("x",0)
+                .attr("font-size", "14px")
+                .style("text-anchor", "end")
+                .text("[COUNT]");
 
         var bars = svg.selectAll(".bar");
 
