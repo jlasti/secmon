@@ -345,7 +345,7 @@ class FilterController extends Controller
       $query = EventsNormalized::find();
       $filter = $this->findModel($filterId);
 
-      $filteredData = $query->select([new \yii\db\Expression("to_char(datetime,'HH24 MM-DD-YYYY') as x"), new \yii\db\Expression("count(to_char(datetime,'HH24 MM-DD-YYYY')) as y")])
+      $filteredData = $query->select([new \yii\db\Expression("to_char(datetime,'HH24 MM-DD') as x"), new \yii\db\Expression("count(to_char(datetime,'HH24 MM-DD-YYYY')) as y")])
                             ->applyFilter($filter)
                             ->andWhere(['>', "CAST(datetime AS date)", $date])
                             ->groupBy([new \yii\db\Expression("x")])
@@ -355,6 +355,7 @@ class FilterController extends Controller
       Yii::$app->cache->flush();
 
       $graphData = array();
+
       foreach ($filteredData as $key => $value) {
           $graphData[] = [ 'x' => $value['x'], 'y' => intval($value['y']) ];
       }
