@@ -7,8 +7,8 @@
   $filters = \app\controllers\FilterController::getFiltersOfUser($loggedUserId);
   $contentTypes = [
       'table' => 'Table',
-      'lineChart' => 'Line chart',
-      'barChart' => 'Bar chart'
+      'lineChart' => 'Bar chart',
+//      'barChart' => 'Bar chart'
   ];
   $columns = \app\models\EventsNormalized::getColumnsDropdown();
 ?>
