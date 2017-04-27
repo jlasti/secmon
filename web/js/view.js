@@ -734,7 +734,7 @@ $(function () {
                 .attr("x",width)
                 .attr("font-size", "14px")
                 .style("text-anchor", "end")
-                .text("[TIME FRAME]");
+                .text("[TIME FRAME][hour month-day]");
 
         // add the y Axis
         svg.append("g")
