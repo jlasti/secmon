@@ -196,7 +196,7 @@ class FilterController extends Controller
                     return [
                       'contentTypeId' => $contentTypeId,
                       'dataTypeParameter' => $dataTypeParameter,
-                      'data' => Json::encode($this->getFilteredEventsBarGraph($filter->id))
+                      'data' => Json::encode($this->getFilteredEventsBarGraph($filter->id, $dataTypeParameter))
                     ];
                     break;
                 case "barChart":
@@ -248,7 +248,7 @@ class FilterController extends Controller
                     return [
                       'contentTypeId' => $contentTypeId,
                       'dataTypeParameter' => $dataTypeParameter,
-                      'data' => Json::encode($this->getFilteredEventsBarGraph($filter->id))
+                      'data' => Json::encode($this->getFilteredEventsBarGraph($filter->id, $dataTypeParameter))
                     ];
                     break;
                 case "barChart":
@@ -328,20 +328,24 @@ class FilterController extends Controller
         return Json::encode($this->getFilteredEventsBarGraph($filterId));
     }
 
-    protected function getFilteredEventsBarGraph($filterId)
+    protected function getFilteredEventsBarGraph($filterId, $dataTypeParameter = null)
     {
       unset($filteredData);
       unset($graphData);
+      $range = 'P1D';
+
+      if (!empty($dataTypeParameter)) $range = $dataTypeParameter;
+
 
       $date = new \DateTime();
       $date->setTimezone(new \DateTimeZone('Europe/Bratislava'));
-      $date->sub(new \DateInterval('P2D'));
+      $date->sub(new \DateInterval($range));
       $date = date_format($date,"Y-m-d H:i:s");
 
       $query = EventsNormalized::find();
       $filter = $this->findModel($filterId);
 
-      $filteredData = $query->select([new \yii\db\Expression("to_char(datetime,'HH') as x"), new \yii\db\Expression("count(to_char(datetime,'HH MM-DD-YYYY')) as y")])
+      $filteredData = $query->select([new \yii\db\Expression("to_char(datetime,'HH24 MM-DD-YYYY') as x"), new \yii\db\Expression("count(to_char(datetime,'HH24 MM-DD-YYYY')) as y")])
                             ->applyFilter($filter)
                             ->andWhere(['>', "CAST(datetime AS date)", $date])
                             ->groupBy([new \yii\db\Expression("x")])
