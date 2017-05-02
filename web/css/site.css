@@ -197,6 +197,7 @@ body.compact .compact-button i {
   min-width: 60px;
   min-height: 60px;
   box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+  margin: 0 !important;
 }
 .card .card-content,
 .card .card-reveal{
@@ -208,15 +209,26 @@ body.compact .compact-button i {
 }
 .grid-item .card-header {
   border-bottom: 1px solid #ddd;
+  position: relative;
+}
+.grid-item .card-header::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 42px;
+    bottom: 0;
+    content: '';
 }
 .grid-item .card-header .card-title {
   font-size: 1.3rem;
   line-height: initial;
   font-weight: normal;
 }
-.grid-item { width: 24%; }
-.grid-item.width2 { width: 49%; }
-.grid-item.width3 { width: 75%; }
+.gutter-sizer { width: 1%; }
+.grid-sizer,
+.grid-item { width: 23%; }
+.grid-item.width2 { width: 47%; }
+.grid-item.width3 { width: 71%; }
 .grid-item.width4 { width: 100%; }
 /* Draggabilly adds is-dragging */
 .grid-item.is-dragging,

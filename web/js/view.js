@@ -46,8 +46,9 @@ $(function () {
             // Inicializacia boxov.
             grid = $('.grid').packery({
                 itemSelector: '.grid-item',
-                gutter: 10,
-                columnWidth: 20
+                gutter: '.gutter-sizer',
+                columnWidth: '.grid-sizer',
+                percentPosition: true
             }).hide();
 
             // make all items draggable
@@ -220,6 +221,8 @@ $(function () {
                     cont.empty();
                     DrawBarGraph(JSON.parse(data.data), width / 2, width, "#componentContentBody" + item);
                 }
+                // Fit item in grid
+                grid.packery('fit', $('#component_' + item)[0]);
             }).fail(function () {
                 Materialize.toast("Couldn't update component content!", 4000);
             }).complete(function (jqXHR, textStatus) {
@@ -289,6 +292,9 @@ $(function () {
                 cont.empty();
                 DrawBarGraph(JSON.parse(data.data), width/2, width, "#componentContentBody" + compId);
              }
+
+            // Fit item in grid
+            grid.packery('fit', comp[0]);
          }).fail(function(){
              Materialize.toast("Couldn't add filter to component!", 4000);
          });
@@ -469,7 +475,7 @@ $(function () {
             },
         }).done(function (data) {
             if (!data) {
-                Materialize.toast("Couldn't update component.", 4000);
+                //Materialize.toast("Couldn't update component.", 4000);
                 return false;
             }
         });

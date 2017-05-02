@@ -55,7 +55,7 @@ $this->params['title'] = $select;
 
     <?php foreach ($views as $view): ?>
         <?php 
-            printf("<div class='grid invisible' id='grid_%s'>", $view->id);
+            printf("<div class='grid invisible' id='grid_%s'><div class='grid-sizer'></div><div class='gutter-sizer'></div>", $view->id);
             $components = $view->getViewComponents()->all();
             
             foreach ($components as $component) 
