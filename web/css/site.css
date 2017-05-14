@@ -226,9 +226,9 @@ body.compact .compact-button i {
 }
 .gutter-sizer { width: 1%; }
 .grid-sizer,
-.grid-item { width: 23%; }
-.grid-item.width2 { width: 47%; }
-.grid-item.width3 { width: 71%; }
+.grid-item { width: 24%; }
+.grid-item.width2 { width: 49%; }
+.grid-item.width3 { width: 74%; }
 .grid-item.width4 { width: 100%; }
 /* Draggabilly adds is-dragging */
 .grid-item.is-dragging,
