@@ -330,39 +330,54 @@ class FilterController extends Controller
 
     protected function getFilteredEventsBarGraph($filterId, $dataTypeParameter = null)
     {
-      unset($filteredData);
-      unset($graphData);
-      $range = 'P1D';
+        unset($filteredData);
+        unset($graphData);
+        $range = 'P1D';
 
-      if (!empty($dataTypeParameter)) $range = $dataTypeParameter;
+        if (!empty($dataTypeParameter)) $range = $dataTypeParameter;
 
+        $date = new \DateTime();
+        $date->setTimezone(new \DateTimeZone('Europe/Bratislava'));
+        $date->sub(new \DateInterval($range));
+        $date = date_format($date,"Y-m-d H:i:s");
 
-      $date = new \DateTime();
-      $date->setTimezone(new \DateTimeZone('Europe/Bratislava'));
-      $date->sub(new \DateInterval($range));
-      $date = date_format($date,"Y-m-d H:i:s");
+        $query = EventsNormalized::find();
+        $filter = $this->findModel($filterId);
 
-      $query = EventsNormalized::find();
-      $filter = $this->findModel($filterId);
+        $foundDateRule = $this->checkFilterForDateRule($filter);
 
-      $filteredData = $query->select([new \yii\db\Expression("to_char(datetime,'HH24 MM-DD') as x"), new \yii\db\Expression("count(to_char(datetime,'HH24 MM-DD-YYYY')) as y")])
-                            ->applyFilter($filter)
-                            ->andWhere(['>', "CAST(datetime AS date)", $date])
-                            ->groupBy([new \yii\db\Expression("x")])
-                            ->orderBy([ 'x' => SORT_ASC ])
-                            ->all();
+        $query->select([new \yii\db\Expression("to_char(datetime,'HH24 MM-DD') as x"),
+                        new \yii\db\Expression("count(to_char(datetime,'HH24 MM-DD-YYYY')) as y")])
+              ->applyFilter($filter)
+              ->groupBy([new \yii\db\Expression("x")])
+              ->orderBy([ 'x' => SORT_ASC ]);
 
-      Yii::$app->cache->flush();
+        if (!$foundDateRule) {
+            $query->andWhere(['>', "CAST(datetime AS date)", $date]);
+        }
 
-      $graphData = array();
+        $filteredData = $query->all();
+        Yii::$app->cache->flush();
+        $graphData = array();
 
-      foreach ($filteredData as $key => $value) {
-          $graphData[] = [ 'x' => $value['x'], 'y' => intval($value['y']) ];
-      }
+        foreach ($filteredData as $key => $value) {
+            $graphData[] = [ 'x' => $value['x'], 'y' => intval($value['y']) ];
+        }
 
-      unset($filteredData);
+        unset($filteredData);
 
-      return $graphData;
+        return $graphData;
+    }
+
+    protected function checkFilterForDateRule($filter){
+        $rules = $filter->getRules()->all();
+
+        foreach ($rules as $key => $value) {
+            $attributes = $value->getAttributes();
+            if ($attributes['type'] == 'date') return true;
+        }
+
+        return false;
     }
 
     /**
