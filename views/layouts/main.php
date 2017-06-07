@@ -40,8 +40,8 @@ $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 
 <header>
 	<?php if(!$isGuest): ?>
-		<a href="#" class="compact-button preload">
-			<i class="material-icons waves-effect">keyboard_arrow_left</i>
+		<a href="#" class="compact-button waves-effect preload">
+			<i class="material-icons">keyboard_arrow_left</i>
 		</a>
 	<?php endif; ?>
 	<nav class="top-nav light-blue accent-4">
