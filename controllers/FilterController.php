@@ -346,19 +346,21 @@ class FilterController extends Controller
         $query = EventsNormalized::find();
         $filter = $this->findModel($filterId);
 
-        $foundDateRule = $this->checkFilterForDateRule($filter);
+//        $foundDateRule = $this->checkFilterForDateRule($filter);
+
+        $filteredData =
 
         $query->select([new \yii\db\Expression("to_char(datetime,'HH24 MM-DD') as x"),
                         new \yii\db\Expression("count(to_char(datetime,'HH24 MM-DD-YYYY')) as y")])
               ->applyFilter($filter)
-              ->groupBy([new \yii\db\Expression("x")])
-              ->orderBy([ 'x' => SORT_ASC ]);
+            ->andWhere(['>', "CAST(datetime AS date)", $date])
 
-        if (!$foundDateRule) {
-            $query->andWhere(['>', "CAST(datetime AS date)", $date]);
-        }
+            ->groupBy([new \yii\db\Expression("x")])
+               ->orderBy([ 'x' => SORT_ASC ])
+        ->all();
+//        if (!$foundDateRule) {
+//        }
 
-        $filteredData = $query->all();
         Yii::$app->cache->flush();
         $graphData = array();
 

@@ -177,12 +177,12 @@ $(function () {
 
                     var dText = dest.outerText.split("close").filter(function(o){return o}).join(",");
                     $(dest).siblings("input").val(dText).trigger("change");
-                    console.log(dText)
+                    console.log(dText);
 
                     if(source != dest){
                         var sText = source.outerText.split("close").filter(function(o){return o}).join(",");
                         $(source).siblings("input").val(sText).trigger("change");
-                        console.log(sText)
+                        console.log(sText);
                     }
                 }
             });
