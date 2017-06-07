@@ -26,6 +26,6 @@ desc=Possible brute force attack (ssh) user $+{duser} from $+{ip}
 window=60
 thresh=5
 context=!SSH_BRUTE_FROM_$+{ip}
-action=create SSH_BRUTE_FROM_$+{ip} 60; write /var/www/develop/__secInput $+{host} CEF:0|SECMON|sshd|ver|0|Possible brute force attack|0|src=$+{ip} dpt=$+{dpt} duser=$+{duser}
+action=create SSH_BRUTE_FROM_$+{ip} 600; write /var/www/develop/__secInput $+{host} CEF:0|SECMON|sshd|ver|0|Possible brute force attack|0|src=$+{ip} dpt=$+{dpt} duser=$+{duser}
 
 # === END - Bruteforce attack detection ===
