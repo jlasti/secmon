@@ -308,6 +308,10 @@ td, th {
     line-height: normal;
 }
 
+.no-sidebar main .container {
+    width: 90% !important;
+}
+
 main .container {
     width: 96% !important;
 }
