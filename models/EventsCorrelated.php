@@ -20,7 +20,7 @@ use Yii;
  * @property integer $parent_events
  * @property string $raw
  */
-class EventsCorrelated extends \yii\db\ActiveRecord
+class EventsCorrelated extends BaseEvent
 {
     /**
      * @inheritdoc
@@ -38,16 +38,34 @@ class EventsCorrelated extends \yii\db\ActiveRecord
         return [
             [['datetime'], 'safe'],
             [['cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_event_class_id', 'cef_name', 'cef_severity', 'parent_events'], 'required'],
-            [['cef_event_class_id', 'cef_severity', 'parent_events'], 'integer'],
+            [['cef_event_class_id', 'cef_severity'], 'integer'],
             [['raw'], 'string'],
-            [['host', 'cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_name'], 'string', 'max' => 255],
+            [['host', 'cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_name', 'parent_events'], 'string', 'max' => 255],
+        ];
+    }
+
+    public static function columns()
+    {
+        return [
+            'id' => [ FilterTypeEnum::COMPARE ],
+            'datetime' => [ FilterTypeEnum::DATE ],
+            'host' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'cef_version' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'cef_vendor' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'cef_dev_prod' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'cef_dev_version' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'cef_event_class_id' => [ FilterTypeEnum::COMPARE ],
+            'cef_name' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'cef_severity' => [ FilterTypeEnum::COMPARE ],
+            'parent_events' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'raw' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ]
         ];
     }
 
     /**
      * @inheritdoc
      */
-    public function attributeLabels()
+    public static function labels()
     {
         return [
             'id' => 'ID',

@@ -32,9 +32,6 @@ use Yii;
  */
 class EventsNormalized extends BaseEvent
 {
-    private static $_colsDropdown = null;
-    public $x, $y;
-
     /**
      * @inheritdoc
      */
@@ -63,10 +60,10 @@ class EventsNormalized extends BaseEvent
             'id' => [ FilterTypeEnum::COMPARE ],
             'datetime' => [ FilterTypeEnum::DATE ],
             'host' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
-            'cef_version' => [ FilterTypeEnum::COMPARE ],
-            'cef_vendor' => [ FilterTypeEnum::COMPARE ],
+            'cef_version' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'cef_vendor' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
             'cef_dev_prod' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
-            'cef_dev_version' => [ FilterTypeEnum::COMPARE ],
+            'cef_dev_version' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
             'cef_event_class_id' => [ FilterTypeEnum::COMPARE ],
             'cef_name' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
             'cef_severity' => [ FilterTypeEnum::COMPARE ],

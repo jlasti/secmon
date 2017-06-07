@@ -188,6 +188,8 @@ class FilterController extends Controller
             }
 
             $component->filter_id = $filterId;
+            $component->data_type = $contentTypeId;
+            $component->data_param = $dataTypeParameter;
             $component->update();
 
             switch ($contentTypeId) {
@@ -239,8 +241,8 @@ class FilterController extends Controller
 
         if ( !empty($component) )
         {
-            $contentTypeId =  Json::decode($component->config)['dataType'];
-            $dataTypeParameter =  Json::decode($component->config)['dataTypeParameter'] ?? "";
+            $contentTypeId =  $component->data_type;
+            $dataTypeParameter =  $component->data_param ?? "";
 
             switch ($contentTypeId) {
                 case "lineChart":

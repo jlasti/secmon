@@ -13,6 +13,7 @@ $this->registerJsFile('@web/js/packery.min.js', ['depends' => 'yii\web\YiiAsset'
 $this->registerJsFile('@web/js/d3.v4.min.js', ['depends' => 'yii\web\YiiAsset']);
 $this->registerJsFile('@web/js/draggabilly.min.js', ['depends' => 'yii\web\YiiAsset']);
 $this->registerJsFile('@web/js/view.js', ['depends' => 'yii\web\YiiAsset']);
+$this->registerJsFile('@web/js/jquery-ui.min.js', ['depends' => 'yii\web\YiiAsset']);
 //$this->registerJs(sprintf('$(document).ready(function(){DrawLineGraph(%s);});', $graph), \yii\web\View::POS_END);
 $select = '<div class="row"><div class="col s12 m6 l4"><select id="dashboard">';
 

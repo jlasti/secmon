@@ -298,3 +298,14 @@ td, th {
 main .container {
     width: 96% !important;
 }
+
+
+.modal .dropdown-content {
+    position: relative !important;
+    max-height:200px !important;
+}
+
+.modal {
+    max-height: 90%;
+    top: 5% !important;
+}

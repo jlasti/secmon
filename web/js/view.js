@@ -1,4 +1,4 @@
-var viewUpdateInterval = 30000;
+var viewUpdateInterval = 10000;
 
 $(function () {
     //#region [ Fields ]
@@ -78,15 +78,115 @@ $(function () {
      */
     function activateTableColumns(e) {
         var chips;
+        var addColumns;
         if (e === undefined) {
             chips = $('.chips-table');
+            addColumns = $('[data-type="columnsSelectAdd"]');
         }
         else {
             chips = $(e).find('.chips-table');
+            addColumns = $(e).find('[data-type="columnsSelectAdd"]');
         }
+
+        var updateColumnsValue = function(e, target, action, chipObj) {
+            var compId = $(target).attr('data-id');
+            var val = $(target).material_chip('data');
+            val = $.map(val, function (chip) {
+                return chip.tag;
+            });
+
+            var changed = false;
+            if (action === 'add' && tableColumnsNames.indexOf(chipObj.tag) === -1) {
+                var idx = val.indexOf(chipObj.tag);
+                if (idx !== -1) {
+                    val.splice(idx, 1);
+                    changed = true;
+                }
+                else {
+                    console.log('chip object index not found!');
+                }
+            }
+
+            if (changed) {
+                var newData = $.map(val, function(v) { return { tag: v }; });
+                $(target).material_chip({
+                    data: newData
+                });
+                chip.find('input').hide().css({'width': '0', 'padding': '0', 'margin': '0'});
+            }
+
+            val = val.join(',');
+            $('#componentDataTypeParameter' + compId).val(val);
+        };
+
+        addColumns.each(function() {
+           var addCol = $(this);
+           addCol.on('click', function(e) {
+               var btn = $(this);
+               var compId = btn.attr('data-id');
+               var selectedValue = $('#columnsSelect' + compId).val();
+
+               //updateColumnsValue(undefined, $(), 'add', { tag : val});
+
+               var target = $('#chipsTable' + compId);
+               var val = target.material_chip('data');
+               val = $.map(val, function (chip) {
+                   return chip.tag;
+               });
+
+               if (tableColumnsNames.indexOf(selectedValue) !== -1)
+               {
+                   if (val.indexOf(selectedValue) === -1)
+                   {
+                       val.push(selectedValue);
+                       var newData = $.map(val, function(v) { return { tag: v }; });
+                       target.material_chip({
+                           data: newData
+                       });
+
+                       val = val.join(',');
+                       $('#componentDataTypeParameter' + compId).val(val);
+                   }
+                   else
+                       Materialize.toast('Column "' + selectedValue + '" already in list!', 2000);
+               }
+               else
+                   Materialize.toast('Column "' + selectedValue + '" is unknown!', 2000);
+           });
+        });
 
         chips.each(function() {
             var chip = $(this);
+            var source, dest;
+            chip.sortable({
+                connectWith: ".chips-table",
+                start: function(e, ui){
+                    source = dest = e.target;
+                    console.log(source.outerText.split("close").filter(function(o){return o}).join(","));
+                    $(source).find('.close').hide();
+                },
+                change: function(e, ui){
+                    if(ui.sender){
+                        if (e.target.tagName.toLowerCase() !== 'div')
+                            dest = e.target;
+                    }
+                },
+                stop: function(e, ui){
+
+                    $(source).find('.close').show();
+
+                    var dText = dest.outerText.split("close").filter(function(o){return o}).join(",");
+                    $(dest).siblings("input").val(dText).trigger("change");
+                    console.log(dText)
+
+                    if(source != dest){
+                        var sText = source.outerText.split("close").filter(function(o){return o}).join(",");
+                        $(source).siblings("input").val(sText).trigger("change");
+                        console.log(sText)
+                    }
+                }
+            });
+
             var columns = chip.attr('data-table-columns');
             var data = [];
             if (columns !== undefined && columns !== '') {
@@ -97,42 +197,9 @@ $(function () {
             }
 
             chip.material_chip({
-                data: data,
-                autocompleteData: tableColumns,
-                autocompleteLimit: 4
+                data: data
             });
-
-            var updateColumnsValue = function(e, target, action, chipObj) {
-                var compId = $(target).attr('data-id');
-                var val = $(target).material_chip('data');
-                val = $.map(val, function (chip) {
-                    return chip.tag;
-                });
-
-                var changed = false;
-                if (action === 'add' && tableColumnsNames.indexOf(chipObj.tag) === -1) {
-                    var idx = val.indexOf(chipObj.tag);
-                    if (idx !== -1) {
-                        val.splice(idx, 1);
-                        changed = true;
-                    }
-                    else {
-                        console.log('chip object index not found!');
-                    }
-                }
-
-                if (changed) {
-                    var newData = $.map(val, function(v) { return { tag: v }; });
-                    $(target).material_chip({
-                        data: newData,
-                        autocompleteData: tableColumns,
-                        autocompleteLimit: 4
-                    });
-                }
-
-                val = val.join(',');
-                $('#componentDataTypeParameter' + compId).val(val);
-            };
+            chip.find('input').hide().css({'width': '0', 'padding': '0', 'margin': '0'});
 
             updateColumnsValue(undefined, chip, 'init');
 
@@ -269,9 +336,7 @@ $(function () {
                     componentId : compId,
                     config : JSON.stringify({
                         name: comp.find("#name" + compId).val(),
-                        width: comp.find("#width" + compId).val(),
-                        dataType: data.contentTypeId,
-                        dataTypeParameter: data.dataTypeParameter
+                        width: comp.find("#width" + compId).val()
                     })
                 }
             });
@@ -351,7 +416,7 @@ $(function () {
      */
     function widthSelect_onChange (e) {
         var selectNode = $(this);
-        var gridItemNode = $("#" + selectNode.attr('data-id'));
+        var gridItemNode = $("#" + selectNode.attr('data-id')).find('.grid-item');
         gridItemNode.attr('class', 'grid-item card ' + this.value);
         grid.packery('fit', gridItemNode[0]);
         gridItemNode.find("form.componentForm").submit();
@@ -372,9 +437,7 @@ $(function () {
                 viewId : dashboardSelect.val(),
                 config : JSON.stringify({
                     name: newComponentName,
-                    width: '',
-                    dataType: 'table',
-                    dataTypeParameter: 'datetime,host,protocol'
+                    width: ''
                 }),
                 order : activeGrid.packery("getItemElements").length
             }
@@ -469,8 +532,7 @@ $(function () {
                 componentId : componentId,
                 config : JSON.stringify({
                     name: $(this).find("#name" + componentId).val(),
-                    width: $(this).find("#width" + componentId).val(),
-                    dataType: $("#componentContentBody" + componentId).attr('data-type')
+                    width: $(this).find("#width" + componentId).val()
                 })
             },
         }).done(function (data) {
