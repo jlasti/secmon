@@ -364,13 +364,12 @@ class FilterController extends Controller
 
         $now = new \DateTime();
         $i = 0;
-        $filterDt = null;
         while ($dt <= $now)
         {
             $str = date_format($dt, 'Y-d-m H:00');
             $formatted = date_format($dt, 'H:00 m-d');
 
-            if (strcmp($str, $filteredData[$i]['x']) === 0) {
+            if (count($filteredData) > 0 and strcmp($str, $filteredData[$i]['x']) === 0) {
                 $graphData[] = ['x' => $formatted, 'y' => intval($filteredData[$i]['y'])];
                 $i++;
             }
