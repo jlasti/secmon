@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\User;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -82,4 +83,28 @@ class SiteController extends Controller
 
 		return $this->goHome();
 	}
+
+    /**
+     *  Inits admin user
+     *
+     * @return void
+     */
+    public function actionInit()
+    {
+        $user = User::findByUsername('admin');
+        if ($user === null)
+        {
+            $model = new User();
+            $model->first_name = 'Admin';
+            $model->last_name = '';
+            $model->username = 'admin';
+            $model->password = '$2y$13$SStnQKWo6hkm3Ka9cCNeROJ5hZkkQhHF3B3/Si/Gebln3PTLoAeHm';
+            $model->rolesList = [1, 100];
+            $model->email = 'admin@secmon.com';
+            $model->save();
+            echo 'done';
+        }
+        else
+            echo 'user allready exists';
+    }
 }
