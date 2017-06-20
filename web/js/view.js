@@ -88,6 +88,14 @@ $(function () {
             addColumns = $(e).find('[data-type="columnsSelectAdd"]');
         }
 
+        var updateChips = function(target, val) {
+            var newData = $.map(val, function(v) { return { tag: v }; });
+            target.material_chip({
+                data: newData
+            });
+            target.find('input').hide().css({'width': '0', 'padding': '0', 'margin': '0'});
+        };
+
         var updateColumnsValue = function(e, target, action, chipObj) {
             var compId = $(target).attr('data-id');
             var val = $(target).material_chip('data');
@@ -108,11 +116,7 @@ $(function () {
             }
 
             if (changed) {
-                var newData = $.map(val, function(v) { return { tag: v }; });
-                $(target).material_chip({
-                    data: newData
-                });
-                chip.find('input').hide().css({'width': '0', 'padding': '0', 'margin': '0'});
+                updateChips($(target), val);
             }
 
             val = val.join(',');
@@ -126,8 +130,6 @@ $(function () {
                var compId = btn.attr('data-id');
                var selectedValue = $('#columnsSelect' + compId).val();
 
-               //updateColumnsValue(undefined, $(), 'add', { tag : val});
-
                var target = $('#chipsTable' + compId);
                var val = target.material_chip('data');
                val = $.map(val, function (chip) {
@@ -139,10 +141,7 @@ $(function () {
                    if (val.indexOf(selectedValue) === -1)
                    {
                        val.push(selectedValue);
-                       var newData = $.map(val, function(v) { return { tag: v }; });
-                       target.material_chip({
-                           data: newData
-                       });
+                       updateChips(target, val);
 
                        val = val.join(',');
                        $('#componentDataTypeParameter' + compId).val(val);
@@ -162,7 +161,6 @@ $(function () {
                 connectWith: ".chips-table",
                 start: function(e, ui){
                     source = dest = e.target;
-                    console.log(source.outerText.split("close").filter(function(o){return o}).join(","));
                     $(source).find('.close').hide();
                 },
                 change: function(e, ui){
@@ -172,18 +170,17 @@ $(function () {
                     }
                 },
                 stop: function(e, ui){
-
                     $(source).find('.close').show();
 
                     var dText = dest.outerText.split("close").filter(function(o){return o}).join(",");
                     $(dest).siblings("input").val(dText).trigger("change");
-                    console.log(dText);
 
                     if(source != dest){
                         var sText = source.outerText.split("close").filter(function(o){return o}).join(",");
                         $(source).siblings("input").val(sText).trigger("change");
-                        console.log(sText);
                     }
+
+                    updateChips($(e.target), dText.split(','));
                 }
             });
 
