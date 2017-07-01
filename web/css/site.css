@@ -326,3 +326,20 @@ main .container {
     max-height: 90%;
     top: 5% !important;
 }
+
+.profile-btn {
+    margin-left: -21px;
+    width: 218px;
+    background-color: transparent !important;
+    -webkit-transition: background-color 0.2s;
+    -moz-transition: background-color 0.2s;
+    -ms-transition: background-color 0.2s;
+    -o-transition: background-color 0.2s;
+    transition: background-color 0.2s;
+}
+.profile-btn:hover {
+    background-color: rgba(0,0,0,0.1) !important;
+}
+.profile-btn span {
+    margin-left: 20px;
+}

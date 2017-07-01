@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\models\User;
 use app\models\User\UserSearch;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -53,6 +54,10 @@ class UserController extends Controller
 						'allow' => true,
 						'roles' => ['delete_users'],
 					],
+                    [
+                        'actions' => ['profile', 'init'],
+                        'allow' => true
+                    ]
 				],
 			],
         ];
@@ -134,6 +139,74 @@ class UserController extends Controller
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+    /**
+     * Change password action.
+     *
+     * @return string|\yii\web\Response
+     */
+    public function actionProfile()
+    {
+        $model = new User();
+        $model->scenario = User::SCENARIO_CHGPASS;
+
+        if (Yii::$app->request->isPost)
+        {
+            $userId = Yii::$app->user->getId();
+            $model = $this->findModel($userId);
+            if ($model->load(Yii::$app->request->post()))
+            {
+                if (Yii::$app->getSecurity()->validatePassword($model->passwordTextOld, $model->password))
+                {
+                    if ($model->passwordTextNew === $model->passwordTextNew2)
+                    {
+                        $model->passwordText = $model->passwordTextNew;
+                        if ($model->save())
+                            return $this->redirect(Url::home());
+                        else
+                            $model->addError('passwordTextOld', 'Unexpected error while updating password');
+                    }
+                    else
+                        $model->addError('passwordTextNew2', 'New passwords aren\'t same');
+                }
+                else
+                    $model->addError('passwordTextOld', 'Wrong old password');
+            }
+            else
+                $model->addError('passwordTextOld', 'Failed to load model');
+        }
+
+        return $this->render('profile', [
+            'model' => $model
+        ]);
+    }
+
+    /**
+     *  Initialize admin user
+     *
+     * @return void
+     */
+    public function actionInit()
+    {
+        $user = User::findByUsername('secmon');
+        if ($user === null)
+        {
+            $model = new User();
+            $model->first_name = 'secmon';
+            $model->last_name = 'admin';
+            $model->username = 'secmon';
+            //$model->passwordText = 'password';
+            $model->password = '$2y$13$SStnQKWo6hkm3Ka9cCNeROJ5hZkkQhHF3B3/Si/Gebln3PTLoAeHm';
+            $model->rolesList = [1, 100];
+            $model->email = 'root@localhost';
+            if ($model->save(false))
+                echo 'done';
+            else
+                echo 'error';
+        }
+        else
+            echo 'user allready exists';
     }
 
     /**
