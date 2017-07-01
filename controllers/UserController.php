@@ -55,7 +55,12 @@ class UserController extends Controller
 						'roles' => ['delete_users'],
 					],
                     [
-                        'actions' => ['profile', 'init'],
+                        'actions' => ['profile'],
+                        'allow' => true,
+                        'roles' => ['view_users']
+                    ],
+                    [
+                        'actions' => ['init'],
                         'allow' => true
                     ]
 				],
@@ -196,8 +201,7 @@ class UserController extends Controller
             $model->first_name = 'secmon';
             $model->last_name = 'admin';
             $model->username = 'secmon';
-            //$model->passwordText = 'password';
-            $model->password = '$2y$13$SStnQKWo6hkm3Ka9cCNeROJ5hZkkQhHF3B3/Si/Gebln3PTLoAeHm';
+            $model->passwordText = Yii::$app->params['defaultPass'];
             $model->rolesList = [1, 100];
             $model->email = 'root@localhost';
             if ($model->save(false))
