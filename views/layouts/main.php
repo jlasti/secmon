@@ -4,7 +4,6 @@
 /* @var $content string */
 
 use macgyer\yii2materializecss\lib\Html;
-use macgyer\yii2materializecss\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 
 AppAsset::register($this);
@@ -14,7 +13,7 @@ $user = Yii::$app->user->identity;
 $userRole = $isGuest ? '' : $user->presenter()->getMainRole();
 $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 ?>
-
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>">

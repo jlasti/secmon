@@ -1,45 +1,61 @@
-type=single
+# Ruleset for normalization of sshd logs to readable format
+# =============================================================
+# =============================================================
+#
+# Logs example:
+# Oct 10 2018 16:35:55 localhost sshd[5507]: Failed password for invalid user asd from ::1 port 55308 ssh2
+# Apr 10 2018 06:39:27 echo sshd[22297]: reverse mapping checking getaddrinfo for 222-237-78-139.tongkni.co.kr failed - POSSIBLE BREAK-IN ATTEMPT!
+# Jul 24 2018 22:06:54 server1 sshd[8261]: Accepted publickey for root from xxx.xxx.xx.xxx port 39721 ssh2
+# Jul 24 2018 22:06:54 server1 sshd[8261]: Address xx.yyy.zzz.x maps to xx.yyy.zzz.x.static-pune-vsnl.net.in, but this does not map back to the address - POSSIBLE BREAK-IN ATTEMPT!
+# Oct 10 2018 16:18:02 localhost sshd[3922]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=localhost
+# =============================================================
+
+type=Single
 continue=dontcont
 ptype=Nregexp
 pattern=sshd|SSHD
 desc=filter out non-sshd events
 action=none
 
+type=Single
+ptype=Regexp
+continue=dontcont
+pattern=^([A-Za-z0-9: ]*) ([0-9:]+) (.*) sshd\[(\d+)\]:.*Failed (password) for( invalid user)? (\S+) from (.*) port (\d+) ssh2$
+desc=$1 failed ssh login to $3 from $8 for user $7 on port $9
+action=write /var/log/mkv/__secInput $1 $2 $3 CEF:0|Security|sshd|0|130|Wrong password|0|src=$8 spt=$9 outcome=failure app=SSHv2 destinationServiceName=sshd duser=$7 dpid=$4 dhost=$3 reason=$5$6 rawEvent=$0
+
+type=Single
+ptype=Regexp
+continue=dontcont
+pattern=^([A-Za-z0-9: ]*) ([0-9:]+) (.*) sshd\[(\d+)\]:.*pam_unix\(sshd:auth\): (authentication failure); logname=(.*) uid=(\d+) euid=(\d+) tty=ssh ruser=(.*) rhost=(.*)
+desc=$1 failed authentication ssh login to $3 with $6 name for user $9
+action=write /var/log/mkv/__secInput $1 $2 $3 CEF:0|Security|sshd|0|131|Authentication failed|0| outcome=failure app=SSHv2 destinationServiceName=sshd dpid=$4 rhost=$10 reason=$5 rawEvent=$0
 
 type=single
 ptype=regexp
 continue=dontcont
-pattern=^([A-Za-z0-9: ]*) (\S+) sshd\[(\d+)\]: Failed (password) for( invalid user)? (\S+) from ((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}) port (\d+) ssh2$
-desc=$1 fialed ssh login to $2 from $7 for user $6 on port $11
-action=write /var/log/secmon/__secInput $1 $2 CEF:0|Security|sshd|0|130|Wrong password|0|src=$7 dpt=$11 outcome=failure app=SSHv2 destinationServiceName=sshd duser=$6 dpid=$3 reason=$4$5 rawEvent=$0
-
-type=single
-ptype=regexp
-continue=dontcont
-pattern=^([A-Za-z0-9: ]*) (\S+) sshd\[(\d+)\]: Address ((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}) maps to ((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])), but this does not map back to the address - POSSIBLE BREAK-IN ATTEMPT!$
+pattern=^([A-Za-z0-9: ]*) (\S+) sshd\[(\d+)\]:.*Address (.*) maps to (.*), but this does not map back to the address - POSSIBLE BREAK-IN ATTEMPT!$
 desc=$1 hfg
-action=write /var/log/secmon/__secInput $1 $2 CEF:0|Security|sshd|0|131|Bad address mapping|0|dst=$4 outcome=failure app=SSHv2 destinationServiceName=sshd dhost=$8 dpid=$3 reason=address does not map back to the address rawEvent=$0
+action=write /var/log/mkv/__secInput $1 $2 CEF:0|Security|sshd|0|132|Bad address mapping|0|dst=$4 outcome=failure app=SSHv2 destinationServiceName=sshd dhost=$5 dpid=$3 reason=address does not map back to the address rawEvent=$0
 
 type=single
 ptype=regexp
 continue=dontcont
-pattern=^([A-Za-z0-9: ]*) (\S+) sshd\[(\d+)\]: reverse mapping checking getaddrinfo for ((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])) \[((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3})\] failed - POSSIBLE BREAK-IN ATTEMPT!$
+pattern=^([A-Za-z0-9: ]*) (\S+) sshd\[(\d+)\]:.*reverse mapping checking getaddrinfo for (.*) failed - POSSIBLE BREAK-IN ATTEMPT!$
 desc= hfg $1
-action=write /var/log/secmon/__secInput $1 $2 CEF:0|Security|sshd|0|132|Reverse mapping|0|dst=$8 outcome=failure app=SSHv2 destinationServiceName=sshd dhost=$4 dpid=$3 reason=address does not map back to the address rawEvent=$0
-
-
+action=write /var/log/mkv/__secInput $1 $2 CEF:0|Security|sshd|0|133|Reverse mapping|0|dst=$4 outcome=failure app=SSHv2 destinationServiceName=sshd dhost=$4 dpid=$3 reason=address does not map back to the address rawEvent=$0
 
 type=single
 ptype=regexp
 continue=dontcont
-pattern=^([A-Za-z0-9: ]*) (\S+) sshd\[(\d+)\]: Accepted (password|publickey) for (\S+) from ((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}) port (\d+) ssh2([A-Za-z0-9: ]*)$
-desc=$1 ssh login to $2 from $6 for user $5 on port $10
-action=write /var/log/secmon/__secInput $1 $2 CEF:0|Security|sshd|0|133|Sucess login|0|src=$6 dpt=$10 outcome=success app=SSHv2 destinationServiceName=sshd duser=$5 dpid=$3 reason=$4$11 rawEvent=$0
+pattern=^([A-Za-z0-9: ]*) (\S+) sshd\[(\d+)\]: Accepted (password|publickey) for (\S+) from (.*) port (\d+) ssh2([A-Za-z0-9: ]*)$
+desc=$1 ssh login to $2 from $6 for user $5 on port $7
+action=write /var/log/mkv/__secInput $1 $2 CEF:0|Security|sshd|0|134|Sucess login|0|src=$6 spt=$7 outcome=success app=SSHv2 destinationServiceName=sshd duser=$5 dpid=$3 reason=$4$8 rawEvent=$0
 
-
+# !!! ZATIAL NEFUNKCNE !!!
 #type=single
 #ptype=regexp
 #continue=dontcont
 #pattern=.*
-#desc=print alll others
-#action=write /var/log/secmon/__secInput $0
+#desc=print all others
+#action=write /var/log/mkv/__secInput CEF:0|Security|sshd|0|135|Other event|0| reason=unknown rawEvent=$0

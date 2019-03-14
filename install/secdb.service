@@ -4,7 +4,7 @@ After=multi-user.target
 
 [Service]
 Type=idle
-ExecStart=/usr/bin/perl /cesta/kam/potrebujes/secdb.pl
+ExecStart=/usr/bin/perl /var/www/secmon/secdb/secdb.pl
 
 [Install]
 WantedBy=multi-user.target
