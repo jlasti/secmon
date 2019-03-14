@@ -32,7 +32,7 @@ class m181021_144913_create_analyzed_events extends Migration
             'country' => $this->string(),
             'city' => $this->string(),
             'src_city' => $this->string(),
-            'src_city' => $this->string(),
+            'src_code' => $this->string(),
             'latitude' => $this->float(),
             'longitude' => $this->float(),
             'src_latitude' => $this->float(),
