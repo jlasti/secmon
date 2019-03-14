@@ -20,7 +20,15 @@
         "yiisoft/yii2-swiftmailer": "*",
         "frostealth/yii2-presenter": "@stable",
         "macgyer/yii2-materializecss": "*",
-        "bower-asset/materialize": "0.98.0"
+        "bower-asset/materialize": "0.98.0",
+        "php-ds/php-ds": "^1.2",
+        "2amigos/yii2-grid-view-library": "~1.0",
+        "mcaskill/php-array-group-by": "^1.0",
+        "kartik-v/yii2-context-menu": "dev-master",
+        "liyunfang/yii2-contextmenu": "^1.0",
+      "ext-pgsql": "*",
+      "ext-geoip": "*",
+      "ext-json": "*"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",

@@ -36,13 +36,13 @@ class Event extends \yii\db\ActiveRecord
 		$dateHost = explode(' ', strrev(array_shift($data)), 3);
 
 		$event->cef_version = str_replace('CEF:', '', strrev(array_shift($dateHost)));
-		$event->host = strrev(array_shift($dateHost));
-        
-        // osetrenie ak na zaciatk logu nie je timestamp 
+        $event->host= strrev(array_shift($dateHost));
+
+        // osetrenie ak na zaciatku logu nie je timestamp
         $strDate = array_shift($dateHost);
         if(!empty($strDate))
         {
-		  $event->datetime = date('Y-m-d H:i:s', strtotime(strrev($strDate)));
+		    $event->datetime = date('Y-m-d H:i:s', strtotime(strrev($strDate)));
         }
         else
         {
@@ -66,11 +66,11 @@ class Event extends \yii\db\ActiveRecord
             {
                 break;
             }
-            $values[$tmp[0]] = $tmp[1];
+            $values[$tmp[0]] = isset($tmp[1]) ? $tmp[1] : null;
         }
 
         $event->parent_events = $values['cs1'] ?? null;
-
+        $event->attack_type = $values['att'] ?? null;
 		$event->raw = $cefString;
 
 		return $event;

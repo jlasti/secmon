@@ -1,0 +1,75 @@
+#  OBIDVA PRAVIDLA NARAZ SA ZATIAL BIJU (treba vybrat jedno)
+# ==================================
+# === Bruteforce SSH attack detection from one IP ===
+# ==================================
+#
+# Pravidla deteguju neuspesne pokusy o prihlasenia a neuspesne pokusy o autentifikaciu.
+# Ak sa z jednej IP adresy v priebehu 60 sekund niekto pokusy 5 krat neuspesne prihlasit, resp. autentifikovat(3x),
+# prida sa vynimka do firewallu, ktora dropne packety z danej adresy po dobu 60 minut
+#
+# Logs example:
+# Oct 10 2018 16:18:02 localhost sshd[3922]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=localhost
+# Oct 10 2018 16:35:55 localhost sshd[5507]: Failed password for invalid user asd from ::1 port 55308 ssh2
+
+type=SingleWithThreshold
+ptype=RegExp
+pattern=(\d+):(\w{3} [\s\d]\d [\d:]+) (\S+).(.*)CEF.*Authentication failed.*rhost=(\S+)
+desc=Multiple failed ssh authentication attempts from $5
+action=write /var/www/secmon/__secInput $2 $3 $4 CEF:0|Security|sshd|0|130|Wrong authentication - Possible burte force attack|0|att=brute_force src=$5 rawEvent=$0
+window=60
+thresh=3
+
+# Moznost pridat vinimku do firewallu (; shellcmd ( /usr/local/sbin/ipt-add -I FORWARD -s $5 -p tcp -j DROP ;  /usr/local/sbin/ipt-add -I INPUT -s $5 -p tcp -j DROP ))
+# desc2=Pruning iptables firewall rule blocking ssh from $5
+# action2=logonly ; shellcmd  ( /sbin/iptables -D FORWARD -s $5 -p tcp -j DROP ;  /sbin/iptables -D INPUT -s $5 -p tcp -j DROP )
+# window2=3600
+# thresh2=0
+
+type=SingleWithThreshold
+ptype=RegExp
+pattern=(\d+):(\w{3} [\s\d]\d [\d:]+) (\S+).(.*)CEF.*Wrong password.*src=(.*)spt=(\d+).*duser=(\S+).*dhost=(\S+)
+desc=Multiple ssh password failures from $5
+action=write /var/www/secmon/__secInput $2 $3 $8 CEF:0|Security|sshd|0|131|Wrong passwords - Possible burte force attack|0|att=brute_force src=$5 rawEvent=$0
+window=60
+thresh=2
+
+# Moznost pridat vinimku do firewallu (; shellcmd ( /usr/local/sbin/ipt-add -I FORWARD -s $5 -p tcp -j DROP ; /usr/local/sbin/ipt-add -I INPUT -s $5 -p tcp -j DROP ))
+# desc2=Pruning iptables firewall rule blocking ssh from $5
+# action2=logonly ; shellcmd ( /sbin/iptables -D FORWARD -s $5 -p tcp -j DROP ; sleep 2; /sbin/iptables -D INPUT -s $5 -p tcp -j DROP  ; sleep 2)
+# window2=3600
+# thresh2=0
+
+# === END - Bruteforce SSH attack detection from one IP ===
+
+# ==================================
+# === Bruteforce SSH attack detection from many IP ===
+# ==================================
+#
+# Pravidla deteguju neuspesne prihlasenia pre pouzivatela z roznych IP adries,
+# po naslednom uspesnom prihlaseni posle src do pipe
+#
+
+# type=Single
+# ptype=RegExp
+# pattern=(\d+):(\w{3} [\s\d]\d [\d:]+) (\S+).(.*)CEF.*Wrong password.*src=(.*)spt=(\d+).*duser=(\S+).*dhost=(\S+)
+# desc=Possible brute force ssh attack on user $7 from $5
+# action=add SSH_BRUTE_AGAINST_$7 $0; set SSH_BRUTE_AGAINST_$7 86400; set SSH_BRUTE_AGAINST_$7_LIMIT_EXCEEDED 3600
+# continue=TakeNext
+
+# type=SingleWithThreshold
+# window=3600
+# thresh=10
+# ptype=RegExp
+# pattern=(\d+):(\w{3} [\s\d]\d [\d:]+) (\S+).(.*)CEF.*Wrong password.*src=(.*)spt=(\d+).*duser=(\S+).*dhost=(\S+)
+# desc=Additional brute force attempt against $7
+# context=SSH_BRUTE_AGAINST_$7
+# action=add SSH_BRUTE_AGAINST_$7_LIMIT_EXCEEDED $0; set SSH_BRUTE_AGAINST_$7_LIMIT_EXCEEDED 3600; logonly "SSH brute force monitor activated for user $7"
+
+# type=Single
+# ptype=RegExp
+# pattern=(\d+):(\w{3} [\s\d]\d [\d:]+) (\S+).(.*)CEF.*Sucess login.*src=(.*)spt=(\d+).*duser=(\S+).*dhost=(\S+)
+# desc=Investigate Possible Successful break-in against user $7 from host $4
+# context=SSH_BRUTE_AGAINST_$7
+# action=write /var/www/secmon/__secInput $2 $3 $4 CEF:0|Security|sshd|0|131|Wrong passwords - Possible burte force attacks|0|att=brute_force src=$5 rawEvent=$0 ; delete SSH_BRUTE_AGAINST_$7;
+
+# === END - Bruteforce SSH attack detection from many IP ===

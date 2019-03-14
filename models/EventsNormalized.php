@@ -4,8 +4,8 @@ namespace app\models;
 
 use app\components\filter\FilterQuery;
 use app\components\filter\FilterTypeEnum;
-use app\models\Event\EventType;
 use Yii;
+use yii\base\InvalidConfigException;
 
 /**
  * This is the model class for table "events_normalized".
@@ -27,8 +27,17 @@ use Yii;
  * @property string $protocol
  * @property string $src_mac
  * @property string $dst_mac
+ * @property string $src_country
+ * @property string $dst_country
+ * @property string $src_city
+ * @property string $dst_city
+ * @property float $src_latitude
+ * @property float $dst_latitude
+ * @property float $src_longtitude
+ * @property float $dst_longtitude
  * @property string $extensions
  * @property string $raw
+ * @property boolean analyzed
  */
 class EventsNormalized extends BaseEvent
 {
@@ -53,7 +62,9 @@ class EventsNormalized extends BaseEvent
             [['cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_event_class_id', 'cef_name', 'cef_severity'], 'required'],
             [['cef_event_class_id', 'cef_severity', 'src_port', 'dst_port'], 'integer'],
             [['extensions', 'raw'], 'string'],
-            [['host', 'cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_name', 'src_ip', 'dst_ip', 'protocol', 'src_mac', 'dst_mac'], 'string', 'max' => 255],
+            [['analyzed'], 'boolean'],
+            [['src_latitude', 'dst_latitude', 'src_longitude', 'dst_longitude'], 'double'],
+            [['host', 'cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_name', 'src_ip', 'dst_ip', 'protocol', 'src_mac', 'dst_mac', 'src_country', 'dst_country', 'src_city', 'dst_city', 'src_latitude', 'dst_latitude', 'src_longitude', 'dst_longitude'], 'string', 'max' => 255],
         ];
     }
 
@@ -77,8 +88,16 @@ class EventsNormalized extends BaseEvent
             'protocol' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
             'src_mac' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
             'dst_mac' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'src_country' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'dst_country' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'src_city' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'dst_city' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'src_latitude' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'dst_latitude' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'src_longitude' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'dst_longitude' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
             'extensions' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
-            'raw' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ]
+            'raw' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
         ];
     }
 
@@ -102,16 +121,29 @@ class EventsNormalized extends BaseEvent
             'protocol' => 'Protocol',
             'src_mac' => 'Src Mac',
             'dst_mac' => 'Dst Mac',
+            'src_country' => 'Src Country',
+            'dst_country' => 'Dst Country',
+            'src_city' => 'Src City',
+            'dst_city' => 'Dst City',
+            'src_latitude' => 'Src Latitude',
+            'dst_latitude' => 'Dst Latitude',
+            'src_longitude' => 'Src Longitude',
+            'dst_longitude' => 'Dst Longitude',
             'extensions' => 'Extensions',
             'raw' => 'Raw',
         ];
     }
 
     /**
-     * @return FilterQuery
+     * @return object
+     * @throws \yii\base\InvalidConfigException
      */
     public static function find()
     {
-        return Yii::createObject(FilterQuery::className(), [get_called_class()]);
+        try {
+            return Yii::createObject(FilterQuery::className(), [get_called_class()]);
+        } catch (InvalidConfigException $e) {
+            echo 'Message: ' .$e->getMessage();
+        }
     }
 }

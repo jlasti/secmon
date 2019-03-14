@@ -58,7 +58,7 @@ class Normalized extends Event
 			{
 				break;
 			}
-			$values[$tmp[0]] = $tmp[1];
+            $values[$tmp[0]] = isset($tmp[1]) ? $tmp[1] : null;
 		}
 
 		$event->src_ip = $values['src'] ?? null;
@@ -70,6 +70,78 @@ class Normalized extends Event
 		$event->protocol = $values['proto'] ?? $values['app'] ?? null;
 		$event->raw = $raw;
 
+		self::setEventLoc($event);
+
 		return $event;
 	}
+
+    /**
+     * @param $hostname
+     * @return array|null
+     */
+    private static function getGeoLocationLib($hostname) {
+        $record = geoip_record_by_name($hostname);
+        return $record ?? null;
+
+    }
+
+    /**
+     * @param $hostname
+     * @return mixed|null
+     */
+    private  static function getGeoLocationApi($hostname) {
+        $details = json_decode(file_get_contents("http://ipinfo.io/{$hostname}/json"));
+        return $details ?? null;
+    }
+
+    /**
+     * @param $event
+     */
+    private static function setEventLoc($event){
+        if ($event->src_ip) {
+            $geoLocationLib = self::getGeoLocationLib($event->src_ip);
+            if ($geoLocationLib) {
+                $event->src_code = $geoLocationLib["country_code"];
+                $event->src_country = $geoLocationLib["country_name"];
+                $event->src_city = $geoLocationLib["city"];
+                $event->src_latitude = $geoLocationLib["latitude"];
+                $event->src_longtitude = $geoLocationLib["longitude"];
+            } else {
+                $geoLocationApi = self::getGeoLocationApi($event->src_ip);
+                if ($geoLocationApi) {
+                    $event->src_code = $geoLocationLib["country"];
+                    $event->src_city = $geoLocationLib["city"];
+                    $latlon = explode(",", $geoLocationLib["loc"]);
+                    if (count($latlon) > 1) {
+                        $event->src_latitude = $latlon[0];
+                        $event->src_longtitude = $latlon[1];
+                    }
+                }
+
+            }
+        }
+
+        if ($event->dst_ip) {
+            $geoLocationLib = self::getGeoLocationLib($event->dst_ip);
+            if ($geoLocationLib) {
+                $event->dst_code = $geoLocationLib["country_code"];
+                $event->dst_country = $geoLocationLib["country_name"];
+                $event->dst_city = $geoLocationLib["city"];
+                $event->dst_latitude = $geoLocationLib["latitude"];
+                $event->dst_longtitude = $geoLocationLib["longitude"];
+            } else {
+                $geoLocationApi = self::getGeoLocationApi($event->dst_ip);
+                if ($geoLocationApi) {
+                    $event->dst_code = $geoLocationLib["country"];
+                    $event->dst_city = $geoLocationLib["city"];
+                    $latlon = explode(",", $geoLocationLib["loc"]);
+                    if (count($latlon) > 1) {
+                        $event->dst_latitude = $latlon[0];
+                        $event->dst_longtitude = $latlon[1];
+                    }
+                }
+
+            }
+        }
+    }
 }
