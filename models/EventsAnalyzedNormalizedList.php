@@ -2,6 +2,8 @@
 
 namespace app\models;
 
+use app\components\filter\FilterTypeEnum;
+
 /**
  * This is the model class for table "analyzed_normalized_events_list".
  *
@@ -27,6 +29,25 @@ class EventsAnalyzedNormalizedList extends \yii\db\ActiveRecord
     {
         return [
             [['events_analyzed_normalized_id'], 'integer'],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function columns()
+    {
+        return [
+            'events_analyzed_normalized_id' => [ FilterTypeEnum::COMPARE ],
+            'datetime' => [ FilterTypeEnum::DATE ],
+            'eventNormalized.host' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'eventNormalized.cef_name' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'eventNormalized.src_ip' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'eventNormalized.dst_ip' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'eventNormalized.src_country' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'eventNormalized.dst_country' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'eventNormalized.src_code' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'eventNormalized.dst_code' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
         ];
     }
 

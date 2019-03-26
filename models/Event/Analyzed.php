@@ -13,10 +13,11 @@ use Yii;
 use yii\db\Exception;
 
 /**
- * This is the model class for table "analyzed_events".
+ * This is the model class for table "clustered_events".
  *
- * @property string $id
+ * @property integer $id
  * @property string $time
+ * @property string $raw
  * @property string $src_ip
  * @property string $dst_ip
  * @property string $country
@@ -82,9 +83,8 @@ class Analyzed extends \yii\db\ActiveRecord
         self::saveAnalyzedDST($groupedDst,$countsDST,$params,$iteration);
 
         // save normalized to analyzed_normalized_events_list
-        $id = $params[':id'];
-        self::saveNormalized($eventsNormalizedSrc,$id,$iteration);
-        self::saveNormalized($eventsNormalizedDst,$id,$iteration);
+        self::saveNormalized($eventsNormalizedSrc,$params[':id'],$iteration);
+        self::saveNormalized($eventsNormalizedDst,$params[':id'],$iteration);
     }
 
     /**
@@ -222,34 +222,30 @@ class Analyzed extends \yii\db\ActiveRecord
      * @param $key
      * @return array|null
      */
-    private function array_group_byCustom(&$counts, array $array, $key)
-    {
-        if (!is_string($key) && !is_int($key) && !is_float($key) && !is_callable($key) ) {
-            trigger_error('array_group_by(): The key should be a string, an integer, or a callback', E_USER_ERROR);
+    private function array_group_byCustom(&$counts, array $array, $key) {
+        if (!is_string($key)) {
+            trigger_error('The key should be a string', E_USER_ERROR);
             return null;
         }
-        $func = (!is_string($key) && is_callable($key) ? $key : null);
-        $_key = $key;
+
         // load the new array, splitting by the target key
         $grouped = [];
         foreach ($array as $value) {
-            $key = null;
-            if (is_callable($func)) {
-                $key = call_user_func($func, $value);
-            } elseif (is_object($value) && property_exists($value, $_key)) {
-                $key = $value->{$_key};
-            } elseif (isset($value[$_key])) {
-                $key = $value[$_key];
+            $_key = null;
+            if (is_object($value) && property_exists($value, $key)) {
+                $_key = $value->{$key};
+            } elseif (isset($value[$key])) {
+                $_key = $value[$key];
             }
-            if ($key === null) {
+            if ($_key === null) {
                 continue;
             }
-            $grouped[$key][] = $value;
-            if (empty($counts[$key])) {
-                $counts[$key] = 0;
+            $grouped[$_key][] = $value;
+            if (empty($counts[$_key])) {
+                $counts[$_key] = 0;
             }
             // grouped count
-            $counts[$key]++;
+            $counts[$_key]++;
         }
 
         // recursion for more grouping params

@@ -49,6 +49,7 @@ class EventsNormalizedListController extends Controller
      * Displays a single Event model.
      * @param integer $id
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionView($id)
     {

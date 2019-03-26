@@ -19,13 +19,20 @@ class Navigation extends \yii\base\Component
 				'active' => 'events-correlated',
 				'icon' => 'event'
 	        ],
-          [
-        'label' => 'Normalized Events',
-        'url' => ['/events-normalized'],
-        'visible' => true,
-        'active' => 'events-normalized',
-        'icon' => 'event'
-          ],
+            [
+                'label' => 'Normalized Events',
+                'url' => ['/events-normalized'],
+                'visible' => true,
+                'active' => 'events-normalized',
+                'icon' => 'event'
+            ],
+            [
+                'label' => 'Clustered Events',
+                'url' => ['/events-clustered'],
+                'visible' => true,
+                'active' => 'events-clustered',
+                'icon' => 'event'
+            ],
 	        [
 				'label' => 'Dashboard', 
 				'url' => ['/view'],

@@ -2,18 +2,18 @@
 
 namespace app\controllers;
 
+use app\models\EventsClustered;
+use app\models\EventsClusteredSearch;
 use Yii;
-use app\models\EventsCorrelated;
-use app\models\EventsCorrelatedSearch;
 use yii\db\StaleObjectException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * EventsCorrelatedController implements the CRUD actions for EventsCorrelated model.
+ * EventsClusteredController implements the CRUD actions for EventsClustered model.
  */
-class EventsCorrelatedController extends Controller
+class EventsClusteredController extends Controller
 {
     /**
      * @inheritdoc
@@ -31,12 +31,13 @@ class EventsCorrelatedController extends Controller
     }
 
     /**
-     * Lists all EventsCorrelated models.
+     * Lists all EventsClustered models.
      * @return mixed
+     * @throws \yii\base\InvalidConfigException
      */
     public function actionIndex()
     {
-        $searchModel = new EventsCorrelatedSearch();
+        $searchModel = new EventsClusteredSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -46,7 +47,7 @@ class EventsCorrelatedController extends Controller
     }
 
     /**
-     * Displays a single EventsCorrelated model.
+     * Displays a single EventsClustered model.
      * @param string $id
      * @return mixed
      * @throws NotFoundHttpException
@@ -59,13 +60,13 @@ class EventsCorrelatedController extends Controller
     }
 
     /**
-     * Creates a new EventsCorrelated model.
+     * Creates a new EventsClustered model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new EventsCorrelated();
+        $model = new EventsClustered();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -77,7 +78,7 @@ class EventsCorrelatedController extends Controller
     }
 
     /**
-     * Updates an existing EventsCorrelated model.
+     * Updates an existing EventsClustered model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param string $id
      * @return mixed
@@ -97,7 +98,7 @@ class EventsCorrelatedController extends Controller
     }
 
     /**
-     * Deletes an existing EventsCorrelated model.
+     * Deletes an existing EventsClustered model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param string $id
      * @return mixed
@@ -116,15 +117,15 @@ class EventsCorrelatedController extends Controller
     }
 
     /**
-     * Finds the EventsCorrelated model based on its primary key value.
+     * Finds the EventsNormalized model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param string $id
-     * @return EventsCorrelated the loaded model
+     * @return EventsClustered the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = EventsCorrelated::findOne($id)) !== null) {
+        if (($model = EventsClustered::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

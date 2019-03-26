@@ -128,9 +128,14 @@ use \yii\helpers\Html;
             polygonSeries.data = [];
             imageSeries.data = [];
             lineSeries.data = [];
+            polygonSeries.data.push({
+                "id": "FR",
+                "name": "France",
+            });
             lineSeries.validateData();
             imageSeries.validateData();
             polygonSeries.validateData();
+
 
         });
 
