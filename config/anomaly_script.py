@@ -92,13 +92,41 @@ def insert(raw, number,run,comment):
     cur.close()
     conn.close()
 
+def euclidean_distance(array):
+    if(len(array) == 0):
+        new_array = [[]]
+        return new_array
+
+    line_final = []
+    for all_elements in array:
+        temp_line = []
+        for all_elemets_temp in array:
+            line = make_euclidian_distance(all_elements,all_elemets_temp)
+            temp_line.append(line)
+        line_final.append(temp_line)
+
+    return np.array(line_final)
+
+def make_euclidian_distance(vectorX, vectorY):
+    if(len(vectorX) != len(vectorY)):
+        raise RuntimeWarning("The length of the two vectors are not the same!")
+
+    zipVector = zip(vectorX, vectorY)
+    distance = 0
+    for pair_number in zipVector:
+        distance += (pair_number[1] - pair_number[0]) ** 2
+
+    return math.sqrt(distance)
+
 while True:
     # read logs from messages
+    line_number = 0
     lines = []
     with open("/var/log/mkv/messages") as textFile:
         for i, line in enumerate(textFile):
-            if i > 1:
+            if i > line_number:
                 lines.append(line.split())
+                line_number = i
                 # [['Mar', '6', '2019', '16:57:01', 'localhost', 'gdm-password]:gkr-pam:', 'unlocked', 'login', 'keyring']]
 
     # transform data
@@ -128,7 +156,7 @@ while True:
             senetense_to_nums[sentenses].append(0);
 
     # distance matrix
-    D = pairwise_distances(senetense_to_nums, metric='euclidean')
+    D = euclidean_distance(senetense_to_nums)
 
     # split into x clusters
     run = 0
