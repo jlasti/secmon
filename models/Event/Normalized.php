@@ -2,6 +2,9 @@
 namespace app\models\Event;
 
 use app\models\Event;
+use GeoIp2\Database\Reader;
+use GeoIp2\Exception\AddressNotFoundException;
+use MaxMind\Db\Reader\InvalidDatabaseException;
 
 class Normalized extends Event
 {
@@ -58,16 +61,16 @@ class Normalized extends Event
 			{
 				break;
 			}
-            $values[$tmp[0]] = isset($tmp[1]) ? $tmp[1] : null;
+            $values[$tmp[0]] = isset($tmp[1]) ? $tmp[1] : "";
 		}
 
-		$event->src_ip = $values['src'] ?? null;
-		$event->dst_ip = $values['dst'] ?? null;
-		$event->src_mac = $values['smac'] ?? null;
-		$event->dst_mac = $values['dmac'] ?? null;
-		$event->src_port = $values['spt'] ?? null;
-		$event->dst_port = $values['dpt'] ?? null;
-		$event->protocol = $values['proto'] ?? $values['app'] ?? null;
+		$event->src_ip = $values['src'] ?? "";
+		$event->dst_ip = $values['dst'] ?? "";
+		$event->src_mac = $values['smac'] ?? "";
+		$event->dst_mac = $values['dmac'] ?? "";
+		$event->src_port = $values['spt'] ?? "";
+		$event->dst_port = $values['dpt'] ?? "";
+		$event->protocol = $values['proto'] ?? $values['app'] ?? "";
 		$event->raw = $raw;
 
 		self::setEventLoc($event);
@@ -77,10 +80,13 @@ class Normalized extends Event
 
     /**
      * @param $hostname
-     * @return array|null
+     * @return \GeoIp2\Model\City
+     * @throws \MaxMind\Db\Reader\InvalidDatabaseException
+     * @throws \GeoIp2\Exception\AddressNotFoundException
      */
     private static function getGeoLocationLib($hostname) {
-        $record = geoip_record_by_name($hostname);
+        $reader = new Reader('/usr/local/share/GeoIP/GeoLite2-City.mmdb');
+        $record = $reader->city($hostname);
         return $record ?? null;
 
     }
@@ -99,22 +105,29 @@ class Normalized extends Event
      */
     private static function setEventLoc($event){
         if ($event->src_ip) {
-            $geoLocationLib = self::getGeoLocationLib($event->src_ip);
+            $geoLocationLib = null;
+            try {
+                $geoLocationLib = self::getGeoLocationLib($event->src_ip);
+            } catch (AddressNotFoundException $e) {
+            } catch (InvalidDatabaseException $e) {
+            }
+            /** @var \GeoIp2\Model\City $geoLocationLib */
             if ($geoLocationLib) {
-                $event->src_code = $geoLocationLib["country_code"];
-                $event->src_country = $geoLocationLib["country_name"];
-                $event->src_city = $geoLocationLib["city"];
-                $event->src_latitude = $geoLocationLib["latitude"];
-                $event->src_longtitude = $geoLocationLib["longitude"];
+                $event->src_code = $geoLocationLib->country->isoCode ?? "";
+                $event->src_country = $geoLocationLib->country->name ?? "";
+                $event->src_city = $geoLocationLib->city->name ?? "";
+                $event->src_latitude = $geoLocationLib->location->latitude ?? "";
+                $event->src_longitude = $geoLocationLib->location->longitude ?? "";
             } else {
                 $geoLocationApi = self::getGeoLocationApi($event->src_ip);
                 if ($geoLocationApi) {
-                    $event->src_code = $geoLocationLib["country"];
-                    $event->src_city = $geoLocationLib["city"];
+                    $event->src_code = $geoLocationLib["country"] ?? "";
+                    $event->src_city = $geoLocationLib["city"] ?? "";
+                    /** @var array $latlon */
                     $latlon = explode(",", $geoLocationLib["loc"]);
                     if (count($latlon) > 1) {
-                        $event->src_latitude = $latlon[0];
-                        $event->src_longtitude = $latlon[1];
+                        $event->src_latitude = $latlon[0] ?? "";
+                        $event->src_longitude = $latlon[1] ?? "";
                     }
                 }
 
@@ -122,22 +135,29 @@ class Normalized extends Event
         }
 
         if ($event->dst_ip) {
-            $geoLocationLib = self::getGeoLocationLib($event->dst_ip);
+            $geoLocationLib = null;
+            try {
+                $geoLocationLib = self::getGeoLocationLib($event->dst_ip);
+            } catch (AddressNotFoundException $e) {
+            } catch (InvalidDatabaseException $e) {
+            }
+            /** @var \GeoIp2\Model\City $geoLocationLib */
             if ($geoLocationLib) {
-                $event->dst_code = $geoLocationLib["country_code"];
-                $event->dst_country = $geoLocationLib["country_name"];
-                $event->dst_city = $geoLocationLib["city"];
-                $event->dst_latitude = $geoLocationLib["latitude"];
-                $event->dst_longtitude = $geoLocationLib["longitude"];
+                $event->dst_code = $geoLocationLib->country->isoCode ?? "";
+                $event->dst_country = $geoLocationLib->country->name ?? "";
+                $event->dst_city = $geoLocationLib->city->name ?? "";
+                $event->dst_latitude = $geoLocationLib->location->latitude ?? "";
+                $event->dst_longitude = $geoLocationLib->location->longitude ?? "";
             } else {
                 $geoLocationApi = self::getGeoLocationApi($event->dst_ip);
                 if ($geoLocationApi) {
-                    $event->dst_code = $geoLocationLib["country"];
-                    $event->dst_city = $geoLocationLib["city"];
+                    $event->dst_code = $geoLocationLib["country"] ?? "";
+                    $event->dst_city = $geoLocationLib["city"] ?? "";
+                    /** @var array $latlon */
                     $latlon = explode(",", $geoLocationLib["loc"]);
                     if (count($latlon) > 1) {
-                        $event->dst_latitude = $latlon[0];
-                        $event->dst_longtitude = $latlon[1];
+                        $event->dst_latitude = $latlon[0] ?? "";
+                        $event->dst_longitude = $latlon[1] ?? "";
                     }
                 }
 

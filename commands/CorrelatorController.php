@@ -12,6 +12,11 @@ require 'vendor/autoload.php';
 
 class CorrelatorController extends Controller
 {
+    /**
+     * @param $logPath
+     * @param $deviceName
+     * @throws Exception
+     */
     public function actionIndex($logPath, $deviceName)
     {
         if ($logPath == null || $deviceName == null) {
@@ -73,6 +78,7 @@ class CorrelatorController extends Controller
             while (($line = fgets($normInputStream)) != FALSE) {
                 if (!empty($line)) {
                     Yii::info(sprintf("Normalized:\n%s\n", $line));
+
                     $event = Normalized::fromCef($line);
 
                     if ($event->save()) {

@@ -160,7 +160,7 @@ while True:
 
     # split into x clusters
     run = 0
-    x = 2
+    x = 8
     M, C = kMedoids(D, x)
 
     for label in C:

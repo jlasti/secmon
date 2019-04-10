@@ -26,9 +26,9 @@
         "mcaskill/php-array-group-by": "^1.0",
         "kartik-v/yii2-context-menu": "dev-master",
         "liyunfang/yii2-contextmenu": "^1.0",
-      "ext-pgsql": "*",
-      "ext-geoip": "*",
-      "ext-json": "*"
+        "ext-pgsql": "*",
+        "ext-json": "*",
+        "geoip2/geoip2": "~2.0"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",
@@ -38,7 +38,11 @@
         "phpdocumentor/phpdocumentor": "2.*"
     },
     "config": {
-        "process-timeout": 1800
+      "preferred-install": "dist",
+      "github-protocols": ["https","http"],
+      "github-oauth": {
+        "github.com": "YourGithubOauth"
+      }
     },
     "scripts": {
         "post-create-project-cmd": [
@@ -62,5 +66,11 @@
             "npm-asset-library": "vendor/npm",
             "bower-asset-library": "vendor/bower"
         }
-    }
+    },
+    "repositories": [
+      {
+        "type": "composer",
+        "url": "https://asset-packagist.org"
+      }
+    ]
 }

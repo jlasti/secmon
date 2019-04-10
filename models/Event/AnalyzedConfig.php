@@ -30,6 +30,8 @@ class AnalyzedConfig
             $myObj->id = self::getIndexOfCountryCode(pg_escape_string($analyzedCodes[$i]["code"]));
             $myObj->value = intval($analyzedCodes[$i]["count"]);
             $defaultPointValue += $myObj->value;
+            if ($myObj->id == null)
+                continue;
             array_push($dataArray,$myObj);
         }
         // default country from analyse
@@ -56,24 +58,31 @@ class AnalyzedConfig
         for ($i = 0; $i < sizeof($analyzedCodes); $i++) {
             $myObj = (object)[];
             $myObj->title = $analyzedCodes[$i]["city"];
+            if ($myObj->title == null)
+                $myObj->title = "Unknown city";
             $myObj->latitude = intval($analyzedCodes[$i]["latitude"]);
             $myObj->longitude = intval($analyzedCodes[$i]["longitude"]);
             $myObj->scale = intval($analyzedCodes[$i]["events_count"]);
             $myObj->value = $analyzedCodes[$i]["events_count"];
             if (!$analyzedCodes[$i]["flag"])
                 $defaultPointScale += $myObj->value;
+            if ($myObj->latitude == 0 || $myObj->longitude == 0)
+                continue;
             $myObj->multiGeoLine = self::prepareLines($myObj, $analyzedCodes[$i]["src_latitude"],$analyzedCodes[$i]["src_longitude"],$analyzedCodes[$i]["flag"]);
             array_push($dataArray,$myObj);
         }
         // default city from analyse
-        $myObj = (object)[];
-        $myObj->title = $analyzedCodes[0]["src_city"];
-        $myObj->latitude = intval($analyzedCodes[0]["src_latitude"]);
-        $myObj->longitude = intval($analyzedCodes[0]["src_longitude"]);
-        $myObj->scale = intval($defaultPointScale);
-        $myObj->value = $defaultPointScale;
-        array_push($dataArray,$myObj);
-
+        if ($defaultPointScale != 0) {
+            $myObj = (object)[];
+            $myObj->title = $analyzedCodes[0]["src_city"];
+            if ($myObj->title == null)
+                $myObj->title = "Unknown city";
+            $myObj->latitude = intval($analyzedCodes[0]["src_latitude"]);
+            $myObj->longitude = intval($analyzedCodes[0]["src_longitude"]);
+            $myObj->scale = intval($defaultPointScale);
+            $myObj->value = $defaultPointScale;
+            array_push($dataArray, $myObj);
+        }
         return $dataArray;
     }
 
@@ -99,7 +108,7 @@ class AnalyzedConfig
     private function getAnalyZedCodes($params){
         try {
             return Yii::$app->db->createCommand(/** @lang text */
-                "select t.code, sum (t.events_count) as count, t.src_code as src_code from (select code, events_count, src_code from analyzed_events a where events_normalized_id = :id group by code, src_code, events_count HAVING max(iteration) = (SELECT max(iteration) as iteration FROM analyzed_events)) t WHERE t.code != '' GROUP BY t.code, t.src_code")
+                "select t.code, sum (t.events_count) as count, t.src_code as src_code from (select code, events_count, src_code from analyzed_events a where events_normalized_id = :id group by code, src_code, events_count HAVING max(iteration) = (SELECT max(iteration) as iteration FROM analyzed_events)) t GROUP BY t.code, t.src_code")
                 ->bindValue(':id', $params)
                 ->queryAll();
         } catch (Exception $e) {

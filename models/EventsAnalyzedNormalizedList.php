@@ -8,7 +8,7 @@ use app\components\filter\FilterTypeEnum;
  * This is the model class for table "analyzed_normalized_events_list".
  *
  * @property integer $id
- * @property integer $events_analyzed_id
+ * @property integer $events_normalized_id
  * @property integer $events_analyzed_iteration
  * @property integer $events_analyzed_normalized_id
  */

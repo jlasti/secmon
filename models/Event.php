@@ -66,11 +66,11 @@ class Event extends \yii\db\ActiveRecord
             {
                 break;
             }
-            $values[$tmp[0]] = isset($tmp[1]) ? $tmp[1] : null;
+            $values[$tmp[0]] = isset($tmp[1]) ? $tmp[1] : "";
         }
 
-        $event->parent_events = $values['cs1'] ?? null;
-        $event->attack_type = $values['att'] ?? null;
+        $event->parent_events = $values['cs1'] ?? "";
+        $event->attack_type = $values['att'] ?? "";
 		$event->raw = $cefString;
 
 		return $event;

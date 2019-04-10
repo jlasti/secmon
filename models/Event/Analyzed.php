@@ -10,6 +10,7 @@ namespace app\models\Event;
 use app\models\EventsAnalyzedNormalizedList;
 use app\models\EventsNormalized;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\db\Exception;
 
 /**
@@ -83,8 +84,16 @@ class Analyzed extends \yii\db\ActiveRecord
         self::saveAnalyzedDST($groupedDst,$countsDST,$params,$iteration);
 
         // save normalized to analyzed_normalized_events_list
-        self::saveNormalized($eventsNormalizedSrc,$params[':id'],$iteration);
-        self::saveNormalized($eventsNormalizedDst,$params[':id'],$iteration);
+        try {
+            self::saveNormalized($eventsNormalizedSrc, $params[':id'], $iteration);
+        } catch (InvalidConfigException $e) {
+            echo 'Message: ' .$e->getMessage();
+        }
+        try {
+            self::saveNormalized($eventsNormalizedDst, $params[':id'], $iteration);
+        } catch (InvalidConfigException $e) {
+            echo 'Message: ' .$e->getMessage();
+        }
     }
 
     /**
@@ -122,6 +131,7 @@ class Analyzed extends \yii\db\ActiveRecord
      * @param $eventsNormalized
      * @param $id
      * @param $fieldVal2
+     * @throws \yii\base\InvalidConfigException
      */
     private static function saveNormalized($eventsNormalized, $id, $fieldVal2){
         if(is_array($eventsNormalized) && count($eventsNormalized) > 0){
@@ -129,16 +139,17 @@ class Analyzed extends \yii\db\ActiveRecord
                 $eventsAnalyzedNormalizedList = new EventsAnalyzedNormalizedList;
                 $eventsAnalyzedNormalizedList->events_analyzed_iteration = $fieldVal2;
                 $eventsAnalyzedNormalizedList->events_analyzed_normalized_id = pg_escape_string($eventsNormalized[$i]["id"]);
-                $eventsAnalyzedNormalizedList->events_analyzed_normalized_id = $id;
-                $eventsAnalyzedNormalizedList->save();
+                $eventsAnalyzedNormalizedList->events_normalized_id = $id;
+                $eventsAnalyzedNormalizedList->save(true);
             }
         }
 
-        if ($id) {
+        if ($id != 0) {
             $model = EventsNormalized::findOne($id);
             $model->analyzed = true;
-            $model->save();
+            $model->save(false);
         }
+
     }
 
     /**
@@ -150,7 +161,13 @@ class Analyzed extends \yii\db\ActiveRecord
     private static function saveAnalyzedSRC($groupedSrc, $counts, $params, &$fieldVal2){
         // need to know all events with the same analyse (iteration flag)
         $model = Analyzed::find()->orderBy('iteration DESC')->limit(1)->one();
-        $fieldVal2 = $model->iteration;
+        if (!empty($model->iteration))
+            $fieldVal2 = $model->iteration;
+        else {
+            $model = new Analyzed;
+            $model->iteration = 0;
+            $model->save(false);
+        }
         $fieldVal2++;
 
         date_default_timezone_set('Europe/Bratislava');
@@ -159,24 +176,24 @@ class Analyzed extends \yii\db\ActiveRecord
             foreach ($value3 as &$value) {
                 $model = new Analyzed;
                 for ($i = 0; $i < sizeof($value); $i++) {
-                    $model->time = date("Y-m-d H:i:s");
-                    $model->src_ip = $value[$i]["src_ip"];
-                    $model->dst_ip = $value[$i]["dst_ip"];
-                    $model->code = $value[$i]["dst_code"];
-                    $model->country = $value[$i]["dst_country"];
-                    $model->city = $value[$i]["dst_city"];
+                    $model->time = date("Y-m-d H:i:s") ?? "";
+                    $model->src_ip = $value[$i]["src_ip"] ?? "";
+                    $model->dst_ip = $value[$i]["dst_ip"] ?? "";
+                    $model->code = $value[$i]["dst_code"] ?? "";
+                    $model->country = $value[$i]["dst_country"] ?? "";
+                    $model->city = $value[$i]["dst_city"] ?? "";
                     $model->latitude = $value[$i]["dst_latitude"] ?? 0;
                     $model->longitude = $value[$i]["dst_longitude"] ?? 0;
                     $model->src_latitude = $value[$i]["src_latitude"] ?? 0;
                     $model->src_longitude = $value[$i]["src_longitude"] ?? 0;
-                    $model->src_city = $value[$i]["src_city"];
+                    $model->src_city = $value[$i]["src_city"] ?? "";
                     $model->events_count = $counts[$value[$i]["src_ip"]] ?? 0;
-                    $model->events_normalized_id = $params[':id'];
+                    $model->events_normalized_id = $params[':id'] ?? "";
                     $model->iteration = $fieldVal2;
                     $model->flag = false;
-                    $model->src_code = $value[$i]["src_code"];
+                    $model->src_code = $value[$i]["src_code"] ?? "";
                 }
-                $model->save();
+                $model->save(true);
             }
         }
     }
@@ -194,24 +211,24 @@ class Analyzed extends \yii\db\ActiveRecord
             foreach ($value3 as &$value) {
                 $model = new Analyzed;
                 for ($i = 0; $i < sizeof($value); $i++) {
-                    $model->time = date("Y-m-d H:i:s");
-                    $model->src_ip = $value[$i]["dst_ip"];
-                    $model->dst_ip = $value[$i]["src_ip"];
-                    $model->code = $value[$i]["src_code"];
-                    $model->country = $value[$i]["src_country"];
-                    $model->city = $value[$i]["src_city"];
+                    $model->time = date("Y-m-d H:i:s") ?? "";
+                    $model->src_ip = $value[$i]["dst_ip"] ?? "";
+                    $model->dst_ip = $value[$i]["src_ip"] ?? "";
+                    $model->code = $value[$i]["src_code"] ?? "";
+                    $model->country = $value[$i]["src_country"] ?? "";
+                    $model->city = $value[$i]["src_city"] ?? "";
                     $model->latitude = $value[$i]["src_latitude"] ?? 0;
                     $model->longitude = $value[$i]["src_longitude"] ?? 0;
                     $model->src_latitude = $value[$i]["dst_latitude"] ?? 0;
                     $model->src_longitude = $value[$i]["dst_longitude"] ?? 0;
-                    $model->src_city = $value[$i]["dst_city"];
+                    $model->src_city = $value[$i]["dst_city"] ?? "";
                     $model->events_count = $counts[$value[$i]["dst_ip"]] ?? 0;
-                    $model->events_normalized_id = $params[':id'];
+                    $model->events_normalized_id = $params[':id'] ?? "";
                     $model->iteration = $fieldVal2;
                     $model->flag = true;
-                    $model->src_code = $value[$i]["dst_code"];
+                    $model->src_code = $value[$i]["dst_code"] ?? "";
                 }
-                $model->save();
+                $model->save(true);
             }
         }
     }
