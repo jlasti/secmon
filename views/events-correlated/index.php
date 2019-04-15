@@ -2,6 +2,7 @@
 
 use macgyer\yii2materializecss\widgets\grid\GridView;
 use yii\widgets\Pjax;
+
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\EventsCorrelatedSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -36,9 +37,6 @@ $this->registerJs('
             ],
             'columns' => [
                 ['class' => 'yii\grid\SerialColumn'],
-
-                //'id',
-                //'datetime',
                 [
                     'attribute' => 'datetime',
                     'value' => 'datetime',
@@ -52,16 +50,8 @@ $this->registerJs('
                     ])
                 ],
                 'host',
-                // 'cef_version',
-                // 'cef_vendor',
-                // 'cef_dev_prod',
-                // 'cef_dev_version',
-                // 'cef_event_class_id',
                 'cef_name',
                 'cef_severity',
-                // 'parent_events',
-                // 'raw:ntext',
-
                 ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}'],
             ],
         ]); ?>

@@ -58,6 +58,6 @@ action=lcall %ports $+{ip} -> ( sub { my($ip) = $_[0]; \
 	obsolete COUNTING_$+{ip}; \
 	lcall %ids -> \
 	( sub { return $ids; } ); \
-	write  /var/www/develop/__secInput $+{host} CEF:0|SECMON|iptables|ver|0|Portscan|0|src=$+{ip} cs1Label=parentEvents cs1=%ids
+	write  /var/www/secmon/__secInput $+{host} CEF:0|SECMON|iptables|ver|0|Portscan|0|src=$+{ip} att=portscan cs1Label=parentEvents cs1=%ids
 
 # === END - Portscan detection ===
