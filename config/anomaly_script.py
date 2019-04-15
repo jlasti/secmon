@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 # encoding: utf-8
 # Place anomaly_daemon.service to /etc/systemd/system/ - run as every service
+# Change in anomaly_daemon.service working directory as you wish
 import numpy as np
 import datetime
 import psycopg2
 import random
 import time
-from scipy.spatial import distance
-from sklearn.metrics.pairwise import pairwise_distances
 
 # Bauckhage C. Numpy/scipy Recipes for Data Science: k-Medoids Clustering[R]. Technical Report, University of Bonn, 2015.
 def kMedoids(D, k, tmax=100000):
