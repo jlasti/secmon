@@ -167,7 +167,8 @@ while True:
 
     # split into x clusters
     run = 0
-    x = 2
+    x = int(config['DEFAULT']['clusters'])
+
     M, C = kMedoids(D, x)
 
     for label in C:
