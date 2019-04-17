@@ -20,7 +20,7 @@ action=none
 type=Single
 ptype=Regexp
 continue=dontcont
-pattern=^([A-Za-z0-9: ]*) ([0-9:]+) (.*) sshd\[(\d+)\]:.*Failed (password) for( invalid user)? (\S+) from (.*) port (\d+) ssh2$
+pattern=^([A-Za-z0-9: ]*) ([0-9:]+) (.*) sshd\[(\d+)\]:.*Failed (password) for(.*)? (\S+) from (.*) port (\d+) ssh2$
 desc=$1 failed ssh login to $3 from $8 for user $7 on port $9
 action=write /var/log/mkv/__secInput $1 $2 $3 CEF:0|Security|sshd|0|130|Wrong password|0|src=$8 spt=$9 outcome=failure app=SSHv2 destinationServiceName=sshd duser=$7 dpid=$4 dhost=$3 reason=$5$6 rawEvent=$0
 

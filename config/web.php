@@ -50,7 +50,7 @@ $config = [
 	],
 	'params' => $params,
     'aliases' => [
-        '@bower' => '@vendor/bower-asset',
+        '@bower' => '@vendor/bower',
         '@npm'   => '@vendor/npm-asset',
     ],
 ];
