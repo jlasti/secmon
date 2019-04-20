@@ -138,9 +138,10 @@ class Analyzed extends \yii\db\ActiveRecord
      * @param $eventsNormalized
      * @param $id
      * @param $fieldVal2
-     * @throws \yii\base\InvalidConfigException
+     * @param $flag
      */
-    private static function saveNormalized($eventsNormalized, $id, $fieldVal2,$flag){
+
+    private static function saveNormalized($eventsNormalized, $id, $fieldVal2, $flag){
         $next = 0;
         if (!$flag)
             $next = 1;
@@ -214,7 +215,9 @@ class Analyzed extends \yii\db\ActiveRecord
      * @param $counts
      * @param $params
      * @param $fieldVal2
+     * @param $flag
      */
+
     private static function saveAnalyzedDST($groupedDst, $counts, $params, $fieldVal2, $flag){
         $counter = 0;
         if (!$flag)

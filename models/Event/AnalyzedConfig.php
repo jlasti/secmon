@@ -120,9 +120,9 @@ class AnalyzedConfig
      * @param $myObj
      * @param $src_latitude
      * @param $src_longitude
-     * @param $flag
      * @return object
      */
+
     private function prepareLines($myObj, $src_latitude, $src_longitude){
         $newObject = (object)[];
         $newObject->latitude = $myObj->latitude;
@@ -133,9 +133,9 @@ class AnalyzedConfig
         $newObject2->longitude = intval($src_longitude);
 
         $newArray = array();
+
         array_push($newArray, $newObject);
         array_push($newArray, $newObject2);
-
 
         $newArray2 = array();
         array_push($newArray2,$newArray);
