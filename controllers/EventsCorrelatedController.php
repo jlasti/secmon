@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\models\EventsCorrelated;
 use app\models\EventsCorrelatedSearch;
+use yii\db\StaleObjectException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -48,6 +49,7 @@ class EventsCorrelatedController extends Controller
      * Displays a single EventsCorrelated model.
      * @param string $id
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionView($id)
     {
@@ -79,6 +81,7 @@ class EventsCorrelatedController extends Controller
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param string $id
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
@@ -98,10 +101,16 @@ class EventsCorrelatedController extends Controller
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param string $id
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        try {
+            $this->findModel($id)->delete();
+        } catch (StaleObjectException $e) {
+        } catch (NotFoundHttpException $e) {
+        } catch (\Throwable $e) {
+        }
 
         return $this->redirect(['index']);
     }
