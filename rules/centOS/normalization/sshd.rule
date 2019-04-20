@@ -27,9 +27,9 @@ action=write /var/log/mkv/__secInput $1 $2 $3 CEF:0|Security|sshd|0|130|Wrong pa
 type=Single
 ptype=Regexp
 continue=dontcont
-pattern=^([A-Za-z0-9: ]*) ([0-9:]+) (.*) sshd\[(\d+)\]:.*pam_unix\(sshd:auth\): (authentication failure); logname=(.*) uid=(\d+) euid=(\d+) tty=ssh ruser=(.*) rhost=(.*)
+pattern=^([A-Za-z0-9: ]*) ([0-9:]+) (.*) sshd\[(\d+)\]:.*pam_unix\(sshd:auth\): (authentication failure); logname=(.*) uid=(\d+) euid=(\d+) tty=ssh ruser=(.*) rhost=(.*) (user=(.*))?
 desc=$1 failed authentication ssh login to $3 with $6 name for user $9
-action=write /var/log/mkv/__secInput $1 $2 $3 CEF:0|Security|sshd|0|131|Authentication failed|0| outcome=failure app=SSHv2 destinationServiceName=sshd dpid=$4 rhost=$10 reason=$5 rawEvent=$0
+action=write /var/log/mkv/__secInput $1 $2 $3 CEF:0|Security|sshd|0|131|Authentication failed|0| outcome=failure app=SSHv2 destinationServiceName=sshd dpid=$4 src=$10 rhost=$10 reason=$5 rawEvent=$0
 
 type=single
 ptype=regexp
