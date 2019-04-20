@@ -19,6 +19,7 @@ use Yii;
  * @property integer $cef_severity
  * @property integer $parent_events
  * @property string $raw
+ * @property string $attack_type
  */
 class EventsCorrelated extends \yii\db\ActiveRecord
 {
@@ -40,7 +41,7 @@ class EventsCorrelated extends \yii\db\ActiveRecord
             [['cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_event_class_id', 'cef_name', 'cef_severity', 'parent_events'], 'required'],
             [['cef_event_class_id', 'cef_severity', 'parent_events'], 'integer'],
             [['raw'], 'string'],
-            [['host', 'cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_name'], 'string', 'max' => 255],
+            [['host', 'cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_name', 'attack_type'], 'string', 'max' => 255],
         ];
     }
 
@@ -62,6 +63,7 @@ class EventsCorrelated extends \yii\db\ActiveRecord
             'cef_severity' => 'Cef Severity',
             'parent_events' => 'Parent Events',
             'raw' => 'Raw',
+            'attack_type' => 'Attack type',
         ];
     }
 }

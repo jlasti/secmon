@@ -1,9 +1,6 @@
 <?php
 
 use yii\helpers\Html;
-use macgyer\yii2materializecss\widgets\grid\GridView;
-use yii\widgets\Pjax;
-use yii\helpers\Json;
 use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\View\Search */
