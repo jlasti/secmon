@@ -105,8 +105,8 @@ use \yii\helpers\Html;
         polygonSeries.heatRules.push({
             "property": "fill",
             "target": polygonSeries.mapPolygons.template,
-            "min": am4core.color("#fafaff"),
-            "max": am4core.color("#0091ea")
+            "min": am4core.color("#b2b8ff"),
+            "max": am4core.color("#0076b9")
         });
 
         var polygonTemplate = polygonSeries.mapPolygons.template;

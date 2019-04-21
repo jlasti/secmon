@@ -25,7 +25,8 @@ class AnalyzedConfig
         $defaultPointValue = 0;
 
         $analyzedCodes = self::getAnalyZedCodes($params[':id']);
-        for ($i = 0; $i < sizeof($analyzedCodes); $i++) {
+        $max = sizeof($analyzedCodes);
+        for ($i = 0; $i < $max; $i++) {
             $myObj = (object)[];
             $myObj->id = self::getIndexOfCountryCode(pg_escape_string($analyzedCodes[$i]["code"]));
             $myObj->value = intval($analyzedCodes[$i]["count"]);
@@ -55,7 +56,8 @@ class AnalyzedConfig
         $defaultPointScale = 0;
 
         $analyzedCodes = self::getAnalyZedPoints($params[':id']);
-        for ($i = 0; $i < sizeof($analyzedCodes); $i++) {
+        $max = sizeof($analyzedCodes);
+        for ($i = 0; $i < $max; $i++) {
             $myObj = (object)[];
             $myObj->title = $analyzedCodes[$i]["city"];
             if ($myObj->title == null)
@@ -133,7 +135,6 @@ class AnalyzedConfig
         $newObject2->longitude = intval($src_longitude);
 
         $newArray = array();
-
         array_push($newArray, $newObject);
         array_push($newArray, $newObject2);
 

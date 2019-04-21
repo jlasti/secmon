@@ -71,36 +71,24 @@ class Analyzed extends \yii\db\ActiveRecord
         $eventsNormalizedSrc = self::getNormalizedSRC($params[':id']);
         $eventsNormalizedDst = self::getNormalizedDST($params[':id']);
 
-        $flag = true;
-
         // group by IPs
         $countsSRC = [];
         $groupedSrc = self::array_group_byCustom($countsSRC, $eventsNormalizedSrc, "src_ip", "dst_ip");
 
         $countsDST = [];
-        $groupedDst = self::array_group_byCustom($countsDST, $eventsNormalizedDst, "dst_ip", "src_ip");
+        $groupedDst = self::array_group_byCustom($countsDST, $eventsNormalizedDst, "src_ip", "dst_ip");
 
         // save normalized events to analyzed_normalized_events_list and change status of event to analyzed (true)
         $iteration = 0;
         self::saveAnalyzedSRC($groupedSrc,$countsSRC,$params,$iteration);
+        self::saveAnalyzedDST($groupedDst,$countsDST,$params,$iteration);
+
+        // to remove duplicity in analyse
+        $result = array_merge($eventsNormalizedDst, $eventsNormalizedSrc);
+        $resultEvents = (array_values(array_unique($result, SORT_REGULAR)));
 
         // save normalized to analyzed_normalized_events_list
-        try {
-            self::saveNormalized($eventsNormalizedSrc, $params[':id'], $iteration, $flag);
-        } catch (InvalidConfigException $e) {
-            echo 'Message: ' .$e->getMessage();
-        }
-
-        if ($eventsNormalizedSrc[0]['src_ip'] != '' && $eventsNormalizedSrc[0]['dst_ip'] != '')
-            $flag = false;
-
-        self::saveAnalyzedDST($groupedDst,$countsDST,$params,$iteration, $flag);
-
-        try {
-            self::saveNormalized($eventsNormalizedDst, $params[':id'], $iteration, $flag);
-        } catch (InvalidConfigException $e) {
-            echo 'Message: ' .$e->getMessage();
-        }
+        self::saveNormalized($resultEvents, $params[':id'], $iteration);
     }
 
     /**
@@ -110,7 +98,7 @@ class Analyzed extends \yii\db\ActiveRecord
     private static function getNormalizedSRC($params){
         try {
             return Yii::$app->db->createCommand(/** @lang text */
-                "SELECT * FROM events_normalized n where n.dst_ip = (SELECT src_ip FROM events_normalized where id=:id AND dst_ip != '') OR n.src_ip = (SELECT src_ip FROM events_normalized where id=:id AND src_ip != '') ORDER BY CASE WHEN id=:id THEN '1' ELSE id END ASC")
+                "SELECT * FROM events_normalized n where n.dst_ip = (SELECT src_ip FROM events_normalized where id=:id AND src_ip != '') OR n.src_ip = (SELECT src_ip FROM events_normalized where id=:id AND src_ip != '')")
                 ->bindValue(':id',$params)
                 ->queryAll();
         }
@@ -126,7 +114,7 @@ class Analyzed extends \yii\db\ActiveRecord
     private static function getNormalizedDST($params){
         try {
             return Yii::$app->db->createCommand(/** @lang text */
-                "SELECT * FROM events_normalized n where n.dst_ip = (SELECT dst_ip FROM events_normalized where id=:id AND dst_ip != '') OR n.src_ip = (SELECT dst_ip FROM events_normalized where id=:id AND src_ip != '')")
+                "SELECT * FROM events_normalized n where n.dst_ip = (SELECT dst_ip FROM events_normalized where id=:id AND dst_ip != '') OR n.src_ip = (SELECT dst_ip FROM events_normalized where id=:id AND dst_ip != '') ORDER BY CASE WHEN id=:id THEN '1' ELSE id END ASC")
                 ->bindValue(':id', $params)
                 ->queryAll();
         } catch (Exception $e) {
@@ -138,16 +126,12 @@ class Analyzed extends \yii\db\ActiveRecord
      * @param $eventsNormalized
      * @param $id
      * @param $fieldVal2
-     * @param $flag
      */
 
-    private static function saveNormalized($eventsNormalized, $id, $fieldVal2, $flag){
-        $next = 0;
-        if (!$flag)
-            $next = 1;
-
+    private static function saveNormalized($eventsNormalized, $id, $fieldVal2){
         if(is_array($eventsNormalized) && count($eventsNormalized) > 0){
-            for ($i = $next; $i< sizeof($eventsNormalized);$i++){
+            $max = sizeof($eventsNormalized);
+            for ($i = 0; $i< $max;$i++){
                 $eventsAnalyzedNormalizedList = new EventsAnalyzedNormalizedList;
                 $eventsAnalyzedNormalizedList->events_analyzed_iteration = $fieldVal2;
                 $eventsAnalyzedNormalizedList->events_analyzed_normalized_id = pg_escape_string($eventsNormalized[$i]["id"]);
@@ -187,7 +171,8 @@ class Analyzed extends \yii\db\ActiveRecord
             $value3 = &$value2;
             foreach ($value3 as &$value) {
                 $model = new Analyzed;
-                for ($i = 0; $i < sizeof($value); $i++) {
+                $max = sizeof($value);
+                for ($i = 0; $i < $max; $i++) {
                     $model->time = date("Y-m-d H:i:s") ?? "";
                     $model->src_ip = $value[$i]["src_ip"] ?? "";
                     $model->dst_ip = $value[$i]["dst_ip"] ?? "";
@@ -199,7 +184,7 @@ class Analyzed extends \yii\db\ActiveRecord
                     $model->src_latitude = $value[$i]["src_latitude"] ?? 0;
                     $model->src_longitude = $value[$i]["src_longitude"] ?? 0;
                     $model->src_city = $value[$i]["src_city"] ?? "";
-                    $model->events_count = $counts[$value[$i]["src_ip"]] ?? 0;
+                    $model->events_count = ($counts[$value[$i]["src_ip"]])-1 ?? 0;
                     $model->events_normalized_id = $params[':id'] ?? "";
                     $model->iteration = $fieldVal2;
                     $model->flag = false;
@@ -215,20 +200,16 @@ class Analyzed extends \yii\db\ActiveRecord
      * @param $counts
      * @param $params
      * @param $fieldVal2
-     * @param $flag
      */
 
-    private static function saveAnalyzedDST($groupedDst, $counts, $params, $fieldVal2, $flag){
-        $counter = 0;
-        if (!$flag)
-            $counter = 1;
-
+    private static function saveAnalyzedDST($groupedDst, $counts, $params, $fieldVal2){
         date_default_timezone_set('Europe/Bratislava');
         foreach ($groupedDst as &$value2) {
             $value3 = &$value2;
             foreach ($value3 as &$value) {
                 $model = new Analyzed;
-                for ($i = 0; $i < sizeof($value); $i++) {
+                $max = sizeof($value);
+                for ($i = 0; $i < $max; $i++) {
                     $model->time = date("Y-m-d H:i:s") ?? "";
                     $model->src_ip = $value[$i]["dst_ip"] ?? "";
                     $model->dst_ip = $value[$i]["src_ip"] ?? "";
@@ -240,7 +221,8 @@ class Analyzed extends \yii\db\ActiveRecord
                     $model->src_latitude = $value[$i]["dst_latitude"] ?? 0;
                     $model->src_longitude = $value[$i]["dst_longitude"] ?? 0;
                     $model->src_city = $value[$i]["dst_city"] ?? "";
-                    $model->events_count = $counts[$value[$i]["dst_ip"]]-$counter ?? 0;
+                    $countAdd = ($counts[$value[$i]["dst_ip"]]) ?? 0;
+                    $model->events_count = ++$countAdd;
                     $model->events_normalized_id = $params[':id'] ?? "";
                     $model->iteration = $fieldVal2;
                     $model->flag = true;
@@ -273,6 +255,7 @@ class Analyzed extends \yii\db\ActiveRecord
                 $_key = $value[$key];
             }
             if ($_key === null) {
+                $counts[$_key]=0;
                 continue;
             }
             $grouped[$_key][] = $value;
@@ -281,6 +264,7 @@ class Analyzed extends \yii\db\ActiveRecord
             }
             // grouped count
             $counts[$_key]++;
+
         }
 
         // recursion for more grouping params
@@ -288,6 +272,7 @@ class Analyzed extends \yii\db\ActiveRecord
             $args = func_get_args();
             foreach ($grouped as $key => $value) {
                 $params = array_merge([ $value ], array_slice($args, 3, func_num_args()));
+                $counts[$key]++;
                 $grouped[$key] = call_user_func_array('array_group_by', $params);
             }
         }

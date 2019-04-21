@@ -109,7 +109,9 @@ class Normalized extends Event
             try {
                 $geoLocationLib = self::getGeoLocationLib($event->src_ip);
             } catch (AddressNotFoundException $e) {
+                echo 'Message: ' .$e->getMessage();
             } catch (InvalidDatabaseException $e) {
+                echo 'Message: ' .$e->getMessage();
             }
             /** @var \GeoIp2\Model\City $geoLocationLib */
             if ($geoLocationLib) {
@@ -139,7 +141,9 @@ class Normalized extends Event
             try {
                 $geoLocationLib = self::getGeoLocationLib($event->dst_ip);
             } catch (AddressNotFoundException $e) {
+                echo 'Message: ' .$e->getMessage();
             } catch (InvalidDatabaseException $e) {
+                echo 'Message: ' .$e->getMessage();
             }
             /** @var \GeoIp2\Model\City $geoLocationLib */
             if ($geoLocationLib) {
