@@ -80,9 +80,8 @@ class AnalyzedConfig
         if ($defaultPointScale != 0) {
             $myObj = (object)[];
             $myObj->title = $analyzedCodes[0]["src_city"];
-            // possibility to work with unknown cities, but not working correctly
-            //if ($myObj->title == null)
-            //    $myObj->title = "Unknown city";
+            if ($myObj->title == null)
+                $myObj->title = "Unknown city";
             $myObj->latitude = intval($analyzedCodes[0]["src_latitude"]);
             $myObj->longitude = intval($analyzedCodes[0]["src_longitude"]);
             $myObj->scale = intval($defaultPointScale);
@@ -101,7 +100,7 @@ class AnalyzedConfig
             return Yii::$app->db->createCommand(/** @lang text */
                 "SELECT city, latitude, longitude, events_count, src_latitude, src_longitude, src_city, flag 
                         FROM analyzed_events WHERE iteration = (SELECT iteration 
-                            FROM analyzed_events WHERE events_normalized_id = :id ORDER BY iteration DESC LIMIT 1) AND city != '' AND src_city != ''")
+                            FROM analyzed_events WHERE events_normalized_id = :id ORDER BY iteration DESC LIMIT 1) AND city != ''")
                 ->bindValue(':id', $params)
                 ->queryAll();
         } catch (Exception $e) {
