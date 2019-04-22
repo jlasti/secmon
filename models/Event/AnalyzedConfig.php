@@ -62,8 +62,9 @@ class AnalyzedConfig
         for ($i = 0; $i < $max; $i++) {
             $myObj = (object)[];
             $myObj->title = $analyzedCodes[$i]["city"];
-            if ($myObj->title == null)
-                $myObj->title = "Unknown city";
+            // possibility to work with unknown cities, but not working correctly
+            //if ($myObj->title == null)
+            //    $myObj->title = "Unknown city";
             $myObj->latitude = intval($analyzedCodes[$i]["latitude"]);
             $myObj->longitude = intval($analyzedCodes[$i]["longitude"]);
             $myObj->scale = intval($analyzedCodes[$i]["events_count"]);
@@ -79,8 +80,9 @@ class AnalyzedConfig
         if ($defaultPointScale != 0) {
             $myObj = (object)[];
             $myObj->title = $analyzedCodes[0]["src_city"];
-            if ($myObj->title == null)
-                $myObj->title = "Unknown city";
+            // possibility to work with unknown cities, but not working correctly
+            //if ($myObj->title == null)
+            //    $myObj->title = "Unknown city";
             $myObj->latitude = intval($analyzedCodes[0]["src_latitude"]);
             $myObj->longitude = intval($analyzedCodes[0]["src_longitude"]);
             $myObj->scale = intval($defaultPointScale);
@@ -99,7 +101,7 @@ class AnalyzedConfig
             return Yii::$app->db->createCommand(/** @lang text */
                 "SELECT city, latitude, longitude, events_count, src_latitude, src_longitude, src_city, flag 
                         FROM analyzed_events WHERE iteration = (SELECT iteration 
-                            FROM analyzed_events WHERE events_normalized_id = :id ORDER BY iteration DESC LIMIT 1)")
+                            FROM analyzed_events WHERE events_normalized_id = :id ORDER BY iteration DESC LIMIT 1) AND city != '' AND src_city != ''")
                 ->bindValue(':id', $params)
                 ->queryAll();
         } catch (Exception $e) {
@@ -116,8 +118,8 @@ class AnalyzedConfig
             return Yii::$app->db->createCommand(/** @lang text */
                 "SELECT t.code, sum (t.events_counts) AS count, t.src_code AS src_code 
                         FROM (SELECT code, src_code, SUM (events_count) AS events_counts 
-                            FROM analyzed_events a where events_normalized_id=:id AND iteration = (SELECT MAX(iteration) AS iteration 
-                                FROM analyzed_events where events_normalized_id=:id) GROUP BY code, src_code) t GROUP BY t.code, t.src_code")
+                            FROM analyzed_events a where iteration = (SELECT MAX(iteration) AS iteration 
+                                FROM analyzed_events where events_normalized_id=:id) and city != '' GROUP BY code, src_code) t GROUP BY t.code, t.src_code")
                 ->bindValue(':id', $params)
                 ->queryAll();
         } catch (Exception $e) {
