@@ -97,7 +97,9 @@ class AnalyzedConfig
     private function getAnalyZedPoints($params){
         try {
             return Yii::$app->db->createCommand(/** @lang text */
-                "SELECT city, latitude, longitude, events_count, src_latitude, src_longitude, src_city, flag FROM analyzed_events WHERE iteration = (SELECT iteration FROM analyzed_events WHERE events_normalized_id = :id ORDER BY iteration DESC LIMIT 1)")
+                "SELECT city, latitude, longitude, events_count, src_latitude, src_longitude, src_city, flag 
+                        FROM analyzed_events WHERE iteration = (SELECT iteration 
+                            FROM analyzed_events WHERE events_normalized_id = :id ORDER BY iteration DESC LIMIT 1)")
                 ->bindValue(':id', $params)
                 ->queryAll();
         } catch (Exception $e) {
@@ -112,7 +114,10 @@ class AnalyzedConfig
     private function getAnalyZedCodes($params){
         try {
             return Yii::$app->db->createCommand(/** @lang text */
-                "select t.code, sum (t.events_count) as count, t.src_code as src_code from (select code, events_count, src_code from analyzed_events a where events_normalized_id =:id and code != '' group by code, src_code, events_count HAVING max(iteration) = (SELECT max(iteration) as iteration FROM analyzed_events)) t GROUP BY t.code, t.src_code")
+                "SELECT t.code, sum (t.events_counts) AS count, t.src_code AS src_code 
+                        FROM (SELECT code, src_code, SUM (events_count) AS events_counts 
+                            FROM analyzed_events a where events_normalized_id=:id AND iteration = (SELECT MAX(iteration) AS iteration 
+                                FROM analyzed_events where events_normalized_id=:id) GROUP BY code, src_code) t GROUP BY t.code, t.src_code")
                 ->bindValue(':id', $params)
                 ->queryAll();
         } catch (Exception $e) {
