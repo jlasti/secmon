@@ -39,9 +39,9 @@ class AnalyzedConfig
             if ($myObj->id == null)
                 continue;
             $myObj->value = 1;
-
             array_push($dataArray,$myObj);
         }
+
 
         return $dataArray;
     }
