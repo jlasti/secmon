@@ -18,6 +18,7 @@
 $| = 1;
 
 use strict;
+use warnings FATAL => 'all';
 use DBI();
 
 # Pridavna kniznica na spracovanie konfiguracneho suboru

@@ -1,0 +1,14 @@
+[Unit]
+Description=Anomaly detection daemon
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python36 /var/www/secmon/commands/anomaly_script.py
+WorkingDirectory=/var/www/working_dir
+Environment=API_KEY=123456789
+Environment=API_PASS=password
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=sysinit.target

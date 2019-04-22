@@ -2,9 +2,11 @@
 
 namespace app\controllers;
 
+use app\models\Event\AnalyzedConfig;
 use Yii;
 use app\models\EventsNormalized;
 use app\models\EventsNormalizedSearch;
+use app\models\Event\Analyzed;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -104,6 +106,45 @@ class EventsNormalizedController extends Controller
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+    // perform analyse
+    public function actionAnalyse(){
+        $params = [':id' => $_GET['id'], ':norm' => $_GET['norm']];
+
+        $event = new Analyzed();
+        $event->Analyse($params);
+
+        return $this->redirect(['/events-normalized-list/index']);
+    }
+
+    // show map
+    public function actionShow(){
+        $params = [':id' => $_GET['id']];
+
+        return $this->render('show');
+    }
+
+    // show heat map
+    public function actionAll(){
+        $params = [':id' => $_GET['id']];
+
+        $analyzedConfig = new AnalyzedConfig();
+
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        return json_encode($analyzedConfig->getAnalyzedCodeCount($params));
+    }
+
+    // show points map
+    public function actionPoint(){
+        $params = [':id' => $_GET['id']];
+
+        $analyzedConfig = new AnalyzedConfig();
+
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        return json_encode($analyzedConfig->getAnalyzedAllPoints($params));
     }
 
     /**
