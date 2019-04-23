@@ -38,11 +38,15 @@ class AnalyzedConfig
             $myObj->id = self::getIndexOfCountryCode(pg_escape_string($analyzedCodes[$i]["src_code"]));
             if ($myObj->id == null)
                 continue;
-            $myObj->value = 1;
+            $code = ($analyzedCodes[$i]["code"]);
+            if ($code == '')
+                $myObj->value = intval($analyzedCodes[$i]["count"]);
+            else if ($code != $analyzedCodes[$i]["src_code"])
+                $myObj->value = 1;
+            else
+                $myObj->value = -1;
             array_push($dataArray,$myObj);
         }
-
-
         return $dataArray;
     }
 
@@ -62,17 +66,19 @@ class AnalyzedConfig
         for ($i = 0; $i < $max; $i++) {
             $myObj = (object)[];
             $myObj->title = $analyzedCodes[$i]["city"];
-            // possibility to work with unknown cities, but not working correctly
-            //if ($myObj->title == null)
-            //    $myObj->title = "Unknown city";
             $myObj->latitude = intval($analyzedCodes[$i]["latitude"]);
             $myObj->longitude = intval($analyzedCodes[$i]["longitude"]);
+            if ($myObj->latitude == 0 || $myObj->longitude == 0) {
+                $myObj->title = $analyzedCodes[$i]["src_city"];
+                if ($myObj->title == null)
+                    $myObj->title = "Unknown city";
+                $myObj->latitude = intval($analyzedCodes[$i]["src_latitude"]);
+                $myObj->longitude = intval($analyzedCodes[$i]["src_longitude"]);
+                $myObj->value = $analyzedCodes[$i]["events_count"];
+                if (!$analyzedCodes[$i]["flag"])
+                    $defaultPointScale += $myObj->value;
+            }
             $myObj->scale = intval($analyzedCodes[$i]["events_count"]);
-            $myObj->value = $analyzedCodes[$i]["events_count"];
-            if (!$analyzedCodes[$i]["flag"])
-                $defaultPointScale += $myObj->value;
-            if ($myObj->latitude == 0 || $myObj->longitude == 0)
-                continue;
             $myObj->multiGeoLine = self::prepareLines($myObj, $analyzedCodes[$i]["src_latitude"],$analyzedCodes[$i]["src_longitude"]);
             array_push($dataArray,$myObj);
         }
@@ -100,7 +106,7 @@ class AnalyzedConfig
             return Yii::$app->db->createCommand(/** @lang text */
                 "SELECT city, latitude, longitude, events_count, src_latitude, src_longitude, src_city, flag 
                         FROM analyzed_events WHERE iteration = (SELECT iteration 
-                            FROM analyzed_events WHERE events_normalized_id = :id ORDER BY iteration DESC LIMIT 1) AND city != ''")
+                            FROM analyzed_events WHERE events_normalized_id = :id ORDER BY iteration DESC LIMIT 1)")
                 ->bindValue(':id', $params)
                 ->queryAll();
         } catch (Exception $e) {
@@ -118,7 +124,7 @@ class AnalyzedConfig
                 "SELECT t.code, sum (t.events_counts) AS count, t.src_code AS src_code 
                         FROM (SELECT code, src_code, SUM (events_count) AS events_counts 
                             FROM analyzed_events a where iteration = (SELECT MAX(iteration) AS iteration 
-                                FROM analyzed_events where events_normalized_id=:id) and city != '' GROUP BY code, src_code) t GROUP BY t.code, t.src_code")
+                                FROM analyzed_events where events_normalized_id=:id) GROUP BY code, src_code) t GROUP BY t.code, t.src_code")
                 ->bindValue(':id', $params)
                 ->queryAll();
         } catch (Exception $e) {
