@@ -272,7 +272,6 @@ class Analyzed extends \yii\db\ActiveRecord
             $args = func_get_args();
             foreach ($grouped as $key => $value) {
                 $params = array_merge([ $value ], array_slice($args, 3, func_num_args()));
-                $counts[$key]++;
                 $grouped[$key] = call_user_func_array('array_group_by', $params);
             }
         }

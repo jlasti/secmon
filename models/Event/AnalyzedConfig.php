@@ -39,7 +39,7 @@ class AnalyzedConfig
             if ($myObj->id == null)
                 continue;
             $code = ($analyzedCodes[$i]["code"]);
-            if ($code == '')
+            if ($code == '' || $code == null)
                 $myObj->value = intval($analyzedCodes[$i]["count"]);
             else if ($code != $analyzedCodes[$i]["src_code"])
                 $myObj->value = 1;
@@ -66,6 +66,8 @@ class AnalyzedConfig
         for ($i = 0; $i < $max; $i++) {
             $myObj = (object)[];
             $myObj->title = $analyzedCodes[$i]["city"];
+            if ($myObj->title == null)
+                $myObj->title = "Unknown city";
             $myObj->latitude = intval($analyzedCodes[$i]["latitude"]);
             $myObj->longitude = intval($analyzedCodes[$i]["longitude"]);
             if ($myObj->latitude == 0 || $myObj->longitude == 0) {
@@ -74,16 +76,16 @@ class AnalyzedConfig
                     $myObj->title = "Unknown city";
                 $myObj->latitude = intval($analyzedCodes[$i]["src_latitude"]);
                 $myObj->longitude = intval($analyzedCodes[$i]["src_longitude"]);
-                $myObj->value = $analyzedCodes[$i]["events_count"];
-                if (!$analyzedCodes[$i]["flag"])
-                    $defaultPointScale += $myObj->value;
             }
+            $myObj->value = $analyzedCodes[$i]["events_count"];
+            if (!$analyzedCodes[$i]["flag"])
+                $defaultPointScale += $myObj->value;
             $myObj->scale = intval($analyzedCodes[$i]["events_count"]);
             $myObj->multiGeoLine = self::prepareLines($myObj, $analyzedCodes[$i]["src_latitude"],$analyzedCodes[$i]["src_longitude"]);
             array_push($dataArray,$myObj);
         }
         // default city from analyse
-        if ($defaultPointScale != 0) {
+        if ($defaultPointScale != 0 && $analyzedCodes[0]["flag"]) {
             $myObj = (object)[];
             $myObj->title = $analyzedCodes[0]["src_city"];
             if ($myObj->title == null)
