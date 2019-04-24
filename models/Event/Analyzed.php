@@ -184,7 +184,7 @@ class Analyzed extends \yii\db\ActiveRecord
                     $model->src_latitude = $value[$i]["src_latitude"] ?? 0;
                     $model->src_longitude = $value[$i]["src_longitude"] ?? 0;
                     $model->src_city = $value[$i]["src_city"] ?? "";
-                    $model->events_count = ($counts[$value[$i]["src_ip"]])-1 ?? 0;
+                    $model->events_count = $counts[$value[$i]["src_ip"]] ?? 0;
                     $model->events_normalized_id = $params[':id'] ?? "";
                     $model->iteration = $fieldVal2;
                     $model->flag = false;
@@ -221,8 +221,7 @@ class Analyzed extends \yii\db\ActiveRecord
                     $model->src_latitude = $value[$i]["dst_latitude"] ?? 0;
                     $model->src_longitude = $value[$i]["dst_longitude"] ?? 0;
                     $model->src_city = $value[$i]["dst_city"] ?? "";
-                    $countAdd = ($counts[$value[$i]["dst_ip"]]) ?? 0;
-                    $model->events_count = ++$countAdd;
+                    $model->events_count = $counts[$value[$i]["src_ip"]] ?? 0;
                     $model->events_normalized_id = $params[':id'] ?? "";
                     $model->iteration = $fieldVal2;
                     $model->flag = true;
@@ -264,7 +263,6 @@ class Analyzed extends \yii\db\ActiveRecord
             }
             // grouped count
             $counts[$_key]++;
-
         }
 
         // recursion for more grouping params
