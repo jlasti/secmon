@@ -14,6 +14,7 @@ use app\models\User;
  * @property integer $user_id
  * @property integer $active
  * @property string $config
+ * @property string $refresh_time
  *
  * @property View\Component[] $viewComponents
  * @property User $user
@@ -36,7 +37,11 @@ class View extends \yii\db\ActiveRecord
         return [
             [['user_id', 'active'], 'integer'],
             [['name'], 'string', 'max' => 255],
-            [['config'], 'string'],
+            [['config', 'refresh_time'], 'string'],
+//            [['refresh_time'], 'match', 'pattern' => '/^P(?!$)(T(?=\d+[HMS])(\d+H)?(\d+M)?(\d+S)?)?$/',
+//                'message' => 'Enter valid (ISO 8601 - time) format (PTnHnMnS)!'],
+            [['refresh_time'], 'match', 'pattern' => '/^\d{1,5}[YMWDHmS]{1}$/',
+                'message' => 'Enter valid format(nY/nM/nW/nD/nH/nm/nS)!'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
@@ -51,7 +56,8 @@ class View extends \yii\db\ActiveRecord
             'name' => Yii::t('app', 'Name'),
             'user_id' => Yii::t('app', 'User ID'),
             'active' => Yii::t('app', 'Active'),
-            'config' => Yii::t('app', 'Config')
+            'config' => Yii::t('app', 'Config'),
+            'refresh_time' => Yii::t('app', 'Refresh time')
         ];
     }
 

@@ -46,6 +46,7 @@ class ViewController extends Controller
             $view->name = 'Default';
             $view->user_id = $userId;
             $view->active = 1;
+            $view->refresh_time = '00:00:10';
             $view->save();
             array_push($views,$view);
         }
@@ -210,6 +211,22 @@ class ViewController extends Controller
         $component = View\Component::findOne($componentId);
 
         return !empty($component) ? ($component->delete() ? true : null) : null;
+    }
+
+    public function actionGetRefreshTimes()
+    {
+        $userId = Yii::$app->user->getId();
+        $views = View::findAll(['user_id' => $userId]);
+        $refresh_times = array();
+        foreach($views as $view) {
+            if($view->refresh_time != null && $view->refresh_time != "") {
+                $refresh_times[$view->id] = $view->refresh_time;
+            } else {
+                $refresh_times[$view->id] = '0';
+            }
+
+        }
+        return Json::encode($refresh_times);
     }
 
     /*

@@ -1,5 +1,6 @@
 <?php
 use \app\components\filter\FilterTypeEnum;
+use bs\Flatpickr\FlatpickrWidget;
 
 $selectedType = $rule->type ?? 'date';
 $hideLogic = '';
@@ -37,13 +38,13 @@ if ($index == 0)
 
             echo $form->field($rule, "[$index]operator", [
                 'options' => [ 'class' => 'input-field col m2', 'data-type' => $typeValue ]
-            ])->dropDownList($type->getOperatorsForDropdown());
+            ])->dropDownList($type->getOperatorsForDropdown(), [ 'data-rule-operator' => $index ]);
 
             if ($typeValue == FilterTypeEnum::DATE)
             {
                 echo $form->field($rule, "[$index]value", [
                     'options' => ['class' => 'input-field col m3', 'data-type' => $typeValue]
-                ])->textInput(['class' => 'datepicker']);
+                ])->textInput(['class' => 'flatpickr']);
             }
             else
             {

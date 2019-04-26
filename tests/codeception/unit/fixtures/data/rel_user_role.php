@@ -10,9 +10,10 @@ foreach($users as $user)
 	shuffle($roles);
 
 	$data[] = [
-		'user_id' => $user['id'],
-		'role_id' => reset($roles)['id'],
-	];
+                'user_id' => $user['id'],
+                //'role_id' => reset($roles)['id'],
+                'role_id' => 100,
+        ];
 }
 
 return $data;

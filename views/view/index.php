@@ -17,7 +17,7 @@ $this->registerJsFile('@web/js/jquery-ui.min.js', ['depends' => 'yii\web\YiiAsse
 //$this->registerJs(sprintf('$(document).ready(function(){DrawLineGraph(%s);});', $graph), \yii\web\View::POS_END);
 $select = '<div class="row"><div class="col s12 m6 l4"><select id="dashboard">';
 
-foreach($views as $view) 
+foreach($views as $view)
 {
     $select .= sprintf("<option value='%s' %s>%s</option>", $view->id, ($view->active == 1 ? 'selected' : ''), $view->name );
 }
@@ -44,8 +44,8 @@ $this->params['title'] = $select;
              'data' => [
                 'confirm' => Yii::t('app', 'Are you sure you want to delete this dashboard?'),
                 'method' => 'post',
-            ],
-        ]) ?>
+                ],
+            ]) ?>
     </div>
 
     <div class="fixed-action-btn" style="bottom: 45px; right: 24px;">
@@ -90,6 +90,7 @@ $this->registerJs(
             deleteComponent: '%s',
             updateComponent: '%s',
             updateOrder: '%s',
+            getRefreshTimes: '%s',
             updateComponentSettings: '%s',
             deleteComponentSettings: '%s',
             updateComponentContent: '%s',
@@ -102,6 +103,7 @@ $this->registerJs(
         Url::to(["view/delete-component"]),
         Url::to(["view/update-component"]),
         Url::to(["view/update-order-of-components"]),
+        Url::to(["view/get-refresh-times"]),
         Url::to(["filter/add-filter-to-component"]),
         Url::to(["filter/remove-filter-from-component"]),
         Url::to(["filter/get-component-content"]),

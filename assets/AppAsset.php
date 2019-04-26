@@ -28,5 +28,6 @@ class AppAsset extends AssetBundle
         //'yii\bootstrap\BootstrapAsset',
         'macgyer\yii2materializecss\assets\MaterializeAsset',
         'macgyer\yii2materializecss\assets\MaterializePluginAsset',
+        '\app\assets\FlatpickrAsset',
     ];
 }

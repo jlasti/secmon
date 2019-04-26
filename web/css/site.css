@@ -1,3 +1,18 @@
+.tooltip {
+    background: #eee;
+    box-shadow: 0 0 5px #999999;
+    color: #333;
+    display: none;
+    font-size: 16px;
+    left: 130px;
+    padding: 5px;
+    position: absolute;
+    text-align: center;
+    top: 95px;
+    width: 150px;
+    z-index: 4;
+}
+
 .not-set {
     color: #c55;
     font-style: italic;
@@ -280,7 +295,7 @@ body.compact .compact-button i {
   transition: none !important;
 }
 
-.clickable-table table tbody tr {
+.clickable-table table tbody tr, .close-modal, .component-row {
     cursor: pointer;
 }
 .clickable-table table tbody tr:hover {
