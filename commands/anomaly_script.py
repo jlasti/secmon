@@ -78,11 +78,14 @@ def kMedoids(D, k, tmax=100000):
     # return results
     return M, C
 
-def insert(raw, number,run,comment):
+def connect():
     try:
         conn = psycopg2.connect(host=config['DATABASE']['host'],database=config['DATABASE']['database'], user=config['DATABASE']['user'], password=config['DATABASE']['password'])
     except:
         print ("I am unable to connect to the database")
+    return conn
+
+def insert(raw, number,run,comment, conn):
     cur = conn.cursor()
     sql = (
         "INSERT INTO clustered_events (time, raw, cluster_number, cluster_run, comment)"
@@ -96,7 +99,6 @@ def insert(raw, number,run,comment):
         conn.rollback()
         print ("I can't execute insert script!")
     cur.close()
-    conn.close()
 
 def euclidean_distance(array):
     if(len(array) == 0):
@@ -129,7 +131,7 @@ while True:
     line_number = 0
     lines = []
     # change log file
-    with open("/var/log/mkv/messages") as textFile:
+    with open(config['DEFAULT']['file']) as textFile:
         for i, line in enumerate(textFile):
             if i > line_number:
                 lines.append(line.split())
@@ -171,6 +173,8 @@ while True:
 
     M, C = kMedoids(D, x)
 
+    connection = connect();
+
     for label in C:
         for point_idx in C[label]:
             nums_to_words = []
@@ -182,7 +186,8 @@ while True:
             str_temp = "".join(str(x) for x in nums_to_words)
             output_str = str_temp.replace(",", " ")
             output_str_final = output_str.strip(' ')
-            insert(output_str_final,label,run,"")
+            insert(output_str_final,label,run,"",connection)
 
     run = run + 1
+    connection.close()
     time.sleep(float(config['DEFAULT']['time']))
