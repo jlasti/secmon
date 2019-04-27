@@ -36,7 +36,7 @@ class AnalyzedConfig
         for ($i = 0; $i < $max; $i++) {
             $myObj = (object)[];
             $myObj->id = self::getIndexOfCountryCode(pg_escape_string($analyzedCodes[$i]["src_code"]));
-            if ($myObj->id == null)
+            if ($myObj->id == null || $analyzedCodes[$i]["src_code"] == '')
                 continue;
             $code = ($analyzedCodes[$i]["code"]);
             if ($code == '' || $code == null)

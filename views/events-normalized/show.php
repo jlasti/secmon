@@ -20,7 +20,7 @@ use \yii\helpers\Html;
 <div class="main-actions centered-horizontal">
     <a class="btn-floating waves-effect waves-light btn-large blue" id="allHeat" title="All analyzed events in heat map"><i class='material-icons'>select_all</i>></a>
     <a class="btn-floating waves-effect waves-light btn-large blue" id="allPoints" title="All analyzed events in point map"><i class='material-icons'>control_point</i>></a>
-    <a class="btn-floating waves-effect waves-light btn-large blue" id="clear" title="All analyzed events in point map"><i class='material-icons'>clear</i>></a>
+    <a class="btn-floating waves-effect waves-light btn-large blue" id="clear" title="Reset"><i class='material-icons'>clear</i>></a>
 </div>
 <div id="chartdiv"></div>
 </body>
