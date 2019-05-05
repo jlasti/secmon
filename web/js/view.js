@@ -532,6 +532,7 @@ $(function () {
      * Event handler na zmenu dashboardu
      */
     function dashboardSelect_onChange (e) {
+        var currentRefreshTime = refreshTime;
         activeGrid.hide();
         activeGrid = $('#grid_' + this.value);
         UpdateBtnUrl(editBtn, this.value);
@@ -543,6 +544,10 @@ $(function () {
             data : { viewId : this.value}
         });
         getRefreshTime();
+        isInitialized = false;
+        if(currentRefreshTime == 0) {
+            componentUpdate();
+        }
     }
 
     /*
@@ -560,7 +565,6 @@ $(function () {
         gridItemNode.attr('class', 'grid-item card ' + this.value);
 
         gridItemNode.parent().find("form.componentForm").submit();
-        grid.packery('fit', gridItemNode[0]);
         singleComponentUpdate(compId, page);
     }
 

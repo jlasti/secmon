@@ -1,12 +1,6 @@
 <?php
 namespace app\components\filter;
 
-use app\components\filter\BaseFilterRule;
-use Symfony\Component\Validator\Constraints\Date;
-use yii\base\InvalidParamException;
-use yii\base\Application;
-
-
 class DateFilterRule extends BaseFilterRule
 {
 	/**
@@ -57,10 +51,11 @@ class DateFilterRule extends BaseFilterRule
 		return array_merge(parent::rules(), [
 			['value', 'date', 'format' => 'yyyy-MM-dd HH:mm', 'when' => function ($model) {
 		        return $model->operator != 'Last';
-            }],
-            ['value', 'match', 'pattern' => '/^\d{1,5}[YMWDHmS]{1}$/', 'when' => function ($model) {
+            }, 'message' => 'Enter valid format(yyyy-MM-dd HH:mm)!'],
+            ['value', 'match', 'pattern' => '/^(\d+[YMWDHmS]{1})$/', 'when' => function ($model) {
 		        return $model->operator == 'Last';
             }, 'message' => 'Enter valid format(nY/nM/nW/nD/nH/nm/nS)!'],
+            ['value', 'required']
 		]);
 	}
 
