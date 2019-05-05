@@ -12,6 +12,7 @@ use yii\web\UploadedFile;
  * @property string $name
  * @property string $link
  * @property string $state
+ * @property string $type
  */
 class SecRule extends \yii\db\ActiveRecord
 {
@@ -34,9 +35,9 @@ class SecRule extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'link'], 'string', 'max' => 255],
+            [['name', 'link', 'type'], 'string', 'max' => 255],
             [['state'], 'boolean'],
-            [['secConfigFile'], 'file', 'skipOnEmpty' => false, 'extensions' => 'txt', 'checkExtensionByMimeType' => false],
+            [['secConfigFile'], 'file', 'skipOnEmpty' => !$this->isNewRecord, 'extensions' => 'rule', 'checkExtensionByMimeType' => false],
         ];
     }
 
@@ -50,6 +51,7 @@ class SecRule extends \yii\db\ActiveRecord
             'name' => 'Name',
             'link' => 'Link',
             'state' => 'Active rule',
+            'type' => 'Type',
             'secConfigFile' => ''
         ];
     }
@@ -57,10 +59,32 @@ class SecRule extends \yii\db\ActiveRecord
     public function upload()
     {
     	$transaction = Yii::$app->db->beginTransaction();
-
         if($this->save())
         {
-            $path = sprintf(Yii::getAlias('@app/rules/uploads/%s_%s.%s'), $this->secConfigFile->baseName, $this->id, $this->secConfigFile->extension);
+            if($this->state)
+                $files = scandir("/var/www/secmon/rules/active/correlation");
+            else
+                $files = scandir("/var/www/secmon/rules/available/correlation");
+
+            $fileExists = 0;
+
+            foreach($files as $file){
+                if($file == $this->secConfigFile->baseName.'.'.$this->secConfigFile->extension)
+                    $fileExists = 1;
+            }
+
+            if($fileExists){
+                if($this->state)
+                    $path = sprintf(Yii::getAlias('@app/rules/active/correlation/%s_%s.%s'), $this->secConfigFile->baseName, $this->id, $this->secConfigFile->extension);
+                else
+                    $path = sprintf(Yii::getAlias('@app/rules/available/correlation/%s_%s.%s'), $this->secConfigFile->baseName, $this->id, $this->secConfigFile->extension);
+            } else {
+                if($this->state)
+                    $path = sprintf(Yii::getAlias('@app/rules/active/correlation/%s.%s'), $this->secConfigFile->baseName, $this->secConfigFile->extension);
+                else
+                    $path = sprintf(Yii::getAlias('@app/rules/available/correlation/%s.%s'), $this->secConfigFile->baseName, $this->secConfigFile->extension);
+            }
+
             $this->link = $path;
 
             if($this->secConfigFile->saveAs($path) && $this->save())
@@ -76,5 +100,33 @@ class SecRule extends \yii\db\ActiveRecord
         $transaction->rollBack();
 
 		return false;
+    }
+
+    public function changeRepository()
+    {
+
+        $linkParts = explode("/", $this->link);
+        $fileName = $linkParts[7];
+        $fileExists = 0;
+
+        if ($this->state) {
+            $this->link = '/var/www/secmon/rules/active/correlation' . '/' . $fileName;
+            $files = scandir('/var/www/secmon/rules/active/correlation');
+            foreach ($files as $file) {
+                if ($file == $fileName)
+                    $fileExists = 1;
+            }
+            if (!$fileExists)
+                exec("mv /var/www/secmon/rules/available/correlation/'$fileName' /var/www/secmon/rules/active/correlation/'$fileName'");
+        } else {
+            $this->link = '/var/www/secmon/rules/available/correlation' . '/' . $fileName;
+            $files = scandir('/var/www/secmon/rules/available/correlation');
+            foreach ($files as $file) {
+                if ($file == $fileName)
+                    $fileExists = 1;
+            }
+            if (!$fileExists)
+                exec("mv /var/www/secmon/rules/active/correlation/'$fileName' /var/www/secmon/rules/available/correlation/'$fileName'");
+        }
     }
 }

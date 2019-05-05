@@ -19,7 +19,7 @@ class SecRuleSearch extends SecRule
     {
         return [
             [['id'], 'integer'],
-            [['name', 'link'], 'safe'],
+            [['name', 'link', 'type'], 'safe'],
             [['state'], 'boolean'],
         ];
     }
@@ -65,7 +65,9 @@ class SecRuleSearch extends SecRule
 
         $query->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'link', $this->link])
-            ->andFilterWhere(['state' => $this->state]);
+            ->andFilterWhere(['state' => $this->state])
+            ->andFilterWhere(['type' => $this->type])
+            ->addOrderBy("id asc");
 
         return $dataProvider;
     }

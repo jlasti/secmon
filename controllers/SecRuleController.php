@@ -91,9 +91,14 @@ class SecRuleController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        if ($model->load(Yii::$app->request->post())) {
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            $model->changeRepository();
+
+            if($model->save())
+
+                return $this->redirect(['view', 'id' => $model->id]);
+
         } else {
             return $this->render('update', [
                 'model' => $model,
@@ -110,13 +115,10 @@ class SecRuleController extends Controller
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
-
-        if (file_exists($model->link))
-        {
-            unlink($model->link);
-        }
-
-        $model->delete();
+            if (file_exists($model->link)) {
+                unlink($model->link);
+            }
+            $model->delete();
 
         return $this->redirect(['index']);
     }

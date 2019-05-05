@@ -16,16 +16,19 @@ use macgyer\yii2materializecss\widgets\form\ActiveForm;
     </div>
 
     <div class="row">
-
-    <div class="file-field input-field">
-      <div class="btn">
-        <span>File</span>
-        <?= $form->field($model, 'secConfigFile')->fileInput() ?>
-      </div>
-      <div class="file-path-wrapper">
-        <input class="file-path validate" type="text" placeholder="Upload sec rule file">
-      </div>
+        <?= $form->field($model, 'type')->textInput(['maxlength' => true]) ?>
     </div>
+
+    <div class="row">
+     <div class="file-field input-field">
+        <div class="btn">
+         <span>File</span>
+            <?= $form->field($model, 'secConfigFile')->fileInput() ?>
+        </div>
+        <div class="file-path-wrapper">
+            <input class="file-path validate" type="text" placeholder="Upload sec rule file">
+        </div>
+     </div>
     </div>
 
     <div class="row">
@@ -36,7 +39,11 @@ use macgyer\yii2materializecss\widgets\form\ActiveForm;
 			
     <div class="row">
         <div class="form-group">
-            <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'waves-effect waves-light green btn' : 'waves-effect waves-light btn']) ?>
+            <?= Html::submitButton('Create' , ['class' => 'waves-effect waves-light green btn',
+                'data' => [
+                    'confirm' => Yii::t('app', "To start using added active rule, systemctl restart secmon-corellator.service is required !!"),
+                    'method' => 'post',
+                ], ]) ?>
         </div>
     </div>
 

@@ -1,8 +1,8 @@
 [db]
 host=localhost
-user=sec
-password=heslo
-dbname=secdev
+user=secmon
+password=secmon
+dbname=secmon
 
 [log]
 dir=/var/log/secmon/
