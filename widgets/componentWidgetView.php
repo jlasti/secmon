@@ -8,8 +8,8 @@
   $filters = \app\controllers\FilterController::getFiltersOfUser($loggedUserId);
   $contentTypes = [
       'table' => 'Table',
-      'lineChart' => 'Bar chart',
-//      'barChart' => 'Bar chart'
+      'barChart' => 'Bar chart',
+      'pieChart' => 'Pie chart',
   ];
   $columns = \app\models\EventsNormalized::getColumnsDropdown();
 ?>
@@ -19,7 +19,12 @@
         <!--Main content of component-->
         <div class="card-content">
             <div class="card-header">
-                <span class="card-title activator grey-text text-darken-4"><span class="nameTitle"><?php  echo $options['name']; ?></span><i class="material-icons right">more_vert</i></span>
+                <span class="card-title activator grey-text text-darken-4">
+                    <span class="nameTitle"><?php  echo $options['name']; ?></span>
+                    <a href="#settings<?= $component->id ?>">
+                        <i class="material-icons right">more_vert</i>
+                    </a>
+                </span>
                 <a href="#modal<?= $component->id ?>" class="btn-floating waves-effect waves-light btn-small blue"
                    style="position:absolute; top: 30px; right: 40px; display: <?= $component->filter_id == null ? 'none' : 'block' ?>" id="contentEdit">
                     <i class="material-icons">edit</i>
@@ -46,40 +51,37 @@
         </div>
 
         <!--Component options-->
-        <div class="card-reveal">
-            <div class="card-header light-blue accent-4">
-                <span class="card-title white-text"><span class="nameTitle"><?php  echo $options['name']; ?></span> - options<i class="material-icons right">close</i></span>
-            </div>
 
-            <div class="card-body">
-                <form class="row componentForm"  data-id="<?php  echo $component->id; ?>">
-                    <div class="input-field col s12">
-                        <label class="active" for="name">Name</label>
-                        <input class="nameInput" data-id="component_<?php  echo $component->id; ?>" onfocus="this.select();" onmouseup="return false;" id="name<?php  echo $component->id; ?>" type="text" value="<?php  echo $options['name']; ?>">
-                    </div>
-
-                    <div class="input-field col s12">
-                        <label class="active">Select width</label>
-                        <select id="width<?php  echo $component->id; ?>" class="widthSelect" data-id="component_<?php  echo $component->id; ?>">
-                            <option <?= $options['width'] == '' ? ' selected="selected"' : '' ?> value="">25%</option>
-                            <option <?= $options['width'] == 'width2' ? ' selected="selected"' : '' ?> value="width2">50%</option>
-                            <option <?= $options['width'] == 'width3' ? ' selected="selected"' : '' ?> value="width3">75%</option>
-                            <option <?= $options['width'] == 'width4' ? ' selected="selected"' : '' ?> value="width4">100%</option>
-                        </select>
-                    </div>
-
-                    <div class="input-field col s12 center-align">
-                        <button type="button" class="deleteComponentBtn btn waves-effect waves-light red" data-id="<?php  echo $component->id; ?>">
-                            Delete
-                            <i class="material-icons right">delete</i>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
     </div>
 
+    <div class="modal" id="settings<?= $component->id ?>">
+        <div class="modal-content">
+            <i class="material-icons right close-modal">close</i><h4 class="nameHeader"><?php  echo $options['name']; ?> - options</h4>
+            <form class="row componentForm"  data-id="<?php  echo $component->id; ?>">
+                <div class="input-field col s12">
+                    <label class="active" for="name">Name</label>
+                    <input class="nameInput" data-id="component_<?php  echo $component->id; ?>" onmouseup="return false;" id="name<?php  echo $component->id; ?>" type="text" value="<?php  echo $options['name']; ?>">
+                </div>
 
+                <div class="input-field col s12">
+                    <label class="active">Select width</label>
+                    <select id="width<?php  echo $component->id; ?>" class="widthSelect" data-id="component_<?php  echo $component->id; ?>">
+                        <option <?= $options['width'] == '' ? ' selected="selected"' : '' ?> value="">25%</option>
+                        <option <?= $options['width'] == 'width2' ? ' selected="selected"' : '' ?> value="width2">50%</option>
+                        <option <?= $options['width'] == 'width3' ? ' selected="selected"' : '' ?> value="width3">75%</option>
+                        <option <?= $options['width'] == 'width4' ? ' selected="selected"' : '' ?> value="width4">100%</option>
+                    </select>
+                </div>
+
+                <div class="input-field col s12 center-align">
+                    <button type="button" class="deleteComponentBtn btn waves-effect waves-light red" data-id="<?php  echo $component->id; ?>">
+                        Delete
+                        <i class="material-icons right">delete</i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Modal Structure -->
     <div class="modal" id="modal<?= $component->id ?>">
@@ -130,12 +132,25 @@
                                      data-table-columns="<?= ($component->data_type ?? "") == $key && !empty($component->data_param) ? $component->data_param : 'datetime,host,protocol'
                                      ?>">
                                 </div>
-                            <?php else : ?>
+                            <?php elseif ($key == 'barChart') : ?>
                                 <input type="text" id="componentContentParameter<?= $component->id ?>" name="dataTypeParameter"
-                                       value="<?= ($component->data_type ?? "") == $key && !empty($component->data_param) ? $component->data_param : "" ?>" />
-                                <label for="componentContentParameter<?= $component->id ?>">Content parameter</label>
+                                       value="<?= ($component->data_type ?? "") == $key && !empty($component->data_param) ? $component->data_param : "" ?>"
+                                       placeholder="nY/nM/nW/nD/nH/nm/nS"/>
+                                <label for="componentContentParameter<?= $component->id ?>">Time range</label>
+                            <?php else : ?>
+                                <select id="componentContentParameter<?= $component->id ?>" name="dataTypeParameter">
+                                    <?php foreach ($colsDown as $key1 => $val1) : ?>
+                                        <?php if ($key1 == $component->data_param) : ?>
+                                            <option value="<?= $key1 ?>" selected><?= $val1 ?></option>
+                                        <?php else : ?>
+                                            <option value="<?= $key1 ?>"><?= $val1 ?></option>
+                                        <?php endif ?>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label>Filtered column</label>
                             <?php endif; ?>
                         </div>
+
                         <?php if ($key == 'table') : ?>
                         <div data-content-type="<?= $key ?>" class=" input-field col s11">
                             <select id="columnsSelect<?= $component->id ?>">

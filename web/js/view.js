@@ -19,9 +19,10 @@ $(function () {
     var grid;
     var deleteComponentBtn;
     var componentForm;
+    var refreshTime;
+    var isInitialized = false;
 
     var newComponentName = "New Component";
-
     //#endregion
 
 
@@ -69,7 +70,9 @@ $(function () {
             // Show grid after js inicialization
             $('.grid').removeClass("invisible");
 
+            getRefreshTime();
             componentUpdate();
+            grid.packery('shiftLayout');
         }
     }
 
@@ -218,6 +221,8 @@ $(function () {
         }
 
         element.find('.modal').modal();
+        element.find('.close-modal').on('click', closeModal);
+        element.find('.nameInput').on('keyup', changeNameHeader);
         element.find('select').material_select();
         element.find('.nameInput').on('focusout blur', name_onFocusOut);
         element.find('select.widthSelect').on("change", widthSelect_onChange);
@@ -259,12 +264,19 @@ $(function () {
         if (index === undefined) {
             index = 0;
         }
+        if(refreshTime === undefined) {
+            getRefreshTime();
+        }
 
         if (index < activeComponentIds.length) {
             var item = activeComponentIds[index];
+            var page = 1;
+            if($('#component_' + item).find('.pagination').length != 0 && $($('#component_' + item).find('.pagination')[0]).find('.active').length != 0) {
+                page = parseInt($($($('#component_' + item).find('.pagination')[0]).find('.active')[0]).find('a')[0].innerHTML);
+            }
             $.ajax({
                 url: hostUrl + options.updateComponentContent,
-                data: {componentId: item},
+                data: {componentId: item, pagination: page},
                 async: true,
                 cache: false
             }).done(function (data) {
@@ -276,25 +288,134 @@ $(function () {
                 var loader = cont.find("#componentLoader");
                 var body = cont.find("#componentBody");
                 loader.css('display', 'none');
-
                 if (data.contentTypeId == "table") {
-                    cont.html(data.html);
+                    var paging = data.paging[0].count;
+                    var htmlData = data.html + createPagination(page, item, paging);
+                    cont.html(htmlData);
+                    $(cont.find('table')[0]).attr('class', 'striped');
+                    $(cont.find('th')[0]).css('display', 'none');
+                    $(cont.find('tbody')[0]).find('tr').each(function(i, e) {
+                        $(e).attr('class', 'component-row');
+                        $(e).attr('data-key', '/secmon/web/events-normalized/view?id=' + $(e).find('td')[0].innerHTML);
+                        $($(e).find('td')[0]).css('display', 'none');
+                    });
                 }
-                if (data.contentTypeId == "lineChart") {
+                else if (data.contentTypeId == "barChart") {
                     var width = parseInt(cont.css("width").replace("px", ""));
                     cont.empty();
                     DrawBarGraph(JSON.parse(data.data), width / 2, width, "#componentContentBody" + item);
+                }
+                else if (data.contentTypeId == "pieChart") {
+                    var width = parseInt(cont.css("width").replace("px",""));
+                    cont.empty();
+                    DrawPieGraph(JSON.parse(data.data), width / 2, width, "#componentContentBody" + item);
                 }
                 // Fit item in grid
                 grid.packery('fit', $('#component_' + item)[0]);
             }).fail(function () {
                 Materialize.toast("Couldn't update component content!", 4000);
-            }).complete(function (jqXHR, textStatus) {
+            }).always(function (jqXHR, textStatus) {
                 componentUpdate(index + 1);
             });
         }
         else {
-            setTimeout(componentUpdate, viewUpdateInterval);
+            if(!isInitialized) {
+                grid.packery('shiftLayout');
+                isInitialized = true;
+            }
+            if(refreshTime > 0) {
+                setTimeout(componentUpdate, refreshTime * 1000);
+            }
+        }
+    }
+
+    function singleComponentUpdate(item, page) {
+        $.ajax({
+            url: hostUrl + options.updateComponentContent,
+            data: {componentId: item, pagination: page},
+            async: true,
+            cache: false
+        }).done(function (data) {
+            if (!data) {
+                Materialize.toast("Couldn't add filter to component.", 4000);
+                return;
+            }
+            var cont = $("#componentContentBody" + item);
+            var loader = cont.find("#componentLoader");
+            var body = cont.find("#componentBody");
+            loader.css('display', 'none');
+            if (data.contentTypeId == "table") {
+                var paging = data.paging[0].count;
+                var htmlData = data.html + createPagination(page, item, paging);
+                cont.html(htmlData);
+                $(cont.find('table')[0]).attr('class', 'striped');
+                $(cont.find('th')[0]).css('display', 'none');
+                $(cont.find('tbody')[0]).find('tr').each(function(i, e) {
+                    $(e).attr('class', 'component-row');
+                    $(e).attr('data-key', '/secmon/web/events-normalized/view?id=' + $(e).find('td')[0].innerHTML);
+                    $($(e).find('td')[0]).css('display', 'none');
+                });
+            }
+            else if (data.contentTypeId == "barChart") {
+                var width = parseInt(cont.css("width").replace("px", ""));
+                cont.empty();
+                DrawBarGraph(JSON.parse(data.data), width / 2, width, "#componentContentBody" + item);
+            }
+            else if (data.contentTypeId == "pieChart") {
+                var width = parseInt(cont.css("width").replace("px",""));
+                cont.empty();
+                DrawPieGraph(JSON.parse(data.data), width / 2, width, "#componentContentBody" + item);
+            }
+            // Fit item in grid
+            grid.packery('fit', $('#component_' + item)[0]);
+            grid.packery('shiftLayout');
+        }).fail(function () {
+            Materialize.toast("Couldn't update component content!", 4000);
+        });
+    }
+
+    function getRefreshTime() {
+        $.ajax({
+            url: hostUrl + options.getRefreshTimes
+        }).done(function(data) {
+            if(!data) {
+                Materialize.toast("Refresh times not found.", 4000);
+                return;
+            }
+            var json = JSON.parse(data);
+            refreshTime = getIntervalFromArray(json[dashboardSelect.val()]);
+        });
+    }
+
+    function getIntervalFromArray(refreshString) {
+        if(refreshString == '0') {
+            return 0;
+        }
+        var timeUnit = refreshString.substring(refreshString.length - 1, refreshString.length);
+        var refreshTime = parseInt(refreshString.substring(0, refreshString.length - 1));
+        if(timeUnit == 'S') {
+            return refreshTime;
+        }
+        refreshTime *= 60;
+        if(timeUnit == 'm') {
+            return refreshTime;
+        }
+        refreshTime *= 60;
+        if(timeUnit == 'H') {
+            return refreshTime;
+        }
+        return refreshTime * 24;
+        if(timeUnit == 'D') {
+            return refreshTime;
+        }
+        if(timeUnit == 'W') {
+            return refreshTime * 7;
+        }
+        if(timeUnit == 'M') {
+            return refreshTime * 30;
+        }
+        if(timeUnit == 'Y') {
+            return refreshTime * 365;
         }
     }
 
@@ -347,16 +468,31 @@ $(function () {
              addActiveComponent(compId);
 
              if (data.contentTypeId == "table") {
-                cont.html(data.html);
+                 var paging = data.paging[0].count;
+                 var htmlData = data.html + createPagination(1, compId, paging);
+                 cont.html(htmlData);
+                 $(cont.find('table')[0]).attr('class', 'striped');
+                 $(cont.find('th')[0]).css('display', 'none');
+                 $(cont.find('tbody')[0]).find('tr').each(function(i, e) {
+                     $(e).attr('class', 'component-row');
+                     $(e).attr('data-key', '/secmon/web/events-normalized/view?id=' + $(e).find('td')[0].innerHTML);
+                     $($(e).find('td')[0]).css('display', 'none');
+                 });
              }
-             else if (data.contentTypeId == "lineChart") {
+             else if (data.contentTypeId == "barChart") {
                 var width = parseInt(cont.css("width").replace("px",""));
                 cont.empty();
                 DrawBarGraph(JSON.parse(data.data), width/2, width, "#componentContentBody" + compId);
              }
+             else if (data.contentTypeId == "pieChart") {
+                 var width = parseInt(cont.css("width").replace("px",""));
+                 cont.empty();
+                 DrawPieGraph(JSON.parse(data.data), width / 2, width, "#componentContentBody" + compId);
+             }
 
             // Fit item in grid
-            grid.packery('fit', comp[0]);
+             grid.packery('fit', comp[0]);
+             grid.packery('shiftLayout');
          }).fail(function(){
              Materialize.toast("Couldn't add filter to component!", 4000);
          });
@@ -396,6 +532,7 @@ $(function () {
      * Event handler na zmenu dashboardu
      */
     function dashboardSelect_onChange (e) {
+        var currentRefreshTime = refreshTime;
         activeGrid.hide();
         activeGrid = $('#grid_' + this.value);
         UpdateBtnUrl(editBtn, this.value);
@@ -406,6 +543,11 @@ $(function () {
             url: hostUrl + options.changeView,
             data : { viewId : this.value}
         });
+        getRefreshTime();
+        isInitialized = false;
+        if(currentRefreshTime == 0) {
+            componentUpdate();
+        }
     }
 
     /*
@@ -414,14 +556,16 @@ $(function () {
     function widthSelect_onChange (e) {
         var selectNode = $(this);
         var gridItemNode = $("#" + selectNode.attr('data-id')).find('.grid-item');
-        gridItemNode.attr('class', 'grid-item card ' + this.value);
-        grid.packery('fit', gridItemNode[0]);
-        gridItemNode.find("form.componentForm").submit();
+        var compId = $(gridItemNode).parent().attr('id').split('_')[1];
+        var page = 1;
+        if(gridItemNode.find('.pagination').length != 0) {
+            page = parseInt($($(gridItemNode.find('.pagination')[0]).find('.active')[0]).find('a')[0].innerHTML);
+        }
 
-        // Resize graph
-        var width = parseInt(gridItemNode.find(".card-content").css("width").replace("px",""));
-        var height = parseInt(gridItemNode.find(".card-content").css("height").replace("px",""));
-        UpdateBarGraph(height, width, "#componentContentBody" + gridItemNode.find("form.componentForm").attr('data-id'));
+        gridItemNode.attr('class', 'grid-item card ' + this.value);
+
+        gridItemNode.parent().find("form.componentForm").submit();
+        singleComponentUpdate(compId, page);
     }
 
     /*
@@ -445,12 +589,13 @@ $(function () {
             }
 
             var gridItemNode = $(data.html);
+            var gridItem = $(gridItemNode).find('.grid-item')[0];
             activeGrid
                 .append(gridItemNode)
                 .packery( 'appended', gridItemNode );
-            
+
             // Inicializacia noveho grid itemu
-            var draggie = new Draggabilly( gridItemNode[0] );
+            var draggie = new Draggabilly( gridItem );
             activeGrid.packery( 'bindDraggabillyEvents', draggie );
 
             activateComponent(gridItemNode);
@@ -475,8 +620,10 @@ $(function () {
             }
 
             removeActiveComponent(componentId);
-            activeGrid.packery('remove', $("#component_" + componentId));
+            var component = $("#component_" + componentId).find('.grid-item')[0];
+            activeGrid.packery('remove', component).packery('shiftLayout');
         });
+        $('#settings' + componentId).modal('close');
     }
 
     /*
@@ -485,8 +632,9 @@ $(function () {
     function saveOrder_onDragItemPositioned (e) {
         var itemElems = activeGrid.packery('getItemElements');
         var order = itemElems.map(function (item, index) {
+            var form = $(item).siblings().find('form.componentForm')[0];
             return {
-                id: item.id.replace("component_", ""),
+                id: $(form).attr('data-id'),
                 order: index
             }
         });
@@ -577,155 +725,6 @@ $(function () {
     }
 
     /*
-     * Funkcia na vykreslenie ciary grafu
-     */
-    function DrawLineGraph(data,outboundHeight,outboundWidth,node) {
-        if (!data || !outboundHeight || !outboundWidth || !node) {
-            return;
-        }
-
-        // set the dimensions and margins of the graph
-        var margin = {top: 20, right: 20, bottom: 40, left: 80},
-            width = outboundWidth - margin.left - margin.right,
-            height = outboundHeight - margin.top - margin.bottom;
-
-
-        // append the svg object to the body of the page
-        // append a 'group' element to 'svg'
-        // moves the 'group' element to the top left margin
-        var svg = d3.select(node).append("svg")
-            .attr("id","barChart")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform",
-                "translate(" + margin.left + "," + margin.top + ")");
-
-
-        var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        var parseTime = d3.timeParse("%H-%M");
-        var x = d3.scaleTime()
-            .rangeRound([0, width]);
-
-        var y = d3.scaleLinear()
-            .rangeRound([height, 0]);
-
-        var line = d3.line()
-            .x(function(d) { return x(d.time); })
-            .y(function(d) { return y(d.y); });
-
-        for ( var i = 0 ; i < data.length ; i++ )
-        {
-            data[i].time = parseTime(data[i].time);
-            data[i].y = +data[i].y;
-        }
-
-        x.domain(d3.extent(data, function(d) { return d.time; }));
-        y.domain(d3.extent(data, function(d) { return d.y; }));
-
-        g.append("g")
-            .attr("class", "axis axis--x")
-            .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(x));
-
-        g.append("g")
-            .attr("class", "axis axis--y")
-            .call(d3.axisLeft(y))
-            .append("text")
-            .attr("fill", "#000")
-            .attr("transform", "rotate(-90)")
-            .attr("y", 6)
-            .attr("dy", "0.71em")
-            .style("text-anchor", "end")
-            .text("Number of fault logins");
-
-        g.append("path")
-            .datum(data)
-            .attr("class", "line")
-            .attr("d", line);
-    }
-
-    /*
-     *  Update funkcia ciaroveho grafu
-     *
-     */
-    function UpdateLineGraph(outboundHeight,outboundWidth,node) {
-        if (!outboundHeight || !outboundWidth || !node) {
-            return;
-        }
-
-        var data = d3.select(node).selectAll("svg").selectAll(".bar").data();
-
-        if (!data) {
-            return;
-        }
-
-        d3.select(node).selectAll("#lineChart").remove();
-
-        // set the dimensions and margins of the graph
-        var margin = {top: 20, right: 20, bottom: 40, left: 40},
-            width = outboundWidth - margin.left - margin.right,
-            height = outboundHeight - margin.top - margin.bottom;
-
-
-        // append the svg object to the body of the page
-        // append a 'group' element to 'svg'
-        // moves the 'group' element to the top left margin
-        var svg = d3.select(node).append("svg")
-            .attr("id","lineChart")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform",
-                "translate(" + margin.left + "," + margin.top + ")");
-
-
-        var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        var parseTime = d3.timeParse("%H-%M");
-        var x = d3.scaleTime()
-            .rangeRound([0, width]);
-
-        var y = d3.scaleLinear()
-            .rangeRound([height, 0]);
-
-        var line = d3.line()
-            .x(function(d) { return x(d.time); })
-            .y(function(d) { return y(d.y); });
-
-        for ( var i = 0 ; i < data.length ; i++ )
-        {
-            data[i].time = parseTime(data[i].time);
-            data[i].y = +data[i].y;
-        }
-
-        x.domain(d3.extent(data, function(d) { return d.time; }));
-        y.domain(d3.extent(data, function(d) { return d.y; }));
-
-        g.append("g")
-            .attr("class", "axis axis--x")
-            .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(x));
-
-        g.append("g")
-            .attr("class", "axis axis--y")
-            .call(d3.axisLeft(y))
-            .append("text")
-            .attr("fill", "#000")
-            .attr("transform", "rotate(-90)")
-            .attr("y", 6)
-            .attr("dy", "0.71em")
-            .style("text-anchor", "end")
-            .text("Number of fault logins");
-
-        g.append("path")
-            .datum(data)
-            .attr("class", "line")
-            .attr("d", line);
-    }
-
-    /*
      * Funkcia na vykreslenie bar grafu
      */
     function DrawBarGraph(data,outboundHeight,outboundWidth,node) {
@@ -756,9 +755,19 @@ $(function () {
             .attr("transform", 
                     "translate(" + margin.left + "," + margin.top + ")");
 
+        var tooltip = d3.select(node) // select element in the DOM with id 'chart'
+            .append('div') // append a div element to the element we've selected
+            .attr('class', 'tooltip'); // add class 'tooltip' on the divs we just selected
+
+        tooltip.append('div') // add divs to the tooltip defined above
+            .attr('class', 'label'); // add class 'label' on the selection
+
+        tooltip.append('div') // add divs to the tooltip defined above
+            .attr('class', 'count'); // add class 'count' on the selection
+
         // format the data
         data.forEach(function(d) {
-        d.count = +d.count;
+            d.count = +d.count;
         });
 
         // Scale the range of the data in the domains
@@ -775,13 +784,6 @@ $(function () {
             .attr("y", function(d) { return y(d.y); })
             .attr("height", function(d) { return height - y(d.y); })
             .attr("fill", "#039be5")
-            .on("mouseover", function() {
-                d3.select(this)
-                    .attr("fill", "#F44336");
-            })
-            .on("mouseout", function(d, i) {
-                d3.select(this).attr("fill", "#039be5");
-            })
             .append("title")
             .text(function(d) {
                 return d.x;
@@ -817,116 +819,176 @@ $(function () {
 
         var bars = svg.selectAll(".bar");
 
-        bars.on("mouseover", function() {
+        bars.on('mouseover', function(d) {  // when mouse enters div
+            tooltip.select('.label').html('Value: ' + d.x); // set current label
+            tooltip.select('.count').html('Count: ' + d.y); // set current count
+            tooltip.style('display', 'block'); // set display
+            tooltip.style('top', (d3.event.layerY + 10) + 'px') // always 10px below the cursor
+                .style('left', (d3.event.layerX + 10) + 'px');
             d3.select(this)
-            .attr("fill", "red");
+                 .attr("fill", "#F44336");
+        });
+
+        bars.on('mouseout', function() { // when mouse leaves div
+            tooltip.style('display', 'none'); // hide tooltip for that element
+            d3.select(this)
+                .attr("fill", "#039be5");
+        });
+
+        bars.on('mousemove', function(d) { // when mouse moves
+            tooltip.style('top', (d3.event.layerY + 10) + 'px') // always 10px below the cursor
+                .style('left', (d3.event.layerX + 10) + 'px'); // always 10px to the right of the mouse
         });
     }
 
-    /*
-    * Funkcia na update bar grafu
-    */
-    function UpdateBarGraph(outboundHeight,outboundWidth,node) {
-        if (!outboundHeight || !outboundWidth || !node) {
+
+    function DrawPieGraph(data,outboundHeight,outboundWidth,node) {
+        if (!data || !outboundHeight || !outboundWidth || !node) {
             return;
         }
 
-        var data = d3.select(node).selectAll("svg").selectAll(".bar").data();
+        var radius = Math.min(outboundWidth , outboundHeight) / 2;
 
-        if (!data) {
-            return;
-        }
+        var color = d3.scaleOrdinal(d3.schemeCategory20b);
 
-        d3.select(node).selectAll("#barChart").remove();
-
-        // set the dimensions and margins of the graph
-        var margin = {top: 20, right: 20, bottom: 40, left: 80},
-            width = outboundWidth - margin.left - margin.right,
-            height = outboundHeight - margin.top - margin.bottom;
-
-        // set the ranges
-        var x = d3.scaleBand()
-                    .range([0, width])
-                    .padding(0.1);
-        var y = d3.scaleLinear()
-                    .range([height, 0]);
-                    
         // append the svg object to the body of the page
         // append a 'group' element to 'svg'
         // moves the 'group' element to the top left margin
-        var svg = d3.select(node).append("svg")
-            .attr("id","barChart")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
+        var svg = d3.select(node)
+            .append("svg")
+            .attr("id","pieChart")
+            .attr("width", outboundWidth)
+            .attr("height", outboundHeight)
             .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            .attr('transform', 'translate(' + (outboundWidth / 2) + ',' + (outboundHeight / 2) + ')');
 
-        // format the data
+        var arc = d3.arc()
+            .innerRadius(0) // none for pie chart
+            .outerRadius(radius); // size of overall chart
+
+        var pie = d3.pie() // start and end angles of the segments
+            .value(function(d) { return d.count; }) // how to extract the numerical data from each entry in our dataset
+            .sort(null); // by default, data sorts in oescending value. this will mess with our animation so we set it to null
+
+        var tooltip = d3.select(node) // select element in the DOM with id 'chart'
+            .append('div') // append a div element to the element we've selected
+            .attr('class', 'tooltip'); // add class 'tooltip' on the divs we just selected
+
+        tooltip.append('div') // add divs to the tooltip defined above
+            .attr('class', 'label'); // add class 'label' on the selection
+
+        tooltip.append('div') // add divs to the tooltip defined above
+            .attr('class', 'count'); // add class 'count' on the selection
+
+        tooltip.append('div') // add divs to the tooltip defined above
+            .attr('class', 'percent'); // add class 'percent' on the selection
+
         data.forEach(function(d) {
-            d.count = +d.count;
+            d.count = +d.count; // calculate count as we iterate through the data
+            d.enabled = true; // add enabled property to track which entries are checked
         });
 
-        // Scale the range of the data in the domains
-        x.domain(data.map(function(d) { return d.x; }));
-        y.domain([0, d3.max(data, function(d) { return d.y; })]);
+        var path = svg.selectAll('path') // select all path elements inside the svg. specifically the 'g' element. they don't exist yet but they will be created below
+            .data(pie(data)) //associate dataset wit he path elements we're about to create. must pass through the pie function. it magically knows how to extract values and bakes it into the pie
+            .enter() //creates placeholder nodes for each of the values
+            .append('path') // replace placeholders with path elements
+            .attr('d', arc) // define d attribute with arc function above
+            .attr('fill', function(d) { return color(d.data.label); }) // use color scale to define fill of each label in dataset
+            .each(function(d) { this._current - d; }); // creates a smooth animation for each track
 
-        // append the rectangles for the bar chart
-        svg.selectAll(".bar")
-            .data(data)
-        .enter().append("rect")
-            .attr("class", "bar")
-            .attr("x", function(d) { return x(d.x); })
-            .attr("width", x.bandwidth())
-            .attr("y", function(d) { return y(d.y); })
-            .attr("height", function(d) { return height - y(d.y); })
-            .attr("fill", "#039be5")
-            .on("mouseover", function() {
-                d3.select(this)
-                    .attr("fill", "#F44336");
-            })
-            .on("mouseout", function(d, i) {
-                d3.select(this).attr("fill", "#039be5");
-            })
-            .append("title")
-            .text(function(d) {
-                return d.hour;
-            });
+        path.on('mouseover', function(d) {  // when mouse enters div
+            var totalCount = d3.sum(data.map(function(d) { // calculate the total number of tickets in the dataset
+                return (d.enabled) ? d.count : 0; // checking to see if the entry is enabled. if it isn't, we return 0 and cause other percentages to increase
+            }));
+            var percentage = Math.round(10000 * d.data.count / totalCount) / 100; // calculate percent
+            tooltip.select('.label').html('Value: ' + d.data.label); // set current label
+            tooltip.select('.count').html('Count: ' + d.data.count); // set current count
+            tooltip.select('.percent').html(percentage + '%'); // set percent calculated above
+            tooltip.style('display', 'grid'); // set display
+            tooltip.style('top', (d3.event.layerY + 10) + 'px') // always 10px below the cursor
+                .style('left', (d3.event.layerX + 10) + 'px'); // always 10px to the right of the mouse
+            d3.select(this)
+                .attr("fill", "#F44336");
+        });
 
-        // add the x Axis
-        svg.append("g")
-            .attr("transform", "translate(0," + height + ")")
-            .call(
-            d3.axisBottom(x)
-            )
-            .append("text")
-                .attr("fill","#000000")
-                .attr("y", 30)
-                .attr("x",width)
-                .attr("font-size", "14px")
-                .style("text-anchor", "end")
-                .text("[TIME FRAME]");
+        path.on('mouseout', function() { // when mouse leaves div
+            tooltip.style('display', 'none'); // hide tooltip for that element
+            d3.select(this)
+                .attr("fill", color(this.__data__.data.label));
+        });
 
-        // add the y Axis
-        svg.append("g")
-            .call(
-            d3.axisLeft(y)
-            )
-            .append("text")
-                .attr("fill","#000000")
-                .attr("transform", "rotate(-90)")
-                .attr("y",-30)
-                .attr("x",0)
-                .attr("font-size", "14px")
-                .style("text-anchor", "end")
-                .text("[COUNT]");
-
-        var bars = svg.selectAll(".bar");
-
-        bars.on("mouseover", function() {
-                d3.select(this)
-                    .attr("fill", "red");
+        path.on('mousemove', function() { // when mouse moves
+            tooltip.style('top', (d3.event.layerY + 10) + 'px') // always 10px below the cursor
+                .style('left', (d3.event.layerX + 10) + 'px'); // always 10px to the right of the mouse
         });
     }
+
+    function closeModal() {
+        var e = '#' + $(this).parent().parent().attr('id');
+        $(e).modal('close');
+    }
+
+    function changeNameHeader() {
+        var nameHeader = $(this).parent().parent().siblings('.nameHeader')[0];
+        nameHeader.innerHTML = this.value + ' - options';
+    }
+
+    function createPagination(page, componentId, paging) {
+        var pagination = "<ul class=\"pagination\" data-id=\"" + componentId + "\">";
+
+        //Pages
+        var maxPage = 1;
+        if(paging % 10 == 0 && paging != 0) {
+            maxPage = paging / 10;
+        } else if(paging != 0) {
+            maxPage = paging / 10 + 1;
+        }
+        for(var i = page > 3 ? page - 2 : 1; i <= page + 2 && i <= maxPage; i++) {
+            pagination += i == page ? "<li class=\"active change-page\"><a href=\"#!\">" + i + "</a></li>" : "<li class=\"waves-effect change-page\"><a href=\"#!\">" + i + "</a></li>";
+        }
+
+        //Arrows
+        pagination += "<br>";
+        //First page
+        pagination += "<li class=\"waves-effect pagination-end\" data-page=1><a href=\"#!\"><i class=\"material-icons\">first_page</i></a></li>";
+        //Left
+        pagination += page == 1 ? "<li class=\"disabled\">" : "<li class=\"waves-effect pagination-step\" data-direction=\"left\">";
+        pagination += "<a href=\"#!\"><i class=\"material-icons\">chevron_left</i></a></li>";
+        //Right
+        pagination += page == Math.floor(maxPage) ? "<li class=\"disabled\">" : "<li class=\"waves-effect pagination-step\" data-direction=\"right\">";
+        pagination += "<a href=\"#!\"><i class=\"material-icons\">chevron_right</i></a></li>";
+        //Last page
+        pagination += "<li class=\"waves-effect pagination-end\" data-page=" + Math.floor(maxPage) + "><a href=\"#!\"><i class=\"material-icons\">last_page</i></a></li>";
+
+        pagination += "</ul>";
+        return pagination;
+    }
+
+    $(document).on("click", ".component-row" , function() {
+        window.location = $(this).data("key");
+    });
+
+    $(document).on("click", ".change-page" , function() {
+        var component = $(this).parent().data('id');
+        var page = parseInt($(this).find('a')[0].innerHTML);
+        singleComponentUpdate(component, page);
+    });
+
+    $(document).on("click", ".pagination-step" , function() {
+        var component = $(this).parent().data('id');
+        var page = 1;
+        if($(this).siblings('.active').find('a').length != 0) {
+            page = parseInt($(this).siblings('.active').find('a')[0].innerHTML);
+            page += $(this).data('direction') == 'left' ? (-1) : 1;
+        }
+        singleComponentUpdate(component, page);
+    });
+
+    $(document).on("click", ".pagination-end" , function() {
+        var component = $(this).parent().data('id');
+        var page = $(this).data('page');
+        singleComponentUpdate(component, page);
+    });
 
     //#endregion
 });

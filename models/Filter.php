@@ -18,50 +18,50 @@ class Filter extends \yii\db\ActiveRecord
 {
 	private $_rules;
 
-    /**
-     * @inheritdoc
-     */
-    public static function tableName()
-    {
-        return 'filters';
-    }
+	/**
+	* @inheritdoc
+	*/
+	public static function tableName()
+	{
+		return 'filters';
+	}
 
-    /**
-     * @inheritdoc
-     */
-    public function rules()
-    {
-        return [
-        	['name', 'required'],
-            [['user_id'], 'integer'],
-            [['name'], 'string', 'max' => 255],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
-        ];
-    }
+	/**
+	* @inheritdoc
+	*/
+	public function rules()
+	{
+		return [
+			['name', 'required'],
+			[['user_id'], 'integer'],
+			[['name'], 'string', 'max' => 255],
+			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
+		];
+	}
 
-    /**
-     * @inheritdoc
-     */
-    public function attributeLabels()
-    {
-        return [
-            'id' => Yii::t('app', 'ID'),
-            'user_id' => Yii::t('app', 'User ID'),
-            'name' => Yii::t('app', 'Name'),
-        ];
-    }
+	/**
+	* @inheritdoc
+	*/
+	public function attributeLabels()
+	{
+		return [
+		    'id' => Yii::t('app', 'ID'),
+		    'user_id' => Yii::t('app', 'User ID'),
+		    'name' => Yii::t('app', 'Name'),
+		];
+	}
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getRules()
-    {
-        return $this->hasMany(FilterRule::className(), ['filter_id' => 'id'])->orderBy('position ASC');
-    }
+	/**
+	* @return \yii\db\ActiveQuery
+	*/
+	public function getRules()
+	{
+		return $this->hasMany(FilterRule::className(), ['filter_id' => 'id'])->orderBy('position ASC');
+	}
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
+	/**
+	* @return \yii\db\ActiveQuery
+	*/
     public function getUser()
     {
         return $this->hasOne(Users::className(), ['id' => 'user_id']);
@@ -72,7 +72,7 @@ class Filter extends \yii\db\ActiveRecord
 	 *
 	 * @param FilterRule[] $rules
 	 */
-    public function setRules($rules)
+	public function setRules($rules)
 	{
 		$this->_rules = $rules;
 	}
@@ -86,12 +86,12 @@ class Filter extends \yii\db\ActiveRecord
 
 		if(parent::save($runValidation, $attributeNames))
 		{
-            $i = 0;
+		    $i = 0;
 
 			foreach($this->_rules as $rule)
 			{
 				$rule->filter_id = $this->id;
-                $rule->position = $i;
+				$rule->position = $i;
 
 				if(!$rule->save())
 				{
@@ -100,14 +100,13 @@ class Filter extends \yii\db\ActiveRecord
 					return false;
 				}
 
-                $i++;
+				$i++;
 			}
 
 			$transaction->commit();
 
 			return true;
 		}
-
 		return false;
 	}
 }

@@ -4,7 +4,6 @@
 /* @var $content string */
 
 use macgyer\yii2materializecss\lib\Html;
-use macgyer\yii2materializecss\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 use yii\helpers\Url;
 
