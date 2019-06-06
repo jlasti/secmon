@@ -24,8 +24,8 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
 	use PresentableTrait;
 
-	const SCENARIO_CREATE = 1;
-	const SCENARIO_UPDATE = 2;
+	const SCENARIO_CREATE = 'create';
+	const SCENARIO_UPDATE = 'update';
 
 	public $passwordText;
 	public $rolesList;
@@ -39,23 +39,12 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     }
 
 	/**
-	 * @inheritdoc
-	 */
-    public function scenarios()
-	{
-		return array_merge(parent::scenarios(), [
-			static::SCENARIO_CREATE => [],
-			static::SCENARIO_UPDATE => [],
-		]);
-	}
-
-	/**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-        	[['first_name', 'last_name', 'username', 'email'], 'required'],
+        	[['first_name', 'last_name', 'username', 'email'], 'required', 'on' => [static::SCENARIO_CREATE, static::SCENARIO_UPDATE]],
 			['email', 'email'],
 			['passwordText', 'required', 'on' => static::SCENARIO_CREATE],
 			['passwordText', 'string', 'min' => 6],

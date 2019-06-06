@@ -4,26 +4,33 @@
 /* @var $model \app\models\forms\LoginForm */
 
 use yii\helpers\Html;
-use yii\bootstrap\ActiveForm;
+use macgyer\yii2materializecss\widgets\form\ActiveForm;
 
-$this->title = 'Login';
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['title'] = 'Login';
 ?>
 <div class="site-login">
-	<h1><?= Html::encode($this->title) ?></h1>
-
 	<div class="row">
-		<div class="col-lg-5">
+		<div class="col s12 m4 l4">
 			<?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
 
-			<?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
+			<div class="row">
+				<?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
+			</div>
 
-			<?= $form->field($model, 'password')->passwordInput() ?>
+			<div class="row">
+				<?= $form->field($model, 'password')->passwordInput() ?>
+			</div>
 
-			<?= $form->field($model, 'rememberMe')->checkbox() ?>
+			<div class="row">
+				<?= $form->field($model, 'rememberMe')->checkbox() ?>
+			</div>
 
-			<div class="form-group">
-				<?= Html::submitButton(Yii::t('app', 'Login'), ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+			<div class="row"></div>
+				
+			<div class="row">
+				<div class="form-group">
+					<?= Html::submitButton(Yii::t('app', 'Login'), ['class' => 'btn waves-effect waves-light', 'name' => 'login-button']) ?>
+				</div>
 			</div>
 
 			<?php ActiveForm::end(); ?>

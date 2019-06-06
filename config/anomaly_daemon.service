@@ -1,0 +1,11 @@
+[Unit]
+Description=Anomaly detection daemon
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3.6 /var/www/secmon/commands/anomaly_script.py
+
+[Install]
+WantedBy=multi-user.target
+

@@ -29,7 +29,7 @@ class m161019_234209_inception extends Migration
             'type_id' => $this->integer()->unsigned()->null(),
         ]);
 
-        $this->createIndex('idx_type_id', 'events', 'type_id');
+        $this->createIndex('idx_events_type_id', 'events', 'type_id');
 
         $this->addForeignKey('fk_events_type_id', 'events', 'type_id', 'event_types', 'id', 'SET NULL', 'SET NULL');
     }

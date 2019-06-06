@@ -21,9 +21,12 @@ class AppAsset extends AssetBundle
         'css/site.css',
     ];
     public $js = [
+        'js/site.js',
     ];
     public $depends = [
         'yii\web\YiiAsset',
         'yii\bootstrap\BootstrapAsset',
+        'macgyer\yii2materializecss\assets\MaterializeAsset',
+        'macgyer\yii2materializecss\assets\MaterializePluginAsset',
     ];
 }

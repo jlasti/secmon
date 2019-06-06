@@ -30,8 +30,8 @@ use yii\widgets\ActiveForm;
     <?php // echo $form->field($model, 'auth_key') ?>
 
     <div class="form-group">
-        <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
-        <?= Html::resetButton(Yii::t('app', 'Reset'), ['class' => 'btn btn-default']) ?>
+        <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'waves-effect waves-light btn']) ?>
+        <?= Html::resetButton(Yii::t('app', 'Reset'), ['class' => 'waves-effect waves-light red btn']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>
