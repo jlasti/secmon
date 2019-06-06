@@ -1,17 +1,17 @@
 <?php
 
-namespace app\models\SecRule;
+namespace app\models\NormalizationRule;
 
-use Yii;
+use app\models\NormalizationRule;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\SecRule;
 
 /**
- * SecRuleSearch represents the model behind the search form about `app\models\SecRule`.
+ * NormalizationRuleSearch represents the model behind the search form about `app\models\NormalizationRule`.
  */
-class SecRuleSearch extends SecRule
+class NormalizationRuleSearch extends NormalizationRule
 {
+
     /**
      * @inheritdoc
      */
@@ -20,7 +20,7 @@ class SecRuleSearch extends SecRule
         return [
             [['id'], 'integer'],
             [['name', 'link', 'type'], 'safe'],
-            [['state'], 'boolean'],
+            [['state'], 'boolean']
         ];
     }
 
@@ -42,7 +42,7 @@ class SecRuleSearch extends SecRule
      */
     public function search($params)
     {
-        $query = SecRule::find();
+        $query = NormalizationRule::find();
 
         // add conditions that should always apply here
 

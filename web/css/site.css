@@ -306,9 +306,13 @@ body.compact .compact-button i {
     visibility: hidden;
 }
 
-.input-field.field-secrule-secconfigfile  {
+.input-field.field-secrule-secconfigfile {
     position: static;
 }
+.input-field.field-normalizationrule-normalizationrulefile {
+    position: static;
+}
+
 .file-field .help-block {
     font-size: .8rem;
     -webkit-transform: translateY(-50%);
