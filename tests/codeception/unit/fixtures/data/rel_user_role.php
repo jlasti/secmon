@@ -11,7 +11,8 @@ foreach($users as $user)
 
 	$data[] = [
 		'user_id' => $user['id'],
-		'role_id' => reset($roles)['id'],
+		//'role_id' => reset($roles)['id'],
+		'role_id' => 100,
 	];
 }
 

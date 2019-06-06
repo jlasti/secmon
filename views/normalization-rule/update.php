@@ -4,11 +4,13 @@ use macgyer\yii2materializecss\widgets\form\ActiveForm;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\SecRule */
+/* @var $model app\models\NormalizationRule */
+/* @var $form yii\widgets\ActiveForm */
 
-$this->params['title'] = 'Update Correlation Rule: ' . $model->name;
+$this->params['title'] = 'Update Normalization Rule: ' . $model->name;
+
 ?>
-<div class="sec-rule-update">
+<div class="normalization-rule-update">
 
     <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
@@ -29,10 +31,8 @@ $this->params['title'] = 'Update Correlation Rule: ' . $model->name;
     <div class="row">
         <div class="form-group">
             <?=Html::submitButton('Update', ['class' => 'waves-effect waves-light btn'])?>
-
         </div>
     </div>
 
     <?php ActiveForm::end(); ?>
-
 </div>
