@@ -49,6 +49,7 @@ $config = [
 		'navigation' => ['class' => 'app\components\Navigation'],
 	],
 	'params' => $params,
+    'timeZone' => 'Europe/Bratislava',
 ];
 
 if (YII_ENV_DEV) {

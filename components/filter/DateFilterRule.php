@@ -1,9 +1,6 @@
 <?php
 namespace app\components\filter;
 
-use app\components\filter\BaseFilterRule;
-use yii\base\InvalidParamException;
-
 class DateFilterRule extends BaseFilterRule
 {
 	/**
@@ -42,6 +39,7 @@ class DateFilterRule extends BaseFilterRule
 			'<=',
 			'!=',
 			'=',
+            'Last',
 		];
 	}
 
@@ -49,9 +47,15 @@ class DateFilterRule extends BaseFilterRule
 	 * @inheritdoc
 	 */
 	public static function rules()
-	{
+    {
 		return array_merge(parent::rules(), [
-			['value', 'date', 'format' => 'yyyy-MM-dd'],
+			['value', 'date', 'format' => 'yyyy-MM-dd HH:mm', 'when' => function ($model) {
+		        return $model->operator != 'Last';
+            }, 'message' => 'Enter valid format(yyyy-MM-dd HH:mm)!'],
+            ['value', 'match', 'pattern' => '/^(\d+[YMWDHmS]{1})$/', 'when' => function ($model) {
+		        return $model->operator == 'Last';
+            }, 'message' => 'Enter valid format(nY/nM/nW/nD/nH/nm/nS)!'],
+            ['value', 'required']
 		]);
 	}
 
@@ -60,14 +64,27 @@ class DateFilterRule extends BaseFilterRule
      */
     protected function _applyInternal(&$collection)
     {
+        $dateLast = null;
+        if($this->operator == 'Last') {
+            $timeUnit = substr($this->value, -1);
+            if($timeUnit == 'Y' || $timeUnit == 'M' || $timeUnit == 'W' || $timeUnit == 'D') {
+                $range = 'P' . $this->value;
+            } else if ($timeUnit == 'm') {
+                $range = 'PT' . substr($this->value, 0, -1) . 'M';
+            } else {
+                $range = 'PT' . $this->value;
+            }
+            $dateLast = new \DateTime('now');
+            $dateLast->sub(new \DateInterval($range));
+        }
         switch($this->logic_operator)
         {
             case 'OR':
-                $collection->orWhere([$this->operator, $this->column, $this->value]);
+                $this->operator == 'Last' ? $collection->orWhere(['>=', $this->column, $dateLast->format('Y-m-d H:i:s')]) : $collection->orWhere([$this->operator, $this->column, $this->value.':00']);
                 break;
             case 'AND':
             default:
-                $collection->andWhere([$this->operator, $this->column, $this->value]);
+                $this->operator == 'Last' ? $collection->andWhere(['>=', $this->column, $dateLast->format('Y-m-d H:i:s')]) : $collection->andWhere([$this->operator, $this->column, $this->value.':00']);
                 break;
         }
     }

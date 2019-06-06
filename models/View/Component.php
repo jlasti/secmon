@@ -38,7 +38,10 @@ class Component extends \yii\db\ActiveRecord
         return [
             [['view_id'], 'required'],
             [['view_id', 'filter_id', 'order'], 'integer'],
-            [['config', 'data_type', 'data_param'], 'string'],
+            [['config', 'data_type'], 'string'],
+            [['data_param'], 'match', 'pattern' => '/^\d{1,5}[YMWDHmS]{1}$/', 'when' => function () {
+                return $this->data_type == 'barChart';
+            }, 'message' => 'Enter valid format(nY/nM/nW/nD/nH/nm/nS)!'],
             [['filter_id'], 'exist', 'skipOnError' => true, 'targetClass' => Filter::className(), 'targetAttribute' => ['filter_id' => 'id']],
             [['view_id'], 'exist', 'skipOnError' => true, 'targetClass' => View::className(), 'targetAttribute' => ['view_id' => 'id']],
         ];

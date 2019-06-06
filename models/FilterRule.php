@@ -101,7 +101,8 @@ class FilterRule extends \yii\db\ActiveRecord
             $types = self::types();
             self::$_typesDropdown = array_combine(
                 array_map(function($type) { return $type->type(); }, $types),
-                array_map(function($type) { return $type->title(); }, $types));
+                array_map(function($type) { return $type->title(); }, $types)
+            );
         }
 
         return self::$_typesDropdown;
