@@ -7,16 +7,15 @@ use macgyer\yii2materializecss\widgets\grid\GridView;
 /* @var $searchModel app\models\SecRule\SecRuleSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->params['title'] = 'Correlation Rules';
+$this->params['title'] = 'Normalization Rules';
 ?>
-<div class="sec-rule-index">
 
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+<div class="normalization-rule-index">
 
     <div class="main-actions centered-horizontal">
-        <?= Html::a("<i class='material-icons'>add</i>" . Yii::t('app', 'Create Correlation Rule'), ['create'], ['class' => 'btn-floating waves-effect waves-light btn-large red']) ?>
+        <?= Html::a("<i class='material-icons'>add</i>" . Yii::t('app', 'Create Normalization Rule'), ['create'], ['class' => 'btn-floating waves-effect waves-light btn-large red']) ?>
     </div>
-    
+
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,

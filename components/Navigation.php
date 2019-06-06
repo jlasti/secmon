@@ -48,12 +48,20 @@ class Navigation extends \yii\base\Component
 				'icon' => ''
 	        ],
 	        [
-				'label' => 'Sec Rules',
+				'label' => 'Correlation Rules',
 				'url' => ['/sec-rule'],
 				'visible' => Yii::$app->user->identity->can('create_users'),
 				'active' => 'sec-rule',
 				'icon' => 'receipt'
 	        ],
+            [
+                'label' => 'Normalization Rules',
+                'url' => ['/normalization-rule'],
+                'visible' => Yii::$app->user->identity->can('create_users'),
+                'active' => 'normalization-rule',
+                'icon' => 'receipt'
+
+            ],
 	        [
 				'label' => 'Users',
 				'url' => ['/user'],

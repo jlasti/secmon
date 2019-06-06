@@ -54,6 +54,7 @@ class CorrelatorController extends Controller
 
 			foreach($streams as $file => $stream)
 			{
+
 				if(!array_key_exists($file, $streamPosition))
 				{
 					$pathToFile = $logPath . "/" . $file;
@@ -63,6 +64,7 @@ class CorrelatorController extends Controller
 				usleep(300000); // nutne kvoli vytazeniu CPU
 				clearstatcache(false, $logPath . "/" . $file);
 				fseek($stream, $streamPosition[$file]);
+
 				while(($line = fgets($stream)) != FALSE)
 				{
 					if(!empty($line))
@@ -103,7 +105,8 @@ class CorrelatorController extends Controller
 		}
 	}
 
-	function openStreams(&$streams, $path, $exclude = [])
+
+    function openStreams(&$streams, $path, $exclude = [])
 	{
 		$files = scandir($path);
 
@@ -116,6 +119,11 @@ class CorrelatorController extends Controller
 				continue;
 			}
 
+			if(is_dir($fullPath))
+            {
+			    $this->getFilesFromSubDirectory($fullPath, $file, $streams);
+			    continue;
+            }
 			
 			if(array_key_exists($file, $streams))
 			{
@@ -134,6 +142,39 @@ class CorrelatorController extends Controller
 			$streams[$file] = $stream;
 		}
 	}
+
+	function getFilesFromSubDirectory($dirPath, $dirName, &$streams)
+    {
+
+        $files = scandir($dirPath);
+
+        foreach($files as $file)
+
+        {
+            $fullPath = $dirPath . '/' . $file;
+            $index = $dirName . '/' . $file;
+
+            if($file != "messages" && $file != 'secure')
+            {
+                continue;
+            }
+
+            if(array_key_exists($index, $streams))
+            {
+                continue;
+            }
+
+            $stream = $this->openNonBlockingStream($fullPath);
+
+            if($stream == null)
+            {
+                echo 'Cannot open file ' . $fullPath . PHP_EOL;
+                continue;
+            }
+
+            $streams[$index] = $stream;
+        }
+    }
 
 	function openNonBlockingStream($file)
 	{
