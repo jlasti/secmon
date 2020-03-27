@@ -21,6 +21,7 @@ class m190504_200009_create_normalization_rules extends Migration
             'id' => $this->primaryKey()->unsigned(),
             'name' => $this->string(),
             'link' => $this->string(),
+			'state' => $this->boolean(),
             'type' => $this->string(),
         ]);
     }
