@@ -24,7 +24,7 @@
         "beaten-sect0r/yii2-flatpickr": "*"
     },
     "require-dev": {
-        "yiisoft/yii2-codeception": "*",
+        "codeception/codeception": "*",
         "yiisoft/yii2-debug": "*",
         "yiisoft/yii2-gii": "*",
         "yiisoft/yii2-faker": "*",
@@ -55,5 +55,11 @@
             "npm-asset-library": "vendor/npm",
             "bower-asset-library": "vendor/bower"
         }
+    },
+    "repositories": [
+    {
+        "type": "composer",
+        "url": "https://asset-packagist.org"
     }
+    ]
 }
