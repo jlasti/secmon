@@ -32,6 +32,7 @@ abstract class BaseEvent extends \yii\db\ActiveRecord
         {
             $res[$key] = $labels[$key];
         }
+        natcasesort($res);
         return $res;
     }
 

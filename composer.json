@@ -29,9 +29,10 @@
         "ext-pgsql": "*",
         "ext-json": "*",
         "geoip2/geoip2": "~2.0"
+        "beaten-sect0r/yii2-flatpickr": "*"
     },
     "require-dev": {
-        "yiisoft/yii2-codeception": "*",
+        "codeception/codeception": "*",
         "yiisoft/yii2-debug": "*",
         "yiisoft/yii2-gii": "*",
         "yiisoft/yii2-faker": "*",
@@ -68,9 +69,9 @@
         }
     },
     "repositories": [
-      {
+    {
         "type": "composer",
         "url": "https://asset-packagist.org"
-      }
+    }
     ]
 }

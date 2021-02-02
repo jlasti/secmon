@@ -1,0 +1,31 @@
+# ==================================
+# === BEGIN - root login detection ===
+# ==================================
+
+type=Single
+ptype=RegExp
+continue=dontcont
+pattern=(\d+):\w{3} [\s\d]\d [\d:]+ (\S+).*Sucess login.*src=([\d.]+).*dpt=(\d+).*duser=root
+varmap=id=1; host=2; ip=3; dpt=4;
+desc=root login from $+{ip}
+action=write /var/www/develop/__secInput $+{host} CEF:0|SECMON|sshd|ver|0|root login|0|src=$+{ip} dpt=$+{dpt}
+
+# === END - root login detection ===
+
+
+
+# ==================================
+# === BEGIN - Bruteforce attack detection ===
+# ==================================
+
+type=SingleWithThreshold
+ptype=RegExp
+pattern=(\d+):\w{3} [\s\d]\d [\d:]+ (\S+).*Wrong password.*src=([\d.]+).*dpt=(\d+).*duser=(\S+)
+varmap=id=1; host=2; ip=3; dpt=4; duser=5;
+desc=Possible brute force attack (ssh) user $+{duser} from $+{ip}
+window=60
+thresh=5
+context=!SSH_BRUTE_FROM_$+{ip}
+action=create SSH_BRUTE_FROM_$+{ip} 600; write /var/www/develop/__secInput $+{host} CEF:0|SECMON|sshd|ver|0|Possible brute force attack|0|src=$+{ip} dpt=$+{dpt} duser=$+{duser}
+
+# === END - Bruteforce attack detection ===

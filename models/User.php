@@ -26,8 +26,12 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 
 	const SCENARIO_CREATE = 'create';
 	const SCENARIO_UPDATE = 'update';
+	const SCENARIO_CHGPASS = 'chgPass';
 
 	public $passwordText;
+	public $passwordTextOld;
+	public $passwordTextNew;
+	public $passwordTextNew2;
 	public $rolesList;
 
     /**
@@ -45,9 +49,10 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     {
         return [
         	[['first_name', 'last_name', 'username', 'email'], 'required', 'on' => [static::SCENARIO_CREATE, static::SCENARIO_UPDATE]],
-			['email', 'email'],
-			['passwordText', 'required', 'on' => static::SCENARIO_CREATE],
-			['passwordText', 'string', 'min' => 6],
+			['email', 'email', 'on' => [static::SCENARIO_CREATE, static::SCENARIO_UPDATE]],
+            ['passwordText', 'required', 'on' => static::SCENARIO_CREATE],
+            [['passwordTextOld','passwordTextNew','passwordTextNew2'], 'required', 'on' => static::SCENARIO_CHGPASS],
+            [['passwordText','passwordTextOld','passwordTextNew','passwordTextNew2'], 'string', 'min' => 6],
             [['first_name', 'last_name', 'username', 'password', 'email', 'auth_key'], 'string', 'max' => 255],
         ];
     }
@@ -63,7 +68,10 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             'last_name' => Yii::t('app', 'Last Name'),
             'username' => Yii::t('app', 'Username'),
             'password' => Yii::t('app', 'Password'),
-			'passwordText' => Yii::t('app', 'Password'),
+            'passwordText' => Yii::t('app', 'Password'),
+            'passwordTextOld' => Yii::t('app', 'Old password'),
+            'passwordTextNew' => Yii::t('app', 'New password'),
+            'passwordTextNew2' => Yii::t('app', 'New password again'),
             'email' => Yii::t('app', 'Email'),
             'auth_key' => Yii::t('app', 'Auth Key'),
         ];

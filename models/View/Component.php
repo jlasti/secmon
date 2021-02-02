@@ -14,6 +14,8 @@ use app\models\View;
  * @property integer $filter_id
  * @property string $config
  * @property integer $order
+ * @property string $data_type
+ * @property string $data_param
  *
  * @property Filter $filter
  * @property View $view
@@ -36,7 +38,10 @@ class Component extends \yii\db\ActiveRecord
         return [
             [['view_id'], 'required'],
             [['view_id', 'filter_id', 'order'], 'integer'],
-            [['config'], 'string'],
+            [['config', 'data_type'], 'string'],
+            [['data_param'], 'match', 'pattern' => '/^\d{1,5}[YMWDHmS]{1}$/', 'when' => function () {
+                return $this->data_type == 'barChart';
+            }, 'message' => 'Enter valid format(nY/nM/nW/nD/nH/nm/nS)!'],
             [['filter_id'], 'exist', 'skipOnError' => true, 'targetClass' => Filter::className(), 'targetAttribute' => ['filter_id' => 'id']],
             [['view_id'], 'exist', 'skipOnError' => true, 'targetClass' => View::className(), 'targetAttribute' => ['view_id' => 'id']],
         ];
@@ -52,7 +57,9 @@ class Component extends \yii\db\ActiveRecord
             'view_id' => Yii::t('app', 'View ID'),
             'filter_id' => Yii::t('app', 'Filter ID'),
             'config' => Yii::t('app', 'Config'),
-            'order' => Yii::t('app', 'Order')
+            'order' => Yii::t('app', 'Order'),
+            'data_type' => Yii::t('app', 'Content Type'),
+            'data_param' => Yii::t('app', 'Content Type Parameters')
         ];
     }
 

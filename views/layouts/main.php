@@ -5,6 +5,7 @@
 
 use macgyer\yii2materializecss\lib\Html;
 use app\assets\AppAsset;
+use yii\helpers\Url;
 
 AppAsset::register($this);
 
@@ -39,8 +40,8 @@ $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 
 <header>
 	<?php if(!$isGuest): ?>
-		<a href="#" class="compact-button preload">
-			<i class="material-icons waves-effect">keyboard_arrow_left</i>
+		<a href="#" class="compact-button waves-effect preload">
+			<i class="material-icons">keyboard_arrow_left</i>
 		</a>
 	<?php endif; ?>
 	<nav class="top-nav light-blue accent-4">
@@ -63,8 +64,10 @@ $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 				    <div class="background">
 				        <?=Html::img('@web/images/menu.png');?>
 			      	</div>
-				    <a><span class="white-text name"><?= $user->username . ' (' . $userRole . ')' ?></span></a>
-				    <a><span class="white-text email"><?= $user->email; ?></span></a>
+				    <a class="white-text profile-btn" href="<?= Url::toRoute('user/profile') ?>">
+                        <span class="name"><?= $user->username . ' (' . $userRole . ')' ?></span>
+                        <span class="email"><?= $user->email; ?></span>
+                    </a>
 					<?php
 						printf("<span>%s</span>", Html::beginForm(['/site/logout'], 'post')
 								. Html::submitButton(

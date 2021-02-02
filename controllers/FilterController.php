@@ -188,38 +188,42 @@ class FilterController extends Controller
             }
 
             $component->filter_id = $filterId;
+            $component->data_type = $contentTypeId;
+            $component->data_param = $dataTypeParameter;
             $component->update();
 
             switch ($contentTypeId) {
-                case "lineChart":
-                    //$filteredData = $this->getFilteredEventsBarGraph($filter->id);
+                case "pieChart":
                     return [
-                      'contentTypeId' => $contentTypeId,
-                      'dataTypeParameter' => $dataTypeParameter,
-                      'data' => Json::encode($this->getFilteredEventsBarGraph($filter->id, $dataTypeParameter))
+                        'contentTypeId' => $contentTypeId,
+                        'dataTypeParameter' => $dataTypeParameter,
+                        'data' => Json::encode($this->getFilteredEventsPieGraph($filter->id, $dataTypeParameter))
                     ];
                     break;
                 case "barChart":
-                    //$filteredData = $this->getFilteredEventsBarGraph($filter->id);
                     return [
-                      'contentTypeId' => $contentTypeId,
-                      'dataTypeParameter' => $dataTypeParameter,
-                      'data' => Json::encode($filteredData = $this->getFilteredEventsBarGraph($filter->id))
+                        'contentTypeId' => $contentTypeId,
+                        'dataTypeParameter' => $dataTypeParameter,
+                        'data' => Json::encode($this->getFilteredEventsBarGraph($filter->id, $dataTypeParameter))
                     ];
                     break;
                 case "table":
                     unset($filteredData);
-                    $filteredData = $this->getFilteredEvents($filter->id);
+                    $filteredData = $this->getFilteredEvents($filter->id, 1);
+                    $pages = $this->getFilteredEventsCount($filter->id);
 
-                    if (!empty($dataTypeParameter))
+                    if (!empty($dataTypeParameter)) {
                         $columns = explode(',', $dataTypeParameter);
+                        $columns = array_merge(['id'], $columns);
+                    }
                     else
-                        $columns = ['datetime', 'host', 'protocol'];
+                        $columns = ['id', 'datetime', 'host', 'protocol'];
 
                     return [
-                      'contentTypeId' => $contentTypeId,
-                      'dataTypeParameter' => $dataTypeParameter,
-                      'html' => \app\widgets\FilterWidget::widget(['data' => compact('component', 'filter', 'filteredData', 'columns')])
+                        'contentTypeId' => $contentTypeId,
+                        'dataTypeParameter' => $dataTypeParameter,
+                        'paging' => $pages,
+                        'html' => \app\widgets\FilterWidget::widget(['data' => compact('component', 'filter', 'filteredData', 'columns')])
                     ];
                     break;
             }
@@ -227,7 +231,7 @@ class FilterController extends Controller
         else return null;
     }
 
-    public function actionGetComponentContent($componentId)
+    public function actionGetComponentContent($componentId, $pagination)
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $loggedUserId = Yii::$app->user->getId();
@@ -239,39 +243,41 @@ class FilterController extends Controller
 
         if ( !empty($component) )
         {
-            $contentTypeId =  Json::decode($component->config)['dataType'];
-            $dataTypeParameter =  Json::decode($component->config)['dataTypeParameter'] ?? "";
+            $contentTypeId =  $component->data_type;
+            $dataTypeParameter =  $component->data_param ?? "";
 
             switch ($contentTypeId) {
-                case "lineChart":
-                    //$filteredData = $this->getFilteredEventsBarGraph($filter->id);
+                case "pieChart":
+                    return [
+                      'contentTypeId' => $contentTypeId,
+                      'dataTypeParameter' => $dataTypeParameter,
+                      'data' => Json::encode($this->getFilteredEventsPieGraph($filter->id, $dataTypeParameter))
+                    ];
+                    break;
+                case "barChart":
                     return [
                       'contentTypeId' => $contentTypeId,
                       'dataTypeParameter' => $dataTypeParameter,
                       'data' => Json::encode($this->getFilteredEventsBarGraph($filter->id, $dataTypeParameter))
                     ];
                     break;
-                case "barChart":
-                    //$filteredData = $this->getFilteredEventsBarGraph($filter->id);
-                    return [
-                      'contentTypeId' => $contentTypeId,
-                      'dataTypeParameter' => $dataTypeParameter,
-                      'data' => Json::encode($this->getFilteredEventsBarGraph($filter->id))
-                    ];
-                    break;
                 case "table":
                     unset($filteredData);
-                    $filteredData = $this->getFilteredEvents($filter->id);
+                    $filteredData = $this->getFilteredEvents($filter->id, $pagination);
+                    $pages = $this->getFilteredEventsCount($filter->id);
 
-                    if (!empty($dataTypeParameter))
+                    if (!empty($dataTypeParameter)) {
                         $columns = explode(',', $dataTypeParameter);
+                        $columns = array_merge(['id'], $columns);
+                    }
                     else
-                        $columns = ['datetime', 'host', 'protocol'];
+                        $columns = ['id', 'datetime', 'host', 'protocol'];
 
                     return [
-                      'contentTypeId' => $contentTypeId,
-                      'dataTypeParameter' => $dataTypeParameter,
-                      'html' => \app\widgets\FilterWidget::widget(['data' => compact('component', 'filter', 'filteredData', 'columns')])
+                        'contentTypeId' => $contentTypeId,
+                        'dataTypeParameter' => $dataTypeParameter,
+                        'paging' => $pages,
+                        'html' => \app\widgets\FilterWidget::widget(['data' => compact('filteredData', 'columns')])
                     ];
                     break;
             }
@@ -302,21 +308,39 @@ class FilterController extends Controller
 
     public function actionGetFilteredEvents($filterId)
     {
-        return Json::encode($this->getFilteredEvents($filterId));
+        return Json::encode($this->getFilteredEvents($filterId, 1));
     }
 
-    protected function getFilteredEvents($filterId)
+    protected function getFilteredEvents($filterId, $page)
     {
         unset($filteredData);
         $query = EventsNormalized::find();
+        $page -= 1;
 
         $filter = $this->findModel($filterId);
         $filteredData = $query
                         ->applyFilter($filter)
                         ->orderBy([ 'datetime' => SORT_DESC, 'id' => SORT_DESC ])
                         ->limit(10)
+                        ->offset(10 * $page)
                         ->all();
-        // $filteredData = array_splice($filteredData, 0, 10);
+
+        Yii::$app->cache->flush();
+
+        return $filteredData;
+    }
+
+    protected function getFilteredEventsCount($filterId)
+    {
+        unset($filteredData);
+        $query = EventsNormalized::find();
+
+        $filter = $this->findModel($filterId);
+
+        $query->select(["count(*) as count"])
+            ->applyFilter($filter);
+
+        $filteredData = $query->asArray()->all();
 
         Yii::$app->cache->flush();
 
@@ -328,41 +352,93 @@ class FilterController extends Controller
         return Json::encode($this->getFilteredEventsBarGraph($filterId));
     }
 
+    protected function getFilteredEventsPieGraph($filterId, $dataTypeParameter) {
+        unset($filteredData);
+        unset($graphData);
+
+        $filter = $this->findModel($filterId);
+
+        $query = EventsNormalized::find();
+        $label = "CAST(" . $dataTypeParameter . " AS text) as label";
+        $value = "count(" . $dataTypeParameter . ") as count";
+        $query->select([$label, $value])
+            ->groupby(["label"])
+            ->orderBy(['label' => SORT_ASC])
+            ->applyFilter($filter);
+
+        $filteredData = $query->asArray()->all();
+        Yii::$app->cache->flush();
+
+        return $filteredData;
+    }
+
     protected function getFilteredEventsBarGraph($filterId, $dataTypeParameter = null)
     {
-      unset($filteredData);
-      unset($graphData);
-      $range = 'P1D';
+        unset($filteredData);
+        unset($graphData);
+        $range = 'P1D';
 
-      if (!empty($dataTypeParameter)) $range = $dataTypeParameter;
+        if (!empty($dataTypeParameter)) {
+            $timeUnit = substr($dataTypeParameter, -1);
+            if($timeUnit == 'Y' || $timeUnit == 'M' || $timeUnit == 'W' || $timeUnit == 'D') {
+                $range = 'P' . $dataTypeParameter;
+            } else if ($timeUnit == 'm') {
+                $range = 'PT' . substr($dataTypeParameter, 0, -1) . 'M';
+            } else {
+                $range = 'PT' . $dataTypeParameter;
+            }
+        }
 
+        $dt = new \DateTime();
+        $dt->setTimezone(new \DateTimeZone('Europe/Bratislava'));
+        $dt->sub(new \DateInterval($range));
+        $date = date_format($dt,"Y-m-d H:i:s");
 
-      $date = new \DateTime();
-      $date->setTimezone(new \DateTimeZone('Europe/Bratislava'));
-      $date->sub(new \DateInterval($range));
-      $date = date_format($date,"Y-m-d H:i:s");
+        $filter = $this->findModel($filterId);
 
-      $query = EventsNormalized::find();
-      $filter = $this->findModel($filterId);
+        $query = EventsNormalized::find();
+        $query->select(["to_char(datetime,'YYYY-DD-MM HH24:00') as x", "count(to_char(datetime,'HH24 MM-DD-YYYY')) as y"])
+            ->groupBy(["x"])
+            ->orderBy([ 'x' => SORT_ASC ])
+            ->applyFilter($filter)
+            ->andWhere(['>', "datetime", $date]);
 
-      $filteredData = $query->select([new \yii\db\Expression("to_char(datetime,'HH24 MM-DD') as x"), new \yii\db\Expression("count(to_char(datetime,'HH24 MM-DD-YYYY')) as y")])
-                            ->applyFilter($filter)
-                            ->andWhere(['>', "CAST(datetime AS date)", $date])
-                            ->groupBy([new \yii\db\Expression("x")])
-                            ->orderBy([ 'x' => SORT_ASC ])
-                            ->all();
+        $filteredData = $query->asArray()->all();
+        Yii::$app->cache->flush();
+        $graphData = array();
 
-      Yii::$app->cache->flush();
+        $now = new \DateTime();
+        $i = 0;
+        while ($dt <= $now)
+        {
+            $str = date_format($dt, 'Y-d-m H:00');
+            $formatted = date_format($dt, 'H:00 m-d');
 
-      $graphData = array();
+            if (count($filteredData) > 0 and strcmp($str, $filteredData[$i]['x']) === 0) {
+                $graphData[] = ['x' => $formatted, 'y' => intval($filteredData[$i]['y'])];
+                $i++;
+            }
+            else {
+                $graphData[] = ['x' => $formatted, 'y' => 0];
+            }
 
-      foreach ($filteredData as $key => $value) {
-          $graphData[] = [ 'x' => $value['x'], 'y' => intval($value['y']) ];
-      }
+            $dt->add(new \DateInterval('PT1H'));
+        }
 
-      unset($filteredData);
+        unset($filteredData);
 
-      return $graphData;
+        return $graphData;
+    }
+
+    protected function checkFilterForDateRule($filter){
+        $rules = $filter->getRules()->all();
+
+        foreach ($rules as $key => $value) {
+            $attributes = $value->getAttributes();
+            if ($attributes['type'] == 'date') return true;
+        }
+
+        return false;
     }
 
     /**

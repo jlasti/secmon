@@ -1,5 +1,30 @@
 var newFilterTemplate = $('.rule').eq(0).clone();
 
+function OnOperatorChanged(element) {
+	var index = $(element).attr('data-rule-operator');
+	var newOperator = $(element).val();
+	var rule = $('#rules').find('*[data-rule=\'' + index + '\']');
+	if(rule.length > 0) {
+		rule.find('*[data-type=\'date\']').each(function(i, e) {
+			if(!$(e).hasClass('hide') && $(e).find('.flatpickr').length > 0) {
+				if(newOperator !== 'Last') {
+					$($(e).find('input')[0]).attr('placeholder', 'YYYY-MM-DD HH:mm');
+					flatpickr($(e).find('input')[0], {
+						enableTime: true,
+						allowInput: false,
+						time_24hr: true,
+					});
+				} else if($(e).find('.flatpickr-input').length > 0){
+					$(e).find('input')[0].flatpickr().destroy();
+					$($(e).find('input')[0]).attr('placeholder', 'nY/nM/nW/nD/nH/nm/nS');
+				}
+			}
+		});
+	} else {
+		console.log('Failed to find rule element!');
+	}
+}
+
 function OnFilterTypeChanged(element) {
 	var select = $(element);
 	var index = select.attr('data-rule-type');
@@ -40,7 +65,7 @@ function OnFilterTypeChanged(element) {
 						input.removeAttr('disabled');
 					}
 					else{
-						input.attr('disabled', 'disalbed');
+						input.attr('disabled', 'disabled');
 					}
 				});
             }
@@ -127,6 +152,9 @@ function changeRuleIndex(ruleElement, newIndex, removeId) {
 		el.prop('id', el.prop('id').replace('-'+ oldIndex +'-', '-' + newIndex + '-'));
 	});
 	element.find('a[data-rule-remove]').attr('data-rule-remove', removeId).attr('data-rule-index', newIndex);
+	element.find('select[data-rule-operator]').each(function(i ,e) {
+		$(e).attr('data-rule-operator', newIndex);
+	});
     element.find('select[data-rule-type]').each(function(i, e) {
         $(e).attr('data-rule-type', newIndex);
     });
@@ -168,6 +196,10 @@ $(document).ready(function () {
             OnColumnChanged(e);
         });
 
+        newElement.find('select[data-rule-operator]').each(function(i ,e) {
+        	$(e).on('change', function() { OnOperatorChanged(e); });
+		});
+
 		activateDatePicker(newElement);
 	});
 
@@ -180,4 +212,8 @@ $(document).ready(function () {
 		$(e).on('change', function() { OnColumnChanged(e); });
 		OnColumnChanged(e);
 	});
+
+	$('#rules').find('select[data-rule-operator]').each(function(i ,e) {
+		$(e).on('change', function() {OnOperatorChanged(e); });
+	})
 });
