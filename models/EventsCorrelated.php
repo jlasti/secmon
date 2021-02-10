@@ -41,8 +41,8 @@ class EventsCorrelated extends BaseEvent
             [['cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_event_class_id', 'cef_name', 'cef_severity', 'parent_events'], 'required'],
             [['cef_event_class_id', 'cef_severity'], 'integer'],
             [['raw'], 'string'],
-            /* TODO asi odkomentovat [['host', 'cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_name', 'parent_events', 'attack_type'], 'string', 'max' => 255], */
-            [['host', 'cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_name', 'parent_events'], 'string', 'max' => 255],
+            [['host', 'cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_name', 'parent_events', 'attack_type'], 'string', 'max' => 255],
+            /* TODO otestovat a tento riadok vymazat [['host', 'cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_name', 'parent_events'], 'string', 'max' => 255], */
         ];
     }
 
