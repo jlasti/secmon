@@ -71,6 +71,8 @@ class Normalized extends Event
 		$event->src_port = $values['spt'] ?? "";
 		$event->dst_port = $values['dpt'] ?? "";
 		$event->protocol = $values['proto'] ?? $values['app'] ?? "";
+		$event->request_url = $values['request'] ?? "";
+                $event->request_client_application = $values['requestClientApplication'] ?? "";
 		$event->raw = $raw;
 
 		self::setEventLoc($event);
