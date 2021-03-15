@@ -44,6 +44,10 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'dst_mac')->textInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model, 'request_url')->textarea(['rows' => 6]) ?>
+
+    <?= $form->field($model, 'request_client_application')->textarea(['rows' => 6]) ?>
+
     <?= $form->field($model, 'extensions')->textarea(['rows' => 6]) ?>
 
     <?= $form->field($model, 'raw')->textarea(['rows' => 6]) ?>
