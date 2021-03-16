@@ -66,9 +66,9 @@ class NormalizationRule extends \yii\db\ActiveRecord
         if($this->save())
         {
             if($this->state)
-                $files = scandir("/var/www/secmon/rules/active/normalization");
+                $files = scandir("/var/www/html/secmon/rules/active/normalization");
             else
-                $files = scandir("/var/www/secmon/rules/available/normalization");
+                $files = scandir("/var/www/html/secmon/rules/available/normalization");
 
             $fileExists = 0;
 
@@ -112,24 +112,24 @@ class NormalizationRule extends \yii\db\ActiveRecord
         $fileExists = 0;
 
         if($this->state) {
-            $this->link = '/var/www/secmon/rules/active/normalization' . '/' . $fileName;
-            $files = scandir('/var/www/secmon/rules/active/normalization');
+            $this->link = '/var/www/html/secmon/rules/active/normalization' . '/' . $fileName;
+            $files = scandir('/var/www/html/secmon/rules/active/normalization');
             foreach ($files as $file){
                 if($file == $fileName)
                     $fileExists = 1;
             }
             if(!$fileExists)
-                exec("mv /var/www/secmon/rules/available/normalization/'$fileName' /var/www/secmon/rules/active/normalization/'$fileName'");
+                exec("mv /var/www/html/secmon/rules/default/normalization/'$fileName' /var/www/html/secmon/rules/active/normalization/'$fileName'");
         }
         else {
-            $this->link = '/var/www/secmon/rules/available/normalization' . '/' . $fileName;
-            $files = scandir('/var/www/secmon/rules/available/normalization');
+            $this->link = '/var/www/html/secmon/rules/default/normalization' . '/' . $fileName;
+            $files = scandir('/var/www/html/secmon/rules/default/normalization');
             foreach ($files as $file){
                 if($file == $fileName)
                     $fileExists = 1;
             }
             if(!$fileExists)
-                exec("mv /var/www/secmon/rules/active/normalization/'$fileName' /var/www/secmon/rules/available/normalization/'$fileName'");
+                exec("mv /var/www/html/secmon/rules/active/normalization/'$fileName' /var/www/html/secmon/rules/default/normalization/'$fileName'");
         }
     }
 }
