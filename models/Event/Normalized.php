@@ -61,7 +61,23 @@ class Normalized extends Event
 			{
 				break;
 			}
-            $values[$tmp[0]] = isset($tmp[1]) ? $tmp[1] : "";
+            		$values[$tmp[0]] = isset($tmp[1]) ? $tmp[1] : "";
+		}
+		
+		//nevyhnutne dva if-y, lebo delimiter " " a "=" kazia vstup do atributov request_url a request_client_application
+		if(preg_match('/request=/', $data)){
+			$start_pos = strpos($data, 'request=');
+			$start_pos += strlen('request=');
+			$end_pos = strpos($data, ' ', $start_pos);
+			$length = $end_pos - $start_pos;
+			$request_url = substr($data, $start_pos, $length);
+		}
+		if(preg_match('/requestClientApplication=/', $data)){
+			$start_pos = strpos($data, 'requestClientApplication=');
+			$start_pos += strlen('requestClientApplication=');
+			$end_pos = strpos($data, ' rawEvent=', $start_pos);
+			$length = $end_pos - $start_pos;
+			$request_client_application = substr($data, $start_pos, $length);
 		}
 
 		$event->src_ip = $values['src'] ?? "";
@@ -71,8 +87,8 @@ class Normalized extends Event
 		$event->src_port = $values['spt'] ?? "";
 		$event->dst_port = $values['dpt'] ?? "";
 		$event->protocol = $values['proto'] ?? $values['app'] ?? "";
-		$event->request_url = $values['request'] ?? "";
-                $event->request_client_application = $values['requestClientApplication'] ?? "";
+		$event->request_url = $request_url ?? "";
+		$event->request_client_application = $request_client_application ?? "";
 		$event->raw = $raw;
 
 		self::setEventLoc($event);
