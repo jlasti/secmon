@@ -5,6 +5,7 @@ use app\models\Event;
 use GeoIp2\Database\Reader;
 use GeoIp2\Exception\AddressNotFoundException;
 use MaxMind\Db\Reader\InvalidDatabaseException;
+use app\commands\SeverityCalculator;
 
 class Normalized extends Event
 {
@@ -74,6 +75,8 @@ class Normalized extends Event
 		$event->raw = $raw;
 
 		self::setEventLoc($event);
+
+		$event->cef_severity = SeverityCalculator::calculateSeverity($event);
 
 		return $event;
 	}

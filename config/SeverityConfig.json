@@ -1,0 +1,18 @@
+{
+  "active": false,
+  "exceptions": [
+    {
+      "exception": [
+        {
+          "name": "cef_name",
+          "value": "Sucess login"
+        },
+        {
+          "name": "host",
+          "value": "centos7"
+        }
+      ],
+      "severity": "0"
+    }
+  ]
+}

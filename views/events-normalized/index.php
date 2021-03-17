@@ -3,6 +3,7 @@
 use macgyer\yii2materializecss\widgets\grid\GridView;
 use yii\widgets\Pjax;
 use kartik\cmenu\ContextMenu;
+use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\EventsNormalizedSearch */
@@ -24,7 +25,6 @@ $this->registerJs('
             });
     }, 5000);
 ');
-
 ?>
 <div class="events-normalized-index clickable-table">
     <?php Pjax::begin(['id' => 'pjaxContainer']); ?>
@@ -54,7 +54,31 @@ $this->registerJs('
                     ],
                     'host',
                     'cef_name',
-                    'cef_severity',
+                    #'cef_severity',
+                    [
+                        'attribute' => 'cef_severity',
+                        'value' => 'cef_severity',
+                        'contentOptions' => function ($dataProvider, $key, $index, $column) {
+                            $array = [
+                                ['id' => '1', 'data' => '#00FF00'],
+                                ['id' => '2', 'data' => '#00FF00'],
+                                ['id' => '3', 'data' => '#FFFF00'],
+                                ['id' => '4', 'data' => '#FFFF00'],
+                                ['id' => '5', 'data' => '#CC5500'],
+                                ['id' => '6', 'data' => '#CC5500'],
+                                ['id' => '7', 'data' => '#FF6060'],
+                                ['id' => '8', 'data' => '#FF6060'],
+                                ['id' => '9', 'data' => '#FF0000'],
+                                ['id' => '10', 'data' => '#FF0000'],
+                            ];
+                            if (0 < $dataProvider->cef_severity && $dataProvider->cef_severity < 11){
+                                $map = ArrayHelper::map($array, 'id', 'data');
+                                return ['style' => 'background-color:'.$map[$dataProvider->cef_severity]];
+                            } else {
+                                return ['style' => 'background-color:#FFFFFF'];
+                            }
+                        }
+                    ],
                     'src_ip',
                     'dst_ip',
                     'protocol',
