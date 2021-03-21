@@ -50,6 +50,7 @@ $this->params['title'] = 'Normalized Event ID: ' . $model->id;
             'dst_latitude' ,
             'src_longitude',
 	    'dst_longitude',
+	    'request_method',
 	    'request_url:ntext',
 	    'request_client_request:ntext',
             'extensions:ntext',

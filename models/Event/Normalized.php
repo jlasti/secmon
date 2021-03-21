@@ -78,7 +78,7 @@ class Normalized extends Event
 			$end_pos = strpos($data, ' rawEvent=', $start_pos);
 			$length = $end_pos - $start_pos;
 			$request_client_application = substr($data, $start_pos, $length);
-		}
+		}	
 
 		$event->src_ip = $values['src'] ?? "";
 		$event->dst_ip = $values['dst'] ?? "";
@@ -87,6 +87,7 @@ class Normalized extends Event
 		$event->src_port = $values['spt'] ?? "";
 		$event->dst_port = $values['dpt'] ?? "";
 		$event->protocol = $values['proto'] ?? $values['app'] ?? "";
+		$event->request_method = $values['request_method'] ?? "";
 		$event->request_url = $request_url ?? "";
 		$event->request_client_application = $request_client_application ?? "";
 		$event->raw = $raw;
