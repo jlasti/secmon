@@ -13,7 +13,7 @@ import math
 from backports import configparser
 
 config = configparser.ConfigParser()
-config.read('/var/www/secmon/config/anomaly_config.ini')
+config.read('/var/www/html/secmon/config/anomaly_config.ini')
 
 # Bauckhage C. Numpy/scipy Recipes for Data Science: k-Medoids Clustering[R]. Technical Report, University of Bonn, 2015.
 def kMedoids(D, k, tmax=100000):
