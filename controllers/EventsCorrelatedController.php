@@ -124,7 +124,9 @@ class EventsCorrelatedController extends Controller
      */
     protected function findModel($id)
     {
-        if (($model = EventsCorrelated::findOne($id)) !== null) {
+        $secId = preg_replace('/[^0-9]/','',$id);
+
+        if (($model = EventsCorrelated::findOne($secId)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

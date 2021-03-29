@@ -54,7 +54,9 @@ class EventsClusteredRunsController extends Controller
      */
     public function actionView($id)
     {
-        return $this->redirect(['/events-clustered-clusters', 'run_id' => $id]);
+        $secId = preg_replace('/[^0-9]/','',$id);
+
+        return $this->redirect(['/events-clustered-clusters', 'run_id' => $secId]);
         /*$searchModel = new EventsClusteredClustersSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 

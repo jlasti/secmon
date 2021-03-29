@@ -58,11 +58,7 @@ class EventsClusteredClustersSearch extends EventsClusteredClusters
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'id' => $this->id,
-            'severity' => $this->severity,
-            'event_id' => $this->comment,
-            'fk_run_id' => $_GET['run_id'],
-            'number_of_events' => $this->number_of_events,
+            'fk_run_id' => preg_replace('/[^0-9]/','',$_GET['run_id']),
         ]);
         $query->orderBy(['id' => SORT_ASC]);
 
