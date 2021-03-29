@@ -18,7 +18,7 @@ class EventsClusteredClustersSearch extends EventsClusteredClusters
     {
         return [
             [['id'], 'integer'],
-            [['severity','comment','fk_run_id'], 'safe'],
+            [['severity','comment','fk_run_id','number_of_events'], 'safe'],
         ];
     }
 
@@ -62,6 +62,7 @@ class EventsClusteredClustersSearch extends EventsClusteredClusters
             'severity' => $this->severity,
             'event_id' => $this->comment,
             'fk_run_id' => $_GET['run_id'],
+            'number_of_events' => $this->number_of_events,
         ]);
         $query->orderBy(['id' => SORT_ASC]);
 

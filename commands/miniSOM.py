@@ -63,8 +63,8 @@ def insert_to_db(connection, som, originalData, trainingData):
     cursor = connection.cursor()
 
     run_sql = (
-        "INSERT INTO clustered_events_runs (datetime, type_of_algorithm)"
-        "VALUES (%s,%s) RETURNING id"
+        "INSERT INTO clustered_events_runs (datetime, type_of_algorithm, comment)"
+        "VALUES (%s,%s,%s) RETURNING id"
     )
 
     cluster_sql = (
@@ -77,20 +77,31 @@ def insert_to_db(connection, som, originalData, trainingData):
         "VALUES (%s,%s,%s)"
     )
 
-    select_severity_sql = (
-        "SELECT MAX(cef_severity) FROM events_normalized "
+    select_run_statistics_sql = (
+        "SELECT COUNT(*) FROM clustered_events_clusters "
+        "WHERE fk_run_id=%s"
+    )
+
+    update_run_statistics_sql = (
+        "UPDATE clustered_events_runs "
+        "SET number_of_clusters=%s "
+        "WHERE id=%s"
+    )
+
+    select_cluster_statistics_sql = (
+        "SELECT MAX(cef_severity), COUNT(*) FROM events_normalized "
         "LEFT JOIN clustered_events_relations " 
         "ON events_normalized.id=clustered_events_relations.fk_event_id "
         "WHERE clustered_events_relations.fk_cluster_id=%s"
     )
 
-    update_severity_sql = (
+    update_clusters_statistics_sql = (
         "UPDATE clustered_events_clusters "
-        "SET severity=%s "
+        "SET severity=%s, number_of_events=%s "
         "WHERE id=%s"   
     )
 
-    data = (datetime.datetime.now(),"miniSOM")
+    data = (datetime.datetime.now(),"miniSOM","")
 
     try:
         clusters = defaultdict(list)
@@ -112,11 +123,19 @@ def insert_to_db(connection, som, originalData, trainingData):
                 cursor.execute(relation_sql, data)
             
             data = (cluster_id,)
-            cursor.execute(select_severity_sql, data)
-            severity = cursor.fetchone()[0]
-            print(f'{cluster_id} = {severity}')
-            data = (severity, cluster_id)
-            cursor.execute(update_severity_sql, data)
+            cursor.execute(select_cluster_statistics_sql, data)
+            statistics = cursor.fetchone()
+            data = statistics + (cluster_id,)
+            print(f'{cluster_id} = {data}')
+            cursor.execute(update_clusters_statistics_sql, data)
+
+        data = (run_id,)
+        print(data)
+        cursor.execute(select_run_statistics_sql, data)
+        statistics = cursor.fetchone()[0]
+        data = (statistics, run_id)
+        print(data)
+        cursor.execute(update_run_statistics_sql, data)
             
         connection.commit()
     except Exception as e:

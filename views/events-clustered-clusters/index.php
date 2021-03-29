@@ -67,6 +67,7 @@ $this->registerJs('
                             }
                         }
                     ],
+                        'number_of_events',
                         'comment',
                         ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{update}{view}'],
                     ],

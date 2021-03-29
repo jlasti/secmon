@@ -31,8 +31,8 @@ class EventsClusteredRuns extends \yii\db\ActiveRecord
     {
         return [
             [['datetime'], 'safe'],
-            [['id'], 'integer'],
-            [['type_of_algorithm'], 'string'],
+            [['id', 'number_of_clusters'], 'integer'],
+            [['type_of_algorithm', 'comment'], 'string', 'max' => 255],
         ];
     }
 
@@ -45,6 +45,8 @@ class EventsClusteredRuns extends \yii\db\ActiveRecord
             'datetime' => [ FilterTypeEnum::DATE ],
             'id' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
             'type_of_algorithm' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'number_of_clusters' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'commnet' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
         ];
     }
 
@@ -57,6 +59,8 @@ class EventsClusteredRuns extends \yii\db\ActiveRecord
             'datetime' => 'Datetime',
             'id' => 'Cluster run',
             'type_of_algorithm' => 'Type of Algorithm',
+            'number_of_clusters' => 'Number of Clusters',
+            'comment' => 'Comment'
         ];
     }
 

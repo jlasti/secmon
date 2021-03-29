@@ -60,8 +60,10 @@ $this->registerJs('
                         ])
                     ],
                     'id',
+                    'number_of_clusters',
                     'type_of_algorithm',
-                    ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}'],
+                    'comment',
+                    ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{update}{view}'],
                 ],
             ]); ?>
     <?php Pjax::end(); ?>

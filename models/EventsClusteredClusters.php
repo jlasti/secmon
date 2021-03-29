@@ -28,7 +28,7 @@ class EventsClusteredClusters extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'fk_run_id'], 'integer'],
+            [['id', 'fk_run_id', 'number_of_events'], 'integer'],
             ['severity', 'integer', 'min' => 1, 'max' => 10],
             [['comment'], 'string'],
         ];
@@ -43,7 +43,7 @@ class EventsClusteredClusters extends \yii\db\ActiveRecord
             'id' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
             'severity' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
             'comment' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
-           # 'fk_run_id' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'number_of_events' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
         ];
     }
 
@@ -56,6 +56,7 @@ class EventsClusteredClusters extends \yii\db\ActiveRecord
             'id' => 'Cluster Id',
             'severity' => 'Cluster Severity',
             'comment' => 'Comment',
+            'number_of_events' => 'Number of Events',
         ];
     }
 

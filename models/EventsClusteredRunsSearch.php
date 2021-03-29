@@ -18,7 +18,7 @@ class EventsClusteredRunsSearch extends EventsClusteredRuns
     {
         return [
             [['id'], 'integer'],
-            [['datetime','type_of_algorithm'], 'safe'],
+            [['datetime','type_of_algorithm','number_of_clusters','comment'], 'safe'],
         ];
     }
 
@@ -60,6 +60,8 @@ class EventsClusteredRunsSearch extends EventsClusteredRuns
         $query->andFilterWhere([
             'id' => $this->id,
             'type_of_algorithm' => $this->type_of_algorithm,
+            'number_of_clusters' => $this->number_of_clusters,
+            'comment' => $this->comment,
         ]);
 
         $query->orderBy(['id' => SORT_ASC]);
