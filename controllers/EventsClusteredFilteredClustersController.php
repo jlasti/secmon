@@ -2,19 +2,18 @@
 
 namespace app\controllers;
 
-use app\models\Event\AnalyzedConfig;
+use app\models\EventsClusteredFilteredClusters;
+use app\models\EventsClusteredFilteredClustersSearch;
 use Yii;
-use app\models\EventsNormalized;
-use app\models\EventsNormalizedSearch;
-use app\models\Event\Analyzed;
+use yii\db\StaleObjectException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * EventsNormalizedController implements the CRUD actions for EventsNormalized model.
+ * EventsClusteredController implements the CRUD actions for EventsClustered model.
  */
-class EventsNormalizedController extends Controller
+class EventsClusteredFilteredClustersController extends Controller
 {
     /**
      * @inheritdoc
@@ -32,12 +31,13 @@ class EventsNormalizedController extends Controller
     }
 
     /**
-     * Lists all EventsNormalized models.
+     * Lists all EventsClustered models.
      * @return mixed
+     * @throws \yii\base\InvalidConfigException
      */
     public function actionIndex()
     {
-        $searchModel = new EventsNormalizedSearch();
+        $searchModel = new EventsClusteredFilteredClustersSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -47,25 +47,27 @@ class EventsNormalizedController extends Controller
     }
 
     /**
-     * Displays a single EventsNormalized model.
+     * Displays a single EventsClustered model.
      * @param string $id
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionView($id)
     {
-        return $this->render('view', [
+        return $this->redirect(['/events-clustered-events', 'cluster_id' => $id]);
+        /*return $this->render('view', [
             'model' => $this->findModel($id),
-        ]);
+        ]);*/
     }
 
     /**
-     * Creates a new EventsNormalized model.
+     * Creates a new EventsClustered model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new EventsNormalized();
+        $model = new EventsClusteredClusters();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -77,10 +79,11 @@ class EventsNormalizedController extends Controller
     }
 
     /**
-     * Updates an existing EventsNormalized model.
+     * Updates an existing EventsClustered model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param string $id
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
@@ -96,71 +99,34 @@ class EventsNormalizedController extends Controller
     }
 
     /**
-     * Deletes an existing EventsNormalized model.
+     * Deletes an existing EventsClustered model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param string $id
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        try {
+            $this->findModel($id)->delete();
+        } catch (StaleObjectException $e) {
+        } catch (NotFoundHttpException $e) {
+        } catch (\Throwable $e) {
+        }
 
         return $this->redirect(['index']);
-    }
-
-    // perform analyse
-    public function actionAnalyse(){
-        $params = [':id' => $_GET['id'], ':norm' => $_GET['norm']];
-
-        $event = new Analyzed();
-        $event->Analyse($params);
-
-        return $this->redirect(['/events-normalized-list/index']);
-    }
-
-    public function actionSearchclusters($id){
-        return $this->redirect(['/events-clustered-filtered-clusters', 'event_id' => $id]);
-    }
-
-    // show map
-    public function actionShow(){
-        $params = [':id' => $_GET['id']];
-
-        return $this->render('show');
-    }
-
-    // show heat map
-    public function actionAll(){
-        $params = [':id' => $_GET['id']];
-
-        $analyzedConfig = new AnalyzedConfig();
-
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
-        return json_encode($analyzedConfig->getAnalyzedCodeCount($params));
-    }
-
-    // show points map
-    public function actionPoint(){
-        $params = [':id' => $_GET['id']];
-
-        $analyzedConfig = new AnalyzedConfig();
-
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
-        return json_encode($analyzedConfig->getAnalyzedAllPoints($params));
     }
 
     /**
      * Finds the EventsNormalized model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param string $id
-     * @return EventsNormalized the loaded model
+     * @return EventsClustered the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = EventsNormalized::findOne($id)) !== null) {
+        if (($model = EventsClusteredClusters::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

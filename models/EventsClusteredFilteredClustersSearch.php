@@ -2,16 +2,14 @@
 
 namespace app\models;
 
-use yii\db\Query;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\EventsNormalized;
 
 /**
  * EventsClusteredSearch represents the model behind the search form about `app\models\EventsClustered`.
  */
-class EventsClusteredEventsSearch extends EventsClusteredEvents
+class EventsClusteredFilteredClustersSearch extends EventsClusteredFilteredClusters
 {
     /**
      * @inheritdoc
@@ -19,8 +17,8 @@ class EventsClusteredEventsSearch extends EventsClusteredEvents
     public function rules()
     {
         return [
-             [['id', 'cef_severity', 'src_port', 'dst_port'], 'integer'],
-             [['datetime', 'host', 'cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_name', 'src_ip', 'dst_ip', 'protocol', 'src_mac', 'dst_mac', 'extensions', 'raw', 'src_country', 'dst_country', 'src_city', 'dst_city', 'src_latitude', 'dst_latitude', 'src_longitude', 'dst_longitude'], 'safe'],
+            [['id'], 'integer'],
+            [['severity','comment','fk_run_id','number_of_events'], 'safe'],
         ];
     }
 
@@ -29,7 +27,7 @@ class EventsClusteredEventsSearch extends EventsClusteredEvents
      */
     public function scenarios()
     {
-        // typass scenarios() implementation in the parent class
+        // bypass scenarios() implementation in the parent class
         return Model::scenarios();
     }
 
@@ -42,8 +40,7 @@ class EventsClusteredEventsSearch extends EventsClusteredEvents
      */
     public function search($params)
     {
-
-        $query = EventsNormalized::find()->leftJoin('clustered_events_relations', 'clustered_events_relations.fk_event_id=events_normalized.id');
+        $query = EventsClusteredFilteredClusters::find()->leftJoin('clustered_events_relations', 'clustered_events_relations.fk_cluster_id=clustered_events_clusters.id');
 
         // add conditions that should always apply here
 
@@ -61,10 +58,9 @@ class EventsClusteredEventsSearch extends EventsClusteredEvents
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'fk_cluster_id'=> preg_replace('/[^0-9]/','',$_GET['cluster_id']),
+            'fk_event_id' => preg_replace('/[^0-9]/','',$_GET['event_id']),
         ]);
-
-        $query->orderBy(['datetime' => SORT_DESC]);
+        $query->orderBy(['id' => SORT_ASC]);
 
         Yii::$app->cache->flush();
 
