@@ -24,6 +24,7 @@ $this->params['title'] = 'Normalized Event ID: ' . $model->id;
             ],
         ]) ?>
 </div>
+
 <div class="events-normalized-view">
     <?= DetailView::widget([
         'model' => $model,

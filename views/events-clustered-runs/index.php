@@ -3,13 +3,13 @@
 use macgyer\yii2materializecss\widgets\grid\GridView;
 use yii\widgets\Pjax;
 use kartik\cmenu\ContextMenu;
-use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\EventsNormalizedSearch */
+/* @var $searchModel app\models\EventsClusteredRunsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->params['title'] = 'Normalized Events';
+$this->params['title'] = 'Clustered Events Runs';
 
 $this->registerJs('
     setInterval(function() {
@@ -25,7 +25,14 @@ $this->registerJs('
             });
     }, 5000);
 ');
+
 ?>
+
+<div class="main-actions centered-horizontal">
+    <?= Html::a('miniSOM', ['/events-clustered-runs/minisom'], ['class' => 'btn', 'title' => 'miniSOM', 'style' => 'border-radius: 10px']) ?>
+    <?= Html::a('k-median', ['/events-clustered-runs/kmedian'], ['class' => 'btn', 'title' => 'k-median', 'style' => ' border-radius: 10px']) ?>
+</div>
+
 <div class="events-normalized-index clickable-table">
     <?php Pjax::begin(['id' => 'pjaxContainer']); ?>
             <?= GridView::widget([
@@ -52,41 +59,8 @@ $this->registerJs('
                             ]
                         ])
                     ],
-                    'host',
-                    'cef_name',
-                    #'cef_severity',
-                    [
-                        'attribute' => 'cef_severity',
-                        'value' => 'cef_severity',
-                        'contentOptions' => function ($dataProvider, $key, $index, $column) {
-                            $array = [
-                                ['id' => '1', 'data' => '#00DBFF'],
-                                ['id' => '2', 'data' => '#00DBFF'],
-                                ['id' => '3', 'data' => '#00FF00'],
-                                ['id' => '4', 'data' => '#00FF00'],
-                                ['id' => '5', 'data' => '#FFFF00'],
-                                ['id' => '6', 'data' => '#FFFF00'],
-                                ['id' => '7', 'data' => '#CC5500'],
-                                ['id' => '8', 'data' => '#CC5500'],
-                                ['id' => '9', 'data' => '#FF0000'],
-                                ['id' => '10', 'data' => '#FF0000'],
-                            ];
-                            if (0 < $dataProvider->cef_severity && $dataProvider->cef_severity < 11){
-                                $map = ArrayHelper::map($array, 'id', 'data');
-                                return ['style' => 'background-color:'.$map[$dataProvider->cef_severity]];
-                            } else {
-                                return ['style' => 'background-color:#FFFFFF'];
-                            }
-                        }
-                    ],
-                    'src_ip',
-                    'dst_ip',
-                    'protocol',
-                    [
-                        'class' => '\dosamigos\grid\columns\BooleanColumn',
-                        'attribute' => 'analyzed',
-                        'treatEmptyAsFalse' => true
-                    ],
+                    'id',
+                    'type_of_algorithm',
                     ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}'],
                 ],
             ]); ?>

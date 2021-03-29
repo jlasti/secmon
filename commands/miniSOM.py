@@ -9,6 +9,7 @@ import pandas
 import numpy as np
 import psycopg2
 import re
+from collections import defaultdict
 from backports import configparser
 
 from sequence import pad_sequences
@@ -62,28 +63,61 @@ def insert_to_db(connection, som, originalData, trainingData):
     cursor = connection.cursor()
 
     run_sql = (
-        "INSERT INTO clustered_events_runs (datetime, type_of_algoritmus)"
+        "INSERT INTO clustered_events_runs (datetime, type_of_algorithm)"
         "VALUES (%s,%s) RETURNING id"
     )
 
     cluster_sql = (
-        "INSERT INTO clustered_events_runs_clusters (run_id, cluster_id, event_id)"
+        "INSERT INTO clustered_events_clusters (comment, fk_run_id)"
+        "VALUES (%s,%s) RETURNING id"
+    )
+
+    relation_sql = (
+        "INSERT INTO clustered_events_relations (fk_run_id, fk_cluster_id, fk_event_id)"
         "VALUES (%s,%s,%s)"
+    )
+
+    select_severity_sql = (
+        "SELECT MAX(cef_severity) FROM events_normalized "
+        "LEFT JOIN clustered_events_relations " 
+        "ON events_normalized.id=clustered_events_relations.fk_event_id "
+        "WHERE clustered_events_relations.fk_cluster_id=%s"
+    )
+
+    update_severity_sql = (
+        "UPDATE clustered_events_clusters "
+        "SET severity=%s "
+        "WHERE id=%s"   
     )
 
     data = (datetime.datetime.now(),"miniSOM")
 
     try:
+        clusters = defaultdict(list)
         cursor.execute(run_sql, data)
         run_id = cursor.fetchone()[0]
+
         for (event_id, event) in zip(dataFrameCopy["id"], padded_data):
             winnin_position = som.winner(event)
-            cluster_id = winnin_position[1] * som_shape[1] + winnin_position[0]
-            data = (run_id, cluster_id.item(), event_id)
+            key = winnin_position[1] * som_shape[1] + winnin_position[0]
+            clusters[key].append(event_id)
+        
+        for key in clusters:
+            data = ("", run_id)
             cursor.execute(cluster_sql, data)
+            cluster_id = cursor.fetchone()[0]
             
-            #print(f"Run_id = {run_id} - Cluster_id = {cluster_id}({winnin_position[0]})({winnin_position[1]}) - Event_id = {event_id}")
-         
+            for item in clusters[key]:
+                data = (run_id, cluster_id, item)
+                cursor.execute(relation_sql, data)
+            
+            data = (cluster_id,)
+            cursor.execute(select_severity_sql, data)
+            severity = cursor.fetchone()[0]
+            print(f'{cluster_id} = {severity}')
+            data = (severity, cluster_id)
+            cursor.execute(update_severity_sql, data)
+            
         connection.commit()
     except Exception as e:
         connection.rollback()
