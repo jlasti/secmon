@@ -59,7 +59,7 @@ def select_from_db(connection, sql):
     return data
 
 
-def insert_to_db(connection, som, originalData, trainingData):
+def insert_to_db(connection, som, dataFrameCopy, paddedData):
     cursor = connection.cursor()
 
     run_sql = (

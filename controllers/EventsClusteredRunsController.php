@@ -132,6 +132,14 @@ class EventsClusteredRunsController extends Controller
         return $this->redirect(['/events-clustered-runs']);
     }
 
+    public function actionKmedian()
+    {
+        $command = escapeshellcmd('/usr/bin/python3.6 /var/www/html/secmon/commands/anomaly_script.py');
+        shell_exec($command);
+
+        return $this->redirect(['/events-clustered-runs']);
+    }
+
     /**
      * Finds the EventsNormalized model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
