@@ -21,10 +21,10 @@ config = configparser.ConfigParser()
 config.read('/var/www/html/secmon/config/anomaly_config.ini')
 
 columns_to_analyze = config['DATA']['columns_to_analyze']
-clean_text = config.getboolean('PREPROCESING', 'clean_text')
-whole_text = config.getboolean('PREPROCESING', 'whole_text')
-whole_ip = config.getboolean('PREPROCESING', 'whole_ip')
-whole_mac = config.getboolean('PREPROCESING', 'whole_mac')
+clean_text = config.getboolean('MINISOM', 'clean_text')
+whole_text = config.getboolean('MINISOM', 'whole_text')
+whole_ip = config.getboolean('MINISOM', 'whole_ip')
+whole_mac = config.getboolean('MINISOM', 'whole_mac')
 som_shape = (int(config['MINISOM']['number_of_clusters_x']), int(config['MINISOM']['number_of_clusters_y']))
 number_of_iteration = int(config['MINISOM']['number_of_iteration'])
 sigma = float(config['MINISOM']['sigma'])
@@ -46,11 +46,11 @@ def connect_to_db():
     return conn
 
 
-def select_from_db(connection, sql):
+def select_from_db(connection, sql, data):
     cursor = connection.cursor()
 
     try:
-        cursor.execute(sql)
+        cursor.execute(sql, data)
         data = cursor.fetchall()
     except:
         print("\nCannot get data from SecMon databaze!\n")
@@ -149,7 +149,10 @@ def prepare_data(raw_data):
 
     for column in columns_to_analyze.split(','):
         # vyplni sa kazda prazdna bunka hodnotou 0 ktora bude analyzovana
-        raw_data[column] = raw_data[column].fillna('0')
+
+        print(column)
+
+        raw_data[column] = raw_data[column].fillna('')
 
         # text nebude obsahovat specialne znaky
         if clean_text:
@@ -217,14 +220,24 @@ if __name__ == '__main__':
     #connect to SecMon database
     connection = connect_to_db()
 
-    #get column headers from events_normalized table
-    columnHeaders = [columnName[0] for columnName in select_from_db(connection, "SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'events_normalized'")]
-
     #get rawData from events_normalized table
-    rawData = select_from_db(connection, "SELECT * FROM EVENTS_NORMALIZED")
+    if config['MINISOM']['not_older_than']:
+        sql = "SELECT * FROM events_normalized WHERE datetime >= %s ORDER BY datetime DESC LIMIT %s"
+        data = (config['MINISOM']['not_older_than'], config['MINISOM']['number_of_events'])
+    else:
+        sql = "SELECT * FROM events_normalized ORDER BY datetime DESC LIMIT %s"
+        data = (config['MINISOM']['number_of_events'],)
+
+    rawData = select_from_db(connection, sql, data)
+
+    if not rawData:
+        exit("Input data are empty!")
+
+    #get column headers from events_normalized table
+    columnHeaders = [columnName[0] for columnName in select_from_db(connection, "SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = %s", ('events_normalized',))]
 
     #convert rawData from events_normalized table to dataFrame
-    dataFrame = pandas.DataFrame(rawData, columns=columnHeaders)
+    dataFrame = pandas.DataFrame(rawData, columns=columnHeaders, dtype=str)
    
     #print(dataFrame)
     

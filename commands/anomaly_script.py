@@ -86,11 +86,11 @@ def connect_to_db():
         print ("I am unable to connect to the database")
     return conn
 
-def select_from_db(connection, sql):
+def select_from_db(connection, sql, data):
     cursor = connection.cursor()
 
     try:
-        cursor.execute(sql)
+        cursor.execute(sql, data)
         data = cursor.fetchall()
     except Exception as e:
         print(f"\nCannot get data from SecMon databaze!\n{e}")
@@ -218,17 +218,22 @@ if __name__ == '__main__':
     # connect to SecMon database
     connection = connect_to_db()
 
-    select_all_sql = (
-        "SELECT * FROM events_normalized"
-    )
-    rawData = select_from_db(connection, select_all_sql)
+    #get rawData from events_normalized table
+    if config['KMEDIAN']['not_older_than']:
+        sql = "SELECT * FROM events_normalized WHERE datetime >= %s ORDER BY datetime DESC LIMIT %s"
+        data = (config['KMEDIAN']['not_older_than'], config['KMEDIAN']['number_of_events'])
+    else:
+        sql = "SELECT * FROM events_normalized ORDER BY datetime DESC LIMIT %s"
+        data = (config['KMEDIAN']['number_of_events'],)
 
-    select_headers_sql = (
-        "SELECT column_name FROM information_schema.columns "
-        "WHERE table_schema = 'public' AND table_name = 'events_normalized'"
-    )
-    columnHeaders = [columnName[0] for columnName in select_from_db(connection, select_headers_sql)]
-    
+    rawData = select_from_db(connection, sql, data)
+
+    if not rawData:
+        exit("Input data are empty!")
+
+    #get column headers from events_normalized table
+    columnHeaders = [columnName[0] for columnName in select_from_db(connection, "SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = %s", ('events_normalized',))]
+
     dataFrame = pandas.DataFrame(rawData, columns=columnHeaders, dtype=str)
     dataFrame = dataFrame.fillna('')
     
