@@ -62,8 +62,24 @@ class Normalized extends Event
 			{
 				break;
 			}
-            $values[$tmp[0]] = isset($tmp[1]) ? $tmp[1] : "";
+            		$values[$tmp[0]] = isset($tmp[1]) ? $tmp[1] : "";
 		}
+		
+		//nevyhnutne dva if-y, lebo delimiter " " a "=" kazia vstup do atributov request_url a request_client_application
+		if(preg_match('/request=/', $data)){
+			$start_pos = strpos($data, 'request=');
+			$start_pos += strlen('request=');
+			$end_pos = strpos($data, ' ', $start_pos);
+			$length = $end_pos - $start_pos;
+			$request_url = substr($data, $start_pos, $length);
+		}
+		if(preg_match('/requestClientApplication=/', $data)){
+			$start_pos = strpos($data, 'requestClientApplication=');
+			$start_pos += strlen('requestClientApplication=');
+			$end_pos = strpos($data, ' rawEvent=', $start_pos);
+			$length = $end_pos - $start_pos;
+			$request_client_application = substr($data, $start_pos, $length);
+		}	
 
 		$event->src_ip = $values['src'] ?? "";
 		$event->dst_ip = $values['dst'] ?? "";
@@ -72,6 +88,9 @@ class Normalized extends Event
 		$event->src_port = $values['spt'] ?? "";
 		$event->dst_port = $values['dpt'] ?? "";
 		$event->protocol = $values['proto'] ?? $values['app'] ?? "";
+		$event->request_method = $values['request_method'] ?? "";
+		$event->request_url = $request_url ?? "";
+		$event->request_client_application = $request_client_application ?? "";
 		$event->raw = $raw;
 
 		self::setEventLoc($event);
@@ -117,26 +136,12 @@ class Normalized extends Event
                 echo 'Message: ' .$e->getMessage();
             }
             /** @var \GeoIp2\Model\City $geoLocationLib */
-            if ($geoLocationLib) {
-                $event->src_code = $geoLocationLib->country->isoCode ?? "";
-                $event->src_country = $geoLocationLib->country->name ?? "";
-                $event->src_city = $geoLocationLib->city->name ?? "";
-                $event->src_latitude = $geoLocationLib->location->latitude ?? "";
-                $event->src_longitude = $geoLocationLib->location->longitude ?? "";
-            } else {
-                $geoLocationApi = self::getGeoLocationApi($event->src_ip);
-                if ($geoLocationApi) {
-                    $event->src_code = $geoLocationLib["country"] ?? "";
-                    $event->src_city = $geoLocationLib["city"] ?? "";
-                    /** @var array $latlon */
-                    $latlon = explode(",", $geoLocationLib["loc"]);
-                    if (count($latlon) > 1) {
-                        $event->src_latitude = $latlon[0] ?? "";
-                        $event->src_longitude = $latlon[1] ?? "";
-                    }
-                }
+            $event->src_code = $geoLocationLib->country->isoCode ?? "";
+            $event->src_country = $geoLocationLib->country->name ?? "";
+            $event->src_city = $geoLocationLib->city->name ?? "";
+            $event->src_latitude = $geoLocationLib->location->latitude ?? "";
+            $event->src_longitude = $geoLocationLib->location->longitude ?? "";
 
-            }
         }
 
         if ($event->dst_ip) {
@@ -149,26 +154,11 @@ class Normalized extends Event
                 echo 'Message: ' .$e->getMessage();
             }
             /** @var \GeoIp2\Model\City $geoLocationLib */
-            if ($geoLocationLib) {
-                $event->dst_code = $geoLocationLib->country->isoCode ?? "";
-                $event->dst_country = $geoLocationLib->country->name ?? "";
-                $event->dst_city = $geoLocationLib->city->name ?? "";
-                $event->dst_latitude = $geoLocationLib->location->latitude ?? "";
-                $event->dst_longitude = $geoLocationLib->location->longitude ?? "";
-            } else {
-                $geoLocationApi = self::getGeoLocationApi($event->dst_ip);
-                if ($geoLocationApi) {
-                    $event->dst_code = $geoLocationLib["country"] ?? "";
-                    $event->dst_city = $geoLocationLib["city"] ?? "";
-                    /** @var array $latlon */
-                    $latlon = explode(",", $geoLocationLib["loc"]);
-                    if (count($latlon) > 1) {
-                        $event->dst_latitude = $latlon[0] ?? "";
-                        $event->dst_longitude = $latlon[1] ?? "";
-                    }
-                }
-
-            }
+            $event->dst_code = $geoLocationLib->country->isoCode ?? "";
+            $event->dst_country = $geoLocationLib->country->name ?? "";
+            $event->dst_city = $geoLocationLib->city->name ?? "";
+            $event->dst_latitude = $geoLocationLib->location->latitude ?? "";
+            $event->dst_longitude = $geoLocationLib->location->longitude ?? "";
         }
     }
 }

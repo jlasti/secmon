@@ -19,7 +19,7 @@ class EventsNormalizedSearch extends EventsNormalized
     {
         return [
             [['id', 'cef_event_class_id', 'cef_severity', 'src_port', 'dst_port'], 'integer'],
-            [['datetime', 'host', 'cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_name', 'src_ip', 'dst_ip', 'protocol', 'src_mac', 'dst_mac', 'extensions', 'raw', 'src_country', 'dst_country', 'src_city', 'dst_city', 'src_latitude', 'dst_latitude', 'src_longitude', 'dst_longitude'], 'safe'],
+            [['datetime', 'host', 'cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_name', 'src_ip', 'dst_ip', 'protocol', 'src_mac', 'dst_mac', 'extensions', 'raw', 'src_country', 'dst_country', 'src_city', 'dst_city', 'src_latitude', 'dst_latitude', 'src_longitude', 'dst_longitude', 'request_url', 'request_client_application', 'request_method'], 'safe'],
         ];
     }
 
@@ -88,7 +88,10 @@ class EventsNormalizedSearch extends EventsNormalized
             ->andFilterWhere(['like', 'src_latitude', $this->src_latitude])
             ->andFilterWhere(['like', 'dst_latitude', $this->dst_latitude])
             ->andFilterWhere(['like', 'src_longitude', $this->src_longitude])
-            ->andFilterWhere(['like', 'dst_longitude', $this->dst_longitude])
+	    ->andFilterWhere(['like', 'dst_longitude', $this->dst_longitude])
+	    ->andFilterWhere(['like', 'request_method', $this->request_method])
+	    ->andFilterWhere(['like', 'request_url', $this->request_url])
+	    ->andFilterWhere(['like', 'request_client_application', $this->request_client_application])
             ->andFilterWhere(['like', 'extensions', $this->extensions])
             ->andFilterWhere(['like', 'raw', $this->raw]);
 

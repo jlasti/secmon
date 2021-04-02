@@ -35,6 +35,9 @@ use yii\base\InvalidConfigException;
  * @property float $dst_latitude
  * @property float $src_longtitude
  * @property float $dst_longtitude
+ * @property string $request_method
+ * @property string $request_url
+ * @property String $request_client_application
  * @property string $extensions
  * @property string $raw
  * @property boolean analyzed
@@ -58,10 +61,10 @@ class EventsNormalized extends BaseEvent
             [['datetime'], 'safe'],
             [['cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_event_class_id', 'cef_name', 'cef_severity'], 'required'],
             [['cef_event_class_id', 'cef_severity', 'src_port', 'dst_port'], 'integer'],
-            [['extensions', 'raw'], 'string'],
+            [['extensions', 'raw', 'request_url', 'request_client_application'], 'string'],
             [['analyzed'], 'boolean'],
             [['src_latitude', 'dst_latitude', 'src_longitude', 'dst_longitude'], 'double'],
-            [['host', 'cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_name', 'src_ip', 'dst_ip', 'protocol', 'src_mac', 'dst_mac', 'src_country', 'dst_country', 'src_city', 'dst_city', 'src_latitude', 'dst_latitude', 'src_longitude', 'dst_longitude'], 'string', 'max' => 255],
+            [['host', 'cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_name', 'src_ip', 'dst_ip', 'protocol', 'src_mac', 'dst_mac', 'src_country', 'dst_country', 'src_city', 'dst_city', 'src_latitude', 'dst_latitude', 'src_longitude', 'dst_longitude', 'request_method'], 'string', 'max' => 255],
         ];
     }
 
@@ -92,7 +95,10 @@ class EventsNormalized extends BaseEvent
             'src_latitude' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
             'dst_latitude' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
             'src_longitude' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
-            'dst_longitude' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+	    'dst_longitude' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+	    'request_method' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+	    'request_url' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+	    'request_client_application' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
             'extensions' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
             'raw' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
         ];
@@ -125,7 +131,10 @@ class EventsNormalized extends BaseEvent
             'src_latitude' => 'Src Latitude',
             'dst_latitude' => 'Dst Latitude',
             'src_longitude' => 'Src Longitude',
-            'dst_longitude' => 'Dst Longitude',
+	    'dst_longitude' => 'Dst Longitude',
+	    'request_method' => 'Request Method',
+	    'request_url' => 'Request Url',
+	    'request_client_application' => 'Request Client Application',
             'extensions' => 'Extensions',
             'raw' => 'Raw',
         ];

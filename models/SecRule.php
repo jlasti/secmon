@@ -62,9 +62,9 @@ class SecRule extends \yii\db\ActiveRecord
         if($this->save())
         {
             if($this->state)
-                $files = scandir("/var/www/secmon/rules/active/correlation");
+                $files = scandir("/var/www/html/secmon/rules/active/correlation");
             else
-                $files = scandir("/var/www/secmon/rules/available/correlation");
+                $files = scandir("/var/www/html/secmon/rules/available/correlation");
 
             $fileExists = 0;
 

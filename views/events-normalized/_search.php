@@ -49,6 +49,12 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'dst_mac') ?>
 
+    <?= $form->field($model, 'request_method') ?>
+
+    <?= $form->field($model, 'request_url') ?>
+
+    <?= $form->field($model, 'request_client_application') ?>
+
     <?= $form->field($model, 'extensions') ?>
 
     <?= $form->field($model, 'raw') ?>
