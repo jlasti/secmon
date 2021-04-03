@@ -5,7 +5,7 @@ use yii\db\Migration;
 /**
  * Class m190505_150643_insert_sec_rules
  */
-class m190505_150643_insert_sec_rules extends Migration
+class m210403_113834_021_insert_sec_rules extends Migration
 {
     /**
      * {@inheritdoc}
@@ -15,14 +15,14 @@ class m190505_150643_insert_sec_rules extends Migration
         $this->insert('sec_rules', [
             'id' => 1,
             'name' => "portscan",
-            'link' => "/var/www/secmon/rules/active/correlation/portscan.rule",
+            'link' => "/var/www/html/secmon/rules/active/correlation/portscan.rule",
             'state' => 1,
         ]);
 
         $this->insert('sec_rules', [
             'id' => 2,
             'name' => "sshd_correlation",
-            'link' => "/var/www/secmon/rules/active/correlation/sshd_correlation.rule",
+            'link' => "/var/www/html/secmon/rules/active/correlation/sshd_correlation.rule",
             'state' => 1,
         ]);
     }

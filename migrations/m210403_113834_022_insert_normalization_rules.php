@@ -5,7 +5,7 @@ use yii\db\Migration;
 /**
  * Class m190505_150618_insert_normalization_rules
  */
-class m190505_150618_insert_normalization_rules extends Migration
+class m210403_113834_022_insert_normalization_rules extends Migration
 {
     /**
      * {@inheritdoc}
@@ -15,14 +15,14 @@ class m190505_150618_insert_normalization_rules extends Migration
         $this->insert('normalization_rules', [
             'id' => 1,
             'name' => "iptables",
-            'link' => "/var/www/secmon/rules/active/normalization/iptables.rule",
+            'link' => "/var/www/html/secmon/rules/active/normalization/iptables.rule",
             'state' => 1,
         ]);
 
         $this->insert('normalization_rules', [
             'id' => 2,
             'name' => "sshd",
-            'link' => "/var/www/secmon/rules/active/normalization/sshd.rule",
+            'link' => "/var/www/html/secmon/rules/active/normalization/sshd.rule",
             'state' => 1,
         ]);
     }

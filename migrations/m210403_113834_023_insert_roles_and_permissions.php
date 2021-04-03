@@ -2,7 +2,7 @@
 
 use yii\db\Migration;
 
-class m161107_000112_insert_roles_and_permissions extends Migration
+class m210403_113834_023_insert_roles_and_permissions extends Migration
 {
 	private $_roles = [
 		1 => 'User',
