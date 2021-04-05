@@ -11,11 +11,9 @@ import psycopg2
 import re
 from collections import defaultdict
 from backports import configparser
-
 from sequence import pad_sequences
 from text import one_hot
 from minisom import MiniSom
-
 
 config = configparser.ConfigParser()
 config.read('/var/www/html/secmon/config/anomaly_config.ini')
