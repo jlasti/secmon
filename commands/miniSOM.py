@@ -15,7 +15,7 @@ from text import one_hot
 config = configparser.ConfigParser()
 config.read('/var/www/html/secmon/config/anomaly_config.ini')
 
-columnsToAnalyze = config['DATA']['columns_to_analyze']
+columnsToAnalyze = config['MINISOM']['columns_to_analyze']
 cleanText = config.getboolean('MINISOM', 'clean_text')
 wholeText = config.getboolean('MINISOM', 'whole_text')
 ipOctet = int(config['MINISOM']['ip_octet'])
@@ -28,6 +28,7 @@ randomSeed = int(config['MINISOM']['random_seed'])
 # vytvorenie regexu na odstranovanie specialnych znakov
 delimiter = "!", "\"", "#", "$", "%%", "&", "(", ")", "*", "+", ",", "-", ".", "/", ":", ";", "<", "=", ">", "?", "@", "[", "\\", "]", "^", "_", "`", "{", "|", "}", "~", "\t", "\n"
 regexPattern = '|'.join(map(re.escape, delimiter))
+
 
 def connect_to_db():
     conn = None
@@ -95,23 +96,23 @@ def insert_to_db(connection, som, originalData, paddedData):
     try:
         clusters = defaultdict(list)
         cursor.execute(insertRunSql, insertRunData)
-        run_id = cursor.fetchone()[0]
+        runId = cursor.fetchone()[0]
 
         for (event_id, event) in zip(originalData['id'], paddedData):
             winninPosition = som.winner(event)
             key = winninPosition[1] * somShape[1] + winninPosition[0]
             clusters[key].append(event_id)
 
-        updateRunStatisticsData = (len(clusters), run_id)
+        updateRunStatisticsData = (len(clusters), runId)
         cursor.execute(updateRunStatisticsSql, updateRunStatisticsData)
 
         for key in clusters:
-            insertClusterData = ("", run_id)
+            insertClusterData = ("", runId)
             cursor.execute(insertClusterSql, insertClusterData)
             clusterId = cursor.fetchone()[0]
 
             for item in clusters[key]:
-                insertRelationData = (run_id, clusterId, item)
+                insertRelationData = (runId, clusterId, item)
                 cursor.execute(insertRelationSql, insertRelationData)
 
             selectClusterStatisticsData = (clusterId,)
@@ -132,7 +133,7 @@ def prepare_data(raw_data):
 
     # iterate though selected columns
     for column in columnsToAnalyze.replace(' ', '').split(','):
-        print(f'{column}')
+        print(f'    Preparing column -> {column}')
 
         # fill empty cells with empty string
         raw_data[column] = raw_data[column].fillna('')
@@ -194,9 +195,11 @@ def miniSOM(paddedData, sizeOfLongestData):
 if __name__ == '__main__':
 
     # connect to SecMon database
+    print('Connecting to SecMon database...')
     connection = connect_to_db()
 
     # get rawData from events_normalized table
+    print('Loading data from SecMon database...')
     selectSql = "SELECT * FROM events_normalized"
     selectData = ()
 
@@ -216,6 +219,7 @@ if __name__ == '__main__':
         exit("Input data are empty!")
 
     # get column headers from events_normalized table
+    print('Loading headers from SecMon database...')
     headersSql = (
         "SELECT column_name FROM information_schema.columns "
         "WHERE table_schema = 'public' AND table_name = %s"
@@ -223,45 +227,39 @@ if __name__ == '__main__':
     headersData = ('events_normalized',)
 
     columnHeaders = [columnName[0] for columnName in select_from_db(connection, headersSql, headersData)]
-
     # convert rawData from events_normalized table to dataFrame
+    print('Converting data to dataFrame...')
     dataFrame = pandas.DataFrame(rawData, columns=columnHeaders, dtype=str)
     dataFrameCopy = dataFrame.copy()
 
     # select columns and create list of rows
     print('Preparing data...')
     preparedData = prepare_data(dataFrame)
-    print(f'{np.array(preparedData)}\n')
 
     # encode list of strings
     print('Encoding data...')
     encodedData = encode_data(preparedData)
-    print(f'{np.array(encodedData)}\n')
 
     # normalize data to <0,1>
     print('Normalizing data...')
     normalizedData = normalize_data(encodedData)
-    print(f'{np.array(normalizedData)}\n')
 
     # get longes list
     print('Finding longest data...')
     sizeOfLongestData = get_size_of_longest_data(normalizedData)
-    print(f'Size of longes data -> {sizeOfLongestData}\n')
 
     # add padding according longest list
     print('Padding unevenly data...')
     paddedData = padding_data(normalizedData, sizeOfLongestData)
-    print(f'{np.array(paddedData)}\n')
 
     # start miniSOM
     print('Starting miniSOM...')
     som = miniSOM(paddedData, sizeOfLongestData)
-    print('Ending miniSOM...\n')
 
     # insert to database
     print('Inserting to db...')
     insert_to_db(connection, som, dataFrameCopy, paddedData)
-    print('Finishing run...')
 
     connection.close()
+    print('End...')
 
