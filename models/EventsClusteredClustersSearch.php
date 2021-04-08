@@ -60,7 +60,6 @@ class EventsClusteredClustersSearch extends EventsClusteredClusters
         $query->andFilterWhere([
             'fk_run_id' => preg_replace('/[^0-9]/','',$_GET['run_id']),
         ]);
-        $query->orderBy(['id' => SORT_ASC]);
 
         Yii::$app->cache->flush();
 

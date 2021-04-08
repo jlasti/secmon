@@ -95,8 +95,6 @@ class EventsNormalizedSearch extends EventsNormalized
             ->andFilterWhere(['like', 'extensions', $this->extensions])
             ->andFilterWhere(['like', 'raw', $this->raw]);
 
-        $query->orderBy(['datetime' => SORT_DESC]);
-
         Yii::$app->cache->flush();
 
         return $dataProvider;

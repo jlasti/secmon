@@ -64,8 +64,6 @@ class EventsClusteredRunsSearch extends EventsClusteredRuns
             'comment' => $this->comment,
         ]);
 
-        $query->orderBy(['id' => SORT_ASC]);
-
         Yii::$app->cache->flush();
 
         return $dataProvider;

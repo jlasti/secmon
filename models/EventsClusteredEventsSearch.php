@@ -64,8 +64,6 @@ class EventsClusteredEventsSearch extends EventsClusteredEvents
             'fk_cluster_id'=> preg_replace('/[^0-9]/','',$_GET['cluster_id']),
         ]);
 
-        $query->orderBy(['datetime' => SORT_DESC]);
-
         Yii::$app->cache->flush();
 
         return $dataProvider;

@@ -75,8 +75,6 @@ class EventsCorrelatedSearch extends EventsCorrelated
             ->andFilterWhere(['like', 'cef_name', $this->cef_name])
             ->andFilterWhere(['like', 'raw', $this->raw]);
 
-        $query->orderBy(['datetime' => SORT_DESC]);
-
         Yii::$app->cache->flush();
 
         return $dataProvider;
