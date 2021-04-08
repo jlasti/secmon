@@ -6,7 +6,7 @@ use kartik\cmenu\ContextMenu;
 use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\EventsClusteredSearch */
+/* @var $searchModel app\models\EventsClusteredFilteredClustersSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->params['title'] = 'Clustered Events Event ID: ' . preg_replace('/[^0-9]/','',$_GET['event_id']);

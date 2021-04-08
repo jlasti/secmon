@@ -9,7 +9,7 @@ use yii\data\ActiveDataProvider;
 use app\models\EventsNormalized;
 
 /**
- * EventsClusteredSearch represents the model behind the search form about `app\models\EventsClustered`.
+ * EventsClusteredEventsSearch represents the model behind the search form about `app\models\EventsClusteredEvetns`.
  */
 class EventsClusteredEventsSearch extends EventsClusteredEvents
 {

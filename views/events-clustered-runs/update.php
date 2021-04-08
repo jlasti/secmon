@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\EventsNormalized */
+/* @var $model app\models\EventsClusteredRuns */
 
 $this->title = 'Update Events Clustered Runs: ' . $model->id;
 $this->params['breadcrumbs'][] = ['label' => 'Events Clustered Runs', 'url' => ['index']];

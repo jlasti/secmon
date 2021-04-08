@@ -6,7 +6,7 @@ use kartik\cmenu\ContextMenu;
 use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\EventsClusteredSearch */
+/* @var $searchModel app\models\EventsClusteredEventsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->params['title'] = 'Clustered Events Cluster ID: ' . $_GET['cluster_id'];
@@ -44,7 +44,6 @@ $this->registerJs('
                     'datetime',
                     'host',
                     'cef_name',
-                    #'cef_severity',
                     [
                         'attribute' => 'cef_severity',
                         'value' => 'cef_severity',

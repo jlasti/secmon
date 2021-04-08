@@ -118,6 +118,11 @@ class EventsNormalizedController extends Controller
         return $this->redirect(['/events-normalized-list/index']);
     }
 
+    /**
+     * Search for clusters which contains event_id
+     * @param string $id
+     * @return mixed
+     */
     public function actionSearchclusters($id){
         return $this->redirect(['/events-clustered-filtered-clusters', 'event_id' => $id]);
     }

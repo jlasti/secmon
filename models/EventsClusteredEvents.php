@@ -9,7 +9,7 @@ use Yii;
 use yii\base\InvalidConfigException;
 
 /**
- * This is the model class for table "clustered_events_runs_clusters".
+ * This is the model class for table "events_clustered_events".
  *
  * @property integer $cluster_id
  */

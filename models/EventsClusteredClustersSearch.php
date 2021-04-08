@@ -7,7 +7,7 @@ use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * EventsClusteredSearch represents the model behind the search form about `app\models\EventsClustered`.
+ * EventsClusteredClustersSearch represents the model behind the search form about `app\models\EventsClusteredClusters`.
  */
 class EventsClusteredClustersSearch extends EventsClusteredClusters
 {

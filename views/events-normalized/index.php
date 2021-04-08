@@ -54,7 +54,6 @@ $this->registerJs('
                     ],
                     'host',
                     'cef_name',
-                    #'cef_severity',
                     [
                         'attribute' => 'cef_severity',
                         'value' => 'cef_severity',

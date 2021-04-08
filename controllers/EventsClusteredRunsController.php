@@ -57,14 +57,6 @@ class EventsClusteredRunsController extends Controller
         $secId = preg_replace('/[^0-9]/','',$id);
 
         return $this->redirect(['/events-clustered-clusters', 'run_id' => $secId]);
-        /*$searchModel = new EventsClusteredClustersSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->render('events-clustered-clusters', [
-            'model' => $this->findModel($id),
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);*/
     }
 
     /**
@@ -124,6 +116,10 @@ class EventsClusteredRunsController extends Controller
         return $this->redirect(['index']);
     }
 
+    /**
+     * Run minisom algorithm
+     * @return mixed
+     */
     public function actionMinisom()
     {
         $command = escapeshellcmd('/usr/bin/python3.6 /var/www/html/secmon/commands/miniSOM.py');
@@ -132,6 +128,10 @@ class EventsClusteredRunsController extends Controller
         return $this->redirect(['/events-clustered-runs']);
     }
 
+    /**
+     * Run k-median algorithm
+     * @return mixed
+     */
     public function actionKmedian()
     {
         $command = escapeshellcmd('/usr/bin/python3.6 /var/www/html/secmon/commands/anomaly_script.py');
@@ -141,7 +141,7 @@ class EventsClusteredRunsController extends Controller
     }
 
     /**
-     * Finds the EventsNormalized model based on its primary key value.
+     * Finds the EventsClusteredRuns model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param string $id
      * @return EventsClustered the loaded model

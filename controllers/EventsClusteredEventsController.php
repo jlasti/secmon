@@ -11,7 +11,7 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * EventsClusteredController implements the CRUD actions for EventsClustered model.
+ * EventsClusteredEventsController implements the CRUD actions for EventsClusteredEvents model.
  */
 class EventsClusteredEventsController extends Controller
 {
@@ -31,7 +31,7 @@ class EventsClusteredEventsController extends Controller
     }
 
     /**
-     * Lists all EventsClustered models.
+     * Lists all EventsClusteredEvents models.
      * @return mixed
      * @throws \yii\base\InvalidConfigException
      */
@@ -47,7 +47,7 @@ class EventsClusteredEventsController extends Controller
     }
 
     /**
-     * Displays a single EventsClustered model.
+     * Displays a single EventsClusteredEvents model.
      * @param string $id
      * @return mixed
      * @throws NotFoundHttpException
@@ -55,13 +55,10 @@ class EventsClusteredEventsController extends Controller
     public function actionView($id)
     {
         return $this->redirect(['/events-normalized/view', 'id' => $id]);
-        /*return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);*/
     }
 
     /**
-     * Creates a new EventsClustered model.
+     * Creates a new EventsClusteredEvents model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
@@ -79,7 +76,7 @@ class EventsClusteredEventsController extends Controller
     }
 
     /**
-     * Updates an existing EventsClustered model.
+     * Updates an existing EventsClusteredEvents model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param string $id
      * @return mixed
@@ -99,7 +96,7 @@ class EventsClusteredEventsController extends Controller
     }
 
     /**
-     * Deletes an existing EventsClustered model.
+     * Deletes an existing EventsClusteredEvents model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param string $id
      * @return mixed
@@ -118,7 +115,7 @@ class EventsClusteredEventsController extends Controller
     }
 
     /**
-     * Finds the EventsNormalized model based on its primary key value.
+     * Finds the EventsClusteredEvents model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param string $id
      * @return EventsClustered the loaded model
