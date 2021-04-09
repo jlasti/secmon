@@ -1,0 +1,2 @@
+PHP Warning:  require(/var/www/html/secmon/vendor/autoload.php): failed to open stream: No such file or directory in /var/www/html/secmon/yii on line 14
+PHP Fatal error:  require(): Failed opening required '/var/www/html/secmon/vendor/autoload.php' (include_path='.:/usr/share/pear:/usr/share/php') in /var/www/html/secmon/yii on line 14

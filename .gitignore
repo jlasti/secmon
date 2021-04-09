@@ -36,3 +36,6 @@ output/
 
 # sec rules folder
 rules/uploads/
+
+#error logs
+error.log
