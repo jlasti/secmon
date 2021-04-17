@@ -191,21 +191,17 @@ def miniSOM(paddedData, sizeOfLongestData):
     som.train(np.array(paddedData), numberOfIteration, random_order=True, verbose=True)
     return som
 
-
-if __name__ == '__main__':
-
-    # connect to SecMon database
-    print('Connecting to SecMon database...')
-    connection = connect_to_db()
-
-    # get rawData from events_normalized table
-    print('Loading data from SecMon database...')
+def loadDataFromDB(connection):
     selectSql = "SELECT * FROM events_normalized"
     selectData = ()
 
     if config['MINISOM']['not_older_than']:
+        if re.search("^\\d+w \\d+d \\d+h \\d+m \\d+s$", config['MINISOM']['not_older_than']):
+            time = np.fromstring(re.sub("[^0-9 ]", "", config['MINISOM']['not_older_than']), dtype=np.float, sep=' ')
+            selectData = ((datetime.datetime.today() - datetime.timedelta(weeks=time[0], days=time[1], hours=time[2], minutes=time[3], seconds=time[4])).strftime("%Y-%m-%d %H:%M:%S"),)
+        else:
+            selectData = (config['MINISOM']['not_older_than'],)
         selectSql += " WHERE datetime >= %s"
-        selectData = (config['MINISOM']['not_older_than'],)
 
     selectSql += " ORDER BY datetime DESC"
 
@@ -227,9 +223,22 @@ if __name__ == '__main__':
     headersData = ('events_normalized',)
 
     columnHeaders = [columnName[0] for columnName in select_from_db(connection, headersSql, headersData)]
+
     # convert rawData from events_normalized table to dataFrame
     print('Converting data to dataFrame...')
     dataFrame = pandas.DataFrame(rawData, columns=columnHeaders, dtype=str)
+
+    return dataFrame
+
+if __name__ == '__main__':
+
+    # connect to SecMon database
+    print('Connecting to SecMon database...')
+    connection = connect_to_db()
+
+    # get rawData from events_normalized table
+    print('Loading data from SecMon database...')
+    dataFrame = loadDataFromDB(connection)
     dataFrameCopy = dataFrame.copy()
 
     # select columns and create list of rows
