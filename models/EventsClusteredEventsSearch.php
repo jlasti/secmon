@@ -49,6 +49,7 @@ class EventsClusteredEventsSearch extends EventsClusteredEvents
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort'=> ['defaultOrder' => ['datetime' => SORT_DESC]],
         ]);
 
         $this->load($params);
