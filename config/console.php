@@ -36,6 +36,9 @@ $config = [
         'fixture' => [ // Fixture generation command line.
             'class' => 'yii\faker\FixtureController',
         ],
+        'migration' => [
+            'class' => 'bizley\migration\controllers\MigrationController',
+        ],
     ],
 ];
 

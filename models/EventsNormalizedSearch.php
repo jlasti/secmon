@@ -48,6 +48,7 @@ class EventsNormalizedSearch extends EventsNormalized
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort'=> ['defaultOrder' => ['datetime' => SORT_DESC]],
         ]);
 
         $this->load($params);
@@ -94,8 +95,6 @@ class EventsNormalizedSearch extends EventsNormalized
 	    ->andFilterWhere(['like', 'request_client_application', $this->request_client_application])
             ->andFilterWhere(['like', 'extensions', $this->extensions])
             ->andFilterWhere(['like', 'raw', $this->raw]);
-
-        $query->orderBy(['datetime' => SORT_DESC]);
 
         Yii::$app->cache->flush();
 

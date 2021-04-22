@@ -7,9 +7,9 @@ use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * EventsCorrelatedSearch represents the model behind the search form about `app\models\EventsCorrelated`.
+ * EventsClusteredRunsSearch represents the model behind the search form about `app\models\EventsClusteredRuns`.
  */
-class EventsCorrelatedSearch extends EventsCorrelated
+class EventsClusteredRunsSearch extends EventsClusteredRuns
 {
     /**
      * @inheritdoc
@@ -17,8 +17,8 @@ class EventsCorrelatedSearch extends EventsCorrelated
     public function rules()
     {
         return [
-            [['id', 'cef_event_class_id', 'cef_severity', 'parent_events'], 'integer'],
-            [['datetime', 'host', 'cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_name', 'raw'], 'safe'],
+            [['id'], 'integer'],
+            [['datetime','type_of_algorithm','number_of_clusters','comment'], 'safe'],
         ];
     }
 
@@ -40,7 +40,7 @@ class EventsCorrelatedSearch extends EventsCorrelated
      */
     public function search($params)
     {
-        $query = EventsCorrelated::find();
+        $query = EventsClusteredRuns::find();
 
         // add conditions that should always apply here
 
@@ -60,21 +60,10 @@ class EventsCorrelatedSearch extends EventsCorrelated
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            // 'datetime' => $this->datetime,
-            'cef_event_class_id' => $this->cef_event_class_id,
-            'cef_severity' => $this->cef_severity,
-            'parent_events' => $this->parent_events,
+            'type_of_algorithm' => $this->type_of_algorithm,
+            'number_of_clusters' => $this->number_of_clusters,
+            'comment' => $this->comment,
         ]);
-
-        $query->andFilterWhere(['>=', 'datetime', $this->datetime]);
-
-        $query->andFilterWhere(['like', 'host', $this->host])
-            ->andFilterWhere(['like', 'cef_version', $this->cef_version])
-            ->andFilterWhere(['like', 'cef_vendor', $this->cef_vendor])
-            ->andFilterWhere(['like', 'cef_dev_prod', $this->cef_dev_prod])
-            ->andFilterWhere(['like', 'cef_dev_version', $this->cef_dev_version])
-            ->andFilterWhere(['like', 'cef_name', $this->cef_name])
-            ->andFilterWhere(['like', 'raw', $this->raw]);
 
         Yii::$app->cache->flush();
 

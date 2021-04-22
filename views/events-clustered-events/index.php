@@ -6,10 +6,10 @@ use kartik\cmenu\ContextMenu;
 use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\EventsNormalizedSearch */
+/* @var $searchModel app\models\EventsClusteredEventsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->params['title'] = 'Normalized Events';
+$this->params['title'] = 'Clustered Events Cluster ID: ' . $_GET['cluster_id'];
 
 $this->registerJs('
     setInterval(function() {
@@ -25,6 +25,7 @@ $this->registerJs('
             });
     }, 5000);
 ');
+
 ?>
 <div class="events-normalized-index clickable-table">
     <?php Pjax::begin(['id' => 'pjaxContainer']); ?>
@@ -38,20 +39,9 @@ $this->registerJs('
                 ],
                 'columns' => [
                     [
-                            'class' => 'yii\grid\SerialColumn',
+                        'class' => 'yii\grid\SerialColumn',
                     ],
-                    [
-                        'attribute' => 'datetime',
-                        'value' => 'datetime',
-                        'format' => 'raw',
-                        'filter' => \macgyer\yii2materializecss\widgets\form\DatePicker::widget([
-                            'model' => $searchModel,
-                            'attribute' => 'datetime',
-                            'clientOptions' => [
-                                'format' => 'yyyy-mm-dd'
-                            ]
-                        ])
-                    ],
+                    'datetime',
                     'host',
                     'cef_name',
                     [
@@ -81,15 +71,7 @@ $this->registerJs('
                     'src_ip',
                     'dst_ip',
                     'protocol',
-                    [
-                        'class' => '\dosamigos\grid\columns\BooleanColumn',
-                        'attribute' => 'analyzed',
-                        'treatEmptyAsFalse' => true
-                    ],
                     ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}'],
-                ],
+                    ],
             ]); ?>
     <?php Pjax::end(); ?>
-</div>
-
-

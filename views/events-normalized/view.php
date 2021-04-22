@@ -15,6 +15,7 @@ $this->params['title'] = 'Normalized Event ID: ' . $model->id;
         <?= Html::a("<i class='material-icons' title=\"Show charts\">show_chart</i>" . Yii::t('app', 'Get'), ['show', 'id' => $model->id], ['class' => 'btn-floating waves-effect waves-light btn-large blue'], ['title' =>'Show charts']) ?>
     <?php endif; ?>
     <?= Html::a("<i class='material-icons' title=\"Group events\">group_work</i>" . Yii::t('app', 'Get'), ['analyse', 'id' => $model->id, 'norm' => 'true'], ['class' => 'btn-floating waves-effect waves-light btn-large blue']) ?>
+    <?= Html::a("<i class='material-icons' title=\"Search clusters\">filter_alt</i>" . Yii::t('app', 'Get'), ['searchclusters', 'id' => $model->id], ['class' => 'btn-floating waves-effect waves-light btn-large blue']) ?>
     <?= Html::a("<i class='material-icons' title=\"Delete event\">delete</i>" . Yii::t('app', 'Delete'),
         ['delete', 'id' => $model->id],
         ['class' => 'btn-floating waves-effect waves-light btn-large red',
@@ -24,6 +25,7 @@ $this->params['title'] = 'Normalized Event ID: ' . $model->id;
             ],
         ]) ?>
 </div>
+
 <div class="events-normalized-view">
     <?= DetailView::widget([
         'model' => $model,

@@ -118,6 +118,15 @@ class EventsNormalizedController extends Controller
         return $this->redirect(['/events-normalized-list/index']);
     }
 
+    /**
+     * Search for clusters which contains event_id
+     * @param string $id
+     * @return mixed
+     */
+    public function actionSearchclusters($id){
+        return $this->redirect(['/events-clustered-filtered-clusters', 'event_id' => $id]);
+    }
+
     // show map
     public function actionShow(){
         $params = [':id' => $_GET['id']];
@@ -156,7 +165,9 @@ class EventsNormalizedController extends Controller
      */
     protected function findModel($id)
     {
-        if (($model = EventsNormalized::findOne($id)) !== null) {
+        $secId = preg_replace('/[^0-9]/','',$id);
+
+        if (($model = EventsNormalized::findOne($secId)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

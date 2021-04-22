@@ -2,18 +2,18 @@
 
 namespace app\controllers;
 
+use app\models\EventsClusteredFilteredClusters;
+use app\models\EventsClusteredFilteredClustersSearch;
 use Yii;
-use app\models\EventsCorrelated;
-use app\models\EventsCorrelatedSearch;
 use yii\db\StaleObjectException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * EventsCorrelatedController implements the CRUD actions for EventsCorrelated model.
+ * EventsClusteredFilteredClustersController implements the CRUD actions for EventsClusteredFiltered model.
  */
-class EventsCorrelatedController extends Controller
+class EventsClusteredFilteredClustersController extends Controller
 {
     /**
      * @inheritdoc
@@ -31,12 +31,13 @@ class EventsCorrelatedController extends Controller
     }
 
     /**
-     * Lists all EventsCorrelated models.
+     * Lists all EventsClusteredFiltered models.
      * @return mixed
+     * @throws \yii\base\InvalidConfigException
      */
     public function actionIndex()
     {
-        $searchModel = new EventsCorrelatedSearch();
+        $searchModel = new EventsClusteredFilteredClustersSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -46,26 +47,24 @@ class EventsCorrelatedController extends Controller
     }
 
     /**
-     * Displays a single EventsCorrelated model.
+     * Redirect to EventsClusteredEvents view.
      * @param string $id
      * @return mixed
      * @throws NotFoundHttpException
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        return $this->redirect(['/events-clustered-events', 'cluster_id' => $id]);
     }
 
     /**
-     * Creates a new EventsCorrelated model.
+     * Creates a new EventsClusteredFiltered model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new EventsCorrelated();
+        $model = new EventsClusteredClusters();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -77,7 +76,7 @@ class EventsCorrelatedController extends Controller
     }
 
     /**
-     * Updates an existing EventsCorrelated model.
+     * Updates an existing EventsClusteredFiltered model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param string $id
      * @return mixed
@@ -97,7 +96,7 @@ class EventsCorrelatedController extends Controller
     }
 
     /**
-     * Deletes an existing EventsCorrelated model.
+     * Deletes an existing EventsClusteredFiltered model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param string $id
      * @return mixed
@@ -116,17 +115,15 @@ class EventsCorrelatedController extends Controller
     }
 
     /**
-     * Finds the EventsCorrelated model based on its primary key value.
+     * Finds the EventsClusteredClusters model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param string $id
-     * @return EventsCorrelated the loaded model
+     * @return EventsClustered the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        $secId = preg_replace('/[^0-9]/','',$id);
-
-        if (($model = EventsCorrelated::findOne($secId)) !== null) {
+        if (($model = EventsClusteredClusters::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

@@ -6,10 +6,10 @@ use kartik\cmenu\ContextMenu;
 use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\EventsNormalizedSearch */
+/* @var $searchModel app\models\EventsClusteredFilteredClustersSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->params['title'] = 'Normalized Events';
+$this->params['title'] = 'Clustered Events Event ID: ' . preg_replace('/[^0-9]/','',$_GET['event_id']);
 
 $this->registerJs('
     setInterval(function() {
@@ -25,6 +25,7 @@ $this->registerJs('
             });
     }, 5000);
 ');
+
 ?>
 <div class="events-normalized-index clickable-table">
     <?php Pjax::begin(['id' => 'pjaxContainer']); ?>
@@ -40,23 +41,11 @@ $this->registerJs('
                     [
                             'class' => 'yii\grid\SerialColumn',
                     ],
-                    [
-                        'attribute' => 'datetime',
-                        'value' => 'datetime',
-                        'format' => 'raw',
-                        'filter' => \macgyer\yii2materializecss\widgets\form\DatePicker::widget([
-                            'model' => $searchModel,
-                            'attribute' => 'datetime',
-                            'clientOptions' => [
-                                'format' => 'yyyy-mm-dd'
-                            ]
-                        ])
-                    ],
-                    'host',
-                    'cef_name',
-                    [
-                        'attribute' => 'cef_severity',
-                        'value' => 'cef_severity',
+                        'fk_run_id',
+                        'id',
+                        [
+                        'attribute' => 'severity',
+                        'value' => 'severity',
                         'contentOptions' => function ($dataProvider, $key, $index, $column) {
                             $array = [
                                 ['id' => '1', 'data' => '#00DBFF'],
@@ -68,28 +57,19 @@ $this->registerJs('
                                 ['id' => '7', 'data' => '#CC5500'],
                                 ['id' => '8', 'data' => '#CC5500'],
                                 ['id' => '9', 'data' => '#FF0000'],
-                                ['id' => '10', 'data' => '#FF0000'],
+                                ['id' => '10', 'data' => '#FF0000'], 
                             ];
-                            if (0 < $dataProvider->cef_severity && $dataProvider->cef_severity < 11){
+                            if (0 < $dataProvider->severity && $dataProvider->severity < 11){
                                 $map = ArrayHelper::map($array, 'id', 'data');
-                                return ['style' => 'background-color:'.$map[$dataProvider->cef_severity]];
+                                return ['style' => 'background-color:'.$map[$dataProvider->severity]];
                             } else {
                                 return ['style' => 'background-color:#FFFFFF'];
                             }
                         }
                     ],
-                    'src_ip',
-                    'dst_ip',
-                    'protocol',
-                    [
-                        'class' => '\dosamigos\grid\columns\BooleanColumn',
-                        'attribute' => 'analyzed',
-                        'treatEmptyAsFalse' => true
+                        'number_of_events',
+                        'comment',
+                        ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{update}{view}'],
                     ],
-                    ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}'],
-                ],
             ]); ?>
     <?php Pjax::end(); ?>
-</div>
-
-
