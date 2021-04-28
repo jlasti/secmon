@@ -15,6 +15,7 @@ use yii\web\UploadedFile;
  * @property string $link
  * @property string $state
  * @property string $type
+ * @property string $description
  * @property string $isDefault
  */
 class NormalizationRule extends \yii\db\ActiveRecord
@@ -40,6 +41,7 @@ class NormalizationRule extends \yii\db\ActiveRecord
         return [
             [['name', 'link', 'type'], 'string', 'max' => 255],
             [['state'], 'boolean'],
+            [['description'], 'string'],
             [['normalizationRuleFile'], 'file', 'skipOnEmpty' => !$this->isNewRecord, 'extensions' => 'rule', 'checkExtensionByMimeType' => false],
         ];
     }
@@ -55,6 +57,7 @@ class NormalizationRule extends \yii\db\ActiveRecord
             'link' => 'Link',
             'type' => 'Type',
             'state' => 'Active rule',
+            'description' => 'Description',
             'normalizationRuleFile' => ''
         ];
     }
@@ -62,6 +65,7 @@ class NormalizationRule extends \yii\db\ActiveRecord
     public function upload()
     {
         $transaction = Yii::$app->db->beginTransaction();
+
 
         if($this->save())
         {
@@ -94,6 +98,7 @@ class NormalizationRule extends \yii\db\ActiveRecord
             {
 
                 $transaction->commit();
+                exec("sudo systemctl restart normalizer.service >> /var/www/html/secmon/error.log 2>&1"); 
                 return true;
             }
 
@@ -108,28 +113,31 @@ class NormalizationRule extends \yii\db\ActiveRecord
     public function changeRepository(){
 
         $linkParts = explode("/", $this->link);
-        $fileName = $linkParts[7];
+        $fileName = end($linkParts);
         $fileExists = 0;
+        $appPath = Yii::getAlias('@app');
 
-        if($this->state) {
-            $this->link = '/var/www/html/secmon/rules/active/normalization' . '/' . $fileName;
-            $files = scandir('/var/www/html/secmon/rules/active/normalization');
+        if($this->state) {      // move rule from available to active
+            $this->link = $appPath . '/rules/active/normalization' . '/' . $fileName;
+            $files = scandir($appPath . '/rules/active/normalization');
             foreach ($files as $file){
                 if($file == $fileName)
                     $fileExists = 1;
             }
             if(!$fileExists)
-                exec("mv /var/www/html/secmon/rules/default/normalization/'$fileName' /var/www/html/secmon/rules/active/normalization/'$fileName'");
+                exec("mv $appPath/rules/available/normalization/'$fileName' $appPath/rules/active/normalization/'$fileName' >> /var/www/html/secmon/error.log 2>&1");
+                exec("sudo systemctl restart normalizer.service >> /var/www/html/secmon/error.log 2>&1");
         }
-        else {
-            $this->link = '/var/www/html/secmon/rules/default/normalization' . '/' . $fileName;
-            $files = scandir('/var/www/html/secmon/rules/default/normalization');
+        else {              // move rule from active to available
+            $this->link = $appPath . '/rules/available/normalization' . '/' . $fileName;
+            $files = scandir($appPath . '/rules/available/normalization');
             foreach ($files as $file){
                 if($file == $fileName)
                     $fileExists = 1;
             }
             if(!$fileExists)
-                exec("mv /var/www/html/secmon/rules/active/normalization/'$fileName' /var/www/html/secmon/rules/default/normalization/'$fileName'");
+                exec("mv $appPath/rules/active/normalization/'$fileName' $appPath/rules/available/normalization/'$fileName'  >> /var/www/html/secmon/error.log 2>&1");
+                exec("sudo systemctl restart normalizer.service >> /var/www/html/secmon/error.log 2>&1");
         }
     }
 }

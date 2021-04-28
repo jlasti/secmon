@@ -13,6 +13,7 @@ use macgyer\yii2materializecss\widgets\form\ActiveForm;
     <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
     <div class="row">
+        <div></div>
         <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
     </div>
 
@@ -34,6 +35,10 @@ use macgyer\yii2materializecss\widgets\form\ActiveForm;
 
     <div class="row">
         <?= $form->field($model, 'state')->checkbox() ?>
+    </div>
+
+    <div class="row">
+        <?= $form->field($model, 'description')->textarea() ?>
     </div>
 
     <div class="row"></div>

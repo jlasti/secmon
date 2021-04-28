@@ -29,6 +29,7 @@ $this->params['title'] = 'Normalization Rule: ' . $model->name;
             'name',
             'type',
             'state',
+            'description',
         ],
     ]) ?>
 

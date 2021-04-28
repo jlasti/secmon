@@ -1,2 +1,24 @@
-PHP Warning:  require(/var/www/html/secmon/vendor/autoload.php): failed to open stream: No such file or directory in /var/www/html/secmon/yii on line 14
-PHP Fatal error:  require(): Failed opening required '/var/www/html/secmon/vendor/autoload.php' (include_path='.:/usr/share/pear:/usr/share/php') in /var/www/html/secmon/yii on line 14
+--- /var/www/html/secmon ---
+apache
+mv: cannot stat '/var/www/html/secmon/rules/active/normalization/normalization': No such file or directory
+--- /var/www/html/secmon ---
+apache
+
+
+We trust you have received the usual lecture from the local System
+Administrator. It usually boils down to these three things:
+
+    #1) Respect the privacy of others.
+    #2) Think before you type.
+    #3) With great power comes great responsibility.
+
+sudo: no tty present and no askpass program specified
+
+We trust you have received the usual lecture from the local System
+Administrator. It usually boils down to these three things:
+
+    #1) Respect the privacy of others.
+    #2) Think before you type.
+    #3) With great power comes great responsibility.
+
+sudo: no tty present and no askpass program specified

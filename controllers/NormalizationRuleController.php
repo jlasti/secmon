@@ -112,8 +112,7 @@ class NormalizationRuleController extends Controller
         $model = $this->findModel($id);
             if (file_exists($model->link)) {
                 unlink($model->link);
-
-            $model->delete();
+                $model->delete();
         }
         return $this->redirect(['index']);
     }

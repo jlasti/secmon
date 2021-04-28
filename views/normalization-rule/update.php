@@ -26,6 +26,10 @@ $this->params['title'] = 'Update Normalization Rule: ' . $model->name;
         <?= $form->field($model, 'state')->checkbox() ?>
     </div>
 
+    <div class="row">
+        <?= $form->field($model, 'description')->textarea() ?>
+    </div>
+
     <div class="row"></div>
 
     <div class="row">
