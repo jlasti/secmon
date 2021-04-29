@@ -1,4 +1,5 @@
-<?php
+<?php 
+
 namespace app\commands;
 
 use app\models\Event;
@@ -6,201 +7,95 @@ use app\models\Event\Normalized;
 use Yii;
 use yii\console\Controller;
 use yii\console\Exception;
+use ZMQ;
+use ZMQContext;
+use ZMQSocketException;
 
-require 'vendor/autoload.php';
+require '/var/www/html/secmon/vendor/autoload.php';
 
+class CorrelatorController extends Controller{
 
-class CorrelatorController extends Controller
-{
-    /**
-     * @param $logPath
-     * @param $deviceName
-     * @throws Exception
-     */
-public function actionIndex($logPath, $deviceName)
-{
-	if($logPath == null || $deviceName == null)
-	{
-		throw new Exception('Not all arguments were specified');
-	}
-		if(!is_dir($logPath))
-	{
-		throw new Exception('Log path is not directory');
-	}
-		$normOutputFile = $logPath . '/__secOutput';
-	$normInputFile = $logPath . '/__secInput';
-		$corrOutputFile = Yii::getAlias('@app/__secOutput');
-	$corrInputFile = Yii::getAlias('@app/__secInput');
+	public function actionIndex(){
 
-	$streams = [];
+		$aggregator_config_file = $this->openNonBlockingStream("/var/www/html/secmon/config/aggregator_config.ini");
 
-	$normOutputStream = $this->openPipe($normOutputFile);
-	$normInputStream = $this->openPipe($normInputFile);
+		if($aggregator_config_file){
+			while(($line = fgets($aggregator_config_file)) !== false){
 
-	$corrOutputStream = $this->openPipe($corrOutputFile);
-	$corrInputStream = $this->openPipe($corrInputFile);
+				if(strpos($line, "Cor_input_NP:") !== FALSE){
+                    $parts = explode(":", $line);
+                    $corrInputFile  = trim($parts[1]);
+                }
 
-	if($normOutputStream == null || $normInputStream == null || $corrOutputStream == null || $corrInputStream == null)
-	{
-		$msg = 'Cannot open SEC pipes' . PHP_EOL;
-		$msg .= 'Normalizer Output: ' . ($normOutputStream == null ? 'error' : 'open') . PHP_EOL;
-		$msg .= 'Normalizer Input: ' . ($normInputStream == null ? 'error' : 'open') . PHP_EOL;
-		$msg .= 'Global SEC output: ' . ($corrOutputStream == null ? 'error' : 'open') . PHP_EOL;
-		$msg .= 'Global SEC input: ' . ($corrInputStream == null ? 'error' : 'open') . PHP_EOL;
-
-		throw new Exception($msg);
-	}
-
-	$streamPosition = [];
-
-	while(1)
-	{
-		$this->openStreams($streams, $logPath, [$normOutputFile, $normInputFile]);
-
-		foreach($streams as $file => $stream)
-		{
-
-			if(!array_key_exists($file, $streamPosition))
-				{
-					$pathToFile = $logPath . "/" . $file;
-					$endOfFilePos = intval(exec("wc -c '$pathToFile'"));
-					$streamPosition[$file] = $endOfFilePos;
-				}
-				usleep(300000); // nutne kvoli vytazeniu CPU
-				clearstatcache(false, $logPath . "/" . $file);
-				fseek($stream, $streamPosition[$file]);
-
-				while(($line = fgets($stream)) != FALSE)
-				{
-					if(!empty($line))
-					{
-						fwrite($normOutputStream, $line);
-						flush();
-					}
-				}
-
-				$streamPosition[$file] = ftell($stream);
+                if(strpos($line, "Cor_output_NP:") !== FALSE){
+                    $parts = explode(":", $line);
+                    $corrOutputFile = trim($parts[1]);
+                }
 			}
-			
-			while(($line = fgets($normInputStream)) != FALSE)
-			{
-				if(!empty($line))
-				{
-					Yii::info(sprintf("Normalized:\n%s\n", $line));
+		}
+		fclose($aggregator_config_file);
+		$aggregator_config_file = escapeshellarg("/var/www/html/secmon/config/aggregator_config.ini");
+		$last_line = `tail -n 1 $aggregator_config_file`;
+		$parts = explode(":", $last_line);
+		$portIn = trim($parts[1]);
 
-					$event = Normalized::fromCef($line);
+		$corrOutputStream = $this->openPipe($corrOutputFile);
+		$corrInputStream = $this->openPipe($corrInputFile);
 
-					if($event->save())
-					{
-						fwrite($corrOutputStream, $event->id . ':' . $line);
-					}
-				}
+		if ($corrOutputStream == null || $corrInputStream == null) {
+		    $msg = 'Cannot open SEC pipes' . PHP_EOL;
+		    $msg .= 'Global SEC output: ' . ($corrOutputStream == null ? 'error' : 'open') . PHP_EOL;
+		    $msg .= 'Global SEC input: ' . ($corrInputStream == null ? 'error' : 'open') . PHP_EOL;
+
+		    throw new Exception($msg);
+		}
+
+		$zmq = new ZMQContext();
+		$recSocket = $zmq->getSocket(ZMQ::SOCKET_PULL);  
+		$recSocket->connect("tcp://127.0.0.1:" . $portIn);
+
+		#echo "JPRIJIMAM SPRAVY :";
+
+		while(true){
+			$msg = $recSocket->recv(ZMQ::MODE_NOBLOCK);
+			if(empty($msq)){
+				usleep(300000);
 			}
-			
-			while(($line = fgets($corrInputStream)) != FALSE)
-			{
-				if(!empty($line))
-				{
-					Yii::info(sprintf("Correlated:\n%s\n", $line));
 
-					$event = Event::fromCef($line);
-					$event->save();
+			if (!empty($msg)) {
+                fwrite($corrInputStream, $msg);
+                flush();
+            }
+
+			while (($line = fgets($corrOutputStream)) != FALSE) {
+				if (!empty($line)) {
+				    Yii::info(sprintf("Correlated:\n%s\n", $line));
+				    $event = Event::fromCef($line);
+				    $event->save();
 				}
-			}
+            		}
 		}
 	}
 
+	function openPipe($file){
+            $pipe = posix_mkfifo($file, 0666);
+            $openPipe = fopen($file, 'r+');
+            stream_set_blocking($openPipe, false);
 
-    function openStreams(&$streams, $path, $exclude = [])
-	{
-		$files = scandir($path);
-
-		foreach($files as $file)
-		{
-			$fullPath = $path . '/' . $file;
-
-			if($file == '..' || $file == '.' || in_array($fullPath, $exclude))
-			{
-				continue;
-			}
-
-			if(is_dir($fullPath))
-            {
-			    $this->getFilesFromSubDirectory($fullPath, $file, $streams);
-			    continue;
-            }
-			
-			if(array_key_exists($file, $streams))
-			{
-				continue;
-			}
-			
-			$stream = $this->openNonBlockingStream($fullPath);
-
-			if($stream == null)
-			{
-				echo 'Cannot open file ' . $fullPath . PHP_EOL;
-
-				continue;
-			}
-
-			$streams[$file] = $stream;
-		}
-	}
-
-	function getFilesFromSubDirectory($dirPath, $dirName, &$streams)
-    {
-
-        $files = scandir($dirPath);
-
-        foreach($files as $file)
-
-        {
-            $fullPath = $dirPath . '/' . $file;
-            $index = $dirName . '/' . $file;
-
-            if($file != "messages" && $file != 'secure')
-            {
-                continue;
-            }
-
-            if(array_key_exists($index, $streams))
-            {
-                continue;
-            }
-
-            $stream = $this->openNonBlockingStream($fullPath);
-
-            if($stream == null)
-            {
-                echo 'Cannot open file ' . $fullPath . PHP_EOL;
-                continue;
-            }
-
-            $streams[$index] = $stream;
+            return $openPipe;
         }
-    }
 
-	function openNonBlockingStream($file)
-	{
-		$stream = fopen($file, 'r+');
+	function openNonBlockingStream($file){
+            $stream = fopen($file, 'r+');
 
-		if($stream === false)
-		{
-			return null;
-		}
+            if ($stream === false) {
+                return null;
+            }
 
-		stream_set_blocking($stream, false);
+            stream_set_blocking($stream, false);
 
-		return $stream;
-	}
-
-	function openPipe($file)
-	{
-		$pipe = posix_mkfifo($file, 0666);
-		$openPipe = fopen($file, 'r+');
-		stream_set_blocking($openPipe, false);
-		
-		return $openPipe;
-	}
+            return $stream;
+       }
 }
+
+?>
