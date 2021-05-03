@@ -28,9 +28,23 @@ $this->params['title'] = 'Normalization Rule: ' . $model->name;
             'id',
             'name',
             'type',
-            'state',
-            'description',
+            [
+                    'attribute' => 'state',
+                    'label' => 'State',
+                    'value' => function($model){
+                        if($model->state){
+                            return 'ACTIVE';
+                        }
+                        else{
+                            return 'INACTIVE';
+                        }
+                    },
+            ],
+            [
+                    'label' => 'Description',
+                    'format' => 'html',
+                    'value' => \yii\helpers\Markdown::process($model->description),
+
+            ],
         ],
     ]) ?>
-
-</div>

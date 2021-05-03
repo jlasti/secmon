@@ -1,0 +1,19 @@
+type=Single
+ptype=RegExp
+continue=DontCont
+pattern=^(\S+\s+\d+\s[0-9:]*) (\S+) sudo:\s+apache\s+: TTY=(\S+) ; PWD=/var/www/html/secmon/web ; USER=root ; COMMAND=/bin/systemctl restart secmon-normalizer.service
+desc=$0
+action=none
+
+type=Single
+ptype=RegExp
+pattern=^(\S+\s+\d+\s[0-9:]*) (\S+) sudo:\s+(\S+)\s+: TTY=(\S+) ; PWD=(\S+) ; USER=(\S+) ; COMMAND=(\S+)
+desc=$0
+action= write /var/log/secmon/__secInput $1 $2 CEF:0|Linux|sudo|0|0|'sudo' command usage|0| user=$3 tty=$4 pwd=$5 userRights=$6 cmnd=$7 rawEvent=$0
+
+type=Single
+ptype=RegExp
+pattern=^(\S+\s+\d+\s[0-9:]*) (\S+) sudo:\s+(\S+)\s+: user NOT in sudoers ; TTY=(\S+) ; PWD=(\S+) ; USER=(\S+) ; COMMAND=(\S+)
+desc=$0
+action= write /var/log/secmon/__secInput $1 $2 CEF:0|Linux|sudo|0|0|Invalid 'sudo' usage|0| user=$3 tty=$4 pwd=$5 userRights=$6 cmnd=$7 rawEvent=$0
+

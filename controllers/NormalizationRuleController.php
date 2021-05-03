@@ -113,7 +113,8 @@ class NormalizationRuleController extends Controller
             if (file_exists($model->link)) {
                 unlink($model->link);
                 $model->delete();
-        }
+                exec("sudo systemctl restart secmon-normalizer.service");
+            }
         return $this->redirect(['index']);
     }
     /**

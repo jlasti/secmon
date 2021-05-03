@@ -24,8 +24,22 @@ $this->params['title'] = 'Normalization Rules';
             'id',
             'name',
             'type',
-            'state',
+            [
+                'attribute' => 'state',
+                'label' => 'State',
+                'value' => function($model){
+                    if($model->state){
+                        return 'ACTIVE';
+                    }
+                    else{
+                        return 'INACTIVE';
+                    }
+                },
+            ],
             ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn'],
         ],
     ]); ?>
+
+
+
 </div>
