@@ -1,0 +1,5 @@
+type=Single
+ptype=RegExp
+pattern=.*
+desc=$0
+action=write /var/www/html/secmon/__secInput testhost CEF:0|SECMON|test|test|0|TEST MESSAGE|0| test

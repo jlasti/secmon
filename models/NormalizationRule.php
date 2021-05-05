@@ -126,10 +126,11 @@ class NormalizationRule extends \yii\db\ActiveRecord
                 if($file == $fileName)
                     $fileExists = 1;
             }
-            if(!$fileExists)
+            if(!$fileExists){
                 exec("mv $appPath/rules/available/normalization/'$fileName' $appPath/rules/active/normalization/'$fileName' >> $appPath/error.log 2>&1");
                 if($this->state != $ruleState)
                     exec("sudo systemctl restart secmon-normalizer.service");
+            }
         }
         else {              // move rule from active to available
             $this->link = $appPath . '/rules/available/normalization' . '/' . $fileName;
@@ -138,10 +139,11 @@ class NormalizationRule extends \yii\db\ActiveRecord
                 if($file == $fileName)
                     $fileExists = 1;
             }
-            if(!$fileExists)
+            if(!$fileExists) {
                 exec("mv $appPath/rules/active/normalization/'$fileName' $appPath/rules/available/normalization/'$fileName'  >> $appPath/error.log 2>&1");
-                if($this->state != $ruleState)
+                if ($this->state != $ruleState)
                     exec("sudo systemctl restart secmon-normalizer.service");
+            }
         }
     }
 }

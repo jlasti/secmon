@@ -11,7 +11,7 @@ ptype=regexp
 continue=dontcont
 pattern=^([A-Za-z0-9: ]*) (\S+) sshd\[(\d+)\]: Failed (password) for( invalid user)? (\S+) from ((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}) port (\d+) ssh2$
 desc=$1 fialed ssh login to $2 from $7 for user $6 on port $11
-action=write /var/log/secmon/__secInput $1 $2 CEF:0|Security|sshd|0|130|Wrong password|0|src=$7 dpt=$11 outcome=failure app=SSHv2 destinationServiceName=sshd duser=$6 dpid=$3 reason=$4$5 rawEvent=$0
+action=write /var/log/secmon/__secInput $1 $2 CEF:0|Security|sshd|0|130|Wrong password($6)|0|src=$7 dpt=$11 outcome=failure app=SSHv2 destinationServiceName=sshd duser=$6 dpid=$3 reason=$4$5 rawEvent=$0
 
 type=single
 ptype=regexp

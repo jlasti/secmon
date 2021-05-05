@@ -63,7 +63,7 @@ class SecRule extends \yii\db\ActiveRecord
         {
             if($this->state)
 //                $files = scandir("/var/www/html/secmon/rules/active/correlation");
-            $files = scandir(Yii::getAlias('@app/rules/active/correlation'));
+                $files = scandir(Yii::getAlias('@app/rules/active/correlation'));
 
             else
  //               $files = scandir("/var/www/html/secmon/rules/available/correlation");
@@ -121,8 +121,11 @@ class SecRule extends \yii\db\ActiveRecord
                 if ($file == $fileName)
                     $fileExists = 1;
             }
-            if (!$fileExists)
+            if (!$fileExists) {
                 exec("mv $appPath/rules/available/correlation/'$fileName' $appPath/rules/active/correlation/'$fileName'");
+                if($this->state != $ruleState)
+                    exec("sudo systemctl restart secmon-correlator.service");
+            }
         } else {
             $this->link = $appPath . '/rules/available/correlation' . '/' . $fileName;
             $files = scandir($appPath . '/rules/available/correlation');
@@ -130,8 +133,11 @@ class SecRule extends \yii\db\ActiveRecord
                 if ($file == $fileName)
                     $fileExists = 1;
             }
-            if (!$fileExists)
+            if (!$fileExists){
                 exec("mv $appPath/rules/active/correlation/'$fileName' $appPath/rules/available/correlation/'$fileName'");
+                if($this->state != $ruleState)
+                    exec("sudo systemctl restart secmon-correlator.service");
+            }
         }
     }
 }
