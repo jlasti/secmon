@@ -93,7 +93,7 @@ class SecRule extends \yii\db\ActiveRecord
             if($this->secConfigFile->saveAs($path) && $this->save())
 			{
 				$transaction->commit();
-
+                exec("sudo systemctl restart secmon-correlator.service");
 				return true;
 			}
 
