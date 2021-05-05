@@ -44,7 +44,7 @@ $this->params['title'] = 'Correlation Rule: ' . $model->name;
             [
                 'label' => 'Description',
                 'format' => 'html',
-                'value' => \yii\helpers\Markdown::process($model->description),
+                'value' => \yii\helpers\Markdown::process($model->description, "gfm-comment"),
 
             ],
         ],

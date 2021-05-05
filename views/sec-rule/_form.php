@@ -47,7 +47,6 @@ use macgyer\yii2materializecss\widgets\form\ActiveForm;
         <div class="form-group">
             <?= Html::submitButton('Create' , ['class' => 'waves-effect waves-light green btn',
                 'data' => [
-                    'confirm' => Yii::t('app', "To start using added active rule, systemctl restart secmon-corellator.service is required !!"),
                     'method' => 'post',
                 ], ]) ?>
         </div>
