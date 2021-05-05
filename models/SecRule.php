@@ -12,6 +12,7 @@ use yii\web\UploadedFile;
  * @property string $name
  * @property string $link
  * @property string $state
+ * @property string $description
  * @property string $type
  */
 class SecRule extends \yii\db\ActiveRecord
@@ -37,6 +38,7 @@ class SecRule extends \yii\db\ActiveRecord
         return [
             [['name', 'link', 'type'], 'string', 'max' => 255],
             [['state'], 'boolean'],
+            [['description'], 'string'],
             [['secConfigFile'], 'file', 'skipOnEmpty' => !$this->isNewRecord, 'extensions' => 'rule', 'checkExtensionByMimeType' => false],
         ];
     }
@@ -52,6 +54,7 @@ class SecRule extends \yii\db\ActiveRecord
             'link' => 'Link',
             'state' => 'Active rule',
             'type' => 'Type',
+            'description' => 'Description',
             'secConfigFile' => ''
         ];
     }

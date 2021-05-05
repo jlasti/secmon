@@ -35,6 +35,12 @@ use macgyer\yii2materializecss\widgets\form\ActiveForm;
         <?= $form->field($model, 'state')->checkbox() ?>
     </div>
 
+    <div class="row">
+        <?= $form->field($model, 'description')->textarea() ?>
+
+        <p>*Description field supports Markdown syntax (<a href="https://www.markdownguide.org/">Markdown Guide</a>).</p>
+    </div>
+
     <div class="row"></div>
 			
     <div class="row">

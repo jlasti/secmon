@@ -28,7 +28,25 @@ $this->params['title'] = 'Correlation Rule: ' . $model->name;
             'id',
             'name',
             'type',
-            'state',
+            [
+                'attribute' => 'state',
+                'label' => 'State',
+                'format' => 'html',
+                'value' => function($model){
+                    if($model->state){
+                        return '<b style="color: #11ff00">ACTIVE</b>';
+                    }
+                    else{
+                        return '<b style="color: red">INACTIVE</b>';
+                    }
+                },
+            ],
+            [
+                'label' => 'Description',
+                'format' => 'html',
+                'value' => \yii\helpers\Markdown::process($model->description),
+
+            ],
         ],
     ]) ?>
 
