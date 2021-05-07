@@ -31,9 +31,7 @@ phpunit.phar
 /secdb/config.ini
 /config/config_secdb.ini
 /config/anomaly_config.ini
-docker-compose.yml
-/docker-compose/db.php
-/docker-compose/anomaly_config.ini
+./docker-compose.yml
 composer.lock
 lastdepoy.txt
 output/
