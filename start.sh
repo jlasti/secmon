@@ -37,16 +37,6 @@ sed -i "s/<password>/$password1/g" config/db.php
 sed -i "s/<password>/$password1/g" config/anomaly_config.ini
 sed -i "s/<password>/$password1/g" docker-compose.yml
 
-echo db.php
-cat config/db.php | grep 9801153934
-echo ----------------------------
-echo anomaly_config.ini
-cat config/anomaly_config.ini | grep 9801153934
-echo ----------------------------
-echo docker-compose.yml
-cat docker-compose.yml | grep 9801153934
-echo ----------------------------
-
 docker-compose down
 docker-compose build --no-cache
 docker-compose up -d
