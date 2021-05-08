@@ -17,7 +17,7 @@ services:
       - db
     environment:
       - POSTGRES_HOST=db
-      - POSTGRES_PASSWORD=password #change before use
+      - POSTGRES_PASSWORD=<password>
       - POSTGRES_USER=secmon
     depends_on:
     - db
@@ -29,7 +29,7 @@ services:
     ports:
       - 5432:5432
     environment:
-      - POSTGRES_PASSWORD=password #change before use
+      - POSTGRES_PASSWORD=<password>
       - POSTGRES_USER=secmon
     volumes:
       - db_data:/var/lib/pgsql/data/
