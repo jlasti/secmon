@@ -18,8 +18,8 @@ class EventsNormalizedSearch extends EventsNormalized
     public function rules()
     {
         return [
-            [['id', 'cef_event_class_id', 'cef_severity', 'src_port', 'dst_port'], 'integer'],
-            [['datetime', 'host', 'cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_name', 'src_ip', 'dst_ip', 'protocol', 'src_mac', 'dst_mac', 'extensions', 'raw', 'src_country', 'dst_country', 'src_city', 'dst_city', 'src_latitude', 'dst_latitude', 'src_longitude', 'dst_longitude', 'request_url', 'request_client_application', 'request_method'], 'safe'],
+            [['id', 'cef_event_class_id', 'cef_severity', 'src_port', 'dst_port', 'destination_user_id', 'destination_group_id', 'device_process_id'], 'integer'],
+            [['datetime', 'host', 'cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_name', 'src_ip', 'dst_ip', 'protocol', 'src_mac', 'dst_mac', 'extensions', 'raw', 'src_country', 'dst_country', 'src_city', 'dst_city', 'src_latitude', 'dst_latitude', 'src_longitude', 'dst_longitude', 'request_url', 'request_client_application', 'request_method', 'destination_user_name', 'destination_group_name', 'source_user_privileges', 'exec_user'], 'safe'],
         ];
     }
 
@@ -88,10 +88,17 @@ class EventsNormalizedSearch extends EventsNormalized
             ->andFilterWhere(['like', 'src_latitude', $this->src_latitude])
             ->andFilterWhere(['like', 'dst_latitude', $this->dst_latitude])
             ->andFilterWhere(['like', 'src_longitude', $this->src_longitude])
-	    ->andFilterWhere(['like', 'dst_longitude', $this->dst_longitude])
-	    ->andFilterWhere(['like', 'request_method', $this->request_method])
-	    ->andFilterWhere(['like', 'request_url', $this->request_url])
-	    ->andFilterWhere(['like', 'request_client_application', $this->request_client_application])
+	        ->andFilterWhere(['like', 'dst_longitude', $this->dst_longitude])
+	        ->andFilterWhere(['like', 'request_method', $this->request_method])
+	        ->andFilterWhere(['like', 'request_url', $this->request_url])
+	        ->andFilterWhere(['like', 'request_client_application', $this->request_client_application])
+            ->andFilterWhere(['like', 'destination_user_name', $this->destination_user_name])
+            ->andFilterWhere(['like', 'destination_user_id', $this->destination_user_id])
+            ->andFilterWhere(['like', 'destination_group_name', $this->destination_group_name])
+            ->andFilterWhere(['like', 'destination_group_id', $this->destination_group_id])
+            ->andFilterWhere(['like', 'device_process_id', $this->device_process_id])
+            ->andFilterWhere(['like', 'source_user_privileges', $this->source_user_privileges])
+            ->andFilterWhere(['like', 'exec_user', $this->exec_user])
             ->andFilterWhere(['like', 'extensions', $this->extensions])
             ->andFilterWhere(['like', 'raw', $this->raw]);
 

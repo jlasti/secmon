@@ -3,12 +3,12 @@ ptype=RegExp
 continue=DontCont
 pattern=^(\S+\s+\d+\s[0-9:]*) (\S+) useradd\[(\d+)\]: new user: name=(\S+), UID=(\d+), GID=(\d+), home=(\S+), shell=(\S+)
 desc=$0
-action=write /var/log/secmon/__secInput $1 $2 CEF:0|Linux|sudo|0|0|user '$4' created|0| dpid=$3 newUser=$4 newUserUID=$5 newUserGID=$6 newUserHome=$7 newUserShell=$8 rawEvent=$0
+action=write /var/log/secmon/__secInput $1 $2 CEF:0|Linux|useradd|0|0|user '$4' created|0| dvcpid=$3 duser=$4 duid=$5 cn1Label=destinationGroupId cn1=$6 rawEvent=$0
 
 type=Single
 ptype=RegExp
 continue=DontCont
 pattern=^(\S+\s+\d+\s[0-9:]*) (\S+) userdel\[(\d+)\]: delete user (\S+)
 desc=$0
-action=write /var/log/secmon/__secInput $1 $2 CEF:0|Linux|sudo|0|0|user '$4' deleted|0| dpid=$3  delUser=$4 rawEvent=$0
+action=write /var/log/secmon/__secInput $1 $2 CEF:0|Linux|userdel|0|0|user '$4' deleted|0| dvcpid=$3 duser=$4 rawEvent=$0
 

@@ -55,6 +55,20 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'request_client_application') ?>
 
+    <?= $form->field($model, 'destination_user_name') ?>
+
+    <?= $form->field($model, 'destination_user_id') ?>
+
+    <?= $form->field($model, 'destination_group_name') ?>
+
+    <?= $form->field($model, 'destination_group_id') ?>
+
+    <?= $form->field($model, 'device_process_id') ?>
+
+    <?= $form->field($model, 'source_user_privileges') ?>
+
+    <?= $form->field($model, 'exec_user') ?>
+
     <?= $form->field($model, 'extensions') ?>
 
     <?= $form->field($model, 'raw') ?>

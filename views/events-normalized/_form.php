@@ -50,6 +50,20 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'request_client_application')->textarea(['rows' => 6]) ?>
 
+    <?= $form->field($model, 'destination_user_name')->textInput() ?>
+
+    <?= $form->field($model, 'destination_user_id')->textInput() ?>
+
+    <?= $form->field($model, 'destination_group_name')->textInput() ?>
+
+    <?= $form->field($model, 'destination_group_id')->textInput() ?>
+
+    <?= $form->field($model, 'device_process_id')->textInput() ?>
+
+    <?= $form->field($model, 'source_user_privileges')->textInput() ?>
+
+    <?= $form->field($model, 'exec_user')->textInput() ?>
+
     <?= $form->field($model, 'extensions')->textarea(['rows' => 6]) ?>
 
     <?= $form->field($model, 'raw')->textarea(['rows' => 6]) ?>
