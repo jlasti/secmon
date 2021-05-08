@@ -17,7 +17,7 @@ while true; do
 	echo
 	
 	if [ "${password1,,}" = "password" ];
-		then echo -e "${RED}Passwor: 'password' is forbidden, try again...${NORMAL}"; continue;
+		then echo -e "${RED}Entered passwor is forbidden, try again...${NORMAL}"; continue;
 	fi
 	
 	if [ ${#password1} -lt 8 ];
@@ -26,6 +26,7 @@ while true; do
 	
 	read -s -p "Re-enter Password: " password2
 	echo
+
 	if [ "${password1}" != "$password2" ]
 		then echo -e "${RED}Sorry, passwords do not match, try again...${NORMAL}"; continue;
 		else break;
@@ -33,6 +34,7 @@ while true; do
 done
 echo -e "${GREEN}Password succesfully created${NORMAL}"
 
+#update password in install and config files
 sed -i "s/<password>/$password1/g" config/db.php
 sed -i "s/<password>/$password1/g" config/anomaly_config.ini
 sed -i "s/<password>/$password1/g" docker-compose.yml
