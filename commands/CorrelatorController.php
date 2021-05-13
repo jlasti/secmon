@@ -54,7 +54,8 @@ class CorrelatorController extends Controller{
 		$recSocket = $zmq->getSocket(ZMQ::SOCKET_PULL);  
 		$recSocket->connect("tcp://127.0.0.1:" . $portIn);
 
-		#echo "JPRIJIMAM SPRAVY :";
+		date_default_timezone_set("Europe/Bratislava");
+        echo "[" . date("Y-m-d H:i:s") . "] Worker correlator started!" . PHP_EOL;
 
 		while(true){
 			$msg = $recSocket->recv(ZMQ::MODE_NOBLOCK);
@@ -99,3 +100,4 @@ class CorrelatorController extends Controller{
 }
 
 ?>
+

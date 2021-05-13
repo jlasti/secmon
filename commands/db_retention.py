@@ -2,13 +2,12 @@
 # encoding: utf-8
 
 from six.moves import configparser
-import subprocess
-import dbus
 import psycopg2
 import sys
 import os
-import fileinput
 import time
+import datetime
+
 
 
 def connect():
@@ -18,20 +17,45 @@ def connect():
         print ("I am unable to connect to the database")
     return conn
 
+def size_check(max_db_size):
+    connection = connect()
+    cursor = connection.cursor()
+    querry = "SELECT pg_size_pretty(pg_database_size(\'" + config.get('DATABASE', 'database') + "\'));"
+    cursor.execute(querry)
+    db_size = cursor.fetchone()
+    act_size = db_size[0].split()
+    if int(act_size[0]) > int(max_db_size):
+        cursor.execute("SELECT count(id) from events_normalized")
+        no_of_events = cursor.fetchone()
+        events_to_delete = (no_of_events[0] / 100) * 15
+        querry = ("DELETE from events_normalized where id in ("
+            "SELECT id from events_normalized order by datetime asc limit (%s))")
+        data = (events_to_delete,)
+        cursor.execute(querry, data)
+        connection.commit()
+        connection.close()
+
+def timestamp_check(last_date):
+    connection = connect()
+    cursor = connection.cursor()
+    querry = ("DELETE from events_normalized where id in ("
+            "SELECT id from events_normalized where datetime < (%s::TIMESTAMP))")
+    data = (last_date,)
+    cursor.execute(querry, data)
+    connection.commit()
+    connection.close()
+
 #read configuration file
 config = configparser.ConfigParser()
 config.read('/var/www/html/secmon/config/middleware_config.ini')
 
-connection = connect()
-cursor = connection.cursor()
-querry = "SELECT pg_size_pretty(pg_database_size(\'" + config.get('DATABASE', 'database') + "\'));"
-cursor.execute(querry)
-db_size = cursor.fetchone()
-print(db_size[0])
+max_db_size = config.get('DATABASE', 'max_size')
+no_of_days = config.get('DATABASE', 'max_days')
 
 while True:
-    #chceck db_size, if its too big delete old normalized events
-    #if not, check for stored events with timestamp higher than ...
-    #if found delete them
-    time.sleep(5)
+    size_check(max_db_size)
+    dt = datetime.datetime.now()
+    last_date = dt - datetime.timedelta(int(no_of_days))
+    timestamp_check(last_date)
+    time.sleep(1800)
     

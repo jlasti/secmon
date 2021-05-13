@@ -68,8 +68,8 @@ class AggregatorController extends Controller{
 
         $streamPosition = [];
         $streams = [];
-
-        //echo "Starting middleware". PHP_EOL;
+        date_default_timezone_set("Europe/Bratislava");
+        echo "[" . date("Y-m-d H:i:s") . "] Aggregator started!" . PHP_EOL;
 
 
         while (1) {
@@ -171,3 +171,4 @@ class AggregatorController extends Controller{
 
 }
 ?>
+

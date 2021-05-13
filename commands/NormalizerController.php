@@ -86,7 +86,8 @@ class NormalizerController extends Controller{
 		$sendSocket = $zmq->getSocket(ZMQ::SOCKET_PUSH);
 		$sendSocket->bind("tcp://127.0.0.1:" . $portOut);
 
-		#echo "JPRIJIMAM SPRAVY :";
+		date_default_timezone_set("Europe/Bratislava");
+        echo "[" . date("Y-m-d H:i:s") . "] Worker normalizer started!" . PHP_EOL;
 
 		while(true){
 			
@@ -139,3 +140,4 @@ class NormalizerController extends Controller{
        }
 }
 ?>
+

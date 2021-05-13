@@ -75,7 +75,10 @@ class NetworkController extends Controller{
 
 		$sendSocket = $zmq->getSocket(ZMQ::SOCKET_PUSH);
 		$sendSocket->bind("tcp://127.0.0.1:" . $portOut);
-        
+		
+		date_default_timezone_set("Europe/Bratislava");
+        echo "[" . date("Y-m-d H:i:s") . "] Network model module started!" . PHP_EOL;
+
         while(true){
 			$srcIp = $dstIp = -1;
 			$msg = $recSocket->recv(ZMQ::MODE_NOBLOCK);
@@ -99,12 +102,10 @@ class NetworkController extends Controller{
 
 				//get hostname from log
 				$array = explode(" ", $msg);
-				$hostname = $array[3];
-				
-				//print("Zdrojova IP:" . $srcIp);
+				$hostname = $array[4];
 				
 				//make lookup to db with source and destination address
-
+				
 				$srcNetworkDeviceId = $this->pairNetworkDevice($srcIp, $hostname, $host, $database, $user, $password);
 				$dstNetworkDeviceId = $this->pairNetworkDevice($dstIp, $hostname, $host, $database, $user, $password);
 
@@ -192,3 +193,4 @@ class NetworkController extends Controller{
    }
 }
 ?>
+

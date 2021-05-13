@@ -21,10 +21,10 @@ class GeoipController extends Controller{
 
 	public function actionIndex(){
 
-		$aggregator_config_file = $this->openNonBlockingStream("/var/www/html/secmon/config/aggregator_config.ini");
+		$temp_config = $this->openNonBlockingStream("/var/www/html/secmon/config/temp_config.ini");
         $save_to_db = 0;
-		if($aggregator_config_file){
-			while(($line = fgets($aggregator_config_file)) !== false){
+		if($temp_config){
+			while(($line = fgets($temp_config)) !== false){
 				if(strpos($line, "Geoip:") !== FALSE){
 					$parts = explode(":", $line);
 					$portOut = trim($parts[1]);
@@ -34,10 +34,10 @@ class GeoipController extends Controller{
 		     throw new Exception('Could not open a config file');
 		}
 
-        fclose($aggregator_config_file);
+        fclose($temp_config);
         $portIn = $portOut - 1;			#calculate input port
-		$aggregator_config_file = escapeshellarg("/var/www/html/secmon/config/aggregator_config.ini");
-		$last_line = `tail -n 1 $aggregator_config_file`; 		#get last line of temp file
+		$temp_config = escapeshellarg("/var/www/html/secmon/config/temp_config.ini");
+		$last_line = `tail -n 1 $temp_config`; 		#get last line of temp file
 
 		if(strpos($last_line, "Geoip:")!== FALSE){		
 			$save_to_db = 1;
@@ -52,8 +52,11 @@ class GeoipController extends Controller{
 		$recSocket->connect("tcp://127.0.0.1:" . $portIn);
 
 		$sendSocket = $zmq->getSocket(ZMQ::SOCKET_PUSH);
-		$sendSocket->bind("tcp://127.0.0.1:" . $portOut);
+        $sendSocket->bind("tcp://127.0.0.1:" . $portOut);
         
+        date_default_timezone_set("Europe/Bratislava");
+        echo "[" . date("Y-m-d H:i:s") . "] Geoip module started!" . PHP_EOL;
+
         while(true){
             $srcIp = $dstIp = -1;
             $msg = $recSocket->recv(ZMQ::MODE_NOBLOCK);
@@ -78,67 +81,65 @@ class GeoipController extends Controller{
                
                 if($srcIp != -1) {
                     $geoLocationLib = null;
-                    if($srcIp == "localhost")
-                        $srcIp = "127.0.0.1";
-
-                    try {
-                        $geoLocationLib = self::getGeoLocationLib($srcIp);
-                    } catch (AddressNotFoundException $e) {
-                        echo 'Message: ' .$e->getMessage();
-                    } catch (InvalidDatabaseException $e) {
-                        echo 'Message: ' .$e->getMessage();
+                    if($srcIp != "localhost" && $srcIp != "127.0.0.1" && !str_contains($srcIp, '10.0.')){
+                        try {
+                            $geoLocationLib = self::getGeoLocationLib($srcIp);
+                        } catch (AddressNotFoundException $e) {
+                            echo 'Message: ' .$e->getMessage();
+                        } catch (InvalidDatabaseException $e) {
+                            echo 'Message: ' .$e->getMessage();
+                        }
+                        /** @var \GeoIp2\Model\City $geoLocationLib */
+                        if ($geoLocationLib) {
+                            if($geoLocationLib->country->isoCode)
+                                $msg = $msg . " src_country_isoCode=" . $geoLocationLib->country->isoCode;
+                            
+                            if($geoLocationLib->country->name)
+                                $msg = $msg . " src_country_name=" . $geoLocationLib->country->name;
+    
+                            if($geoLocationLib->city->name)
+                                $msg = $msg . " src_city_name=" . $geoLocationLib->city->name;
+    
+                            if($geoLocationLib->location->latitude)
+                                $msg = $msg . " src_location_latitude=" . $geoLocationLib->location->latitude;
+    
+                            if($geoLocationLib->location->longitude)
+                                $msg = $msg . " src_location_longitude=" . $geoLocationLib->location->longitude;
+                        }
+                        // osetrenie pre parsovanie v EventsNormalized, pri volani ::fromCef
+                        $msg = $msg . " "; 
                     }
-                    /** @var \GeoIp2\Model\City $geoLocationLib */
-                    if ($geoLocationLib) {
-                        if($geoLocationLib->country->isoCode)
-                            $msg = $msg . " src_country_isoCode=" . $geoLocationLib->country->isoCode;
-                        
-                        if($geoLocationLib->country->name)
-                            $msg = $msg . " src_country_name=" . $geoLocationLib->country->name;
-
-                        if($geoLocationLib->city->name)
-                            $msg = $msg . " src_city_name=" . $geoLocationLib->city->name;
-
-                        if($geoLocationLib->location->latitude)
-                            $msg = $msg . " src_location_latitude=" . $geoLocationLib->location->latitude;
-
-                        if($geoLocationLib->location->longitude)
-                            $msg = $msg . " src_location_longitude=" . $geoLocationLib->location->longitude;
-                    }
-                    // osetrenie pre parsovanie v EventsNormalized, pri volani ::fromCef
-                    $msg = $msg . " "; 
                 }
 
                 if($dstIp != -1) {
                     $geoLocationLib = null;
-                    if($dstIp == "localhost")
-                        $dstIp = "127.0.0.1";
-
-                    try {
-                        $geoLocationLib = self::getGeoLocationLib($dstIp);
-                    } catch (AddressNotFoundException $e) {
-                        echo 'Message: ' .$e->getMessage();
-                    } catch (InvalidDatabaseException $e) {
-                        echo 'Message: ' .$e->getMessage();
-                    }
-                    /** @var \GeoIp2\Model\City $geoLocationLib */
-                    if ($geoLocationLib) {
-                        if($geoLocationLib->country->isoCode)
-                            $msg = $msg . " dst_country_isoCode=" . $geoLocationLib->country->isoCode;
-                        
-                        if($geoLocationLib->country->name)
-                            $msg = $msg . " dst_country_name=" . $geoLocationLib->country->name;
-
-                        if($geoLocationLib->city->name)
-                            $msg = $msg . " dst_city_name=" . $geoLocationLib->city->name;
-
-                        if($geoLocationLib->location->latitude)
-                            $msg = $msg . " dst_location_latitude=" . $geoLocationLib->location->latitude;
-
-                        if($geoLocationLib->location->longitude)
-                            $msg = $msg . " dst_location_longitude=" . $geoLocationLib->location->longitude;
+                    if($dstIp == "localhost" && $dstIp = "127.0.0.1" && !str_contains($dstIp, '10.0.')){
+                        try {
+                            $geoLocationLib = self::getGeoLocationLib($dstIp);
+                        } catch (AddressNotFoundException $e) {
+                            echo 'Message: ' .$e->getMessage();
+                        } catch (InvalidDatabaseException $e) {
+                            echo 'Message: ' .$e->getMessage();
+                        }
+                        /** @var \GeoIp2\Model\City $geoLocationLib */
+                        if ($geoLocationLib) {
+                            if($geoLocationLib->country->isoCode)
+                                $msg = $msg . " dst_country_isoCode=" . $geoLocationLib->country->isoCode;
+                            
+                            if($geoLocationLib->country->name)
+                                $msg = $msg . " dst_country_name=" . $geoLocationLib->country->name;
+    
+                            if($geoLocationLib->city->name)
+                                $msg = $msg . " dst_city_name=" . $geoLocationLib->city->name;
+    
+                            if($geoLocationLib->location->latitude)
+                                $msg = $msg . " dst_location_latitude=" . $geoLocationLib->location->latitude;
+    
+                            if($geoLocationLib->location->longitude)
+                                $msg = $msg . " dst_location_longitude=" . $geoLocationLib->location->longitude;
+                        } 
+                        $msg = $msg . " "; 
                     } 
-                    $msg = $msg . " "; 
                 }
                 //print($msg);
                 
@@ -182,3 +183,4 @@ class GeoipController extends Controller{
 }
 
 ?>
+
