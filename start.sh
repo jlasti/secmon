@@ -45,5 +45,8 @@ docker-compose up -d
 docker exec -it app composer update
 docker exec -it app ./yii migrate --interactive=0
 sudo chown -R $USER:apache .
+echo -e "Initializing SecMon admin user ...${GREEN}"
+curl 127.0.0.1:8080/secmon/web/user/init
+echo -e "${NORMAL}"
 docker-compose restart
 echo -e "${GREEN}Installation has been successfully completed${NORMAL}"
