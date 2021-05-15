@@ -51,11 +51,11 @@ config.read('/var/www/html/secmon/config/middleware_config.ini')
 
 max_db_size = config.get('DATABASE', 'max_size')
 no_of_days = config.get('DATABASE', 'max_days')
-
+sleep_interval= config.get('DATABASE', 'sleep_interval')
 while True:
     size_check(max_db_size)
     dt = datetime.datetime.now()
     last_date = dt - datetime.timedelta(int(no_of_days))
     timestamp_check(last_date)
-    time.sleep(1800)
+    time.sleep(int(sleep_interval))
     
