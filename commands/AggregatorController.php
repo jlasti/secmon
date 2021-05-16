@@ -81,7 +81,7 @@ class AggregatorController extends Controller{
                     $endOfFilePos = intval(exec("wc -c '$pathToFile'"));
                     $streamPosition[$file] = $endOfFilePos;
                 }
-                usleep(300000); // nutne kvoli vytazeniu CPU
+                usleep(30000); // nutne kvoli vytazeniu CPU
                 clearstatcache(false, $logPath . "/" . $file);
                 fseek($stream, $streamPosition[$file]);
                 while (($line = fgets($stream)) != FALSE) {

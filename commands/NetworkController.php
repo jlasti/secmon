@@ -83,7 +83,7 @@ class NetworkController extends Controller{
 			$srcIp = $dstIp = -1;
 			$msg = $recSocket->recv(ZMQ::MODE_NOBLOCK);
 			if(empty($msg)){
-				usleep(300000);
+				usleep(30000);
 			}else {
 
 				$position1 = strpos($msg, "src=");

@@ -60,7 +60,7 @@ class CorrelatorController extends Controller{
 		while(true){
 			$msg = $recSocket->recv(ZMQ::MODE_NOBLOCK);
 			if(empty($msq)){
-				usleep(300000);
+				usleep(30000);
 			}
 
 			if (!empty($msg)) {

@@ -62,7 +62,7 @@ class GeoipController extends Controller{
             $msg = $recSocket->recv(ZMQ::MODE_NOBLOCK);
             
 			if(empty($msg)){
-				usleep(300000);
+				usleep(30000);
 			}else {
 
                 $position1 = strpos($msg, "src=");
@@ -81,7 +81,7 @@ class GeoipController extends Controller{
                
                 if($srcIp != -1) {
                     $geoLocationLib = null;
-                    if($srcIp != "localhost" && $srcIp != "127.0.0.1" && !str_contains($srcIp, '10.0.')){
+                    if($srcIp != "localhost" && $srcIp != "127.0.0.1" && strpos($srcIp, '10.0.') === false){
                         try {
                             $geoLocationLib = self::getGeoLocationLib($srcIp);
                         } catch (AddressNotFoundException $e) {
@@ -113,7 +113,7 @@ class GeoipController extends Controller{
 
                 if($dstIp != -1) {
                     $geoLocationLib = null;
-                    if($dstIp == "localhost" && $dstIp = "127.0.0.1" && !str_contains($dstIp, '10.0.')){
+                    if($dstIp == "localhost" && $dstIp = "127.0.0.1" && !strpos($dstIp, '10.0.') === false){
                         try {
                             $geoLocationLib = self::getGeoLocationLib($dstIp);
                         } catch (AddressNotFoundException $e) {
