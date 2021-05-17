@@ -34,10 +34,10 @@ $this->params['title'] = 'Normalization Rule: ' . $model->name;
                     'format' => 'html',
                     'value' => function($model){
                         if($model->state){
-                            return '<b style="color: #11ff00">ACTIVE</b>';
+                            return '<span style="color: #11ff00;">ACTIVE</span>';
                         }
                         else{
-                            return '<b style="color: red">INACTIVE</b>';
+                            return '<span style="color: red">INACTIVE</span>';
                         }
                     },
             ],

@@ -9,6 +9,7 @@ use macgyer\yii2materializecss\widgets\grid\GridView;
 
 $this->params['title'] = 'Correlation Rules';
 ?>
+
 <div class="sec-rule-index">
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
@@ -16,7 +17,7 @@ $this->params['title'] = 'Correlation Rules';
     <div class="main-actions centered-horizontal">
         <?= Html::a("<i class='material-icons'>add</i>" . Yii::t('app', 'Create Correlation Rule'), ['create'], ['class' => 'btn-floating waves-effect waves-light btn-large red']) ?>
     </div>
-    
+
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
@@ -31,14 +32,15 @@ $this->params['title'] = 'Correlation Rules';
                 'format' => 'html',
                 'value' => function($model){
                     if($model->state){
-                        return '<b style="color: #11ff00">ACTIVE</b>';
+                        return '<span style="color: #11ff00;">ACTIVE</span>';
                     }
                     else{
-                        return '<b style="color: red">INACTIVE</b>';
+                        return '<span style="color: red">INACTIVE</span>';
                     }
                 },
             ],
             ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn'],
         ],
     ]); ?>
+
 </div>

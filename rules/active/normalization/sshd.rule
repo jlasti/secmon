@@ -5,7 +5,6 @@ pattern=sshd|SSHD
 desc=filter out non-sshd events
 action=none
 
-
 type=single
 ptype=regexp
 continue=dontcont
@@ -26,7 +25,6 @@ continue=dontcont
 pattern=^([A-Za-z0-9: ]*) (\S+) sshd\[(\d+)\]: reverse mapping checking getaddrinfo for ((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])) \[((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3})\] failed - POSSIBLE BREAK-IN ATTEMPT!$
 desc= hfg $1
 action=write /var/log/secmon/__secInput $1 $2 CEF:0|Security|sshd|0|132|Reverse mapping|0|dst=$8 outcome=failure app=SSHv2 destinationServiceName=sshd dhost=$4 dpid=$3 reason=address does not map back to the address rawEvent=$0
-
 
 
 type=single

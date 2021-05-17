@@ -1,3 +1,11 @@
+##############################################
+# Type = Test rule for correlator
+# Log = Everything
+# SEC variables used = 0
+# Perl variables used = 0
+# Description = Rule used to test if correlator is working
+##############################################
+
 type=Single
 ptype=RegExp
 pattern=.*
