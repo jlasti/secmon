@@ -332,7 +332,7 @@ docker-compose version - vypísanie verzie programu Docker Compose
 ---
 
 ### Inštalačný manuál
-Prerekvizita na inštaláciu SecMon-u je aktualizovaný stroj s OS CentOS 8, s prístupom na internet a s nainštalovanými programami [Docker Engine](https://docs.docker.com/engine/install/) a [Docker Compose](https://docs.docker.com/compose/install/)
+Prerekvizita na inštaláciu SecMon-u je aktualizovaný stroj s OS CentOS 8, s prístupom na internet a s nainštalovanými programami [Docker Engine](https://docs.docker.com/engine/install/) a [Docker Compose](https://docs.docker.com/compose/install/). Funkčnosť programu Docker Engine sa dá overiť príkazom `sudo docker run hello-world`. Funkčnosť programu Docker Compose sa dá oeriť príkazom `sudo docker-compose --version`. V prípade, že príkazy správne nezbehnú, je potrebné tento problém odstrániť, inak inštalácia neprebehne úspešne.
 
 ```
 #Update CentOS-u
@@ -356,7 +356,7 @@ _backend.git secmon
 cd secmon
 
 #Start SecMon deployment process
-./start.sh
+sudo ./start.sh
 
 #Crete password for database user 'secmon' during installation
 
