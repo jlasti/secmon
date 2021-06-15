@@ -1,0 +1,43 @@
+type=single
+continue=dontcont
+ptype=Nregexp
+pattern=sshd|SSHD
+desc=filter out non-sshd events
+action=none
+
+type=single
+ptype=regexp
+continue=dontcont
+pattern=^([A-Za-z0-9: ]*) (\S+) sshd\[(\d+)\]: Failed (password) for( invalid user)? (\S+) from ((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}) port (\d+) ssh2$
+desc=$1 fialed ssh login to $2 from $7 for user $6 on port $11
+action=write /var/log/secmon/__secInput $1 $2 CEF:0|Security|sshd|0|130|Wrong password($6)|0|src=$7 dpt=$11 outcome=failure app=SSHv2 destinationServiceName=sshd duser=$6 dpid=$3 reason=$4$5 rawEvent=$0
+
+type=single
+ptype=regexp
+continue=dontcont
+pattern=^([A-Za-z0-9: ]*) (\S+) sshd\[(\d+)\]: Address ((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}) maps to ((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])), but this does not map back to the address - POSSIBLE BREAK-IN ATTEMPT!$
+desc=$1 hfg
+action=write /var/log/secmon/__secInput $1 $2 CEF:0|Security|sshd|0|131|Bad address mapping|0|dst=$4 outcome=failure app=SSHv2 destinationServiceName=sshd dhost=$8 dpid=$3 reason=address does not map back to the address rawEvent=$0
+
+type=single
+ptype=regexp
+continue=dontcont
+pattern=^([A-Za-z0-9: ]*) (\S+) sshd\[(\d+)\]: reverse mapping checking getaddrinfo for ((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])) \[((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3})\] failed - POSSIBLE BREAK-IN ATTEMPT!$
+desc= hfg $1
+action=write /var/log/secmon/__secInput $1 $2 CEF:0|Security|sshd|0|132|Reverse mapping|0|dst=$8 outcome=failure app=SSHv2 destinationServiceName=sshd dhost=$4 dpid=$3 reason=address does not map back to the address rawEvent=$0
+
+
+type=single
+ptype=regexp
+continue=dontcont
+pattern=^([A-Za-z0-9: ]*) (\S+) sshd\[(\d+)\]: Accepted (password|publickey) for (\S+) from ((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}) port (\d+) ssh2([A-Za-z0-9: ]*)$
+desc=$1 ssh login to $2 from $6 for user $5 on port $10
+action=write /var/log/secmon/__secInput $1 $2 CEF:0|Security|sshd|0|133|Sucess login|0|src=$6 dpt=$10 outcome=success app=SSHv2 destinationServiceName=sshd duser=$5 dpid=$3 reason=$4$11 rawEvent=$0
+
+
+#type=single
+#ptype=regexp
+#continue=dontcont
+#pattern=.*
+#desc=print alll others
+#action=write /var/log/secmon/__secInput $0
