@@ -6,10 +6,8 @@ Prerekvizita na inštaláciu SecMon-u je aktualizovaný stroj s OS CentOS 8, s p
 sudo yum -y update
 
 #Update repository & install useful packages
-sudo rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-late
-st-8.noarch.rpm
-sudo yum -y install vim net-tools bind-utils screen wget curl nc 
-firewalld unzip git
+sudo rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+sudo yum -y install vim net-tools bind-utils screen wget curl nc firewalld unzip git
 
 #Set up firewall (web & rsyslog)
 sudo firewall-cmd --permanent --add-port=8080/tcp
