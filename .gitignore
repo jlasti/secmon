@@ -38,3 +38,6 @@ output/
 
 # sec rules folder
 rules/uploads/
+
+# pycache is not needed
+__pycache__/
