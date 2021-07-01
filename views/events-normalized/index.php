@@ -40,6 +40,7 @@ $this->registerJs('
                     [
                             'class' => 'yii\grid\SerialColumn',
                     ],
+                    'id',
                     [
                         'attribute' => 'datetime',
                         'value' => 'datetime',

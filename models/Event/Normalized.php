@@ -91,6 +91,13 @@ class Normalized extends Event
 		$event->request_method = $values['request_method'] ?? "";
 		$event->request_url = $request_url ?? "";
 		$event->request_client_application = $request_client_application ?? "";
+		$event->destination_user_name = $values['duser'] ?? "";
+		$event->destination_user_id = $values['duid'] ?? "";
+		$event->destination_group_name = $values['cs1'] ?? "";
+		$event->destination_group_id = $values['cn1'] ?? "";
+		$event->device_process_id = $values['dvcpid'] ?? "";
+        $event->source_user_privileges = $values['spriv'] ?? "";
+        $event->exec_user = $values['cs2'] ?? "";
 		$event->raw = $raw;
 
 		self::setEventLoc($event);

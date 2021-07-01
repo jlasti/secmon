@@ -119,6 +119,7 @@ class SecRuleController extends Controller
                 unlink($model->link);
             }
             $model->delete();
+            exec("sudo systemctl restart secmon-correlator.service");
 
         return $this->redirect(['index']);
     }

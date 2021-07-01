@@ -38,6 +38,13 @@ use yii\base\InvalidConfigException;
  * @property string $request_method
  * @property string $request_url
  * @property String $request_client_application
+ * @property string $destination_user_name
+ * @property integer $destination_user_id
+ * @property string $destination_group_name
+ * @property integer $destination_group_id
+ * @property integer $device_process_id
+ * @property string $source_user_privileges
+ * @property string $exec_user
  * @property string $extensions
  * @property string $raw
  * @property boolean analyzed
@@ -60,8 +67,8 @@ class EventsNormalized extends BaseEvent
         return [
             [['datetime'], 'safe'],
             [['cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_event_class_id', 'cef_name', 'cef_severity'], 'required'],
-            [['cef_event_class_id', 'cef_severity', 'src_port', 'dst_port'], 'integer'],
-            [['extensions', 'raw', 'request_url', 'request_client_application'], 'string'],
+            [['cef_event_class_id', 'cef_severity', 'src_port', 'dst_port', 'destination_user_id', 'destination_group_id', 'device_process_id'], 'integer'],
+            [['extensions', 'raw', 'request_url', 'request_client_application','destination_user_name', 'destination_group_name','source_user_privileges', 'exec_user'], 'string'],
             [['analyzed'], 'boolean'],
             [['src_latitude', 'dst_latitude', 'src_longitude', 'dst_longitude'], 'double'],
             [['host', 'cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_name', 'src_ip', 'dst_ip', 'protocol', 'src_mac', 'dst_mac', 'src_country', 'dst_country', 'src_city', 'dst_city', 'src_latitude', 'dst_latitude', 'src_longitude', 'dst_longitude', 'request_method'], 'string', 'max' => 255],
@@ -95,10 +102,17 @@ class EventsNormalized extends BaseEvent
             'src_latitude' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
             'dst_latitude' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
             'src_longitude' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
-	    'dst_longitude' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
-	    'request_method' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
-	    'request_url' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
-	    'request_client_application' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+	        'dst_longitude' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+	        'request_method' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+	        'request_url' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+	        'request_client_application' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'destination_user_name' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'destination_user_id' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'destination_group_name' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'destination_group_id' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'device_process_id' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'source_user_privileges' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'exec_user' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
             'extensions' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
             'raw' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
         ];
@@ -131,10 +145,17 @@ class EventsNormalized extends BaseEvent
             'src_latitude' => 'Src Latitude',
             'dst_latitude' => 'Dst Latitude',
             'src_longitude' => 'Src Longitude',
-	    'dst_longitude' => 'Dst Longitude',
-	    'request_method' => 'Request Method',
-	    'request_url' => 'Request Url',
-	    'request_client_application' => 'Request Client Application',
+	        'dst_longitude' => 'Dst Longitude',
+	        'request_method' => 'Request Method',
+	        'request_url' => 'Request Url',
+	        'request_client_application' => 'Request Client Application',
+            'destination_user_name' => 'Destination User Name',
+            'destination_user_id' => 'Destination User ID',
+            'destination_group_name' => 'Destination Group Name',
+            'destination_group_id' => 'Destination Group ID',
+            'device_process_id' => 'Device Process ID',
+            'source_user_privileges' => 'Source User Privileges',
+            'exec_user' => 'Exec User',
             'extensions' => 'Extensions',
             'raw' => 'Raw',
         ];

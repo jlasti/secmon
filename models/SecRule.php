@@ -12,6 +12,7 @@ use yii\web\UploadedFile;
  * @property string $name
  * @property string $link
  * @property string $state
+ * @property string $description
  * @property string $type
  */
 class SecRule extends \yii\db\ActiveRecord
@@ -37,6 +38,7 @@ class SecRule extends \yii\db\ActiveRecord
         return [
             [['name', 'link', 'type'], 'string', 'max' => 255],
             [['state'], 'boolean'],
+            [['description'], 'string'],
             [['secConfigFile'], 'file', 'skipOnEmpty' => !$this->isNewRecord, 'extensions' => 'rule', 'checkExtensionByMimeType' => false],
         ];
     }
@@ -52,6 +54,7 @@ class SecRule extends \yii\db\ActiveRecord
             'link' => 'Link',
             'state' => 'Active rule',
             'type' => 'Type',
+            'description' => 'Description',
             'secConfigFile' => ''
         ];
     }
@@ -62,9 +65,12 @@ class SecRule extends \yii\db\ActiveRecord
         if($this->save())
         {
             if($this->state)
-                $files = scandir("/var/www/html/secmon/rules/active/correlation");
+//                $files = scandir("/var/www/html/secmon/rules/active/correlation");
+                $files = scandir(Yii::getAlias('@app/rules/active/correlation'));
+
             else
-                $files = scandir("/var/www/html/secmon/rules/available/correlation");
+ //               $files = scandir("/var/www/html/secmon/rules/available/correlation");
+                $files = scandir(Yii::getAlias('@app/rules/available/correlation'));
 
             $fileExists = 0;
 
@@ -90,7 +96,7 @@ class SecRule extends \yii\db\ActiveRecord
             if($this->secConfigFile->saveAs($path) && $this->save())
 			{
 				$transaction->commit();
-
+                exec("sudo systemctl restart secmon-correlator.service");
 				return true;
 			}
 
@@ -106,27 +112,35 @@ class SecRule extends \yii\db\ActiveRecord
     {
 
         $linkParts = explode("/", $this->link);
-        $fileName = $linkParts[7];
+        $fileName = end($linkParts);
         $fileExists = 0;
+        $appPath = Yii::getAlias('@app');
+        $ruleState = (SecRule::findOne($this->id))->state;
 
         if ($this->state) {
-            $this->link = '/var/www/secmon/rules/active/correlation' . '/' . $fileName;
-            $files = scandir('/var/www/secmon/rules/active/correlation');
+            $this->link = $appPath . '/rules/active/correlation' . '/' . $fileName;
+            $files = scandir($appPath . '/rules/active/correlation');
             foreach ($files as $file) {
                 if ($file == $fileName)
                     $fileExists = 1;
             }
-            if (!$fileExists)
-                exec("mv /var/www/secmon/rules/available/correlation/'$fileName' /var/www/secmon/rules/active/correlation/'$fileName'");
+            if (!$fileExists) {
+                exec("mv $appPath/rules/available/correlation/'$fileName' $appPath/rules/active/correlation/'$fileName'");
+                if($this->state != $ruleState)
+                    exec("sudo systemctl restart secmon-correlator.service");
+            }
         } else {
-            $this->link = '/var/www/secmon/rules/available/correlation' . '/' . $fileName;
-            $files = scandir('/var/www/secmon/rules/available/correlation');
+            $this->link = $appPath . '/rules/available/correlation' . '/' . $fileName;
+            $files = scandir($appPath . '/rules/available/correlation');
             foreach ($files as $file) {
                 if ($file == $fileName)
                     $fileExists = 1;
             }
-            if (!$fileExists)
-                exec("mv /var/www/secmon/rules/active/correlation/'$fileName' /var/www/secmon/rules/available/correlation/'$fileName'");
+            if (!$fileExists){
+                exec("mv $appPath/rules/active/correlation/'$fileName' $appPath/rules/available/correlation/'$fileName'");
+                if($this->state != $ruleState)
+                    exec("sudo systemctl restart secmon-correlator.service");
+            }
         }
     }
 }

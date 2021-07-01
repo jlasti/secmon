@@ -1,0 +1,46 @@
+##############################################
+# Author = Matus Mikulas
+# Type = Normalization rule for group-management commands usage
+# Log1 = Mar  1 18:21:48 localhost groupadd[14990]: group added to /etc/group: name=skupina2, GID=1007
+# Log2 = Mar  5 16:09:42 localhost gpasswd[16875]: user user2000 added by root to group group100
+# Log3 = Mar  4 15:30:25 localhost usermod[31552]: add 'jonas' to group 'skupina1'
+# Log4 = Mar  4 15:36:19 localhost gpasswd[31679]: user jonas removed by root from group skupina2
+# Log5 = Mar  6 16:10:15 localhost groupdel[16958]: group 'group200' removed from /etc/group
+# SEC variables used = -
+# Perl variables used = -
+# Description1 = First rule match 'groupadd' command usage
+# Description2 = Second rule match adding user to group using 'gpasswd' command
+# Description3 = Third rule match adding user to group using 'usermod' command
+# Description4 = Fourth rule match removing user from group using 'gpasswd' command
+# Description5 = Fifth rule match 'groupdel' command usage
+##############################################
+
+type=Single
+ptype=RegExp
+pattern=^(\S+\s+\d+\s[0-9:]*) (\S+) groupadd\[(\d+)\]: group added to /etc/group: name=(\S+), GID=(\d+)
+desc=$0
+action=write /var/log/secmon/__secInput $1 $2 CEF:0|Linux|groupadd|0|0|New '$4' group|0| dvcpid=$3 cs1=$4 cs1Label=destinationGroupName cn1=$5 cn1Label=destinationGroupId rawEvent=$0
+
+type=Single
+ptype=RegExp
+pattern=^(\S+\s+\d+\s[0-9:]*) (\S+) gpasswd\[(\d+)\]: user (\S+) added by (\S+) to group (\S+)
+desc=$0
+action=write /var/log/secmon/__secInput $1 $2 CEF:0|Linux|groupadd|0|0|Add '$4' to '$6' group|0| dvcpid=$3 duser=$4 cs2=$5 cs2Label=execUser cs1=$6 cs1Label=destinationGroupName rawEvent=$0
+
+type=Single
+ptype=RegExp
+pattern=^(\S+\s+\d+\s[0-9:]*) (\S+) usermod\[(\d+)\]: add '(\S+)' to group '(\S+)'
+desc=$0
+action=write /var/log/secmon/__secInput $1 $2 CEF:0|Linux|usermod|0|0|Add '$4' to '$5' group|0| dvcpid=$3 duser=$4 cs1=$5 cs1Label=destinationGroupName rawEvent=$0
+
+type=Single
+ptype=RegExp
+pattern=^(\S+\s+\d+\s[0-9:]*) (\S+) gpasswd\[(\d+)\]: user (\S+) removed by (\S+) from group (\S+)
+desc=$0
+action=write /var/log/secmon/__secInput $1 $2 CEF:0|Linux|gpasswd|0|0|Remove '$4' from '$6' group|0| dvcpid=$3 duser=$4 cs2=$5 cs2Label=execUser cs1=$6 cs1Label=destinationGroupName rawEvent=$0
+
+type=Single
+ptype=RegExp
+pattern=^(\S+\s+\d+\s[0-9:]*) (\S+) groupdel\[(\d+)\]: group '(\S+)' removed from /etc/group
+desc=$0
+action=write /var/log/secmon/__secInput $1 $2 CEF:0|Linux|gpasswd|0|0|Group '$4' removed|0| dvcpid=$3 cs1=$4 cs1Label=destinationGroupName rawEvent=$0

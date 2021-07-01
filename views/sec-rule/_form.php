@@ -35,13 +35,18 @@ use macgyer\yii2materializecss\widgets\form\ActiveForm;
         <?= $form->field($model, 'state')->checkbox() ?>
     </div>
 
+    <div class="row">
+        <?= $form->field($model, 'description')->textarea() ?>
+
+        <p>*Description field supports Markdown syntax (<a href="https://www.markdownguide.org/">Markdown Guide</a>).</p>
+    </div>
+
     <div class="row"></div>
 			
     <div class="row">
         <div class="form-group">
             <?= Html::submitButton('Create' , ['class' => 'waves-effect waves-light green btn',
                 'data' => [
-                    'confirm' => Yii::t('app', "To start using added active rule, systemctl restart secmon-corellator.service is required !!"),
                     'method' => 'post',
                 ], ]) ?>
         </div>

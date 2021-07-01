@@ -1,0 +1,43 @@
+##############################################
+# Author = Matus Mikulas
+# Type = Normalization rule for 'sudo' command usage
+# Log1 = Mar 31 12:49:21 localhost sudo:   matus : TTY=pts/1 ; PWD=/home/matus ; USER=root ; COMMAND=/usr/bin/systemctl restart secmon-normalizer.service
+# Log2 = Mar 31 13:50:47 localhost sudo:   matus : TTY=pts/1 ; PWD=/home/matus ; USER=root ; COMMAND=/usr/bin/systemctl restart secmon-correlator.service
+# Log3 = Mar 31 12:26:45 localhost sudo:   matus : TTY=pts/1 ; PWD=/home/matus ; USER=root ; COMMAND=/bin/ls
+# Log4 = Mar  4 15:50:00 localhost sudo:  secmon : user NOT in sudoers ; TTY=pts/1 ; PWD=/home/matus ; USER=root ; COMMAND=/bin/gpasswd -d
+# SEC variables used = -
+# Perl variables used = -
+# Description1 = First rule match 'sudo /bin/systemctl restart secmon-normalizer.service' command usage and ignore that event
+# Description2 = Second rule match 'sudo /bin/systemctl restart secmon-correlator.service' command usage and ignore that event
+# Description3 = Third rule match succesful 'sudo' usage
+# Description4 = Fourth rule match invalid 'sudo' usage tries
+##############################################
+
+type=Single
+ptype=RegExp
+continue=DontCont
+pattern=^(\S+\s+\d+\s[0-9:]*) (\S+) sudo:\s+apache\s+: TTY=(\S+) ; PWD=/var/www/html/secmon/web ; USER=root ; COMMAND=/bin/systemctl restart secmon-normalizer.service
+desc=$0
+action=none
+
+type=Single
+ptype=RegExp
+continue=DontCont
+pattern=^(\S+\s+\d+\s[0-9:]*) (\S+) sudo:\s+apache\s+: TTY=(\S+) ; PWD=/var/www/html/secmon/web ; USER=root ; COMMAND=/bin/systemctl restart secmon-correlator.service
+desc=$0
+action=none
+
+
+type=Single
+ptype=RegExp
+pattern=^(\S+\s+\d+\s[0-9:]*) (\S+) sudo:\s+(\S+)\s+: TTY=(\S+) ; PWD=(\S+) ; USER=(\S+) ; COMMAND=(\S+)
+desc=$0
+action= write /var/log/secmon/__secInput $1 $2 CEF:0|Linux|sudo|0|0|'sudo' command usage|0| cs2=$3 cs2Label=execUser spriv=$6 rawEvent=$0
+
+type=Single
+ptype=RegExp
+pattern=^(\S+\s+\d+\s[0-9:]*) (\S+) sudo:\s+(\S+)\s+: user NOT in sudoers ; TTY=(\S+) ; PWD=(\S+) ; USER=(\S+) ; COMMAND=(\S+)
+desc=$0
+action= write /var/log/secmon/__secInput $1 $2 CEF:0|Linux|sudo|0|0|Invalid 'sudo' usage|0| cs2=$3 cs2Label=execUser spriv=$6 rawEvent=$0
+
+

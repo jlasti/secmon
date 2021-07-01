@@ -28,7 +28,25 @@ $this->params['title'] = 'Correlation Rule: ' . $model->name;
             'id',
             'name',
             'type',
-            'state',
+            [
+                'attribute' => 'state',
+                'label' => 'State',
+                'format' => 'html',
+                'value' => function($model){
+                    if($model->state){
+                        return '<span style="color: #11ff00;">ACTIVE</span>';
+                    }
+                    else{
+                        return '<span style="color: red">INACTIVE</span>';
+                    }
+                },
+            ],
+            [
+                'label' => 'Description',
+                'format' => 'html',
+                'value' => \yii\helpers\Markdown::process($model->description, "gfm-comment"),
+
+            ],
         ],
     ]) ?>
 
