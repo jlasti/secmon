@@ -1,0 +1,103 @@
+#requirements: yum install gnutls-utils
+               yum install rsyslog-gnutls
+
+#Generate CA certificates(we will use this certificates to create client/server certificates, do this on server side)
+#Generate private key
+    certtool --generate-privkey --outfile ca-key.pem
+#Generate CA certificate
+    certtool --generate-self-signed --load-privkey ca-key.pem --outfile ca.pem
+        => fill required information as u wish(u can press enter to ignore a field)
+        => fill these fileds as follows: The certificate will expire in (days): 3650
+                                         Does the certificate belong to an authority? (y/N): y
+                                         Will the certificate be used to sign other certificates? (y/N): y
+
+#Generate clients private key
+    certtool --generate-privkey --outfile rslclient-key.pem --bits 2048
+#Generate request to make clients certificate
+    certtool --generate-request --load-privkey rslclient-key.pem --outfile request.pem
+        => fill these fileds as follows: Common name: secmon-client1
+                                         Enter a dnsName of the subject of the certificate: secmon-client1          
+                                         Does the certificate belong to an authority? (y/N): n
+                                         Is this a TLS web client certificate? (y/N): y
+                                         Is this also a TLS web server certificate? (y/N): y
+
+#Generate clients certificate
+    certtool --generate-certificate --load-request request.pem --outfile rslclient-cert.pem --load-ca-certificate ca.pem --load-ca-privkey ca-key.pem
+        => fill these fileds as follows: The certificate will expire in (days): 3650
+                                         Does the certificate belong to an authority? (y/N): n
+                                         Is this a TLS web client certificate? (y/N): y
+                                         Is this also a TLS web server certificate? (y/N): y
+                                         Enter a dnsName of the subject of the certificate: secmon-client1
+                            
+
+#Remove request
+    rm -rf request.pem
+
+#Generate private certificate for server
+    certtool --generate-privkey --outfile rslserver-key.pem --bits 2048
+
+#Generate request to make servers certificate
+    certtool --generate-request --load-privkey rslserver-key.pem --outfile request.pem
+        => fill these fileds as follows: Common name: secmon-server
+                                         Enter a dnsName of the subject of the certificate: secmon-server        
+                                         Does the certificate belong to an authority? (y/N): n
+                                         Is this a TLS web client certificate? (y/N): y
+                                         Is this also a TLS web server certificate? (y/N): y
+
+#Generate servers certificate
+    certtool --generate-certificate --load-request request.pem --outfile rslserver-cert.pem --load-ca-certificate ca.pem --load-ca-privkey ca-key.pem
+        => fill these fileds as follows: The certificate will expire in (days): 3650
+                                         Does the certificate belong to an authority? (y/N): n
+                                         Is this a TLS web client certificate? (y/N): y
+                                         Is this also a TLS web server certificate? (y/N): y
+                                         Enter a dnsName of the subject of the certificate: secmon-server
+
+
+#Copy certificates and key to client
+    rsync -aP rslclient-* root@<client_ip>:/etc/pki/tls/private/
+    rsync -aP ca.pem root@<client_ip>:/etc/pki/tls/private/
+
+#Copy certificates on server side to tls directory
+    cp rslserver-cert.pem  /etc/pki/tls/private/rslserver-cert.pem
+    cp rslserver-key.pem  /etc/pki/tls/private/rslserver-key.pem
+    cp ca.pem  /etc/pki/tls/private/ca.pem
+
+
+#Add lines to /ets/rsyslog.conf
+#Server side
+    ------------------------------------------------------------------------------------------------------------------------------------------------------------
+    $DefaultNetstreamDriver gtls
+
+    $DefaultNetstreamDriverCAFile /etc/pki/tls/private/ca.pem
+    $DefaultNetstreamDriverCertFile /etc/pki/tls/private/rslserver-cert.pem
+    $DefaultNetstreamDriverKeyFile /etc/pki/tls/private/rslserver-key.pem
+
+    $ModLoad imtcp
+
+    $InputTCPServerStreamDriverAuthMode anon
+    $InputTCPServerStreamDriverMode 1 # run driver in TLS-only mode
+
+    $ActionSendStreamDriverAuthMode x509/name
+    $ActionSendStreamDriverPermittedPeer secmon-client1
+    $ActionSendStreamDriverMode 1 # run driver in TLS-only mode
+
+    $InputTCPServerRun 514
+
+    # Increase the amount of open files rsyslog is allowed, which includes open tcp sockets
+    # This is important if there are many clients.
+    # http://www.rsyslog.com/doc/rsconf1_maxopenfiles.html
+    $MaxOpenFiles 2048
+    ----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#Client side
+    -------------------------------------------------------------------------------------------------------------------------------------------------------------
+    $DefaultNetstreamDriver gtls
+
+    $DefaultNetstreamDriverCAFile /etc/pki/tls/private/ca.pem
+    $DefaultNetstreamDriverCertFile /etc/pki/tls/private/rslclient-cert.pem
+    $DefaultNetstreamDriverKeyFile /etc/pki/tls/private/rslclient-key.pem
+
+    $ActionSendStreamDriverPermittedPeer secmon-server
+    $ActionSendStreamDriverMode 1 # run driver in TLS-only mode
+    $ActionSendStreamDriverAuthMode x509/name
+    -------------------------------------------------------------------------------------------------------------------------------------------------------------

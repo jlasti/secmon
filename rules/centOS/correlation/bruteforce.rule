@@ -15,7 +15,7 @@ type=SingleWithThreshold
 ptype=RegExp
 pattern=(\d+):(\w{3} [\s\d]\d [\d:]+) (\S+).(.*)CEF.*Authentication failed.*rhost=(\S+)
 desc=Multiple failed ssh authentication attempts from $5
-action=write /var/www/secmon/__secInput $2 $3 $4 CEF:0|Security|sshd|0|130|Wrong authentication - Possible burte force attack|0|att=brute_force src=$5 rawEvent=$0
+action=write /var/www/html/secmon/__secInput $2 $3 $4 CEF:0|Security|sshd|0|130|Wrong authentication - Possible burte force attack|0|att=brute_force src=$5 rawEvent=$0
 window=60
 thresh=3
 
@@ -29,7 +29,7 @@ type=SingleWithThreshold
 ptype=RegExp
 pattern=(\d+):(\w{3} [\s\d]\d [\d:]+) (\S+).(.*)CEF.*Wrong password.*src=(.*)spt=(\d+).*duser=(\S+).*dhost=(\S+)
 desc=Multiple ssh password failures from $5
-action=write /var/www/secmon/__secInput $2 $3 $8 CEF:0|Security|sshd|0|131|Wrong passwords - Possible burte force attack|0|att=brute_force src=$5 rawEvent=$0
+action=write /var/www/html/secmon/__secInput $2 $3 $8 CEF:0|Security|sshd|0|131|Wrong passwords - Possible burte force attack|0|att=brute_force src=$5 rawEvent=$0
 window=60
 thresh=2
 
@@ -70,6 +70,6 @@ thresh=2
 # pattern=(\d+):(\w{3} [\s\d]\d [\d:]+) (\S+).(.*)CEF.*Sucess login.*src=(.*)spt=(\d+).*duser=(\S+).*dhost=(\S+)
 # desc=Investigate Possible Successful break-in against user $7 from host $4
 # context=SSH_BRUTE_AGAINST_$7
-# action=write /var/www/secmon/__secInput $2 $3 $4 CEF:0|Security|sshd|0|131|Wrong passwords - Possible burte force attacks|0|att=brute_force src=$5 rawEvent=$0 ; delete SSH_BRUTE_AGAINST_$7;
+# action=write /var/www/html/secmon/__secInput $2 $3 $4 CEF:0|Security|sshd|0|131|Wrong passwords - Possible burte force attacks|0|att=brute_force src=$5 rawEvent=$0 ; delete SSH_BRUTE_AGAINST_$7;
 
 # === END - Bruteforce SSH attack detection from many IP ===

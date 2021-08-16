@@ -1,0 +1,39 @@
+# /var/www/html/secmon/commands/middleware_builder.py
+
+1. Implement the module
+2. Add the script to path /var/www/html/secmon/commands prefferably (here are other event proccesing pipeline modules)
+3. Make a system service out of new module's script
+4. Add new modules parrameters to configurtion file /var/www/html/secmon/config/middleware_config.ini
+5. Add validation to middleware_builder - if required
+6. Add lines to middleware_builder to assign tcp port number if the modul is being used:
+        Example(Geoip module): if config.get('ENRICHMENT', 'geoip').lower() == "true":
+                               #write 0MQ port for Geoip
+                               aggregator_conf_file.write("Geoip: %d\n" % port)
+                               port += 1
+7. Add start/stop/restart systemcalls to middleware_builder
+8. Make sure that module implementation contains following code:
+        -> to read data from tmp system file aggregator_conf_file and chceck wheter this module saves data to db
+        Example(Geoip module):
+-----------------------------------------------------------------------------------------------------------------------------------------
+        $aggregator_config_file = $this->openNonBlockingStream("/var/www/html/secmon/config/aggregator_config.ini");              #Opens config file
+        $save_to_db = 0;
+		if($aggregator_config_file){
+			while(($line = fgets($aggregator_config_file)) !== false){
+				if(strpos($line, "Geoip:") !== FALSE){                                                                             #Gets port by key value "Geoip"
+					$parts = explode(":", $line);
+					$portOut = trim($parts[1]);                                                                                    #Get port out - used to push msg
+				}
+			}
+		}else{
+		     throw new Exception('Could not open a config file');
+		}
+
+        fclose($aggregator_config_file);
+        $portIn = $portOut - 1;			                                                                                           #Calculate inputput port
+		$aggregator_config_file = escapeshellarg("/var/www/html/secmon/config/aggregator_config.ini");
+		$last_line = `tail -n 1 $aggregator_config_file`; 		                                                                   #Get last line of temp file
+
+		if(strpos($last_line, "Geoip:")!== FALSE){		                                                   #If last is this module(Geoip) then ensure saving event to db
+			$save_to_db = 1;
+		}
+----------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -45,6 +45,8 @@ class m210403_113834_005_create_table_events_normalized extends Migration
             'request_url' => $this->text(),
             'request_client_application' => $this->text(),
             'request_method' => $this->string(),
+            'dst_ip_network_model' => $this->integer(),
+            'src_ip_network_model' => $this->integer(),
         ], $tableOptions);
 
         $this->createIndex('idx_events_norm_datetime', '{{%events_normalized}}', 'datetime');
