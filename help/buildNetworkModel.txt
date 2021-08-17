@@ -1,0 +1,9 @@
+#requirements:
+# sudo yum install nmap
+# sudo pip3 install python-libnmap
+
+#You need to scan subnet with nmap tool and save its output to .xml file
+#On path /var/www/html/secmon/commands/ run script:
+    ./network_model_builder.py <nmap_file>.xml
+
+#This will insert scanned entries to network model if they are not already there(Identificator is IP address)

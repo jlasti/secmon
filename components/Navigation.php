@@ -75,7 +75,14 @@ class Navigation extends \yii\base\Component
                 'active' => 'normalization-rule',
                 'icon' => 'receipt'
 
-            ],
+			],
+			[
+				'label' => 'Network model',
+				'url' => ['/network-model'],
+				'visible' => Yii::$app->user->identity->can('create_users'),
+				'active' => 'network-model',
+				'icon' => 'laptop'
+	        ],
 	        [
 				'label' => 'Users',
 				'url' => ['/user'],
