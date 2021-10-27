@@ -23,7 +23,7 @@ class m210429_093420_create_table_interface extends Migration
             'name' => $this->string(),
         ], $tableOptions);
 
-        $this->addForeignKey('fk_network_model_id ', '{{%interface}}', '(network_model_id) ', '{{%network_model}}', 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKey('fk_network_model_id', '{{%interface}}', 'network_model_id', '{{%network_model}}', 'id', 'CASCADE', 'CASCADE');
     }
 
     public function down()

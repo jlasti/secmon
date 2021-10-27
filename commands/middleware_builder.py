@@ -118,7 +118,7 @@ def assign_output_named_pipes(type, named_pipe):
                     line = line.replace(line, line[0:index2] + named_pipe + line[index - 1:])
                 sys.stdout.write(line)
 
-    path_to_rules = "/var/www/html/secmon/rules/default/" + type
+    path_to_rules = "/var/www/html/secmon/rules/available/" + type
     for file in os.listdir(path_to_rules):
         if file.endswith(".rule"):
             file_to_open = path_to_rules + "/" + file
