@@ -1,0 +1,54 @@
+##############################################
+# Author = Matus Mikulas
+# Type = Normalization rule for group-management commands usage
+# Log1 = Mar  1 18:21:48 localhost groupadd[14990]: group added to /etc/group: name=skupina2, GID=1007
+# Log2 = Mar  5 16:09:42 localhost gpasswd[16875]: user user2000 added by root to group group100
+# Log3 = Mar  4 15:30:25 localhost usermod[31552]: add 'jonas' to group 'skupina1'
+# Log4 = Mar  4 15:36:19 localhost gpasswd[31679]: user jonas removed by root from group skupina2
+# Log5 = Mar  6 16:10:15 localhost groupdel[16958]: group 'group200' removed from /etc/group
+# Log6 = Jul 12 22:56:44 secmon userdel[13457]: removed group 'test4' owned by 'test4'
+# 
+# SEC variables used = -
+# Perl variables used = -
+# Description1 = First rule match 'groupadd' command usage
+# Description2 = Second rule match adding user to group using 'gpasswd' command
+# Description3 = Third rule match adding user to group using 'usermod' command
+# Description4 = Fourth rule match removing user from group using 'gpasswd' command
+# Description5 = Fifth rule match 'groupdel' command usage
+##############################################
+
+type=Single
+ptype=RegExp
+pattern=^([1-9]|[1-9][0-9]|1[0-8][0-9]|19[01]) (\S+\s+\d+\s[0-9:]*) (\S+) groupadd\[(\d+)\]: group added to /etc/group: name=(\S+), GID=(\d+)
+desc=$0
+action=write /var/log/secmon/__secInput $2 $3 CEF:0|Linux|groupadd|0|0|New '$5' group|$1| dvcpid=$4 cs1=$5 cs1Label=destinationGroupName cn1=$6 cn1Label=destinationGroupId rawEvent=$0
+
+type=Single
+ptype=RegExp
+pattern=^([1-9]|[1-9][0-9]|1[0-8][0-9]|19[01]) (\S+\s+\d+\s[0-9:]*) (\S+) gpasswd\[(\d+)\]: user (\S+) added by (\S+) to group (\S+)
+desc=$0
+action=write /var/log/secmon/__secInput $2 $3 CEF:0|Linux|groupadd|0|0|Add '$5' to '$7' group|$1| dvcpid=$4 duser=$5 cs2=$6 cs2Label=execUser cs1=$7 cs1Label=destinationGroupName rawEvent=$0
+
+type=Single
+ptype=RegExp
+pattern=^([1-9]|[1-9][0-9]|1[0-8][0-9]|19[01]) (\S+\s+\d+\s[0-9:]*) (\S+) usermod\[(\d+)\]: add '(\S+)' to group '(\S+)'
+desc=$0
+action=write /var/log/secmon/__secInput $2 $3 CEF:0|Linux|usermod|0|0|Add '$5' to '$6' group|$1| dvcpid=$4 duser=$5 cs1=$6 cs1Label=destinationGroupName rawEvent=$0
+
+type=Single
+ptype=RegExp
+pattern=^([1-9]|[1-9][0-9]|1[0-8][0-9]|19[01]) (\S+\s+\d+\s[0-9:]*) (\S+) gpasswd\[(\d+)\]: user (\S+) removed by (\S+) from group (\S+)
+desc=$0
+action=write /var/log/secmon/__secInput $2 $3 CEF:0|Linux|gpasswd|0|0|Remove '$5' from '$7' group|$1| dvcpid=$4 duser=$5 cs2=$6 cs2Label=execUser cs1=$7 cs1Label=destinationGroupName rawEvent=$0
+
+type=Single
+ptype=RegExp
+pattern=^([1-9]|[1-9][0-9]|1[0-8][0-9]|19[01]) (\S+\s+\d+\s[0-9:]*) (\S+) groupdel\[(\d+)\]: group '(\S+)' removed from /etc/group
+desc=$0
+action=write /var/log/secmon/__secInput $2 $3 CEF:0|Linux|gpasswd|0|0|group '$5' removed|$1| dvcpid=$4 cs1=$5 cs1Label=destinationGroupName rawEvent=$0
+
+type=Single
+ptype=RegExp
+pattern=^([1-9]|[1-9][0-9]|1[0-8][0-9]|19[01]) (\S+\s+\d+\s[0-9:]*) (\S+) userdel\[(\d+)\]: removed group '(\S+)' owned by '(\S+)'
+desc=$0
+action=write /var/log/secmon/__secInput $2 $3 CEF:0|Linux|gpasswd|0|0|group '$5' removed|$1| dvcpid=$4 cs1=$5 cs1Label=destinationGroupName rawEvent=$0

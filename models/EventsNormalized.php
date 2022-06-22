@@ -1,0 +1,180 @@
+<?php
+
+namespace app\models;
+
+use app\components\filter\FilterQuery;
+use app\components\filter\FilterTypeEnum;
+use Yii;
+use yii\base\InvalidConfigException;
+
+/**
+ * This is the model class for table "events_normalized".
+ *
+ * @property string $id
+ * @property string $datetime
+ * @property string $host
+ * @property string $cef_version
+ * @property string $cef_vendor
+ * @property string $cef_dev_prod
+ * @property string $cef_dev_version
+ * @property integer $cef_event_class_id
+ * @property string $cef_name
+ * @property integer $cef_severity
+ * @property string $src_ip
+ * @property string $dst_ip
+ * @property integer $src_port
+ * @property integer $dst_port
+ * @property string $protocol
+ * @property string $src_mac
+ * @property string $dst_mac
+ * @property string $src_country
+ * @property string $dst_country
+ * @property string $src_city
+ * @property string $dst_city
+ * @property float $src_latitude
+ * @property float $dst_latitude
+ * @property float $src_longtitude
+ * @property float $dst_longtitude
+ * @property string $request_method
+ * @property string $request_url
+ * @property String $request_client_application
+ * @property string $destination_user_name
+ * @property integer $destination_user_id
+ * @property string $destination_group_name
+ * @property integer $destination_group_id
+ * @property integer $device_process_id
+ * @property string $source_user_privileges
+ * @property string $exec_user
+ * @property string $extensions
+ * @property string $raw
+ * @property boolean analyzed
+ */
+class EventsNormalized extends BaseEvent
+{
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return 'events_normalized';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            [['datetime'], 'safe'],
+            [['cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_event_class_id', 'cef_name', 'cef_severity'], 'required'],
+            [['cef_event_class_id', 'cef_severity', 'src_port', 'dst_port', 'destination_user_id', 'destination_group_id', 'device_process_id'], 'integer'],
+            [['extensions', 'raw', 'request_url', 'request_client_application','destination_user_name', 'destination_group_name','source_user_privileges', 'exec_user'], 'string'],
+            [['analyzed'], 'boolean'],
+            [['src_latitude', 'dst_latitude', 'src_longitude', 'dst_longitude'], 'double'],
+            [['host', 'cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_name', 'src_ip', 'dst_ip', 'protocol', 'src_mac', 'dst_mac', 'src_country', 'dst_country', 'src_city', 'dst_city', 'src_latitude', 'dst_latitude', 'src_longitude', 'dst_longitude', 'request_method'], 'string', 'max' => 255],
+        ];
+    }
+
+    public static function columns()
+    {
+        return [
+            'id' => [ FilterTypeEnum::COMPARE ],
+            'datetime' => [ FilterTypeEnum::DATE ],
+            'host' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'cef_version' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'cef_vendor' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'cef_dev_prod' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'cef_dev_version' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'cef_event_class_id' => [ FilterTypeEnum::COMPARE ],
+            'cef_name' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'cef_severity' => [ FilterTypeEnum::COMPARE ],
+            'src_ip' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'dst_ip' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'src_port' => [ FilterTypeEnum::COMPARE ],
+            'dst_port' => [ FilterTypeEnum::COMPARE ],
+            'protocol' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'src_mac' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'dst_mac' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'src_country' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'dst_country' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'src_city' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'dst_city' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'src_latitude' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'dst_latitude' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'src_longitude' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'dst_longitude' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'src_ip_network_model' => [ FilterTypeEnum::COMPARE ],
+            'dst_ip_network_model' => [ FilterTypeEnum::COMPARE ],
+            'request_method' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'request_url' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'request_client_application' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'destination_user_name' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'destination_user_id' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'destination_group_name' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'destination_group_id' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'device_process_id' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'source_user_privileges' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'exec_user' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'extensions' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'raw' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+        ];
+    }
+
+    public static function labels()
+    {
+        return [
+            'id' => 'ID',
+            'datetime' => 'Datetime',
+            'host' => 'Host',
+            'cef_version' => 'Cef Version',
+            'cef_vendor' => 'Cef Vendor',
+            'cef_dev_prod' => 'Cef Dev Prod',
+            'cef_dev_version' => 'Cef Dev Version',
+            'cef_event_class_id' => 'Cef Event Class ID',
+            'cef_name' => 'Cef Name',
+            'cef_severity' => 'Cef Severity',
+            'src_ip' => 'Src Ip',
+            'dst_ip' => 'Dst Ip',
+            'src_port' => 'Src Port',
+            'dst_port' => 'Dst Port',
+            'protocol' => 'Protocol',
+            'src_mac' => 'Src Mac',
+            'dst_mac' => 'Dst Mac',
+            'src_country' => 'Src Country',
+            'dst_country' => 'Dst Country',
+            'src_city' => 'Src City',
+            'dst_city' => 'Dst City',
+            'src_latitude' => 'Src Latitude',
+            'dst_latitude' => 'Dst Latitude',
+            'src_longitude' => 'Src Longitude',
+            'dst_longitude' => 'Dst Longitude',
+            'src_ip_network_model' => 'Network model src device ID',
+            'dst_ip_network_model' => 'Network model dst device ID',
+            'request_method' => 'Request Method',
+            'request_url' => 'Request Url',
+            'request_client_application' => 'Request Client Application',
+            'destination_user_name' => 'Destination User Name',
+            'destination_user_id' => 'Destination User ID',
+            'destination_group_name' => 'Destination Group Name',
+            'destination_group_id' => 'Destination Group ID',
+            'device_process_id' => 'Device Process ID',
+            'source_user_privileges' => 'Source User Privileges',
+            'exec_user' => 'Exec User',
+            'extensions' => 'Extensions',
+            'raw' => 'Raw',
+        ];
+    }
+
+    /**
+     * @return object
+     * @throws \yii\base\InvalidConfigException
+     */
+    public static function find()
+    {
+        try {
+            return Yii::createObject(FilterQuery::className(), [get_called_class()]);
+        } catch (InvalidConfigException $e) {
+            echo 'Message: ' .$e->getMessage();
+        }
+    }
+}
