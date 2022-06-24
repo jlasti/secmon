@@ -64,7 +64,7 @@ class AggregatorController extends Controller{
 
         $zmq = new ZMQContext();
         $socket = $zmq->getSocket(ZMQ::SOCKET_PUSH);    
-        $socket->bind("tcp://127.0.0.1:" . $port);
+        $socket->connect("tcp://normalizer:" . $port);
 
         $streamPosition = [];
         $streams = [];
