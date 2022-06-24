@@ -1,0 +1,95 @@
+version: "3"
+services:
+  
+  app:
+    build:
+      context:  ./
+      dockerfile: docker-compose/secmon_app.Dockerfile
+    container_name: secmon-app
+    restart: always
+    ports:
+      - 8080:80
+    volumes:
+      - .:/var/www/html/secmon
+      - /var/log/secmon:/var/log/secmon
+    links:
+      - db
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_PASSWORD=secmon
+      - POSTGRES_USER=secmon
+    depends_on:
+      - db
+
+  aggregator:
+    build:
+      context:  ./
+      dockerfile: docker-compose/secmon_base.Dockerfile
+    container_name: secmon-aggregator
+    restart: always
+    command: ["sh", "-c", "./yii aggregator"]
+    volumes:
+      - .:/var/www/html/secmon
+      - /var/log/secmon:/var/log/secmon
+    depends_on:
+      - app
+
+  normalizer:
+    build:
+      context:  ./
+      dockerfile: docker-compose/secmon_base.Dockerfile
+    container_name: secmon-normalizer
+    restart: always
+    command: ["sh", "-c", "sec --conf=/var/www/html/secmon/rules/active/normalization/*.rule --input=/var/log/secmon/__secOutput --bufsize=1 --detach && ./yii normalizer"]
+    expose: 
+      - 5557
+    volumes:
+      - .:/var/www/html/secmon
+      - /var/log/secmon:/var/log/secmon
+    depends_on:
+      - app
+
+  correlator:
+    build:
+      context:  ./
+      dockerfile: docker-compose/secmon_base.Dockerfile
+    container_name: secmon-correlator
+    restart: always
+    command: ["sh", "-c", "sec --conf=/var/www/html/secmon/rules/active/correlation/*.rule --input=/var/www/html/secmon/__secOutput --bufsize=1 --detach && ./yii correlator"]
+    expose:
+      - 5558
+    volumes:
+      - .:/var/www/html/secmon
+      - /var/log/secmon:/var/log/secmon
+    depends_on:
+      - app
+
+  #geoip:
+    #build:
+      #context:  ./
+      #dockerfile: docker-compose/secmon_geoip.Dockerfile
+    #container_name: secmon-geoip
+    #restart: always
+    #command: ["sh", "-c", "./yii geoip"]
+    #expose:
+      #- 5558
+    #volumes:
+      #- .:/var/www/html/secmon
+      #- /var/log/secmon:/var/log/secmon
+    #depends_on:
+      #- app
+
+  db:
+    image: postgres
+    container_name: secmon-db
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=secmon
+      - POSTGRES_USER=secmon
+    volumes:
+      - db_data:/var/lib/pgsql/data/
+    
+volumes:
+  db_data:  

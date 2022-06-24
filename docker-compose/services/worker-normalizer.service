@@ -1,0 +1,11 @@
+[Unit]
+Description=SecMon service, receives events from aggregator, normalizes them, stores them in db, and sends them to data enrichment module 
+After=systemd-user-sessions.service
+[Service]
+Type=simple
+RemainAfterExit=yes
+WorkingDirectory=/var/www/html/secmon
+ExecStart=/usr/bin/worker-normalizer.sh
+KillMode=control-group
+[Install]
+WantedBy=multi-user.target

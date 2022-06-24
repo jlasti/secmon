@@ -1,0 +1,11 @@
+[Unit]
+Description=SecMon service, reads events from source dir and sends them to normalizer
+After=systemd-user-sessions.service
+[Service]
+Type=simple
+RemainAfterExit=yes
+WorkingDirectory=/var/www/html/secmon
+ExecStart=/usr/bin/secmon-aggregator.sh
+KillMode=control-group
+[Install]
+WantedBy=multi-user.target

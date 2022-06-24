@@ -1,0 +1,11 @@
+[Unit]
+Description=SecMon service, main correlation module
+After=systemd-user-sessions.service
+[Service]
+Type=simple
+RemainAfterExit=yes
+WorkingDirectory=/var/www/html/secmon
+ExecStart=/usr/bin/secmon-correlator.sh
+KillMode=control-group
+[Install]
+WantedBy=multi-user.target
