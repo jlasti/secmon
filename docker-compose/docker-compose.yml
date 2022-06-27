@@ -57,6 +57,21 @@ services:
     restart: always
     command: ["sh", "-c", "sec --conf=/var/www/html/secmon/rules/active/correlation/*.rule --input=/var/www/html/secmon/__secOutput --bufsize=1 --detach && ./yii correlator"]
     expose:
+      - 5560
+    volumes:
+      - .:/var/www/html/secmon
+      - /var/log/secmon:/var/log/secmon
+    depends_on:
+      - app
+
+  geoip:
+    build:
+      context:  ./
+      dockerfile: docker-compose/secmon_base.Dockerfile
+    container_name: secmon-geoip
+    restart: always
+    command: ["sh", "-c", "./yii geoip"]
+    expose:
       - 5558
     volumes:
       - .:/var/www/html/secmon
@@ -64,20 +79,21 @@ services:
     depends_on:
       - app
 
-  #geoip:
-    #build:
-      #context:  ./
-      #dockerfile: docker-compose/secmon_geoip.Dockerfile
-    #container_name: secmon-geoip
-    #restart: always
-    #command: ["sh", "-c", "./yii geoip"]
-    #expose:
-      #- 5558
-    #volumes:
-      #- .:/var/www/html/secmon
-      #- /var/log/secmon:/var/log/secmon
-    #depends_on:
-      #- app
+  network-model:
+    build:
+      context:  ./
+      dockerfile: docker-compose/secmon_base.Dockerfile
+    container_name: secmon-network-model
+    restart: always
+    command: ["sh", "-c", "./yii network"]
+    expose:
+      - 5559
+    volumes:
+      - .:/var/www/html/secmon
+      - /var/log/secmon:/var/log/secmon
+    depends_on:
+      - app
+
 
   db:
     image: postgres

@@ -20,4 +20,4 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # Set working directory
 WORKDIR /var/www/html/secmon
 
-COPY ./docker-compose/000-default.conf /etc/apache2/sites-available/
+COPY deployment/config_files/000-default.conf /etc/apache2/sites-available/
