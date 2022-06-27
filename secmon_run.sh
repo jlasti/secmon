@@ -5,30 +5,22 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NORMAL='\033[0m'
 
-#echo -e "Copying config files..."
-#copy configuration and installation files
-#cp docker-compose/db.php config/
-#cp docker-compose/anomaly_config.ini config/
-#cp docker-compose/aggregator_config.ini config/
-#echo -e "${GREEN}Done${NORMAL}"
-
-
 docker stop $(docker ps -a | grep secmon- | cut -d " " -f 1)
 
 docker-compose down
 docker-compose build
 docker-compose up -d
 
-docker build -t secmon_base -f docker-compose/secmon_base.Dockerfile docker-compose/
-docker build -t secmon_aggregator -f docker-compose/secmon_aggregator.Dockerfile docker-compose/
-docker build -t secmon_normalizer -f docker-compose/secmon_normalizer.Dockerfile docker-compose/
-docker build -t secmon_geoip -f docker-compose/secmon_geoip.Dockerfile docker-compose/
-docker build -t secmon_network -f docker-compose/secmon_network.Dockerfile docker-compose/
-docker build -t secmon_correlator -f docker-compose/secmon_correlator.Dockerfile docker-compose/
+docker build -t secmon_base -f deployment/dockerfiles/secmon_base.Dockerfile deployment/dockerfiles/
+docker build -t secmon_aggregator -f deployment/dockerfiles/secmon_aggregator.Dockerfile deployment/dockerfiles/
+docker build -t secmon_normalizer -f deployment/dockerfiles/secmon_normalizer.Dockerfile deployment/dockerfiles/
+docker build -t secmon_geoip -f deployment/dockerfiles/secmon_geoip.Dockerfile deployment/dockerfiles/
+docker build -t secmon_network -f deployment/dockerfiles/secmon_network.Dockerfile deployment/dockerfiles/
+docker build -t secmon_correlator -f deployment/dockerfiles/secmon_correlator.Dockerfile deployment/dockerfiles/
 
 docker exec secmon-app composer update
 docker exec -it secmon-app ./yii migrate --interactive=0
-docker exec -it secmon-app chgrp www-data web/assets
+#docker exec -it secmon-app chgrp -R www-data .
 docker exec -d secmon-app python3.9 ./commands/db_retention.py
 
 echo -e "Starting secmon Aggregator "

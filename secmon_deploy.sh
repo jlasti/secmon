@@ -18,13 +18,13 @@ sudo mkdir /var/log/secmon
 sudo chmod 777 /var/log/secmon
 
 echo -e "Copying config files"
-sudo cp docker-compose/rsyslog.conf /etc/
-sudo cp docker-compose/logrotate.conf /etc/logrotate.d/secmon
-cp docker-compose/db.php config/
-cp docker-compose/anomaly_config.ini config/
-cp docker-compose/aggregator_config.ini config/
-cp docker-compose/middleware_config.ini config/
-cp docker-compose/docker-compose.yml .
+sudo cp deployment/config_files/rsyslog.conf /etc/
+sudo cp deployment/config_files/logrotate.conf /etc/logrotate.d/secmon
+cp deployment/config_files/db.php config/
+cp deployment/config_files/anomaly_config.ini config/
+cp deployment/config_files/aggregator_config.ini config/
+cp deployment/config_files/middleware_config.ini config/
+cp deployment/docker-compose.yml .
 echo -e "${GREEN}Done${NORMAL}"
 
 #Password creating
@@ -58,12 +58,12 @@ sed -i "s/<password>/$password1/g" config/middleware_config.ini
 sed -i "s/<password>/$password1/g" docker-compose.yml
 
 docker-compose build
-docker build -t secmon_base -f ./docker-compose/secmon_base.Dockerfile ./docker-compose/
-docker build -t secmon_aggregator -f ./docker-compose/secmon_aggregator.Dockerfile ./docker-compose/
-docker build -t secmon_normalizer -f ./docker-compose/secmon_normalizer.Dockerfile ./docker-compose/
-docker build -t secmon_geoip -f ./docker-compose/secmon_geoip.Dockerfile ./docker-compose/
-docker build -t secmon_network -f ./docker-compose/secmon_network.Dockerfile ./docker-compose/
-docker build -t secmon_correlator -f ./docker-compose/secmon_correlator.Dockerfile ./docker-compose/
+docker build -t secmon_base -f deployment/dockerfiles/secmon_base.Dockerfile deployment/dockerfiles/
+docker build -t secmon_aggregator -f deployment/dockerfiles/secmon_aggregator.Dockerfile deployment/dockerfiles/
+docker build -t secmon_normalizer -f deployment/dockerfiles/secmon_normalizer.Dockerfile deployment/dockerfiles/
+docker build -t secmon_geoip -f deployment/dockerfiles/secmon_geoip.Dockerfile deployment/dockerfiles/
+docker build -t secmon_network -f deployment/dockerfiles/secmon_network.Dockerfile deployment/dockerfiles/
+docker build -t secmon_correlator -f deployment/dockerfiles/secmon_correlator.Dockerfile deployment/dockerfiles/
 
 docker-compose up -d
 docker exec secmon-app composer update
