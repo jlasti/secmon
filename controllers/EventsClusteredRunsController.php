@@ -122,7 +122,7 @@ class EventsClusteredRunsController extends Controller
      */
     public function actionMinisom()
     {
-        $command = escapeshellcmd('/usr/bin/python3.6 /var/www/html/secmon/commands/miniSOM.py');
+        $command = escapeshellcmd('/usr/bin/python3.9 /var/www/html/secmon/commands/miniSOM.py');
         shell_exec($command);
 
         return $this->redirect(['/events-clustered-runs']);
@@ -134,7 +134,7 @@ class EventsClusteredRunsController extends Controller
      */
     public function actionKmedian()
     {
-        $command = escapeshellcmd('/usr/bin/python3.6 /var/www/html/secmon/commands/anomaly_script.py');
+        $command = escapeshellcmd('/usr/bin/python3.9 /var/www/html/secmon/commands/anomaly_script.py');
         shell_exec($command);
 
         return $this->redirect(['/events-clustered-runs']);
