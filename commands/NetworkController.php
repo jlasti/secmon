@@ -71,10 +71,10 @@ class NetworkController extends Controller{
         
         $zmq = new ZMQContext();
 		$recSocket = $zmq->getSocket(ZMQ::SOCKET_PULL);  
-		$recSocket->connect("tcp://127.0.0.1:" . $portIn);
+		$recSocket->bind("tcp://*:" . $portIn);
 
 		$sendSocket = $zmq->getSocket(ZMQ::SOCKET_PUSH);
-		$sendSocket->bind("tcp://127.0.0.1:" . $portOut);
+		$sendSocket->connect("tcp://correlator:" . $portOut);
 		
 		date_default_timezone_set("Europe/Bratislava");
         echo "[" . date("Y-m-d H:i:s") . "] Network model module started!" . PHP_EOL;
