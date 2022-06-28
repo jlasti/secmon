@@ -84,7 +84,7 @@ class NormalizerController extends Controller{
 		$recSocket->bind("tcp://*:" . $portIn);
 		
 		$sendSocket = $zmq->getSocket(ZMQ::SOCKET_PUSH);
-		$sendSocket->connect("tcp://correlator:" . $portOut);
+		$sendSocket->connect("tcp://secmon-geoip:" . $portOut);
 
 		date_default_timezone_set("Europe/Bratislava");
         echo "[" . date("Y-m-d H:i:s") . "] Worker normalizer started!" . PHP_EOL;
