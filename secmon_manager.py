@@ -8,10 +8,11 @@ import os
 import fileinput
 import re
 
-def run_enrichment_container(name, port):
+def run_enrichment_modul(name, port):
     command = f'docker run -d --restart unless-stopped --name secmon-{name} --network secmon_app-network --expose {port} -v ${{PWD}}:/var/www/html/secmon secmon_{name}'
     os.system(command)
 
+#method for starting stopped containers
 def start_secmon_containers():
     print("Starting secmon modules")
     os.system('docker-compose start')
@@ -22,6 +23,7 @@ def start_secmon_containers():
         print(command)
         os.system(command)
 
+#method for restarting running/stopped containers
 def restart_secmon_containers():
     print("Restarting secmon modules")
     os.system('docker-compose restart')
@@ -48,6 +50,7 @@ def restart_secmon_containers():
     
     config_file.close
 
+#method for stopping running containers
 def stop_secmon_containers():
     print("Stopping secmon modules")
     secmon_modules = ['geoip', 'network', 'correlator']
@@ -56,7 +59,8 @@ def stop_secmon_containers():
         print(command)
         os.system(command)
     os.system('docker-compose stop')
-
+7
+#method for removing stopped containers
 def remove_secmon_containers():
     print("Removeing secmon modules")
     secmon_modules = ['geoip', 'network', 'correlator']
@@ -178,7 +182,6 @@ def assign_output_named_pipes(type, named_pipe):
                     line = line.replace(line, line[0:index2] + named_pipe + line[index - 1:])
                 sys.stdout.write(line)
 
-
 def change_log_input_directory(log_input):
     sys_config = "/etc/rsyslog.conf"
     for line in fileinput.input(sys_config, inplace=1):
@@ -188,11 +191,10 @@ def change_log_input_directory(log_input):
             line = line.replace(line, line[0:index] + log_input + line[index2:])
         sys.stdout.write(line)
 
-
 if len(sys.argv) < 2 or sys.argv[1] == "help":
     print("Available parrameters are:\n")
     print("\"deploy\" - to deploy SecMon (run with sudo)")
-    print("\"start\" - to start SecMon")
+    print("\"start\" - to start stopped SecMon containers")
     print("\"restart\" - to restart SecMon")
     print("\"stop\" - to stop SecMon")
     print("\"remove\" - to remove all SecMon containers with database")
@@ -209,7 +211,6 @@ if sys.argv[1] == "stop":
 if sys.argv[1] == "remove":
     stop_secmon_containers()
     remove_secmon_containers()
-    
 
 #input data validation
 if(not validate(config)):
@@ -248,38 +249,36 @@ if config.get('ENRICHMENT', 'network_model').lower() == "true":
 aggregator_conf_file.close()
 
 if sys.argv[1] == "deploy":
-    answer = input("Deploying SecMon will remove all existing SecMon containers and existing SecMon databse. This process also includes installing necessary packages, setting up different config files and creating new SecMon containers.\nDo you want to still deploy SecMon? [y/N] ")
+    answer = input("Deploying SecMon will remove all existing SecMon containers and existing SecMon database. This process also includes installing necessary packages, setting up different config files and creating new SecMon containers.\nDo you want to still deploy SecMon? [y/N] ")
     if answer == "N":
         sys.exit()
     elif answer == "y":
+        stop_secmon_containers()
+        remove_secmon_containers()
         #run deployment script
         # 1. stop and remove existing containers
         # 2. copying files & creating password
-        stop_secmon_containers()
-        remove_secmon_containers()
-        print("Starting SecMon containers")
-        os.system('docker-compose up -d')
+        os.system('./secmon_deploy.sh')
         
+        os.system('docker-compose -p secmon up -d')
         config_file = open("./config/aggregator_config.ini", "r")
         contents = config_file.readlines()
         secmon_enrichment_modules = ['geoip', 'network']
-
         for module in secmon_enrichment_modules:
             if index_containing_substring(contents, module):
                 port = int(re.findall('[0-9]+', contents[index_containing_substring(contents, module)])[0]) - 1
-                enrichment_module_start(module, port)
+                run_enrichment_modul(module, port)
 
         #calculation port for correlator
         port = int(re.findall('[0-9]+', contents[len(contents)-1])[0])
-        enrichment_module_start('correlator', port)
-        
+        run_enrichment_modul('correlator', port)
         config_file.close
         
-        #docker exec -it secmon-app ./yii migrate --interactive=0
-        #docker exec -it secmon-app chgrp -R www-data .
-        #echo -e "Initializing SecMon admin user ..."
-        #curl 127.0.0.1:8080/secmon/web/user/init
+        os.system('docker exec -it secmon-app ./yii migrate --interactive=0')
+        os.system('docker exec -it secmon-app chgrp -R www-data .')
         os.system('docker exec -d secmon-app python3.9 ./commands/db_retention.py')
+        os.system('echo -e "Initializing SecMon admin user ..."')
+        os.system('curl 127.0.0.1:8080/secmon/web/user/init')
     else:
         sys.exit()
 

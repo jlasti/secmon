@@ -33,7 +33,7 @@ while true; do
 	echo
 	
 	if [ "${password1,,}" = "password" ];
-		then echo -e "${RED}Entered passwor is forbidden, try again...${NORMAL}"; continue;
+		then echo -e "${RED}Entered password is forbidden, try again...${NORMAL}"; continue;
 	fi
 	
 	if [ ${#password1} -lt 8 ];
@@ -56,7 +56,7 @@ sed -i "s/<password>/$password1/g" config/anomaly_config.ini
 sed -i "s/<password>/$password1/g" config/middleware_config.ini
 sed -i "s/<password>/$password1/g" docker-compose.yml
 
-docker-compose build --no-cache
+docker-compose build
 docker build -t secmon_base -f deployment/dockerfiles/secmon_base.Dockerfile deployment/dockerfiles/
 #docker build -t secmon_aggregator -f deployment/dockerfiles/secmon_aggregator.Dockerfile deployment/dockerfiles/
 #docker build -t secmon_normalizer -f deployment/dockerfiles/secmon_normalizer.Dockerfile deployment/dockerfiles/
