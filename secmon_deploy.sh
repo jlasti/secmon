@@ -56,20 +56,15 @@ sed -i "s/<password>/$password1/g" config/anomaly_config.ini
 sed -i "s/<password>/$password1/g" config/middleware_config.ini
 sed -i "s/<password>/$password1/g" docker-compose.yml
 
-docker-compose build
+docker-compose build --no-cache
 docker build -t secmon_base -f deployment/dockerfiles/secmon_base.Dockerfile deployment/dockerfiles/
-docker build -t secmon_aggregator -f deployment/dockerfiles/secmon_aggregator.Dockerfile deployment/dockerfiles/
-docker build -t secmon_normalizer -f deployment/dockerfiles/secmon_normalizer.Dockerfile deployment/dockerfiles/
+#docker build -t secmon_aggregator -f deployment/dockerfiles/secmon_aggregator.Dockerfile deployment/dockerfiles/
+#docker build -t secmon_normalizer -f deployment/dockerfiles/secmon_normalizer.Dockerfile deployment/dockerfiles/
 docker build -t secmon_geoip -f deployment/dockerfiles/secmon_geoip.Dockerfile deployment/dockerfiles/
 docker build -t secmon_network -f deployment/dockerfiles/secmon_network.Dockerfile deployment/dockerfiles/
 docker build -t secmon_correlator -f deployment/dockerfiles/secmon_correlator.Dockerfile deployment/dockerfiles/
 
-docker-compose up -d
+docker run -d --rm --name secmon-app -v ${PWD}:/var/www/html/secmon secmon_app
 docker exec secmon-app composer update
-docker exec -it secmon-app ./yii migrate --interactive=0
-docker exec -it secmon-app chgrp -R www-data .
-
-echo -e "Initializing SecMon admin user ..."
-curl 127.0.0.1:8080/secmon/web/user/init
-
-docker-compose stop
+docker stop secmon-app
+echo -e "${RED}removing tmp container secmon-app${NORMAL}"

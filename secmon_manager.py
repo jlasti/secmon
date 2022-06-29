@@ -8,9 +8,63 @@ import os
 import fileinput
 import re
 
-def enrichment_module_start(name, port):
+def run_enrichment_container(name, port):
     command = f'docker run -d --restart unless-stopped --name secmon-{name} --network secmon_app-network --expose {port} -v ${{PWD}}:/var/www/html/secmon secmon_{name}'
     os.system(command)
+
+def start_secmon_containers():
+    print("Starting secmon modules")
+    os.system('docker-compose start')
+    os.system('docker exec -d secmon-app python3.9 ./commands/db_retention.py')
+    secmon_all_modules = ['geoip', 'network', 'correlator']
+    for module in secmon_all_modules:
+        command = f'docker ps --filter "name=secmon-{module}" | grep -q . && docker start secmon-{module}'
+        print(command)
+        os.system(command)
+
+def restart_secmon_containers():
+    print("Restarting secmon modules")
+    os.system('docker-compose restart')
+    os.system('docker exec -d secmon-app python3.9 ./commands/db_retention.py')
+    secmon_all_modules = ['geoip', 'network', 'correlator']
+    for module in secmon_all_modules:
+        command = f'docker ps --filter "name=secmon-{module}" | grep -q . && docker stop secmon-{module} && docker rm secmon-{module}'
+        print(command)
+        os.system(command)
+
+    config_file = open("./config/aggregator_config.ini", "r")
+    contents = config_file.readlines()
+    
+    #list of all enrichment modules available in SecMon
+    secmon_enrichment_modules = ['geoip', 'network']
+    for module in secmon_enrichment_modules:
+        if index_containing_substring(contents, module):
+            port = int(re.findall('[0-9]+', contents[index_containing_substring(contents, module)])[0]) - 1
+            run_enrichment_container(module, port)
+
+    #calculation port for correlator
+    port = int(re.findall('[0-9]+', contents[len(contents)-1])[0])
+    run_enrichment_container('correlator', port)
+    
+    config_file.close
+
+def stop_secmon_containers():
+    print("Stopping secmon modules")
+    secmon_modules = ['geoip', 'network', 'correlator']
+    for module in secmon_modules:
+        command = f'docker ps --filter "name=secmon-{module}" | grep -q . && docker stop secmon-{module}'
+        print(command)
+        os.system(command)
+    os.system('docker-compose stop')
+
+def remove_secmon_containers():
+    print("Removeing secmon modules")
+    secmon_modules = ['geoip', 'network', 'correlator']
+    for module in secmon_modules:
+        command = f'docker ps --filter "name=secmon-{module}" | grep -q . && docker rm secmon-{module}'
+        print(command)
+        os.system(command)
+    os.system('docker-compose down')
 
 #Method taken from https://stackoverflow.com/questions/2170900/get-first-list-index-containing-sub-string
 def index_containing_substring(the_list, substring):
@@ -137,11 +191,11 @@ def change_log_input_directory(log_input):
 
 if len(sys.argv) < 2 or sys.argv[1] == "help":
     print("Available parrameters are:\n")
-    print("\"deply\" - to deploy SecMon (run with sudo)")
+    print("\"deploy\" - to deploy SecMon (run with sudo)")
     print("\"start\" - to start SecMon")
     print("\"restart\" - to restart SecMon")
     print("\"stop\" - to stop SecMon")
-    print("\"remove\" - to remove all SecMon containers")
+    print("\"remove\" - to remove all SecMon containers with database")
     print("\"help\" - to list all available parameters\n")
     sys.exit()
 
@@ -150,22 +204,12 @@ config = configparser.ConfigParser()
 config.read('./config/middleware_config.ini')
 
 if sys.argv[1] == "stop":
-    print("Stopping secmon modules")
-    os.system('docker-compose stop')
-    secmon_all_modules = ['aggregator', 'normalizer', 'geoip', 'network', 'correlator']
-    for module in secmon_all_modules:
-        command = f'docker ps --filter "name=secmon-{module}" | grep -q . && docker stop secmon-{module}'
-        print(command)
-        os.system(command)
+    stop_secmon_containers()
 
 if sys.argv[1] == "remove":
-    print("Removeing secmon modules")
-    secmon_all_modules = ['aggregator', 'normalizer', 'geoip', 'network', 'correlator']
-    for module in secmon_all_modules:
-        command = f'docker ps --filter "name=secmon-{module}" | grep -q . && docker stop secmon-{module} && docker rm secmon-{module}'
-        print(command)
-        os.system(command)
-    os.system('docker-compose down')
+    stop_secmon_containers()
+    remove_secmon_containers()
+    
 
 #input data validation
 if(not validate(config)):
@@ -204,55 +248,48 @@ if config.get('ENRICHMENT', 'network_model').lower() == "true":
 aggregator_conf_file.close()
 
 if sys.argv[1] == "deploy":
-    #run deployment script
-    # 1. Are you sure, because all container and daytabase data will be deleted
-    # 2. stop and remove existing containers
-    # 3. copying files & creating password
+    answer = input("Deploying SecMon will remove all existing SecMon containers and existing SecMon databse. This process also includes installing necessary packages, setting up different config files and creating new SecMon containers.\nDo you want to still deploy SecMon? [y/N] ")
+    if answer == "N":
+        sys.exit()
+    elif answer == "y":
+        #run deployment script
+        # 1. stop and remove existing containers
+        # 2. copying files & creating password
+        stop_secmon_containers()
+        remove_secmon_containers()
+        print("Starting SecMon containers")
+        os.system('docker-compose up -d')
+        
+        config_file = open("./config/aggregator_config.ini", "r")
+        contents = config_file.readlines()
+        secmon_enrichment_modules = ['geoip', 'network']
 
+        for module in secmon_enrichment_modules:
+            if index_containing_substring(contents, module):
+                port = int(re.findall('[0-9]+', contents[index_containing_substring(contents, module)])[0]) - 1
+                enrichment_module_start(module, port)
 
+        #calculation port for correlator
+        port = int(re.findall('[0-9]+', contents[len(contents)-1])[0])
+        enrichment_module_start('correlator', port)
+        
+        config_file.close
+        
+        #docker exec -it secmon-app ./yii migrate --interactive=0
+        #docker exec -it secmon-app chgrp -R www-data .
+        #echo -e "Initializing SecMon admin user ..."
+        #curl 127.0.0.1:8080/secmon/web/user/init
+        os.system('docker exec -d secmon-app python3.9 ./commands/db_retention.py')
+    else:
+        sys.exit()
 
 #start stopped containers
 if sys.argv[1] == "start":
-    print("Starting secmon modules")
-    os.system('docker-compose start')
-    os.system('docker exec -d secmon-app python3.9 ./commands/db_retention.py')
-    
-    secmon_all_modules = ['aggregator', 'normalizer', 'geoip', 'network', 'correlator']
-
-    for module in secmon_all_modules:
-        command = f'docker ps --filter "name=secmon-{module}" | grep -q . && docker start secmon-{module}'
-        print(command)
-        os.system(command)
+    start_secmon_containers()
 
 #restart running containers
 if sys.argv[1] == "restart":
-    print("Restarting secmon modules")
-    os.system('docker-compose restart')
-    os.system('docker exec -d secmon-app python3.9 ./commands/db_retention.py')
-    os.system('echo Restarting ; docker restart secmon-aggregator; echo done')
-    os.system('echo Restarting ; docker restart secmon-normalizer; echo done')
-
-    secmon_all_modules = ['geoip', 'network', 'correlator']
-
-    for module in secmon_all_modules:
-        command = f'docker ps --filter "name=secmon-{module}" | grep -q . && docker stop secmon-{module} && docker rm secmon-{module}'
-        print(command)
-        os.system(command)
-
-    config_file = open("./config/aggregator_config.ini", "r")
-    contents = config_file.readlines()
-    secmon_enrichment_modules = ['geoip', 'network']
-
-    for module in secmon_enrichment_modules:
-        if index_containing_substring(contents, module):
-            port = int(re.findall('[0-9]+', contents[index_containing_substring(contents, module)])[0]) - 1
-            enrichment_module_start(module, port)
-
-    #calculation port for correlator
-    port = int(re.findall('[0-9]+', contents[len(contents)-1])[0])
-    enrichment_module_start('correlator', port)
-    
-    config_file.close
+    restart_secmon_containers()
 
 
 

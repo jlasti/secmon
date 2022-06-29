@@ -27,7 +27,7 @@ echo 'removing tmp container secmon-app'
 
 docker ps -a
 
-docker-compose up -d
+docker-compose up --project-name secmon -d
 
 #echo -e "Starting secmon Aggregator "
 #docker run -d --restart unless-stopped --name secmon-aggregator --network secmon_app-network -v ${PWD}:/var/www/html/secmon -v /var/log/secmon:/var/log/secmon secmon_aggregator
