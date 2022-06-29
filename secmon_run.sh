@@ -29,10 +29,10 @@ docker ps -a
 
 docker-compose up -d
 
-echo -e "Starting secmon Aggregator "
+#echo -e "Starting secmon Aggregator "
 #docker run -d --restart unless-stopped --name secmon-aggregator --network secmon_app-network -v ${PWD}:/var/www/html/secmon -v /var/log/secmon:/var/log/secmon secmon_aggregator
 
-echo -e "Starting secmon Normalizer "
+#echo -e "Starting secmon Normalizer "
 #docker run -d --restart unless-stopped --name secmon-normalizer --network secmon_app-network --expose 5557 -v ${PWD}:/var/www/html/secmon -v /var/log/secmon:/var/log/secmon secmon_normalizer
 
 echo -e "Starting secmon GeoIP "

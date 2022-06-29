@@ -6,23 +6,22 @@ GREEN='\033[0;32m'
 NORMAL='\033[0m'
 
 echo -e "Installing usefull packages"
-sudo yum install -y firewalld
+#sudo yum install -y firewalld
 
 echo -e "Setting up firewall"
-sudo firewall-cmd --permanent --add-port=80/tcp
-sudo firewall-cmd --permanent --add-port=443/tcp
-sudo firewall-cmd --permanent --add-port=514/tcp
-sudo firewall-cmd --reload
+#sudo firewall-cmd --permanent --add-port=80/tcp
+#sudo firewall-cmd --permanent --add-port=443/tcp
+#sudo firewall-cmd --permanent --add-port=514/tcp
+#sudo firewall-cmd --reload
 
-sudo mkdir /var/log/secmon
-sudo chmod 777 /var/log/secmon
+#sudo mkdir /var/log/secmon
+#sudo chmod 777 /var/log/secmon
 
 echo -e "Copying config files"
-sudo cp deployment/config_files/rsyslog.conf /etc/
-sudo cp deployment/config_files/logrotate.conf /etc/logrotate.d/secmon
+#sudo cp deployment/config_files/rsyslog.conf /etc/
+#sudo cp deployment/config_files/logrotate.conf /etc/logrotate.d/secmon
 cp deployment/config_files/db.php config/
 cp deployment/config_files/anomaly_config.ini config/
-cp deployment/config_files/aggregator_config.ini config/
 cp deployment/config_files/middleware_config.ini config/
 cp deployment/docker-compose.yml .
 echo -e "${GREEN}Done${NORMAL}"

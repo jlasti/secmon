@@ -8,10 +8,6 @@ import os
 import fileinput
 import re
 
-#import subprocess
-#import dbus
-#
-
 def enrichment_module_start(name, port):
     command = f'docker run -d --restart unless-stopped --name secmon-{name} --network secmon_app-network --expose {port} -v ${{PWD}}:/var/www/html/secmon secmon_{name}'
     os.system(command)
@@ -141,10 +137,11 @@ def change_log_input_directory(log_input):
 
 if len(sys.argv) < 2 or sys.argv[1] == "help":
     print("Available parrameters are:\n")
-    print("\"start\" - to start all modules")
-    print("\"restart\" - to restart all modules")
-    print("\"stop\" - to stop all modules")
-    print("\"remove\" - to remove all modules")
+    print("\"deply\" - to deploy SecMon (run with sudo)")
+    print("\"start\" - to start SecMon")
+    print("\"restart\" - to restart SecMon")
+    print("\"stop\" - to stop SecMon")
+    print("\"remove\" - to remove all SecMon containers")
     print("\"help\" - to list all available parameters\n")
     sys.exit()
 
@@ -205,6 +202,14 @@ if config.get('ENRICHMENT', 'network_model').lower() == "true":
 #     port += 1
 
 aggregator_conf_file.close()
+
+if sys.argv[1] == "deploy":
+    #run deployment script
+    # 1. Are you sure, because all container and daytabase data will be deleted
+    # 2. stop and remove existing containers
+    # 3. copying files & creating password
+
+
 
 #start stopped containers
 if sys.argv[1] == "start":
