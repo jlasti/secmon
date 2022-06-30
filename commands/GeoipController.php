@@ -52,7 +52,7 @@ class GeoipController extends Controller{
 		$recSocket->bind("tcp://*:" . $portIn);
 
 		$sendSocket = $zmq->getSocket(ZMQ::SOCKET_PUSH);
-        $sendSocket->connect("tcp://secmon-network:" . $portOut);
+        $sendSocket->connect("tcp://secmon-network-model:" . $portOut);
         
         date_default_timezone_set("Europe/Bratislava");
         echo "[" . date("Y-m-d H:i:s") . "] Geoip module started!" . PHP_EOL;

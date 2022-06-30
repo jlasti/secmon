@@ -22,7 +22,7 @@ class NetworkController extends Controller{
         $save_to_db = 0;
 		if($aggregator_config_file){
 			while(($line = fgets($aggregator_config_file)) !== false){
-				if(strpos($line, "Network_model:") !== FALSE){
+				if(strpos($line, "Network-model:") !== FALSE){
 					$parts = explode(":", $line);
 					$portOut = trim($parts[1]);
 				}
@@ -61,7 +61,7 @@ class NetworkController extends Controller{
 		$aggregator_config_file = escapeshellarg("/var/www/html/secmon/config/aggregator_config.ini");
 		$last_line = `tail -n 1 $aggregator_config_file`; 		#get last line of temp file
 
-		if(strpos($last_line, "Network_model:")!== FALSE){		#if last is network_model, then ensure saving event to db
+		if(strpos($last_line, "Network-model:")!== FALSE){		#if last is network_model, then ensure saving event to db
 			$save_to_db = 1;
 		}
 
