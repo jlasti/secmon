@@ -13,33 +13,30 @@ def run_enrichment_modul(name, port):
     os.system(command)
 
 #method for starting stopped containers
-def start_secmon_containers():
+def start_secmon_containers(enabled_enrichment_modules):
     print("Starting secmon modules")
     os.system('docker-compose start')
     os.system('docker exec -d secmon-app python3.9 ./commands/db_retention.py')
-    secmon_all_modules = ['geoip', 'network-model', 'correlator']
-    for module in secmon_all_modules:
+    for module in enabled_enrichment_modules:
         command = f'docker ps --filter "name=secmon-{module}" | grep -q . && docker start secmon-{module}'
         print(command)
         os.system(command)
 
 #method for restarting running/stopped containers
-def restart_secmon_containers():
+def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules):
     print("Restarting secmon modules")
     os.system('docker-compose restart')
     os.system('docker exec -d secmon-app python3.9 ./commands/db_retention.py')
-    secmon_all_modules = ['geoip', 'network-model', 'correlator']
-    for module in secmon_all_modules:
-        command = f'docker ps --filter "name=secmon-{module}" | grep -q . && docker stop secmon-{module} && docker rm secmon-{module}'
-        print(command)
+
+    for module in all_enrichment_modules:
+        command = f'docker ps --filter "name=secmon-{module}" | grep -q . && docker stop secmon-{module} && docker rm secmon-{module} || echo nemam co robit, dany kontajner neexistuje'
+        #print(command)
         os.system(command)
 
     config_file = open("./config/aggregator_config.ini", "r")
     contents = config_file.readlines()
-    
-    #list of all enrichment modules available in SecMon
-    secmon_enrichment_modules = ['geoip', 'network-model']
-    for module in secmon_enrichment_modules:
+
+    for module in enabled_enrichment_modules:
         if index_containing_substring(contents, module):
             port = int(re.findall('[0-9]+', contents[index_containing_substring(contents, module)])[0]) - 1
             run_enrichment_modul(module, port)
@@ -51,22 +48,21 @@ def restart_secmon_containers():
     config_file.close
 
 #method for stopping running containers
-def stop_secmon_containers():
+def stop_secmon_containers(all_enrichment_modules):
     print("Stopping secmon modules")
-    secmon_modules = ['geoip', 'network-model', 'correlator']
-    for module in secmon_modules:
-        command = f'docker ps --filter "name=secmon-{module}" | grep -q . && docker stop secmon-{module}'
-        print(command)
+    for module in all_enrichment_modules:
+        command = f'docker ps --filter "name=secmon-{module}" | grep -q . && docker stop secmon-{module} || echo nemam co stopnut'
+        #print(command)
         os.system(command)
     os.system('docker-compose stop')
-7
+
 #method for removing stopped containers
-def remove_secmon_containers():
+def remove_secmon_containers(all_enrichment_modules):
     print("Removeing secmon modules")
-    secmon_modules = ['geoip', 'network-model', 'correlator']
-    for module in secmon_modules:
-        command = f'docker ps --filter "name=secmon-{module}" | grep -q . && docker rm secmon-{module}'
-        print(command)
+
+    for module in all_enrichment_modules:
+        command = f'docker ps --filter "name=secmon-{module}" | grep -q . && docker rm secmon-{module} || echo nemam co vymazat'
+        #print(command)
         os.system(command)
     os.system('docker-compose down')
 
@@ -205,12 +201,15 @@ if len(sys.argv) < 2 or sys.argv[1] == "help":
 config = configparser.ConfigParser()
 config.read('./config/middleware_config.ini')
 
+all_enrichment_modules = ['geoip', 'network-model', 'correlator']
+enabled_enrichment_modules = []
+
 if sys.argv[1] == "stop":
-    stop_secmon_containers()
+    stop_secmon_containers(all_enrichment_modules)
 
 if sys.argv[1] == "remove":
-    stop_secmon_containers()
-    remove_secmon_containers()
+    stop_secmon_containers(all_enrichment_modules)
+    remove_secmon_containers(all_enrichment_modules)
 
 #input data validation
 if(not validate(config)):
@@ -235,20 +234,18 @@ if config.get('ENRICHMENT', 'geoip').lower() == "true":
     #write 0MQ port for geoip
     aggregator_conf_file.write("Geoip: %d\n" % port)
     port += 1
+    enabled_enrichment_modules.append('geoip')
 
 if config.get('ENRICHMENT', 'network-model').lower() == "true":
     #write 0MQ port for network-model
     aggregator_conf_file.write("Network-model: %d\n" % port)
     port += 1
+    enabled_enrichment_modules.append('network-model')
 
 # if config.get('ENRICHMENT', 'rep_ip').lower() == "true":
 #     #write 0MQ port for rep_ip
 #     aggregator_conf_file.write("Rep_ip: %d\n" % port)
 #     port += 1
-
-#write 0MQ port for correlator
-#aggregator_conf_file.write("Correlator: %d\n" % port)
-#port += 1
 
 aggregator_conf_file.close()
 
@@ -257,8 +254,8 @@ if sys.argv[1] == "deploy":
     if answer == "N":
         sys.exit()
     elif answer == "y":
-        stop_secmon_containers()
-        remove_secmon_containers()
+        stop_secmon_containers(all_enrichment_modules)
+        remove_secmon_containers(all_enrichment_modules)
         #run deployment script
         # 1. stop and remove existing containers
         # 2. copying files & creating password
@@ -267,8 +264,8 @@ if sys.argv[1] == "deploy":
         os.system('docker-compose -p secmon up -d')
         config_file = open("./config/aggregator_config.ini", "r")
         contents = config_file.readlines()
-        secmon_enrichment_modules = ['geoip', 'network-model']
-        for module in secmon_enrichment_modules:
+
+        for module in enabled_enrichment_modules:
             if index_containing_substring(contents, module):
                 port = int(re.findall('[0-9]+', contents[index_containing_substring(contents, module)])[0]) - 1
                 run_enrichment_modul(module, port)
@@ -288,13 +285,8 @@ if sys.argv[1] == "deploy":
 
 #start stopped containers
 if sys.argv[1] == "start":
-    start_secmon_containers()
+    start_secmon_containers(all_enrichment_modules)
 
 #restart running containers
 if sys.argv[1] == "restart":
-    restart_secmon_containers()
-
-
-
-    
-
+    restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules)

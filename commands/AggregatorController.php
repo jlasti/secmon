@@ -65,6 +65,7 @@ class AggregatorController extends Controller{
         $zmq = new ZMQContext();
         $socket = $zmq->getSocket(ZMQ::SOCKET_PUSH);    
         $socket->connect("tcp://secmon-normalizer:" . $port);
+        print("Aggregator tcp://secmon-normalizer:" . $port);
 
         $streamPosition = [];
         $streams = [];

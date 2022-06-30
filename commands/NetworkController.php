@@ -19,12 +19,21 @@ class NetworkController extends Controller{
 	public function actionIndex(){
 
 		$aggregator_config_file = $this->openNonBlockingStream("/var/www/html/secmon/config/aggregator_config.ini");
-        $save_to_db = 0;
+		$save_to_db = 0;
+		$module_loaded = false;			#variable used for reading line after Network model module in config file
+		$next_module = "correlator";
 		if($aggregator_config_file){
 			while(($line = fgets($aggregator_config_file)) !== false){
+				if($module_loaded == true ){
+					$parts = explode(":", $line);
+					$next_module = strtolower(trim($parts[0]));
+					$module_loaded = false;
+				}
+
 				if(strpos($line, "Network-model:") !== FALSE){
 					$parts = explode(":", $line);
 					$portOut = trim($parts[1]);
+					$module_loaded = true;
 				}
 			}
 		}else{
@@ -74,7 +83,8 @@ class NetworkController extends Controller{
 		$recSocket->bind("tcp://*:" . $portIn);
 
 		$sendSocket = $zmq->getSocket(ZMQ::SOCKET_PUSH);
-		$sendSocket->connect("tcp://secmon-correlator:" . $portOut);
+		$sendSocket->connect("tcp://secmon-" . $next_module . ":" . $portOut);
+		print("Network model tcp://secmon-" . $next_module . ":" . $portOut);
 		
 		date_default_timezone_set("Europe/Bratislava");
         echo "[" . date("Y-m-d H:i:s") . "] Network model module started!" . PHP_EOL;

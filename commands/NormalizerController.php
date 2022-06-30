@@ -20,6 +20,8 @@ class NormalizerController extends Controller{
 
 		$aggregator_config_file = $this->openNonBlockingStream("/var/www/html/secmon/config/aggregator_config.ini");
 		$save_to_db = false;				#boolen value to determine whether to execute save
+		$module_loaded = false;			#variable used for reading line after Normalizer in config file
+		$next_module = "correlator";
 		if($aggregator_config_file){
 			while(($line = fgets($aggregator_config_file)) !== false){
 				if(strpos($line, "Log_input:") !== FALSE){
@@ -28,18 +30,25 @@ class NormalizerController extends Controller{
 				}
 
 				if(strpos($line, "Nor_input_NP:") !== FALSE){
-                    $parts = explode(":", $line);
-                    $normInputFile = trim($parts[1]);
-                }
+					$parts = explode(":", $line);
+					$normInputFile = trim($parts[1]);
+				}
 
-                if(strpos($line, "Nor_output_NP:") !== FALSE){
-                    $parts = explode(":", $line);
-                    $normOutputFile = trim($parts[1]);
-                }
+				if(strpos($line, "Nor_output_NP:") !== FALSE){
+						$parts = explode(":", $line);
+						$normOutputFile = trim($parts[1]);
+				}
+
+				if($module_loaded == true ){
+					$parts = explode(":", $line);
+					$next_module = strtolower(trim($parts[0]));
+					$module_loaded = false;
+				}
 
 				if(strpos($line, "Normalizer:") !== FALSE){
 					$parts = explode(":", $line);
 					$portOut = trim($parts[1]);
+					$module_loaded = true;	
 				}
 			}
 		}else{
@@ -84,7 +93,8 @@ class NormalizerController extends Controller{
 		$recSocket->bind("tcp://*:" . $portIn);
 		
 		$sendSocket = $zmq->getSocket(ZMQ::SOCKET_PUSH);
-		$sendSocket->connect("tcp://secmon-geoip:" . $portOut);
+		$sendSocket->connect("tcp://secmon-" . $next_module . ":" . $portOut);
+		print("Normalizer tcp://secmon-" . $next_module . ":" . $portOut);
 
 		date_default_timezone_set("Europe/Bratislava");
         echo "[" . date("Y-m-d H:i:s") . "] Worker normalizer started!" . PHP_EOL;

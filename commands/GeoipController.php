@@ -21,13 +21,22 @@ class GeoipController extends Controller{
 
 	public function actionIndex(){
 
-		$temp_config = $this->openNonBlockingStream("/var/www/html/secmon/config/temp_config.ini");
+		$temp_config = $this->openNonBlockingStream("/var/www/html/secmon/config/aggregator_config.ini");
         $save_to_db = 0;
+        $module_loaded = false;			#variable used for reading line after Geoip module in config file
+		$next_module = "correlator";
 		if($temp_config){
 			while(($line = fgets($temp_config)) !== false){
-				if(strpos($line, "Geoip:") !== FALSE){
+				if($module_loaded == true ){
+					$parts = explode(":", $line);
+					$next_module = strtolower(trim($parts[0]));
+					$module_loaded = false;
+				}
+
+                if(strpos($line, "Geoip:") !== FALSE){
 					$parts = explode(":", $line);
 					$portOut = trim($parts[1]);
+                    $module_loaded = true;
 				}
 			}
 		}else{
@@ -36,7 +45,7 @@ class GeoipController extends Controller{
 
         fclose($temp_config);
         $portIn = $portOut - 1;			#calculate input port
-		$temp_config = escapeshellarg("/var/www/html/secmon/config/temp_config.ini");
+		$temp_config = escapeshellarg("/var/www/html/secmon/config/aggregator_config.ini");
 		$last_line = `tail -n 1 $temp_config`; 		#get last line of temp file
 
 		if(strpos($last_line, "Geoip:")!== FALSE){		
@@ -52,8 +61,9 @@ class GeoipController extends Controller{
 		$recSocket->bind("tcp://*:" . $portIn);
 
 		$sendSocket = $zmq->getSocket(ZMQ::SOCKET_PUSH);
-        $sendSocket->connect("tcp://secmon-network-model:" . $portOut);
-        
+        $sendSocket->connect("tcp://secmon-" . $next_module . ":" . $portOut);
+        print("Geoip tcp://secmon-" . $next_module . ":" . $portOut);
+
         date_default_timezone_set("Europe/Bratislava");
         echo "[" . date("Y-m-d H:i:s") . "] Geoip module started!" . PHP_EOL;
 
