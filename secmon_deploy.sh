@@ -69,4 +69,4 @@ docker build -t secmon_correlator -f deployment/dockerfiles/secmon_correlator.Do
 docker run -d --rm --name secmon_app -v ${PWD}:/var/www/html/secmon secmon_app
 docker exec secmon_app composer update
 docker stop secmon_app
-echo -e "${RED}removing tmp container secmon-app${NORMAL}"
+echo -e "${RED}removing tmp container secmon_app${NORMAL}"
