@@ -56,14 +56,17 @@ sed -i "s/<password>/$password1/g" config/anomaly_config.ini
 sed -i "s/<password>/$password1/g" config/middleware_config.ini
 sed -i "s/<password>/$password1/g" docker-compose.yml
 
-docker build -t secmon-base -f deployment/dockerfiles/secmon-base.Dockerfile deployment/dockerfiles/
-docker build -t secmon-geoip -f deployment/dockerfiles/secmon-geoip.Dockerfile deployment/dockerfiles/
-docker build -t secmon-network-model -f deployment/dockerfiles/secmon-network-model.Dockerfile deployment/dockerfiles/
-docker build -t secmon-correlator -f deployment/dockerfiles/secmon-correlator.Dockerfile deployment/dockerfiles/
+docker build -t secmon_base -f deployment/dockerfiles/secmon_base.Dockerfile ./
+docker build -t secmon_app -f deployment/dockerfiles/secmon_app.Dockerfile ./
+docker build -t secmon_aggregator -f deployment/dockerfiles/secmon_aggregator.Dockerfile ./deployment
+docker build -t secmon_normalizer -f deployment/dockerfiles/secmon_normalizer.Dockerfile ./deployment
+docker build -t secmon_geoip -f deployment/dockerfiles/secmon_geoip.Dockerfile ./deployment
+docker build -t secmon_network_model -f deployment/dockerfiles/secmon_network_model.Dockerfile ./deployment
+docker build -t secmon_correlator -f deployment/dockerfiles/secmon_correlator.Dockerfile ./deployment
 
-docker-compose build
+#docker-compose build
 
-docker run -d --rm --name secmon-app -v ${PWD}:/var/www/html/secmon secmon-app
-docker exec secmon-app composer update
-docker stop secmon-app
+docker run -d --rm --name secmon_app -v ${PWD}:/var/www/html/secmon secmon_app
+docker exec secmon_app composer update
+docker stop secmon_app
 echo -e "${RED}removing tmp container secmon-app${NORMAL}"

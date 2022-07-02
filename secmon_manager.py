@@ -9,16 +9,16 @@ import fileinput
 import re
 
 def run_enrichment_modul(name, port):
-    command = f'docker run -d --restart unless-stopped --name secmon-{name} --network secmon_app-network --expose {port} -v ${{PWD}}:/var/www/html/secmon secmon-{name}'
+    command = f'docker run -d --restart unless-stopped --name secmon_{name} --network secmon_app-network --expose {port} -v ${{PWD}}:/var/www/html/secmon secmon_{name}'
     os.system(command)
 
 #method for starting stopped containers
 def start_secmon_containers(enabled_enrichment_modules):
     print("Starting secmon modules")
     os.system('docker-compose start')
-    os.system('docker exec -d secmon-app python3.9 ./commands/db_retention.py')
+    os.system('docker exec -d secmon_app python3.9 ./commands/db_retention.py')
     for module in enabled_enrichment_modules:
-        command = f'docker ps --filter "name=secmon-{module}" | grep -q . && docker start secmon-{module}'
+        command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker start secmon_{module}'
         print(command)
         os.system(command)
 
@@ -26,11 +26,10 @@ def start_secmon_containers(enabled_enrichment_modules):
 def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules):
     print("Restarting secmon modules")
     os.system('docker-compose restart')
-    os.system('docker exec -d secmon-app python3.9 ./commands/db_retention.py')
+    os.system('docker exec -d secmon_app python3.9 ./commands/db_retention.py')
 
     for module in all_enrichment_modules:
-        command = f'docker ps --filter "name=secmon-{module}" | grep -q . && docker stop secmon-{module} && docker rm secmon-{module} || echo nemam co robit, dany kontajner neexistuje'
-        #print(command)
+        command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker stop secmon_{module} && docker rm secmon_{module}'
         os.system(command)
 
     config_file = open("./config/aggregator_config.ini", "r")
@@ -51,8 +50,7 @@ def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules
 def stop_secmon_containers(all_enrichment_modules):
     print("Stopping secmon modules")
     for module in all_enrichment_modules:
-        command = f'docker ps --filter "name=secmon-{module}" | grep -q . && docker stop secmon-{module} || echo nemam co stopnut'
-        #print(command)
+        command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker stop secmon_{module}'
         os.system(command)
     os.system('docker-compose stop')
 
@@ -61,8 +59,7 @@ def remove_secmon_containers(all_enrichment_modules):
     print("Removeing secmon modules")
 
     for module in all_enrichment_modules:
-        command = f'docker ps --filter "name=secmon-{module}" | grep -q . && docker rm secmon-{module} || echo nemam co vymazat'
-        #print(command)
+        command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker rm secmon_{module} || echo nemam co vymazat'
         os.system(command)
     os.system('docker-compose down')
 
@@ -201,7 +198,7 @@ if len(sys.argv) < 2 or sys.argv[1] == "help":
 config = configparser.ConfigParser()
 config.read('./config/middleware_config.ini')
 
-all_enrichment_modules = ['geoip', 'network-model', 'correlator']
+all_enrichment_modules = ['geoip', 'network_model', 'correlator']
 enabled_enrichment_modules = []
 
 if sys.argv[1] == "stop":
@@ -236,11 +233,11 @@ if config.get('ENRICHMENT', 'geoip').lower() == "true":
     port += 1
     enabled_enrichment_modules.append('geoip')
 
-if config.get('ENRICHMENT', 'network-model').lower() == "true":
-    #write 0MQ port for network-model
-    aggregator_conf_file.write("Network-model: %d\n" % port)
+if config.get('ENRICHMENT', 'network_model').lower() == "true":
+    #write 0MQ port for network_model
+    aggregator_conf_file.write("Network_model: %d\n" % port)
     port += 1
-    enabled_enrichment_modules.append('network-model')
+    enabled_enrichment_modules.append('network_model')
 
 # if config.get('ENRICHMENT', 'rep_ip').lower() == "true":
 #     #write 0MQ port for rep_ip
@@ -275,9 +272,9 @@ if sys.argv[1] == "deploy":
         run_enrichment_modul('correlator', port)
         config_file.close
         
-        os.system('docker exec -it secmon-app ./yii migrate --interactive=0')
-        os.system('docker exec -it secmon-app chgrp -R www-data .')
-        os.system('docker exec -d secmon-app python3.9 ./commands/db_retention.py')
+        os.system('docker exec -it secmon_app ./yii migrate --interactive=0')
+        os.system('docker exec -it secmon_app chgrp -R www-data .')
+        os.system('docker exec -d secmon_app python3.9 ./commands/db_retention.py')
         os.system('echo -e "Initializing SecMon admin user ..."')
         os.system('curl 127.0.0.1:8080/secmon/web/user/init')
     else:

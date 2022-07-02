@@ -30,7 +30,7 @@ class NetworkController extends Controller{
 					$module_loaded = false;
 				}
 
-				if(strpos($line, "Network-model:") !== FALSE){
+				if(strpos($line, "Network_model:") !== FALSE){
 					$parts = explode(":", $line);
 					$portOut = trim($parts[1]);
 					$module_loaded = true;
@@ -70,7 +70,7 @@ class NetworkController extends Controller{
 		$aggregator_config_file = escapeshellarg("/var/www/html/secmon/config/aggregator_config.ini");
 		$last_line = `tail -n 1 $aggregator_config_file`; 		#get last line of temp file
 
-		if(strpos($last_line, "Network-model:")!== FALSE){		#if last is network_model, then ensure saving event to db
+		if(strpos($last_line, "Network_model:")!== FALSE){		#if last is network_model, then ensure saving event to db
 			$save_to_db = 1;
 		}
 
@@ -83,8 +83,8 @@ class NetworkController extends Controller{
 		$recSocket->bind("tcp://*:" . $portIn);
 
 		$sendSocket = $zmq->getSocket(ZMQ::SOCKET_PUSH);
-		$sendSocket->connect("tcp://secmon-" . $next_module . ":" . $portOut);
-		print("Network model tcp://secmon-" . $next_module . ":" . $portOut);
+		$sendSocket->connect("tcp://secmon_" . $next_module . ":" . $portOut);
+		print("Network model tcp://secmon_" . $next_module . ":" . $portOut);
 		
 		date_default_timezone_set("Europe/Bratislava");
         echo "[" . date("Y-m-d H:i:s") . "] Network model module started!" . PHP_EOL;

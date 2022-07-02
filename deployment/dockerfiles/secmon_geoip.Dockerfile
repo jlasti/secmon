@@ -1,7 +1,7 @@
 FROM secmon_base
 
 RUN mkdir -p /usr/local/share/GeoIP
-COPY deployment/GeoLite2-City.mmdb /usr/local/share/GeoIP/GeoLite2-City.mmdb
+COPY GeoLite2-City.mmdb /usr/local/share/GeoIP/GeoLite2-City.mmdb
 
 # Set working directory
 WORKDIR /var/www/html/secmon
