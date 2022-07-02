@@ -3,8 +3,8 @@ services:
   app:
     build:
       context:  ./
-      dockerfile: deployment/dockerfiles/secmon-app.Dockerfile
-    container_name: secmon-app
+      dockerfile: deployment/dockerfiles/secmon_app.Dockerfile
+    container_name: secmon_app
     restart: always
     ports:
       - 8080:80
@@ -25,10 +25,9 @@ services:
   aggregator:
     build:
       context:  ./
-      dockerfile: deployment/dockerfiles/secmon-aggregator.Dockerfile
-    container_name: secmon-aggregator
+      dockerfile: deployment/dockerfiles/secmon_aggregator.Dockerfile
+    container_name: secmon_aggregator
     restart: unless-stopped
-    #command: ["sh", "-c", "./yii aggregator"]
     volumes:
       - .:/var/www/html/secmon
       - /var/log/secmon:/var/log/secmon
@@ -40,10 +39,9 @@ services:
   normalizer:
     build:
       context:  ./
-      dockerfile: deployment/dockerfiles/secmon-normalizer.Dockerfile
-    container_name: secmon-normalizer
+      dockerfile: deployment/dockerfiles/secmon_normalizer.Dockerfile
+    container_name: secmon_normalizer
     restart: unless-stopped
-    #command: ["sh", "-c", "sec --conf=/var/www/html/secmon/rules/active/normalization/*.rule --input=/var/log/secmon/__secOutput --bufsize=1 --detach && ./yii normalizer"]
     expose: 
       - 5557
     volumes:

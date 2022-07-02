@@ -1,4 +1,4 @@
-FROM secmon-base
+FROM secmon_base
 
 # Update system
 RUN apt-get update
