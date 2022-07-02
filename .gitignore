@@ -28,13 +28,13 @@ phpunit.phar
 /phpunit.xml
 
 /runtime
-config/db.php
-secdb/config.ini
-config/config_secdb.ini
-config/anomaly_config.ini
-config/middleware_config.ini
-config/aggregator_config.ini
-./docker-compose.yml
+/config/db.php
+/secdb/config.ini
+/config/config_secdb.ini
+/config/anomaly_config.ini
+/config/middleware_config.ini
+/config/aggregator_config.ini
+docker-compose.yml
 composer.lock
 lastdepoy.txt
 output/
