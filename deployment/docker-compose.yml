@@ -54,7 +54,7 @@ services:
 
   db:
     image: postgres
-    container_name: secmon-db
+    container_name: secmo_db
     restart: always
     ports:
       - 5432:5432
