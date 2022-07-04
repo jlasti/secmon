@@ -7,6 +7,7 @@ import sys
 import os
 import fileinput
 import re
+import time
 
 def run_enrichment_modul(name, port):
     command = f'docker run -d --restart unless-stopped --name secmon_{name} --network secmon_app-network --expose {port} -v ${{PWD}}:/var/www/html/secmon secmon_{name}'
@@ -267,6 +268,11 @@ if sys.argv[1] == "deploy":
         run_enrichment_modul('correlator', port)
         config_file.close
         
+        #Wait for database to start up
+        while not connect():
+            print('Waiting for database to be ready to receive connections...')
+            time.sleep(0.1)
+
         os.system('docker exec -it secmon_app ./yii migrate --interactive=0')
         os.system('docker exec -it secmon_app chgrp -R www-data .')
         os.system('docker exec -d secmon_app python3.9 ./commands/db_retention.py')
