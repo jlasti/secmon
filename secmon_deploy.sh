@@ -5,15 +5,6 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NORMAL='\033[0m'
 
-echo -e "Copying config files"
-#sudo cp deployment/config_files/rsyslog.conf /etc/
-#sudo cp deployment/config_files/logrotate.conf /etc/logrotate.d/secmon
-cp deployment/config_files/db.php config/
-cp deployment/config_files/anomaly_config.ini config/
-cp deployment/config_files/middleware_config.ini config/
-cp deployment/docker-compose.yml .
-echo -e "${GREEN}Done${NORMAL}"
-
 #Password creating
 echo Create password for database user \'secmon\'
 while true; do
