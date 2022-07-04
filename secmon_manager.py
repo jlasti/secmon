@@ -19,7 +19,6 @@ def start_secmon_containers(enabled_enrichment_modules):
     os.system('docker exec -d secmon_app python3.9 ./commands/db_retention.py')
     for module in enabled_enrichment_modules:
         command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker start secmon_{module}'
-        print(command)
         os.system(command)
 
 #method for restarting running/stopped containers
@@ -57,7 +56,6 @@ def stop_secmon_containers(all_enrichment_modules):
 #method for removing stopped containers
 def remove_secmon_containers(all_enrichment_modules):
     print("Removeing secmon modules")
-
     for module in all_enrichment_modules:
         command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker rm secmon_{module} || echo nemam co vymazat'
         os.system(command)
@@ -247,15 +245,12 @@ if config.get('ENRICHMENT', 'network_model').lower() == "true":
 aggregator_conf_file.close()
 
 if sys.argv[1] == "deploy":
-    answer = input("Deploying SecMon will remove all existing SecMon containers and existing SecMon database. This process also includes installing necessary packages, setting up different config files and creating new SecMon containers.\nDo you want to still deploy SecMon? [y/N] ")
+    answer = input("Deploying SecMon will remove all existing SecMon containers and existing SecMon database. This process also includes setting up different config files and creating new SecMon containers.\nDo you want to still deploy SecMon? [y/N] ")
     if answer == "N":
         sys.exit()
     elif answer == "y":
         stop_secmon_containers(all_enrichment_modules)
         remove_secmon_containers(all_enrichment_modules)
-        #run deployment script
-        # 1. stop and remove existing containers
-        # 2. copying files & creating password
         os.system('./secmon_deploy.sh')
         
         os.system('docker-compose -p secmon up -d')

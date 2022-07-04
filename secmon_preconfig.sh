@@ -37,4 +37,3 @@ cp deployment/docker-compose.yml .
 echo -e "${GREEN}Done${NORMAL}"
 
 echo -e "Secmon preconfiguration is complete, to deploy SecMon run command \"python3 secmon_manager.py deploy\""
-python3 secmon_manager.py deploy
