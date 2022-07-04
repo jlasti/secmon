@@ -62,7 +62,6 @@ class GeoipController extends Controller{
 
 		$sendSocket = $zmq->getSocket(ZMQ::SOCKET_PUSH);
         $sendSocket->connect("tcp://secmon_" . $next_module . ":" . $portOut);
-        print("Geoip tcp://secmon_" . $next_module . ":" . $portOut);
 
         date_default_timezone_set("Europe/Bratislava");
         echo "[" . date("Y-m-d H:i:s") . "] Geoip module started!" . PHP_EOL;
