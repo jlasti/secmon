@@ -267,11 +267,9 @@ if sys.argv[1] == "deploy":
         port = int(re.findall('[0-9]+', contents[len(contents)-1])[0])
         run_enrichment_modul('correlator', port)
         config_file.close
-        
-        #Wait for database to start up
-        while not connect():
-            print('Waiting for database to be ready to receive connections...')
-            time.sleep(0.1)
+
+        print('Waiting for database to be ready to receive connections...')
+        time.sleep(1)
 
         os.system('docker exec -it secmon_app ./yii migrate --interactive=0')
         os.system('docker exec -it secmon_app chgrp -R www-data .')
