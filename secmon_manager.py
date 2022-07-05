@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
-#from termcolor import colored, cprint
 import configparser
 import sys
 import os
 import fileinput
 import re
 import time
+#from termcolor import colored
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NORMAL='\033[0m'
 
 def run_enrichment_modul(name, port):
     command = f'docker run -d --restart unless-stopped --name secmon_{name} --network secmon_app-network --expose {port} -v ${{PWD}}:/var/www/html/secmon secmon_{name}'
-    os.system(command)
+    if os.system(command) == 0:
+        os.system(f'echo -e "\r\033[1A\033[0KCreating secmon_{module} ... {GREEN}done{NORMAL}"')
 
 #method for starting stopped containers
 def start_secmon_containers(enabled_enrichment_modules):
@@ -20,7 +25,8 @@ def start_secmon_containers(enabled_enrichment_modules):
     os.system('docker exec -d secmon_app python3.9 ./commands/db_retention.py')
     for module in enabled_enrichment_modules:
         command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker start secmon_{module}'
-        os.system(command)
+        if os.system(command) == 0:
+            os.system(f'echo -e "\r\033[1A\033[0KStarting secmon_{module} ... {GREEN}done{NORMAL}"')
 
 #method for restarting running/stopped containers
 def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules):
@@ -28,9 +34,11 @@ def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules
     os.system('docker-compose restart')
     os.system('docker exec -d secmon_app python3.9 ./commands/db_retention.py')
 
-    for module in all_enrichment_modules:
-        command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker stop secmon_{module} && docker rm secmon_{module}'
-        os.system(command)
+    #stopping
+    stop_secmon_containers(all_enrichment_modules)
+    
+    #removing
+    remove_secmon_containers(all_enrichment_modules)
 
     config_file = open("./config/aggregator_config.ini", "r")
     contents = config_file.readlines()
@@ -40,7 +48,7 @@ def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules
             port = int(re.findall('[0-9]+', contents[index_containing_substring(contents, module)])[0]) - 1
             run_enrichment_modul(module, port)
 
-    #calculation port for correlator
+    #calculatiog port for correlator
     port = int(re.findall('[0-9]+', contents[len(contents)-1])[0])
     run_enrichment_modul('correlator', port)
     
@@ -48,18 +56,20 @@ def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules
 
 #method for stopping running containers
 def stop_secmon_containers(all_enrichment_modules):
-    print("Stopping secmon modules")
+    print("Stopping secmon modules:")
     for module in all_enrichment_modules:
         command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker stop secmon_{module}'
-        os.system(command)
+        if os.system(command) == 0:
+            os.system(f'echo -e "\r\033[1A\033[0KStopping secmon_{module} ... {GREEN}done{NORMAL}"')
     os.system('docker-compose stop')
 
 #method for removing stopped containers
 def remove_secmon_containers(all_enrichment_modules):
-    print("Removeing secmon modules")
+    print("Removing secmon modules:")
     for module in all_enrichment_modules:
-        command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker rm secmon_{module} || echo nemam co vymazat'
-        os.system(command)
+        command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker rm secmon_{module}'
+        if os.system(command) == 0:
+            os.system(f'echo -e "\r\033[1A\033[0KRemoving secmon_{module} ... {GREEN}done{NORMAL}"')      
     os.system('docker-compose down')
 
 #Method taken from https://stackoverflow.com/questions/2170900/get-first-list-index-containing-sub-string
@@ -268,8 +278,11 @@ if sys.argv[1] == "deploy":
         run_enrichment_modul('correlator', port)
         config_file.close
 
-        print('Waiting for database to be ready to receive connections...')
-        time.sleep(1)
+        os.system('docker logs secmon_db 2>&1 | grep -q "database system is ready to accept connections" && echo Database is ready || echo Database is not ready yet')
+
+        while os.system('docker logs secmon_db 2>&1 | grep -q "database system is ready to accept connections"') != 0:
+            print('Waiting for database to be ready to receive connections...')
+            time.sleep(1)
 
         os.system('docker exec -it secmon_app ./yii migrate --interactive=0')
         os.system('docker exec -it secmon_app chgrp -R www-data .')
