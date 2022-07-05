@@ -16,7 +16,7 @@ NORMAL='\033[0m'
 def run_enrichment_modul(name, port):
     command = f'docker run -d --restart unless-stopped --name secmon_{name} --network secmon_app-network --expose {port} -v ${{PWD}}:/var/www/html/secmon secmon_{name}'
     if os.system(command) == 0:
-        os.system(f'echo -e "\r\033[1A\033[0KCreating secmon_{module} ... {GREEN}done{NORMAL}"')
+        os.system(f'echo -e "\r\033[1A\033[0KCreating secmon_{name} ... {GREEN}done{NORMAL}"')
 
 #method for starting stopped containers
 def start_secmon_containers(enabled_enrichment_modules):
@@ -30,19 +30,20 @@ def start_secmon_containers(enabled_enrichment_modules):
 
 #method for restarting running/stopped containers
 def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules):
-    print("Restarting secmon modules")
-    os.system('docker-compose restart')
-    os.system('docker exec -d secmon_app python3.9 ./commands/db_retention.py')
-
     #stopping
     stop_secmon_containers(all_enrichment_modules)
     
     #removing
     remove_secmon_containers(all_enrichment_modules)
 
+    print("Restarting secmon modules:")
+    os.system('docker-compose restart')
+    os.system('docker exec -d secmon_app python3.9 ./commands/db_retention.py')
+
     config_file = open("./config/aggregator_config.ini", "r")
     contents = config_file.readlines()
 
+    print("Creating secmon enrichment modules:")
     for module in enabled_enrichment_modules:
         if index_containing_substring(contents, module):
             port = int(re.findall('[0-9]+', contents[index_containing_substring(contents, module)])[0]) - 1
@@ -61,7 +62,6 @@ def stop_secmon_containers(all_enrichment_modules):
         command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker stop secmon_{module}'
         if os.system(command) == 0:
             os.system(f'echo -e "\r\033[1A\033[0KStopping secmon_{module} ... {GREEN}done{NORMAL}"')
-    os.system('docker-compose stop')
 
 #method for removing stopped containers
 def remove_secmon_containers(all_enrichment_modules):
@@ -70,7 +70,6 @@ def remove_secmon_containers(all_enrichment_modules):
         command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker rm secmon_{module}'
         if os.system(command) == 0:
             os.system(f'echo -e "\r\033[1A\033[0KRemoving secmon_{module} ... {GREEN}done{NORMAL}"')      
-    os.system('docker-compose down')
 
 #Method taken from https://stackoverflow.com/questions/2170900/get-first-list-index-containing-sub-string
 def index_containing_substring(the_list, substring):
@@ -212,10 +211,13 @@ enabled_enrichment_modules = []
 
 if sys.argv[1] == "stop":
     stop_secmon_containers(all_enrichment_modules)
+    os.system('docker-compose stop')
 
 if sys.argv[1] == "remove":
     stop_secmon_containers(all_enrichment_modules)
+    os.system('docker-compose stop')
     remove_secmon_containers(all_enrichment_modules)
+    os.system('docker-compose down')
 
 #input data validation
 if(not validate(config)):
