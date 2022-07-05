@@ -13,7 +13,6 @@ sudo yum install -y firewalld rsyslog
 sudo yum install -y https://repo.ius.io/ius-release-el7.rpm
 sudo yum install -y python36u python36u-libs python36u-devel python36u-pip
 sudo pip3.6 install -U configparser
-sudo pip3.6 install psycopg2-binary
 sudo pip3.6 install termcolor
 
 echo -e "Setting up firewall"
