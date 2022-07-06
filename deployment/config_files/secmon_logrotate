@@ -17,3 +17,13 @@
 	missingok
 	notifempty
 }
+
+/var/log/docker/secmon.log
+{
+	daily
+	rotate 14
+	create
+	dateext
+	missingok
+	notifempty
+}
