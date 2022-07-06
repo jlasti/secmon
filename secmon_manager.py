@@ -7,7 +7,6 @@ import os
 import fileinput
 import re
 import time
-#from termcolor import colored
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -194,7 +193,8 @@ def change_log_input_directory(log_input):
 
 if len(sys.argv) < 2 or sys.argv[1] == "help":
     print("Available parrameters are:\n")
-    print("\"deploy\" - to deploy SecMon (run with sudo)")
+    print("\"status\" - to print out actual SecMon status")
+    print("\"deploy\" - to deploy SecMon")
     print("\"start\" - to start stopped SecMon containers")
     print("\"restart\" - to restart SecMon")
     print("\"stop\" - to stop SecMon")
@@ -208,6 +208,10 @@ config.read('./config/middleware_config.ini')
 
 all_enrichment_modules = ['geoip', 'network_model', 'correlator']
 enabled_enrichment_modules = []
+
+if sys.argv[1] == "status":
+    if os.system(f'docker ps -a | grep -q secmon_ && echo -e "{GREEN}SecMon is not running{NORMAL}" || echo -e "{RED}SecMon is not running{NORMAL}"') == 0:
+        os.system(f'docker ps -a | grep secmon_ && echo running')
 
 if sys.argv[1] == "stop":
     stop_secmon_containers(all_enrichment_modules)
@@ -264,8 +268,8 @@ if sys.argv[1] == "deploy":
     elif answer == "y":
         stop_secmon_containers(all_enrichment_modules)
         remove_secmon_containers(all_enrichment_modules)
+        os.system('docker-compose down')
         os.system('./secmon_deploy.sh')
-        
         os.system('docker-compose -p secmon up -d')
         config_file = open("./config/aggregator_config.ini", "r")
         contents = config_file.readlines()
@@ -280,8 +284,8 @@ if sys.argv[1] == "deploy":
         run_enrichment_modul('correlator', port)
         config_file.close
 
-        os.system('docker logs secmon_db 2>&1 | grep -q "database system is ready to accept connections" && echo Database is ready || echo Database is not ready yet')
-
+        print('Waiting for database to be ready to receive connections...')
+        time.sleep(1)
         while os.system('docker logs secmon_db 2>&1 | grep -q "database system is ready to accept connections"') != 0:
             print('Waiting for database to be ready to receive connections...')
             time.sleep(1)

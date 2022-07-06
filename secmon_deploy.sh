@@ -5,6 +5,13 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NORMAL='\033[0m'
 
+echo -e "Copying config files"
+cp deployment/config_files/db.php config/
+cp deployment/config_files/anomaly_config.ini config/
+cp deployment/config_files/middleware_config.ini config/
+cp deployment/docker-compose.yml .
+echo -e "${GREEN}Done${NORMAL}"
+
 #Password creating
 echo Create password for database user \'secmon\'
 while true; do
@@ -23,7 +30,7 @@ while true; do
 	echo
 
 	if [ "${password1}" != "$password2" ]
-		then echo -e "${RED}Sorry, passwords do not match, try again...${NORMAL}"; continue;
+		then echo -e "${RED}Entered passwords do not match, try again...${NORMAL}"; continue;
 		else break;
 	fi
 done
@@ -36,16 +43,12 @@ sed -i "s/<password>/$password1/g" config/middleware_config.ini
 sed -i "s/<password>/$password1/g" docker-compose.yml
 
 docker build -t secmon_base -f deployment/dockerfiles/secmon_base.Dockerfile ./
-docker build -t secmon_app -f deployment/dockerfiles/secmon_app.Dockerfile ./
-docker build -t secmon_aggregator -f deployment/dockerfiles/secmon_aggregator.Dockerfile ./deployment
-docker build -t secmon_normalizer -f deployment/dockerfiles/secmon_normalizer.Dockerfile ./deployment
 docker build -t secmon_geoip -f deployment/dockerfiles/secmon_geoip.Dockerfile ./deployment
 docker build -t secmon_network_model -f deployment/dockerfiles/secmon_network_model.Dockerfile ./deployment
 docker build -t secmon_correlator -f deployment/dockerfiles/secmon_correlator.Dockerfile ./deployment
 
-#docker-compose build
+docker-compose build
 
-docker run -d --rm --name secmon_app -v ${PWD}:/var/www/html/secmon secmon_app
+docker run -d --rm --name secmon_app -v ${PWD}:/var/www/html/secmon secmon_app && echo -e "\r\033[1A\033[0KCreating temporary container ... ${GREEN}done${NORMAL}"
 docker exec secmon_app composer update
-docker stop secmon_app
-echo -e "${RED}removing tmp container secmon_app${NORMAL}"
+docker stop secmon_app && echo -e "\r\033[1A\033[0KRemoving temporary container ... ${GREEN}done${NORMAL}"
