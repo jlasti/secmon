@@ -212,16 +212,20 @@ enabled_enrichment_modules = []
 if sys.argv[1] == "status":
     if os.system(f'docker ps -a | grep -q secmon_ && echo -e "{GREEN}SecMon is not running{NORMAL}" || echo -e "{RED}SecMon is not running{NORMAL}"') == 0:
         os.system(f'docker ps -a | grep secmon_ && echo running')
+    sys.exit()
 
 if sys.argv[1] == "stop":
     stop_secmon_containers(all_enrichment_modules)
     os.system('docker-compose stop')
+    sys.exit()
 
 if sys.argv[1] == "remove":
     stop_secmon_containers(all_enrichment_modules)
     os.system('docker-compose stop')
     remove_secmon_containers(all_enrichment_modules)
     os.system('docker-compose down')
+    sys.exit()
+
 
 #input data validation
 if(not validate(config)):
