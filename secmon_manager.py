@@ -288,9 +288,9 @@ if sys.argv[1] == "deploy":
         run_enrichment_modul('correlator', port)
         config_file.close
 
-        os.system('docker logs secmon_db 2>&1 | grep -q "listening on IPv4 address \"0.0.0.0\", port 5432" && echo "Database is ready to receive connections" || echo "Database is not ready to receive connections..."')
+        os.system('docker logs secmon_db 2>&1 | grep -q "listening on IPv4 address \\"0.0.0.0\\", port 5432" && echo "Database is ready to receive connections" || echo "Database is not ready to receive connections..."')
         time.sleep(1)
-        while os.system('docker logs secmon_db 2>&1 | grep -q "listening on IPv4 address \"0.0.0.0\", port 5432"') != 0:
+        while os.system('docker logs secmon_db 2>&1 | grep -q "listening on IPv4 address \\"0.0.0.0\\", port 5432"') != 0:
             print('Waiting for database to be ready to receive connections...')
             time.sleep(1)
 
