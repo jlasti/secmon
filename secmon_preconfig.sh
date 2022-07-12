@@ -29,8 +29,7 @@ echo -e "${GREEN}Done${NORMAL}"
 echo -e "Copying config files"
 sudo cp deployment/config_files/rsyslog.conf /etc/
 sudo cp deployment/config_files/secmon.conf /etc/rsyslog.d/
-sudo cp deployment/config_files/docker-daemon.conf /etc/rsyslog.d/
-sudo cp deployment/config_files/docker-containers.conf /etc/rsyslog.d/
+sudo cp deployment/config_files/docker.conf /etc/rsyslog.d/
 sudo cp deployment/config_files/daemon.json /etc/docker/
 sudo cp deployment/config_files/secmon_logrotate /etc/logrotate.d/
 cp deployment/config_files/db.php config/
