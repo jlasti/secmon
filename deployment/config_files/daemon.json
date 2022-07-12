@@ -1,8 +1,7 @@
 {
   "log-driver": "syslog",
   "log-opts": {
-    "tag": "container_name/{{.Name}}",
-    "labels": "dev",
-    "syslog-facility": "daemon"
+    "syslog-address": "unixgram:///dev/log",
+    "tag": "docker/{{.Name}}"
   }
 }
