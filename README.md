@@ -1,33 +1,18 @@
-### Inštalačný manuál
-Prerekvizita na inštaláciu SecMon-u je aktualizovaný stroj s OS CentOS 8, s prístupom na internet a s nainštalovanými programami [Docker Engine](https://docs.docker.com/engine/install/) a [Docker Compose](https://docs.docker.com/compose/install/). Funkčnosť programu Docker Engine sa dá overiť príkazom `sudo docker run hello-world`. Funkčnosť programu Docker Compose sa dá oeriť príkazom `sudo docker-compose --version`. V prípade, že príkazy správne nezbehnú, je potrebné tento problém odstrániť, inak inštalácia neprebehne úspešne.
+### Install guide
+A prerequisite for installing SecMon is an updated machine with OS CentOS 7 (other Linux distributions are not tested), with Internet access and with the installed programs [Docker Engine](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/). The functionality of the Docker Engine can be verified with the `sudo docker run hello-world` command. Docker Compose functionality can be specified with `sudo docker-compose --version'. If the commands do not run correctly, this problem must be resolved or the installation will not be successful.
 
 ```
-#Update CentOS-u
-sudo yum -y update
+#Download SecMon repository
+git clone https://github.com/Miropanak/dockerized_secmon.git secmon
 
-#Update repository & install useful packages
-sudo rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-sudo yum -y install vim net-tools bind-utils screen wget curl nc firewalld unzip git
-
-#Set up firewall (web & rsyslog)
-sudo firewall-cmd --permanent --add-port=8080/tcp
-sudo firewall-cmd --permanent --add-port=514/tcp
-sudo firewall-cmd --reload
-
-#Make clone from secmon repository to newly created secmon directory
-mkdir secmon
-git clone -b master-tmp-PavlakFinal https://github.com/jlasti/secmon
-_backend.git secmon 
+#Start preconfig script
 cd secmon
+./secmon_preconfig.sh
 
-#Start SecMon deployment process
-sudo ./start.sh
+#Start deploying process
+python3 secmon_manage.py deploy
 
 #Crete password for database user 'secmon' during installation
-
-#Inicialization secmon admin user
-#Type to your browser
-<IP_addres_CentOS_machine>:8080/secmon/web/user/init
 
 #Default login credentials user:secmon, password:password
 #After first login change password!!!
