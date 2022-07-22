@@ -299,6 +299,7 @@ if sys.argv[1] == "deploy":
         os.system('docker exec -d secmon_app python3.9 ./commands/db_retention.py')
         os.system('echo -e "Initializing SecMon admin user ..."')
         os.system('curl 127.0.0.1:8080/secmon/web/user/init')
+        os.system('python3 secmon_manager.py restart')
     else:
         sys.exit()
 
