@@ -6,6 +6,9 @@ services:
       dockerfile: deployment/dockerfiles/secmon_app.Dockerfile
     container_name: secmon_app
     restart: always
+    #command: ["sh", "-c", "apache2 -D FOREGROUND && python3.9 ./commands/db_retention.py"]
+    #command: >
+    #  sh -c "python3.9 ./commands/db_retention.py"
     ports:
       - 8080:80
     volumes:
@@ -52,6 +55,19 @@ services:
     networks:
       - app-network
 
+  db_retention:
+    build:
+      context:  ./
+      dockerfile: deployment/dockerfiles/secmon_db_retention.Dockerfile
+    container_name: secmon_db_retention
+    restart: unless-stopped
+    volumes:
+      - .:/home/secmon
+    depends_on:
+      - app
+    networks:
+      - app-network
+  
   db:
     image: postgres
     container_name: secmon_db
