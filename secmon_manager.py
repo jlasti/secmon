@@ -16,16 +16,26 @@ def run_enrichment_modul(name, port):
     command = f'docker run -d --restart unless-stopped --name secmon_{name} --network secmon_app-network --expose {port} -v ${{PWD}}:/var/www/html/secmon secmon_{name}'
     if os.system(command) == 0:
         os.system(f'echo -e "\r\033[1A\033[0KCreating secmon_{name} ... {GREEN}done{NORMAL}"')
+    else:
+        os.system(f'echo -e "\r\033[1A\033[0KCreating secmon_{name} ... {RED}failed{NORMAL}"')
 
 #method for starting stopped containers
 def start_secmon_containers(enabled_enrichment_modules):
     print("Starting secmon modules")
     os.system('docker-compose start')
-    #os.system('docker exec -d secmon_app python3.9 ./commands/db_retention.py')
+
+    #command = f'docker start secmon_db_retention'
+    #if os.system(command) == 0:
+    #    os.system(f'echo -e "\r\033[1A\033[0KCreating secmon_secmon_db_retention ... {GREEN}done{NORMAL}"')
+    #else
+    #    os.system(f'echo -e "\r\033[1A\033[0KCreating secmon_secmon_db_retention ... {RED}failed{NORMAL}"')
+
     for module in enabled_enrichment_modules:
         command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker start secmon_{module}'
         if os.system(command) == 0:
             os.system(f'echo -e "\r\033[1A\033[0KStarting secmon_{module} ... {GREEN}done{NORMAL}"')
+        else:
+            os.system(f'echo -e "\r\033[1A\033[0KStarting secmon_{module} ... {RED}failed{NORMAL}"')
 
 #method for restarting running/stopped containers
 def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules):
@@ -37,8 +47,12 @@ def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules
 
     print("Restarting secmon modules:")
     os.system('docker-compose restart')
-    #os.system('docker exec -d secmon_app python3.9 ./commands/db_retention.py')
-    os.system('docker restart secmon_db_retention')
+
+    #start_db_retention = f'docker run -d --restart unless-stopped --name secmon_db_retention --network secmon_app-network -v ${{PWD}}:/home/secmon secmon_db_retention'
+    #if os.system(start_db_retention) == 0:
+    #    os.system(f'echo -e "\r\033[1A\033[0KCreating secmon_db_retention ... {GREEN}done{NORMAL}"')
+    #else
+    #    os.system(f'echo -e "\r\033[1A\033[0KCreating secmon_db_retention ... {RED}failed{NORMAL}"')
 
     config_file = open("./config/aggregator_config.ini", "r")
     contents = config_file.readlines()
@@ -218,12 +232,15 @@ if sys.argv[1] == "status":
 if sys.argv[1] == "stop":
     stop_secmon_containers(all_enrichment_modules)
     os.system('docker-compose stop')
+    #os.system('docker stop secmon_db_retention')
     sys.exit()
 
 if sys.argv[1] == "remove":
     stop_secmon_containers(all_enrichment_modules)
+    #os.system('docker stop secmon_db_retention')
     os.system('docker-compose stop')
     remove_secmon_containers(all_enrichment_modules)
+    #os.system('docker rm secmon_db_retention')
     os.system('docker-compose down')
     sys.exit()
 
@@ -297,9 +314,8 @@ if sys.argv[1] == "deploy":
 
         os.system('docker exec -it secmon_app ./yii migrate --interactive=0')
         os.system('docker exec -it secmon_app chgrp -R www-data .')
-        #os.system('docker exec -d secmon_app python3.9 ./commands/db_retention.py')
-        start_db_retention = f'docker run -d --restart unless-stopped --name secmon_db_retention --network secmon_app-network -v ${{PWD}}:/home/secmon secmon_db_retention'
-        os.system(start_db_retention)
+        #start_db_retention = f'docker run -d --restart unless-stopped --name secmon_db_retention --network secmon_app-network -v ${{PWD}}:/home/secmon secmon_db_retention'
+        #os.system(start_db_retention)
         os.system('echo -e "Initializing SecMon admin user ..."')
         os.system('curl 127.0.0.1:8080/secmon/web/user/init')
         os.system('python3 secmon_manager.py restart')
