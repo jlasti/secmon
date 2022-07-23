@@ -46,6 +46,7 @@ docker build -t secmon_base -f deployment/dockerfiles/secmon_base.Dockerfile ./
 docker build -t secmon_geoip -f deployment/dockerfiles/secmon_geoip.Dockerfile ./deployment
 docker build -t secmon_network_model -f deployment/dockerfiles/secmon_network_model.Dockerfile ./deployment
 docker build -t secmon_correlator -f deployment/dockerfiles/secmon_correlator.Dockerfile ./deployment
+docker build -t secmon_db_retention -f deployment/dockerfiles/secmon_db_retention.Dockerfile ./deployment
 
 docker-compose build
 
