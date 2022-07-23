@@ -21,7 +21,7 @@ def run_enrichment_modul(name, port):
 def start_secmon_containers(enabled_enrichment_modules):
     print("Starting secmon modules")
     os.system('docker-compose start')
-    os.system('docker exec -d secmon_app python3.9 ./commands/db_retention.py')
+    #os.system('docker exec -d secmon_app python3.9 ./commands/db_retention.py')
     for module in enabled_enrichment_modules:
         command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker start secmon_{module}'
         if os.system(command) == 0:
@@ -37,7 +37,8 @@ def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules
 
     print("Restarting secmon modules:")
     os.system('docker-compose restart')
-    os.system('docker exec -d secmon_app python3.9 ./commands/db_retention.py')
+    #os.system('docker exec -d secmon_app python3.9 ./commands/db_retention.py')
+    os.system('docker restart secmon_db_retention')
 
     config_file = open("./config/aggregator_config.ini", "r")
     contents = config_file.readlines()
@@ -296,7 +297,9 @@ if sys.argv[1] == "deploy":
 
         os.system('docker exec -it secmon_app ./yii migrate --interactive=0')
         os.system('docker exec -it secmon_app chgrp -R www-data .')
-        os.system('docker exec -d secmon_app python3.9 ./commands/db_retention.py')
+        #os.system('docker exec -d secmon_app python3.9 ./commands/db_retention.py')
+        start_db_retention = f'docker run -d --restart unless-stopped --name secmon_db_retention --network secmon_app-network -v ${{PWD}}:/home/secmon secmon_db_retention'
+        os.system(start_db_retention)
         os.system('echo -e "Initializing SecMon admin user ..."')
         os.system('curl 127.0.0.1:8080/secmon/web/user/init')
         os.system('python3 secmon_manager.py restart')
