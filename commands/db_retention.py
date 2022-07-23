@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
-from six.moves import configparser
+import configparser
 import psycopg2
 import sys
 import os
@@ -18,6 +18,7 @@ def connect():
     return conn
 
 def size_check(max_db_size):
+    print ('database size_check')
     connection = connect()
     cursor = connection.cursor()
     querry = "SELECT pg_size_pretty(pg_database_size(\'" + config.get('DATABASE', 'database') + "\'));"
@@ -36,6 +37,7 @@ def size_check(max_db_size):
         connection.close()
 
 def timestamp_check(last_date):
+    print ('database timestamp_check')
     connection = connect()
     cursor = connection.cursor()
     querry = ("DELETE from events_normalized where id in ("
@@ -47,8 +49,8 @@ def timestamp_check(last_date):
 
 #read configuration file
 config = configparser.ConfigParser()
-config.read('/var/www/html/secmon/config/middleware_config.ini')
-
+config.read('./config/middleware_config.ini')
+print ('db retention')
 max_db_size = config.get('DATABASE', 'max_size')
 no_of_days = config.get('DATABASE', 'max_days')
 sleep_interval= config.get('DATABASE', 'sleep_interval')
