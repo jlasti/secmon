@@ -8,13 +8,6 @@ import os
 import time
 import datetime
 
-def wait_for_db():
-    os.system('docker logs secmon_db 2>&1 | grep -q "listening on IPv4 address \\"0.0.0.0\\", port 5432" && echo "Database is ready to receive connections" || echo "Database is not ready to receive connections..."')
-    time.sleep(1)
-    while os.system('docker logs secmon_db 2>&1 | grep -q "listening on IPv4 address \\"0.0.0.0\\", port 5432"') != 0:
-        print('Waiting for database to be ready to receive connections...')
-        time.sleep(10)
-
 def connect():
     try:
         conn = psycopg2.connect(host=config.get('DATABASE', 'host'),database=config.get('DATABASE', 'database'), user=config.get('DATABASE', 'user'), password=config.get('DATABASE', 'password'))
@@ -40,7 +33,6 @@ def size_check(max_db_size):
         cursor.execute(querry, data)
         connection.commit()
         connection.close()
-    os.system('echo -e "... done"')
 
 def timestamp_check(last_date):
     os.system('echo -e "Proceeding database timestamp check"')
@@ -52,7 +44,6 @@ def timestamp_check(last_date):
     cursor.execute(querry, data)
     connection.commit()
     connection.close()
-    os.system('echo -e "... done"')
 
 #read configuration file
 config = configparser.ConfigParser()
@@ -61,7 +52,6 @@ config.read('./config/middleware_config.ini')
 max_db_size = config.get('DATABASE', 'max_size')
 no_of_days = config.get('DATABASE', 'max_days')
 sleep_interval= config.get('DATABASE', 'sleep_interval')
-wait_for_db()
 while True:
     size_check(max_db_size)
     dt = datetime.datetime.now()
