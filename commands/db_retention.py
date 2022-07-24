@@ -12,7 +12,7 @@ def wait_for_db():
     while(is_db_ready() is not True):
         os.system('echo -e "Waiting for database to be ready"')
         time.sleep(10)
-    os.system('echo -e "Database is ready to receive connections"')
+    os.system('echo -e "Database successfully received connection"')
 
 def is_db_ready():
     connection = connect()
