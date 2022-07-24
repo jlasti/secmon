@@ -8,11 +8,27 @@ import os
 import time
 import datetime
 
+def wait_for_db():
+    while(is_db_ready() is not True):
+        os.system('echo -e "Waiting for database to be ready"')
+        time.sleep(10)
+    os.system('echo -e "Database is ready to receive connections"')
+
+def is_db_ready():
+    connection = connect()
+    if connection is False:
+        return False
+    cur = connection.cursor()
+    cur.execute("select * from information_schema.tables where table_name=%s", ('events_normalized',))
+    return bool(cur.rowcount)
+
 def connect():
+    conn = False
     try:
         conn = psycopg2.connect(host=config.get('DATABASE', 'host'),database=config.get('DATABASE', 'database'), user=config.get('DATABASE', 'user'), password=config.get('DATABASE', 'password'))
     except:
         os.system('echo -e "Connection to the database was unsuccessful"')
+        return False
     return conn
 
 def size_check(max_db_size):
@@ -52,6 +68,9 @@ config.read('./config/middleware_config.ini')
 max_db_size = config.get('DATABASE', 'max_size')
 no_of_days = config.get('DATABASE', 'max_days')
 sleep_interval= config.get('DATABASE', 'sleep_interval')
+
+wait_for_db()
+
 while True:
     size_check(max_db_size)
     dt = datetime.datetime.now()
