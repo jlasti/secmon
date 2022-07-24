@@ -34,7 +34,7 @@ while true; do
 		else break;
 	fi
 done
-echo -e "${GREEN}Password succesfully created${NORMAL}"
+echo -e "${GREEN}Password successfully created${NORMAL}"
 
 #update password in install and config files
 sed -i "s/<password>/$password1/g" config/db.php
