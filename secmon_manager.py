@@ -10,6 +10,7 @@ import time
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
 NORMAL='\033[0m'
 
 def run_enrichment_modul(name, port):
@@ -21,7 +22,8 @@ def run_enrichment_modul(name, port):
 
 #method for starting stopped containers
 def start_secmon_containers(enabled_enrichment_modules):
-    print("Starting secmon modules")
+    os.system(f'echo -en "\n{YELLOW}Starting secmon modules:{NORMAL}\n"')
+    #print("\nStarting secmon modules:")
     os.system('docker-compose start')
 
     for module in enabled_enrichment_modules:
@@ -38,14 +40,15 @@ def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules
     
     #removing
     remove_secmon_containers(all_enrichment_modules)
-
-    print("Restarting secmon modules:")
+    os.system(f'echo -en "\n{YELLOW}Restarting secmon modules:{NORMAL}\n"')
+    #print("\nRestarting secmon modules:")
     os.system('docker-compose restart')
 
     config_file = open("./config/aggregator_config.ini", "r")
     contents = config_file.readlines()
 
-    print("Creating secmon enrichment modules:")
+    os.system(f'echo -en "\n{YELLOW}Creating secmon enrichment modules:\n{NORMAL}"')
+    #print("\nCreating secmon enrichment modules:")
     for module in enabled_enrichment_modules:
         if index_containing_substring(contents, module):
             port = int(re.findall('[0-9]+', contents[index_containing_substring(contents, module)])[0]) - 1
@@ -59,7 +62,8 @@ def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules
 
 #method for stopping running containers
 def stop_secmon_containers(all_enrichment_modules):
-    print("Stopping secmon modules:")
+    os.system(f'echo -en "\n{YELLOW}Stopping secmon modules:{NORMAL}\n"')
+    #print("\nStopping secmon modules:")
     for module in all_enrichment_modules:
         command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker stop secmon_{module}'
         if os.system(command) == 0:
@@ -67,7 +71,8 @@ def stop_secmon_containers(all_enrichment_modules):
 
 #method for removing stopped containers
 def remove_secmon_containers(all_enrichment_modules):
-    print("Removing secmon modules:")
+    os.system(f'echo -en "\n{YELLOW}Removing secmon modules:{NORMAL}\n"')
+    #print("\nRemoving secmon modules:")
     for module in all_enrichment_modules:
         command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker rm secmon_{module}'
         if os.system(command) == 0:
