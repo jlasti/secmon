@@ -1,23 +1,38 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
-from six.moves import configparser
+import configparser
 import psycopg2
 import sys
 import os
 import time
 import datetime
 
+def wait_for_db():
+    while(is_db_ready() is not True):
+        os.system('echo -e "Waiting for database to be ready"')
+        time.sleep(10)
+    os.system('echo -e "Database successfully received connection"')
 
+def is_db_ready():
+    connection = connect()
+    if connection is False:
+        return False
+    cur = connection.cursor()
+    cur.execute("select * from information_schema.tables where table_name=%s", ('events_normalized',))
+    return bool(cur.rowcount)
 
 def connect():
+    conn = False
     try:
         conn = psycopg2.connect(host=config.get('DATABASE', 'host'),database=config.get('DATABASE', 'database'), user=config.get('DATABASE', 'user'), password=config.get('DATABASE', 'password'))
     except:
-        print ("I am unable to connect to the database")
+        os.system('echo -e "Connection to the database was unsuccessful"')
+        return False
     return conn
 
 def size_check(max_db_size):
+    os.system('echo -e "Proceeding database size check"')
     connection = connect()
     cursor = connection.cursor()
     querry = "SELECT pg_size_pretty(pg_database_size(\'" + config.get('DATABASE', 'database') + "\'));"
@@ -36,6 +51,7 @@ def size_check(max_db_size):
         connection.close()
 
 def timestamp_check(last_date):
+    os.system('echo -e "Proceeding database timestamp check"')
     connection = connect()
     cursor = connection.cursor()
     querry = ("DELETE from events_normalized where id in ("
@@ -47,11 +63,14 @@ def timestamp_check(last_date):
 
 #read configuration file
 config = configparser.ConfigParser()
-config.read('/var/www/html/secmon/config/middleware_config.ini')
+config.read('./config/middleware_config.ini')
 
 max_db_size = config.get('DATABASE', 'max_size')
 no_of_days = config.get('DATABASE', 'max_days')
 sleep_interval= config.get('DATABASE', 'sleep_interval')
+
+wait_for_db()
+
 while True:
     size_check(max_db_size)
     dt = datetime.datetime.now()

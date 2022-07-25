@@ -17,6 +17,7 @@ services:
       - POSTGRES_HOST=db
       - POSTGRES_PASSWORD=<password>
       - POSTGRES_USER=secmon
+      - WAIT_HOSTS=db:5432
     depends_on:
       - db
     networks:
@@ -52,6 +53,21 @@ services:
     networks:
       - app-network
 
+  db_retention:
+    build:
+      context:  ./
+      dockerfile: deployment/dockerfiles/secmon_db_retention.Dockerfile
+    container_name: secmon_db_retention
+    restart: unless-stopped
+    volumes:
+      - .:/home/secmon
+    environment:
+    - WAIT_HOSTS=db:5432
+    depends_on:
+      - db
+    networks:
+      - app-network
+  
   db:
     image: postgres
     container_name: secmon_db

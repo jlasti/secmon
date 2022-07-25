@@ -10,22 +10,28 @@ import time
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
 NORMAL='\033[0m'
 
 def run_enrichment_modul(name, port):
     command = f'docker run -d --restart unless-stopped --name secmon_{name} --network secmon_app-network --expose {port} -v ${{PWD}}:/var/www/html/secmon secmon_{name}'
     if os.system(command) == 0:
         os.system(f'echo -e "\r\033[1A\033[0KCreating secmon_{name} ... {GREEN}done{NORMAL}"')
+    else:
+        os.system(f'echo -e "\r\033[1A\033[0KCreating secmon_{name} ... {RED}failed{NORMAL}"')
 
 #method for starting stopped containers
 def start_secmon_containers(enabled_enrichment_modules):
-    print("Starting secmon modules")
+    os.system(f'echo -en "\n{YELLOW}Starting secmon modules:{NORMAL}\n"')
+    #print("\nStarting secmon modules:")
     os.system('docker-compose start')
-    os.system('docker exec -d secmon_app python3.9 ./commands/db_retention.py')
+
     for module in enabled_enrichment_modules:
         command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker start secmon_{module}'
         if os.system(command) == 0:
             os.system(f'echo -e "\r\033[1A\033[0KStarting secmon_{module} ... {GREEN}done{NORMAL}"')
+        else:
+            os.system(f'echo -e "\r\033[1A\033[0KStarting secmon_{module} ... {RED}failed{NORMAL}"')
 
 #method for restarting running/stopped containers
 def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules):
@@ -34,15 +40,15 @@ def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules
     
     #removing
     remove_secmon_containers(all_enrichment_modules)
-
-    print("Restarting secmon modules:")
+    os.system(f'echo -en "\n{YELLOW}Restarting secmon modules:{NORMAL}\n"')
+    #print("\nRestarting secmon modules:")
     os.system('docker-compose restart')
-    os.system('docker exec -d secmon_app python3.9 ./commands/db_retention.py')
 
     config_file = open("./config/aggregator_config.ini", "r")
     contents = config_file.readlines()
 
-    print("Creating secmon enrichment modules:")
+    os.system(f'echo -en "\n{YELLOW}Creating secmon enrichment modules:\n{NORMAL}"')
+    #print("\nCreating secmon enrichment modules:")
     for module in enabled_enrichment_modules:
         if index_containing_substring(contents, module):
             port = int(re.findall('[0-9]+', contents[index_containing_substring(contents, module)])[0]) - 1
@@ -56,7 +62,8 @@ def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules
 
 #method for stopping running containers
 def stop_secmon_containers(all_enrichment_modules):
-    print("Stopping secmon modules:")
+    os.system(f'echo -en "\n{YELLOW}Stopping secmon modules:{NORMAL}\n"')
+    #print("\nStopping secmon modules:")
     for module in all_enrichment_modules:
         command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker stop secmon_{module}'
         if os.system(command) == 0:
@@ -64,7 +71,8 @@ def stop_secmon_containers(all_enrichment_modules):
 
 #method for removing stopped containers
 def remove_secmon_containers(all_enrichment_modules):
-    print("Removing secmon modules:")
+    os.system(f'echo -en "\n{YELLOW}Removing secmon modules:{NORMAL}\n"')
+    #print("\nRemoving secmon modules:")
     for module in all_enrichment_modules:
         command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker rm secmon_{module}'
         if os.system(command) == 0:
@@ -296,7 +304,6 @@ if sys.argv[1] == "deploy":
 
         os.system('docker exec -it secmon_app ./yii migrate --interactive=0')
         os.system('docker exec -it secmon_app chgrp -R www-data .')
-        os.system('docker exec -d secmon_app python3.9 ./commands/db_retention.py')
         os.system('echo -e "Initializing SecMon admin user ..."')
         os.system('curl 127.0.0.1:8080/secmon/web/user/init')
         os.system('python3 secmon_manager.py restart')
