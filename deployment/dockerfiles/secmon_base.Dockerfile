@@ -8,6 +8,7 @@ RUN apt-get install -y git zip curl gcc build-essential apt-utils libpq-dev libd
     && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
     && docker-php-ext-install pdo pdo_pgsql pgsql
 
+# Install ZeroMQ
 RUN git clone https://github.com/zeromq/php-zmq.git \
     && cd php-zmq \
     && phpize && ./configure \

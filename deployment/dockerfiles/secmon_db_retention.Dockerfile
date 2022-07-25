@@ -1,6 +1,6 @@
 FROM python:3.9-alpine
 
-# Install python
+# Install python libraries
 RUN pip3 install --upgrade pip
 RUN pip3 install psycopg2-binary
 RUN pip3 install -U configparser

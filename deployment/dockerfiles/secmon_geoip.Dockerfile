@@ -1,5 +1,6 @@
 FROM secmon_base
 
+# Copy GeoIP database
 RUN mkdir -p /usr/local/share/GeoIP
 COPY GeoLite2-City.mmdb /usr/local/share/GeoIP/GeoLite2-City.mmdb
 

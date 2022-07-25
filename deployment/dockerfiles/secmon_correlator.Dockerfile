@@ -5,7 +5,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 # Update system
 RUN apt-get update
 
-# Install useful packages
+# Install Simple Event Correlator
 RUN apt-get install -y sec
 
 # Clear cache
