@@ -1,5 +1,7 @@
 FROM secmon_base
 
+ARG DEBIAN_FRONTEND=noninteractive
+
 # Update system
 RUN apt-get update
 

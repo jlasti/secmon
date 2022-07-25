@@ -4,7 +4,7 @@ FROM php:7.4-fpm
 RUN apt-get update
 
 # Install useful packages (autoconf balik asi pre php)
-RUN apt-get install -y git zip curl gcc build-essential dialog apt-utils iputils-ping libpq-dev libdbus-1-dev libdbus-glib-1-dev libzmq3-dev \
+RUN apt-get install -y git zip curl gcc build-essential apt-utils libpq-dev libdbus-1-dev libdbus-glib-1-dev libzmq3-dev \
     && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
     && docker-php-ext-install pdo pdo_pgsql pgsql
 
