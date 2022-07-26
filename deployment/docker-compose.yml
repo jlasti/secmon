@@ -14,10 +14,10 @@ services:
     links:
       - db
     environment:
-      - POSTGRES_HOST=db
+      - POSTGRES_HOST=secmon_db
       - POSTGRES_PASSWORD=<password>
       - POSTGRES_USER=secmon
-      - WAIT_HOSTS=db:5432
+      - WAIT_HOSTS=secmon_db:5432
     depends_on:
       - db
     networks:
@@ -62,7 +62,7 @@ services:
     volumes:
       - .:/home/secmon
     environment:
-    - WAIT_HOSTS=db:5432
+    - WAIT_HOSTS=secmon_db:5432
     depends_on:
       - db
     networks:
