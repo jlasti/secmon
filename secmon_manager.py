@@ -190,17 +190,8 @@ def assign_output_named_pipes(type, named_pipe):
                     line = line.replace(line, line[0:index2] + named_pipe + line[index - 1:])
                 sys.stdout.write(line)
 
-def change_log_input_directory(log_input):
-    sys_config = "/etc/rsyslog.conf"
-    for line in fileinput.input(sys_config, inplace=1):
-        if "/var/log/" in line and "local7.*" not in line and "uucp,news.crit" not in line and "cron.*" not in line and "mail.* " not in line:
-            index = line.find("/")
-            index2 = line.find("/", index + len("var/log/") + 1)
-            line = line.replace(line, line[0:index] + log_input + line[index2:])
-        sys.stdout.write(line)
-
 if len(sys.argv) < 2 or sys.argv[1] == "help":
-    print("Available parrameters are:\n")
+    print("Available parameters are:\n")
     print("\"status\" - to print out actual SecMon status")
     print("\"deploy\" - to deploy SecMon")
     print("\"start\" - to start stopped SecMon containers")
