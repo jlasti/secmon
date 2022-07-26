@@ -40,7 +40,7 @@ class NetworkController extends Controller{
 		     throw new Exception('Could not open a config file');
 		}
 
-		$middleware_config_file = $this->openNonBlockingStream("/var/www/html/secmon/config/middleware_config.ini");
+		$middleware_config_file = $this->openNonBlockingStream("/var/www/html/secmon/config/secmon_config.ini");
 		if($middleware_config_file){
 			while(($line = fgets($middleware_config_file)) !== false){
 				if(strpos($line, "host =") !== FALSE){

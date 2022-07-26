@@ -23,7 +23,6 @@ def run_enrichment_modul(name, port):
 #method for starting stopped containers
 def start_secmon_containers(enabled_enrichment_modules):
     os.system(f'echo -en "\n{YELLOW}Starting secmon modules:{NORMAL}\n"')
-    #print("\nStarting secmon modules:")
     os.system('docker-compose start')
 
     for module in enabled_enrichment_modules:
@@ -41,14 +40,12 @@ def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules
     #removing
     remove_secmon_containers(all_enrichment_modules)
     os.system(f'echo -en "\n{YELLOW}Restarting secmon modules:{NORMAL}\n"')
-    #print("\nRestarting secmon modules:")
     os.system('docker-compose restart')
 
     config_file = open("./config/aggregator_config.ini", "r")
     contents = config_file.readlines()
 
     os.system(f'echo -en "\n{YELLOW}Creating secmon enrichment modules:\n{NORMAL}"')
-    #print("\nCreating secmon enrichment modules:")
     for module in enabled_enrichment_modules:
         if index_containing_substring(contents, module):
             port = int(re.findall('[0-9]+', contents[index_containing_substring(contents, module)])[0]) - 1
@@ -63,7 +60,6 @@ def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules
 #method for stopping running containers
 def stop_secmon_containers(all_enrichment_modules):
     os.system(f'echo -en "\n{YELLOW}Stopping secmon modules:{NORMAL}\n"')
-    #print("\nStopping secmon modules:")
     for module in all_enrichment_modules:
         command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker stop secmon_{module}'
         if os.system(command) == 0:
@@ -72,7 +68,6 @@ def stop_secmon_containers(all_enrichment_modules):
 #method for removing stopped containers
 def remove_secmon_containers(all_enrichment_modules):
     os.system(f'echo -en "\n{YELLOW}Removing secmon modules:{NORMAL}\n"')
-    #print("\nRemoving secmon modules:")
     for module in all_enrichment_modules:
         command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker rm secmon_{module}'
         if os.system(command) == 0:
@@ -212,7 +207,7 @@ if len(sys.argv) < 2 or sys.argv[1] == "help":
 
 #read configuration file
 config = configparser.ConfigParser()
-config.read('./config/middleware_config.ini')
+config.read('./config/secmon_config.ini')
 
 all_enrichment_modules = ['geoip', 'network_model', 'correlator']
 enabled_enrichment_modules = []

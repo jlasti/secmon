@@ -34,7 +34,7 @@ sudo cp deployment/config_files/daemon.json /etc/docker/
 sudo cp deployment/config_files/secmon_logrotate /etc/logrotate.d/
 cp deployment/config_files/db.php config/
 cp deployment/config_files/anomaly_config.ini config/
-cp deployment/config_files/middleware_config.ini config/
+cp deployment/config_files/secmon_config.ini config/
 cp deployment/docker-compose.yml .
 echo -e "${GREEN}Done${NORMAL}"
 

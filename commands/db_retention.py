@@ -63,7 +63,7 @@ def timestamp_check(last_date):
 
 #read configuration file
 config = configparser.ConfigParser()
-config.read('./config/middleware_config.ini')
+config.read('./config/secmon_config.ini')
 
 max_db_size = config.get('DATABASE', 'max_size')
 no_of_days = config.get('DATABASE', 'max_days')

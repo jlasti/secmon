@@ -8,7 +8,7 @@ NORMAL='\033[0m'
 echo -e "Copying config files"
 cp deployment/config_files/db.php config/
 cp deployment/config_files/anomaly_config.ini config/
-cp deployment/config_files/middleware_config.ini config/
+cp deployment/config_files/secmon_config.ini config/
 cp deployment/docker-compose.yml .
 echo -e "${GREEN}Done${NORMAL}"
 
@@ -39,7 +39,7 @@ echo -e "${GREEN}Password successfully created${NORMAL}"
 #update password in install and config files
 sed -i "s/<password>/$password1/g" config/db.php
 sed -i "s/<password>/$password1/g" config/anomaly_config.ini
-sed -i "s/<password>/$password1/g" config/middleware_config.ini
+sed -i "s/<password>/$password1/g" config/secmon_config.ini
 sed -i "s/<password>/$password1/g" docker-compose.yml
 
 docker build -t secmon_base -f deployment/dockerfiles/secmon_base.Dockerfile ./

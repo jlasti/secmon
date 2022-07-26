@@ -142,7 +142,7 @@ p = NmapParser.parse_fromfile(sys.argv[1])
 
 #read configuration file
 config = configparser.ConfigParser()
-config.read('/var/www/html/secmon/config/middleware_config.ini')
+config.read('/var/www/html/secmon/config/secmon_config.ini')
 
 for host in p.hosts:
     if already_exists(host.address):
