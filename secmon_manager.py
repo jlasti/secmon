@@ -13,6 +13,16 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NORMAL='\033[0m'
 
+def print_help():
+    print("Available parameters are:\n")
+    print("\"status\" - to print out actual SecMon status")
+    print("\"deploy\" - to deploy SecMon")
+    print("\"start\" - to start stopped SecMon containers")
+    print("\"restart\" - to restart SecMon")
+    print("\"stop\" - to stop SecMon")
+    print("\"remove\" - to remove all SecMon containers with database")
+    print("\"help\" - to list all available parameters\n")
+
 def run_enrichment_modul(name, port):
     command = f'docker run -d --restart unless-stopped --name secmon_{name} --network secmon_app-network --expose {port} -v ${{PWD}}:/var/www/html/secmon secmon_{name}'
     if os.system(command) == 0:
@@ -71,9 +81,11 @@ def stop_secmon_containers(all_enrichment_modules):
 def remove_secmon_containers(all_enrichment_modules):
     os.system(f'echo -en "\n{YELLOW}Removing secmon modules:{NORMAL}\n"')
     for module in all_enrichment_modules:
-        command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker rm secmon_{module}'
-        if os.system(command) == 0:
-            os.system(f'echo -e "\r\033[1A\033[0KRemoving secmon_{module} ... {GREEN}done{NORMAL}"')      
+        if os.system(f'docker container inspect secmon_{module} > /dev/null 2>&1') == 0:
+            if os.system(f'docker rm secmon_{module}') == 0:
+                os.system(f'echo -e "\r\033[1A\033[0KRemoving secmon_{module} ... {GREEN}done{NORMAL}"')
+            else:
+                os.system(f'echo -e "\r\033[1A\033[0KRemoving secmon_{module} ... {RED}failed{NORMAL}"')
 
 #Method taken from https://stackoverflow.com/questions/2170900/get-first-list-index-containing-sub-string
 def index_containing_substring(the_list, substring):
@@ -188,19 +200,8 @@ def assign_output_named_pipes(type, named_pipe):
                 sys.stdout.write(line)
 
 if len(sys.argv) < 2 or sys.argv[1] == "help":
-    print("Available parameters are:\n")
-    print("\"status\" - to print out actual SecMon status")
-    print("\"deploy\" - to deploy SecMon")
-    print("\"start\" - to start stopped SecMon containers")
-    print("\"restart\" - to restart SecMon")
-    print("\"stop\" - to stop SecMon")
-    print("\"remove\" - to remove all SecMon containers with database")
-    print("\"help\" - to list all available parameters\n")
+    print_help()
     sys.exit()
-
-#read configuration file
-config = configparser.ConfigParser()
-config.read('./config/secmon_config.ini')
 
 all_enrichment_modules = ['geoip', 'network_model', 'correlator']
 enabled_enrichment_modules = []
@@ -213,6 +214,7 @@ if sys.argv[1] == "status":
 #start stopped containers
 if sys.argv[1] == "start":
     start_secmon_containers(all_enrichment_modules)
+    sys.exit()
 
 #stop running containers
 if sys.argv[1] == "stop":
@@ -228,6 +230,10 @@ if sys.argv[1] == "remove":
     os.system('docker-compose down')
     sys.exit()
 
+
+#read configuration file
+config = configparser.ConfigParser()
+config.read('./config/secmon_config.ini')
 
 #input data validation
 if(not validate(config)):
@@ -301,9 +307,12 @@ if sys.argv[1] == "deploy":
         os.system('echo -e "Initializing SecMon admin user ..."')
         os.system('curl 127.0.0.1:8080/secmon/web/user/init')
         os.system('python3 secmon_manager.py restart')
+        sys.exit()
     else:
         sys.exit()
 
 #restart running containers
 if sys.argv[1] == "restart":
     restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules)
+    sys.exit()
+print_help()
