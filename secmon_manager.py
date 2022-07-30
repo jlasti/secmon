@@ -15,11 +15,10 @@ NORMAL='\033[0m'
 
 def print_help():
     print("Available parameters are:\n")
-    print("\"status\" - to print out actual SecMon status")
     print("\"deploy\" - to deploy SecMon")
     print("\"start\" - to start stopped SecMon containers")
-    print("\"restart\" - to restart SecMon")
-    print("\"stop\" - to stop SecMon")
+    print("\"restart\" - to restart stopped/running SecMon containers")
+    print("\"stop\" - to stop running SecMon containers")
     print("\"remove\" - to remove all SecMon containers with database")
     print("\"help\" - to list all available parameters\n")
 
@@ -206,11 +205,6 @@ if len(sys.argv) < 2 or sys.argv[1] == "help":
 all_enrichment_modules = ['geoip', 'network_model', 'correlator']
 enabled_enrichment_modules = []
 
-if sys.argv[1] == "status":
-    if os.system(f'docker ps -a | grep -q secmon_ && echo -e "{GREEN}SecMon is not running{NORMAL}" || echo -e "{RED}SecMon is not running{NORMAL}"') == 0:
-        os.system(f'docker ps -a | grep secmon_ && echo running')
-    sys.exit()
-
 #start stopped containers
 if sys.argv[1] == "start":
     start_secmon_containers(all_enrichment_modules)
@@ -282,9 +276,9 @@ if sys.argv[1] == "deploy":
         remove_secmon_containers(all_enrichment_modules)
         os.system('docker-compose down')
         os.system('./secmon_deploy.sh')
-        os.system('docker-compose -p secmon up -d')
         config_file = open("./config/aggregator_config.ini", "r")
         contents = config_file.readlines()
+        os.system('docker-compose -p secmon up -d')
 
         for module in enabled_enrichment_modules:
             if index_containing_substring(contents, module):
@@ -306,7 +300,8 @@ if sys.argv[1] == "deploy":
         os.system('docker exec -it secmon_app chgrp -R www-data .')
         os.system('echo -e "Initializing SecMon admin user ..."')
         os.system('curl 127.0.0.1:8080/secmon/web/user/init')
-        os.system('python3 secmon_manager.py restart')
+        restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules)
+        #os.system('python3 secmon_manager.py restart')
         sys.exit()
     else:
         sys.exit()
