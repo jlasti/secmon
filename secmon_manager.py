@@ -21,16 +21,16 @@ def run_enrichment_modul(name, port):
         os.system(f'echo -e "\r\033[1A\033[0KCreating secmon_{name} ... {RED}failed{NORMAL}"')
 
 #method for starting stopped containers
-def start_secmon_containers(enabled_enrichment_modules):
+def start_secmon_containers(all_enrichment_modules):
     os.system(f'echo -en "\n{YELLOW}Starting secmon modules:{NORMAL}\n"')
     os.system('docker-compose start')
 
-    for module in enabled_enrichment_modules:
-        command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker start secmon_{module}'
-        if os.system(command) == 0:
-            os.system(f'echo -e "\r\033[1A\033[0KStarting secmon_{module} ... {GREEN}done{NORMAL}"')
-        else:
-            os.system(f'echo -e "\r\033[1A\033[0KStarting secmon_{module} ... {RED}failed{NORMAL}"')
+    for module in all_enrichment_modules:
+        if os.system(f'docker container inspect secmon_{module} > /dev/null 2>&1') == 0:
+            if os.system(f'docker start secmon_{module}') == 0:
+                os.system(f'echo -e "\r\033[1A\033[0KStarting secmon_{module} ... {GREEN}done{NORMAL}"')
+            else:
+                os.system(f'echo -e "\r\033[1A\033[0KStarting secmon_{module} ... {RED}failed{NORMAL}"')
 
 #method for restarting running/stopped containers
 def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules):
@@ -61,9 +61,11 @@ def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules
 def stop_secmon_containers(all_enrichment_modules):
     os.system(f'echo -en "\n{YELLOW}Stopping secmon modules:{NORMAL}\n"')
     for module in all_enrichment_modules:
-        command = f'docker ps --filter "name=secmon_{module}" | grep -q . && docker stop secmon_{module}'
-        if os.system(command) == 0:
-            os.system(f'echo -e "\r\033[1A\033[0KStopping secmon_{module} ... {GREEN}done{NORMAL}"')
+        if os.system(f'docker container inspect secmon_{module} > /dev/null 2>&1') == 0:
+            if os.system(f'docker stop secmon_{module}') == 0:
+                os.system(f'echo -e "\r\033[1A\033[0KStopping secmon_{module} ... {GREEN}done{NORMAL}"')
+            else:
+                os.system(f'echo -e "\r\033[1A\033[0KStopping secmon_{module} ... {RED}failed{NORMAL}"')
 
 #method for removing stopped containers
 def remove_secmon_containers(all_enrichment_modules):
@@ -208,11 +210,17 @@ if sys.argv[1] == "status":
         os.system(f'docker ps -a | grep secmon_ && echo running')
     sys.exit()
 
+#start stopped containers
+if sys.argv[1] == "start":
+    start_secmon_containers(all_enrichment_modules)
+
+#stop running containers
 if sys.argv[1] == "stop":
     stop_secmon_containers(all_enrichment_modules)
     os.system('docker-compose stop')
     sys.exit()
 
+#stop and remove all ecmon containers
 if sys.argv[1] == "remove":
     stop_secmon_containers(all_enrichment_modules)
     os.system('docker-compose stop')
@@ -295,10 +303,6 @@ if sys.argv[1] == "deploy":
         os.system('python3 secmon_manager.py restart')
     else:
         sys.exit()
-
-#start stopped containers
-if sys.argv[1] == "start":
-    start_secmon_containers(all_enrichment_modules)
 
 #restart running containers
 if sys.argv[1] == "restart":
