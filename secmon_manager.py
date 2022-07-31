@@ -31,7 +31,7 @@ def run_enrichment_modul(name, port):
 
 #method for starting stopped containers
 def start_secmon_containers(all_enrichment_modules):
-    os.system(f'echo -en "\n{YELLOW}Starting secmon modules:{NORMAL}\n"')
+    print(YELLOW,'\nStarting secmon modules:',NORMAL)
     os.system('docker-compose start')
 
     for module in all_enrichment_modules:
@@ -43,18 +43,16 @@ def start_secmon_containers(all_enrichment_modules):
 
 #method for restarting running/stopped containers
 def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules):
-    #stopping
     stop_secmon_containers(all_enrichment_modules)
-    
-    #removing
     remove_secmon_containers(all_enrichment_modules)
-    os.system(f'echo -en "\n{YELLOW}Restarting secmon modules:{NORMAL}\n"')
-    os.system('docker-compose restart')
-
+    
     config_file = open("./config/aggregator_config.ini", "r")
     contents = config_file.readlines()
 
-    os.system(f'echo -en "\n{YELLOW}Creating secmon enrichment modules:\n{NORMAL}"')
+    print(YELLOW,'\nRestarting SecMon modules:',NORMAL)
+    os.system('docker-compose restart')
+
+    print(YELLOW,'\nCreating SecMon enrichment modules:',NORMAL)
     for module in enabled_enrichment_modules:
         if index_containing_substring(contents, module):
             port = int(re.findall('[0-9]+', contents[index_containing_substring(contents, module)])[0]) - 1
@@ -68,7 +66,7 @@ def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules
 
 #method for stopping running containers
 def stop_secmon_containers(all_enrichment_modules):
-    os.system(f'echo -en "\n{YELLOW}Stopping secmon modules:{NORMAL}\n"')
+    print(YELLOW,'\nStopping secmon modules:',NORMAL)
     for module in all_enrichment_modules:
         if os.system(f'docker container inspect secmon_{module} > /dev/null 2>&1') == 0:
             if os.system(f'docker stop secmon_{module}') == 0:
@@ -78,7 +76,7 @@ def stop_secmon_containers(all_enrichment_modules):
 
 #method for removing stopped containers
 def remove_secmon_containers(all_enrichment_modules):
-    os.system(f'echo -en "\n{YELLOW}Removing secmon modules:{NORMAL}\n"')
+    print(YELLOW,'\nRemoving secmon modules:',NORMAL)
     for module in all_enrichment_modules:
         if os.system(f'docker container inspect secmon_{module} > /dev/null 2>&1') == 0:
             if os.system(f'docker rm secmon_{module}') == 0:
@@ -298,10 +296,11 @@ if sys.argv[1] == "deploy":
 
         os.system('docker exec -it secmon_app ./yii migrate --interactive=0')
         os.system('docker exec -it secmon_app chgrp -R www-data .')
-        os.system('echo -e "Initializing SecMon admin user ..."')
+        #print('\nInitializing SecMon admin user ... ',GREEN, end=" \r")
+        os.system(f'echo -n "Initializing SecMon admin user ... {GREEN}"')
         os.system('curl 127.0.0.1:8080/secmon/web/user/init')
+        print(NORMAL)
         restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules)
-        #os.system('python3 secmon_manager.py restart')
         sys.exit()
     else:
         sys.exit()
