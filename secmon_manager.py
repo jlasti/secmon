@@ -90,10 +90,7 @@ def index_containing_substring(the_list, substring):
         if substring.lower() in s.lower():
               return i
     return -1
-
-def connect():
-    return psycopg2.connect(host=config.get('DATABASE', 'host'),database=config.get('DATABASE', 'database'), user=config.get('DATABASE', 'user'), password=config.get('DATABASE', 'password'))
-    
+  
 def path_validation(path, input_data):
     return (path in input_data)
 
@@ -111,11 +108,6 @@ def log_input_device_name_validation(name, input_data, index):
 def validate(config):
     errorMsg = "Validation unsuccessful, found these errors: "
     error = 0
-
-    #db connection validation
-    #if(not connect()):
-    #    errorMsg += '\n' + "Unable to connect to the database! Please check database credentials."
-    #    error = 1
 
     #log_input path validation
     if(not path_validation("/var/log/", config.get('DEVICE', 'log_input'))):
@@ -172,29 +164,6 @@ def validate(config):
         return False
     else:
         return True
-
-def assign_output_named_pipes(type, named_pipe):
-    path_to_rules = "./rules/active/" + type
-    for file in os.listdir(path_to_rules):
-        if file.endswith(".rule"):
-            file_to_open = path_to_rules + "/" + file
-            for line in fileinput.input(file_to_open, inplace=1):
-                if "write" in line and line[0] != "#":
-                    index = line.find("$")
-                    index2 = line.find("/")
-                    line = line.replace(line, line[0:index2] + named_pipe + line[index - 1:])
-                sys.stdout.write(line)
-
-    path_to_rules = "./rules/available/" + type
-    for file in os.listdir(path_to_rules):
-        if file.endswith(".rule"):
-            file_to_open = path_to_rules + "/" + file
-            for line in fileinput.input(file_to_open, inplace=1):
-                if "write" in line and line[0] != "#":
-                    index = line.find("$")
-                    index2 = line.find("/")
-                    line = line.replace(line, line[0:index2] + named_pipe + line[index - 1:])
-                sys.stdout.write(line)
 
 if len(sys.argv) < 2 or sys.argv[1] == "help":
     print_help()
