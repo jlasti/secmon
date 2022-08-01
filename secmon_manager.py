@@ -32,7 +32,7 @@ def run_enrichment_modul(name, port):
 #method for starting stopped containers
 def start_secmon_containers(all_enrichment_modules):
     print(YELLOW,'\nStarting secmon modules:',NORMAL)
-    os.system('docker-compose start')
+    os.system('docker compose start')
 
     for module in all_enrichment_modules:
         if os.system(f'docker container inspect secmon_{module} > /dev/null 2>&1') == 0:
@@ -50,7 +50,7 @@ def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules
     contents = config_file.readlines()
 
     print(YELLOW,'\nRestarting SecMon modules:',NORMAL)
-    os.system('docker-compose restart')
+    os.system('docker compose restart')
 
     print(YELLOW,'\nCreating SecMon enrichment modules:',NORMAL)
     for module in enabled_enrichment_modules:
@@ -180,15 +180,15 @@ if sys.argv[1] == "start":
 #stop running containers
 if sys.argv[1] == "stop":
     stop_secmon_containers(all_enrichment_modules)
-    os.system('docker-compose stop')
+    os.system('docker compose stop')
     sys.exit()
 
 #stop and remove all ecmon containers
 if sys.argv[1] == "remove":
     stop_secmon_containers(all_enrichment_modules)
-    os.system('docker-compose stop')
+    os.system('docker compose stop')
     remove_secmon_containers(all_enrichment_modules)
-    os.system('docker-compose down')
+    os.system('docker compose down')
     sys.exit()
 
 
@@ -241,11 +241,11 @@ if sys.argv[1] == "deploy":
     elif answer == "y":
         stop_secmon_containers(all_enrichment_modules)
         remove_secmon_containers(all_enrichment_modules)
-        os.system('docker-compose down')
+        os.system('docker compose down')
         os.system('./secmon_deploy.sh')
         config_file = open("./config/aggregator_config.ini", "r")
         contents = config_file.readlines()
-        os.system('docker-compose -p secmon up -d')
+        os.system('docker compose -p secmon up -d')
 
         for module in enabled_enrichment_modules:
             if index_containing_substring(contents, module):

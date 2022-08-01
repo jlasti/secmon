@@ -48,7 +48,7 @@ docker build -t secmon_network_model -f deployment/dockerfiles/secmon_network_mo
 docker build -t secmon_correlator -f deployment/dockerfiles/secmon_correlator.Dockerfile ./deployment
 docker build -t secmon_db_retention -f deployment/dockerfiles/secmon_db_retention.Dockerfile ./deployment
 
-docker-compose build
+docker compose build
 
 docker run -d --rm --name secmon_app -v ${PWD}:/var/www/html/secmon secmon_app && echo -e "\r\033[1A\033[0KCreating temporary container ... ${GREEN}done${NORMAL}"
 docker exec secmon_app composer update
