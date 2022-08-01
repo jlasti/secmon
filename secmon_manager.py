@@ -22,7 +22,8 @@ def print_help():
     print("\"remove\" - to remove all SecMon containers with database")
     print("\"help\" - to list all available parameters\n")
 
-def run_enrichment_modul(name, port):
+#run specific container with port
+def run_enrichment_module(name, port):
     command = f'docker run -d --restart unless-stopped --name secmon_{name} --network secmon_app-network --expose {port} -v ${{PWD}}:/var/www/html/secmon secmon_{name}'
     if os.system(command) == 0:
         os.system(f'echo -e "\r\033[1A\033[0KCreating secmon_{name} ... {GREEN}done{NORMAL}"')
@@ -56,11 +57,11 @@ def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules
     for module in enabled_enrichment_modules:
         if index_containing_substring(contents, module):
             port = int(re.findall('[0-9]+', contents[index_containing_substring(contents, module)])[0]) - 1
-            run_enrichment_modul(module, port)
+            run_enrichment_module(module, port)
 
     #calculatiog port for correlator
     port = int(re.findall('[0-9]+', contents[len(contents)-1])[0])
-    run_enrichment_modul('correlator', port)
+    run_enrichment_module('correlator', port)
     
     config_file.close
 
@@ -183,7 +184,7 @@ if sys.argv[1] == "stop":
     os.system('docker compose stop')
     sys.exit()
 
-#stop and remove all ecmon containers
+#stop and remove all secmon containers
 if sys.argv[1] == "remove":
     stop_secmon_containers(all_enrichment_modules)
     os.system('docker compose stop')
@@ -250,11 +251,11 @@ if sys.argv[1] == "deploy":
         for module in enabled_enrichment_modules:
             if index_containing_substring(contents, module):
                 port = int(re.findall('[0-9]+', contents[index_containing_substring(contents, module)])[0]) - 1
-                run_enrichment_modul(module, port)
+                run_enrichment_module(module, port)
 
         #calculation port for correlator
         port = int(re.findall('[0-9]+', contents[len(contents)-1])[0])
-        run_enrichment_modul('correlator', port)
+        run_enrichment_module('correlator', port)
         config_file.close
 
         os.system('docker logs secmon_db 2>&1 | grep -q "listening on IPv4 address \\"0.0.0.0\\", port 5432" && echo "Database is ready to receive connections" || echo "Database is not ready to receive connections..."')
