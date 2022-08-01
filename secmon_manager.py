@@ -266,7 +266,6 @@ if sys.argv[1] == "deploy":
 
         os.system('docker exec -it secmon_app ./yii migrate --interactive=0')
         os.system('docker exec -it secmon_app chgrp -R www-data .')
-        #print('\nInitializing SecMon admin user ... ',GREEN, end=" \r")
         os.system(f'echo -n "Initializing SecMon admin user ... {GREEN}"')
         os.system('curl 127.0.0.1:8080/secmon/web/user/init')
         print(NORMAL)
