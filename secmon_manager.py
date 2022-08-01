@@ -22,7 +22,7 @@ def print_help():
     print("\"remove\" - to remove all SecMon containers with database")
     print("\"help\" - to list all available parameters\n")
 
-#run specific container with port
+#run specific enrichment module with port
 def run_enrichment_module(name, port):
     command = f'docker run -d --restart unless-stopped --name secmon_{name} --network secmon_app-network --expose {port} -v ${{PWD}}:/var/www/html/secmon secmon_{name}'
     if os.system(command) == 0:
