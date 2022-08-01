@@ -1,5 +1,6 @@
 ### Install guide
-A prerequisite for installing SecMon is an updated machine with OS CentOS 7 (other Linux distributions are not tested), with Internet access and with the installed programs [Git](https://github.com/), [Docker Engine](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/). The functionality of the Docker Engine can be verified with the `sudo docker run hello-world` command. Docker Compose functionality can be specified with `sudo docker-compose --version'. If the commands do not run correctly, this problem must be resolved or the installation will not be successful.
+
+A prerequisite for installing SecMon is an updated machine with OS CentOS 7 (other Linux distributions are not tested), with Internet access and with the installed programs [Git](https://github.com/), [Docker Engine](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/) v2.3.3. The functionality of the Docker Engine can be verified with the `sudo docker run hello-world` command. Docker Compose functionality can be specified with `sudo docker-compose --version'. If the commands do not run correctly, this problem must be resolved or the installation will not be successful.
 
 ```
 #Download SecMon repository
