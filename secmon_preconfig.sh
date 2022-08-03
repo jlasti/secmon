@@ -27,7 +27,6 @@ sudo chmod 777 /var/log/secmon
 echo -e "${GREEN}Done${NORMAL}"
 
 echo -e "Copying config files"
-sudo cp deployment/config_files/rsyslog.conf /etc/
 sudo cp deployment/config_files/secmon.conf /etc/rsyslog.d/
 sudo cp deployment/config_files/docker.conf /etc/rsyslog.d/
 sudo cp deployment/config_files/daemon.json /etc/docker/
