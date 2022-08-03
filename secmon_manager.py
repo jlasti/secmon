@@ -243,7 +243,10 @@ if sys.argv[1] == "deploy":
         stop_secmon_containers(all_enrichment_modules)
         remove_secmon_containers(all_enrichment_modules)
         os.system('docker compose down')
-        os.system('./secmon_deploy.sh')
+        if os.system('./secmon_deploy.sh') != 0:
+            print(RED,'\nError occured during script secmon_deploy.sh execution, SecMon deploying process was unsuccessful.',NORMAL)
+            sys.exit()
+        
         config_file = open("./config/aggregator_config.ini", "r")
         contents = config_file.readlines()
         os.system('docker compose -p secmon up -d')

@@ -42,13 +42,14 @@ sed -i "s/<password>/$password1/g" config/anomaly_config.ini
 sed -i "s/<password>/$password1/g" config/secmon_config.ini
 sed -i "s/<password>/$password1/g" docker-compose.yml
 
-docker build -t secmon_base -f deployment/dockerfiles/secmon_base.Dockerfile ./
-docker build -t secmon_geoip -f deployment/dockerfiles/secmon_geoip.Dockerfile ./deployment
-docker build -t secmon_network_model -f deployment/dockerfiles/secmon_network_model.Dockerfile ./deployment
-docker build -t secmon_correlator -f deployment/dockerfiles/secmon_correlator.Dockerfile ./deployment
-docker build -t secmon_db_retention -f deployment/dockerfiles/secmon_db_retention.Dockerfile ./deployment
+docker pull php:7.4-fpm
+docker build -t secmon_base -f deployment/dockerfiles/secmon_base.Dockerfile ./ || { echo 'docker build secmon_base image failed' ; exit 1; }
+docker build -t secmon_geoip -f deployment/dockerfiles/secmon_geoip.Dockerfile ./deployment || { echo 'docker build secmon_geoip image failed' ; exit 1; }
+docker build -t secmon_network_model -f deployment/dockerfiles/secmon_network_model.Dockerfile ./deployment || { echo 'docker build secmon_network_model image failed' ; exit 1; }
+docker build -t secmon_correlator -f deployment/dockerfiles/secmon_correlator.Dockerfile ./deployment || { echo 'docker build secmon_correlator image failed' ; exit 1; }
+docker build -t secmon_db_retention -f deployment/dockerfiles/secmon_db_retention.Dockerfile ./deployment || { echo 'docker build secmon_db_retention image failed' ; exit 1; }
 
-docker compose build
+docker compose build || { echo 'docker compose build failed' ; exit 1; }
 
 docker run -d --rm --name secmon_app -v ${PWD}:/var/www/html/secmon secmon_app && echo -e "\r\033[1A\033[0KCreating temporary container ... ${GREEN}done${NORMAL}"
 docker exec secmon_app composer update
