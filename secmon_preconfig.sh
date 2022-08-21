@@ -10,8 +10,9 @@ sudo yum -y update
 
 echo -e "Installing usefull packages"
 sudo yum install -y firewalld rsyslog
-sudo yum install -y https://repo.ius.io/ius-release-el7.rpm
-sudo yum install -y python36u python36u-libs python36u-devel python36u-pip
+#Installation of python packages on CentOS 7
+#sudo yum install -y https://repo.ius.io/ius-release-el7.rpm
+#sudo yum install -y python36u python36u-libs python36u-devel python36u-pip
 sudo pip3.6 install -U configparser
 
 echo -e "Setting up firewall"
