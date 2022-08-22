@@ -1,6 +1,6 @@
 ### Install guide
 
-Prerequisite for installing SecMon is an updated machine with OS CentOS Stream 8 (other suitble Linux distributions are CentOS 7, Ubuntu 22.04), with Internet access and with the installed programs [Docker Engine](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/) v2.3.3. The functionality of the Docker Engine can be verified with the `sudo docker run hello-world` command. Docker Compose functionality can be specified with `sudo docker-compose --version'. If the commands do not run correctly, this problem must be resolved or the installation will not be successful.
+Prerequisite for installing SecMon is OS CentOS7/CentOS Stream 8/Ubuntu 22.04 (tested Linux distribution) with Internet access and with the installed programs [Docker Engine](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/) v2.3.3. The functionality of the Docker Engine can be verified with the command `sudo docker run hello-world`. Docker Compose functionality can be verified with `sudo docker-compose --version'. If the commands do not run correctly, this problem must be resolved or the installation will not be successful.
 
 ```
 ##### System Update #####
@@ -16,10 +16,10 @@ sudo apt -y update
 ##### Install git, firewall & rsyslog #####
 
 # CentOS 7/CentOS Stream 8
-sudo yum install -y firewalld rsyslog
+sudo yum install -y git firewalld rsyslog
 
 # Ubuntu 22.04
-sudo apt install -y ufw rsyslog
+sudo apt install -y git ufw rsyslog
 
 ##### Install python packages #####
 
