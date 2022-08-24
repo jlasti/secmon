@@ -5,11 +5,12 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NORMAL='\033[0m'
 
-echo -e "Copying config files"
-cp deployment/config_files/db.php config/ && cp deployment/config_files/anomaly_config.ini config/ && cp deployment/config_files/secmon_config.ini config/ && cp deployment/docker-compose.yml . || { echo 'Copying config files failed! Make sure, that you run command from secmon directory.' ; exit 1; }
-#cp deployment/config_files/anomaly_config.ini config/ || { echo 'Copying config files failed! Make sure, that you run command from secmon directory.' ; exit 1; }
-#cp deployment/config_files/secmon_config.ini config/ || { echo 'Copying config files failed! Make sure, that you run command from secmon directory.' ; exit 1; }
-#cp deployment/docker-compose.yml . || { echo 'Copying config files failed! Make sure, that you run command from secmon directory.' ; exit 1; }
+echo -e "Copying configuration files"
+cp deployment/config_files/db.php config/ \
+&& cp deployment/config_files/anomaly_config.ini config/ \
+&& cp deployment/config_files/secmon_config.ini config/ \
+&& cp deployment/docker-compose.yml . \
+|| { echo -e "${RED}Copying configuration files failed!${NORMAL}" ; exit 1; }
 echo -e "${GREEN}Done${NORMAL}"
 
 #Password creating
