@@ -7,7 +7,7 @@ NORMAL='\033[0m'
 
 echo -e "Creating log directory"
 sudo mkdir -p /var/log/secmon || { echo -e "${RED}Creating directory /var/log/secmon failed${NORMAL}" ; exit 1; }
-sudo chmod 777 /var/log/secmon || { echo -e "${RED}Changing access mode of the directory /var/log/secmon failed${NORMAL}" ; exit 1; }
+sudo chmod 600 /var/log/secmon || { echo -e "${RED}Changing access mode of the directory /var/log/secmon failed${NORMAL}" ; exit 1; }
 echo -e "${GREEN}Done${NORMAL}"
 
 echo -e "Copying config files"
