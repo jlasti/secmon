@@ -6,19 +6,19 @@ GREEN='\033[0;32m'
 NORMAL='\033[0m'
 
 echo -e "Creating log directory"
-sudo mkdir /var/log/secmon
-sudo chmod 777 /var/log/secmon
+sudo mkdir /var/log/secmon || { echo 'Creating directory /var/log/secmon failed' ; exit 1; }
+sudo chmod 777 /var/log/secmon || { echo 'Changing access mode of the directory /var/log/secmon failed' ; exit 1; }
 echo -e "${GREEN}Done${NORMAL}"
 
 echo -e "Copying config files"
-sudo cp deployment/config_files/secmon.conf /etc/rsyslog.d/
-sudo cp deployment/config_files/docker.conf /etc/rsyslog.d/
-sudo cp deployment/config_files/daemon.json /etc/docker/
-sudo cp deployment/config_files/secmon_logrotate /etc/logrotate.d/
-cp deployment/config_files/db.php config/
-cp deployment/config_files/anomaly_config.ini config/
-cp deployment/config_files/secmon_config.ini config/
-cp deployment/docker-compose.yml .
+sudo cp deployment/config_files/secmon.conf /etc/rsyslog.d/ || { echo 'Copying config files failed' ; exit 1; }
+sudo cp deployment/config_files/docker.conf /etc/rsyslog.d/ || { echo 'Copying config files failed' ; exit 1; }
+sudo cp deployment/config_files/daemon.json /etc/docker/ || { echo 'Copying config files failed' ; exit 1; }
+sudo cp deployment/config_files/secmon_logrotate /etc/logrotate.d/ || { echo 'Copying config files failed' ; exit 1; }
+cp deployment/config_files/db.php config/ || { echo 'Copying config files failed' ; exit 1; }
+cp deployment/config_files/anomaly_config.ini config/ || { echo 'Copying config files failed' ; exit 1; }
+cp deployment/config_files/secmon_config.ini config/ || { echo 'Copying config files failed' ; exit 1; }
+cp deployment/docker-compose.yml . || { echo 'Copying config files failed' ; exit 1; }
 echo -e "${GREEN}Done${NORMAL}"
 
 sudo systemctl restart rsyslog.service
