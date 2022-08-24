@@ -22,8 +22,8 @@ sudo cp deployment/config_files/secmon.conf /etc/rsyslog.d/ \
 || { echo -e "${RED}Copying config files failed${NORMAL}" ; exit 1; }
 echo -e "${GREEN}Done${NORMAL}"
 
-sudo systemctl restart rsyslog.service
-sudo systemctl daemon-reload
-sudo systemctl restart docker
+sudo systemctl restart rsyslog.service || { echo -e "${RED}Restarting rsyslog service failed${NORMAL}" ; exit 1; }
+sudo systemctl daemon-reload || { echo -e "${RED}Reloading docker daemon failed${NORMAL}" ; exit 1; }
+sudo systemctl restart docker || { echo -e "${RED}Restarting docker service failed${NORMAL}" ; exit 1; }
 
 echo -e "Secmon preconfiguration is complete, to deploy SecMon run command \"python3 secmon_manager.py deploy\""
