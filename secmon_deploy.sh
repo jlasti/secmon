@@ -8,7 +8,7 @@ NORMAL='\033[0m'
 FILE=/var/log/docker/secmon.log
 if sudo test -f "$FILE"; then
   TIMESTAMP=`date +%Y%m%d`
-  sudo mv $FILE /var/log/docker/old.secmon.log-$TIMESTAMP || { echo -e "${RED}Renaming old /var/log/docker/secmon.log failed!${NORMAL}" ; exit 1; }
+  sudo mv $FILE /var/log/docker/secmon.log.old-$TIMESTAMP || { echo -e "${RED}Renaming old /var/log/docker/secmon.log failed!${NORMAL}" ; exit 1; }
   sudo systemctl restart rsyslog.service || { echo -e "${RED}Restarting rsyslog service failed${NORMAL}" ; exit 1; }
 fi
 
