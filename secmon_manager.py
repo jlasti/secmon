@@ -265,7 +265,7 @@ if sys.argv[1] == "deploy":
         time.sleep(1)
         while os.system('docker logs secmon_db 2>&1 | grep -q "listening on IPv4 address \\"0.0.0.0\\", port 5432"') != 0:
             print('Waiting for database to be ready to receive connections...')
-            time.sleep(1)
+            time.sleep(5)
 
         os.system('docker exec -it secmon_app ./yii migrate --interactive=0')
         os.system('docker exec -it secmon_app chgrp -R www-data .')
