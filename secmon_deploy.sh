@@ -6,10 +6,10 @@ GREEN='\033[0;32m'
 NORMAL='\033[0m'
 
 echo -e "Copying config files"
-cp deployment/config_files/db.php config/
-cp deployment/config_files/anomaly_config.ini config/
-cp deployment/config_files/secmon_config.ini config/
-cp deployment/docker-compose.yml .
+cp deployment/config_files/db.php config/ && cp deployment/config_files/anomaly_config.ini config/ && cp deployment/config_files/secmon_config.ini config/ && cp deployment/docker-compose.yml . || { echo 'Copying config files failed! Make sure, that you run command from secmon directory.' ; exit 1; }
+#cp deployment/config_files/anomaly_config.ini config/ || { echo 'Copying config files failed! Make sure, that you run command from secmon directory.' ; exit 1; }
+#cp deployment/config_files/secmon_config.ini config/ || { echo 'Copying config files failed! Make sure, that you run command from secmon directory.' ; exit 1; }
+#cp deployment/docker-compose.yml . || { echo 'Copying config files failed! Make sure, that you run command from secmon directory.' ; exit 1; }
 echo -e "${GREEN}Done${NORMAL}"
 
 #Password creating
@@ -36,11 +36,11 @@ while true; do
 done
 echo -e "${GREEN}Password successfully created${NORMAL}"
 
-#update password in install and config files
-sed -i "s/<password>/$password1/g" config/db.php
-sed -i "s/<password>/$password1/g" config/anomaly_config.ini
-sed -i "s/<password>/$password1/g" config/secmon_config.ini
-sed -i "s/<password>/$password1/g" docker-compose.yml
+#update password in config files
+sed -i "s/<password>/$password1/g" config/db.php || { echo 'Updating password in config/db.php failed' ; exit 1; }
+sed -i "s/<password>/$password1/g" config/anomaly_config.ini || { echo 'Updating password in config/anomaly_config.ini failed' ; exit 1; }
+sed -i "s/<password>/$password1/g" config/secmon_config.ini || { echo 'Updating password in config/secmon_config.ini failed' ; exit 1; }
+sed -i "s/<password>/$password1/g" docker-compose.yml || { echo 'Updating password in docker-compose.yml failed' ; exit 1; }
 
 docker pull php:7.4-fpm
 docker build -t secmon_base -f deployment/dockerfiles/secmon_base.Dockerfile ./ || { echo 'docker build secmon_base image failed' ; exit 1; }
