@@ -69,5 +69,5 @@ python3 secmon_manage.py deploy
 
 #Default login credentials user:secmon, password:password
 #After first login change password!!!
-<IP_addres_host_machine>:8080/secmon/web
+<IP_address_host_machine>:8080/secmon/web
 ```
