@@ -5,6 +5,13 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NORMAL='\033[0m'
 
+FILE=/var/log/docker/secmon.log
+if sudo test -f "$FILE"; then
+  TIMESTAMP=`date +%Y%m%d`
+  sudo mv $FILE /var/log/docker/old.secmon.log-$TIMESTAMP || { echo -e "${RED}Renaming old /var/log/docker/secmon.log failed!${NORMAL}" ; exit 1; }
+  sudo systemctl restart rsyslog.service || { echo -e "${RED}Restarting rsyslog service failed${NORMAL}" ; exit 1; }
+fi
+
 echo -e "Copying configuration files"
 cp deployment/config_files/db.php config/ \
 && cp deployment/config_files/anomaly_config.ini config/ \
