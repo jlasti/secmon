@@ -68,6 +68,6 @@ python3 secmon_manage.py deploy
 #Crete password for database user 'secmon' during installation
 
 #Default login credentials user:secmon, password:password
-#After first login change password!!!
+#Change password after first login!!!
 <IP_address_host_machine>:8080/secmon/web
 ```
