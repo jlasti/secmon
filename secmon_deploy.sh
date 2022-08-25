@@ -44,18 +44,20 @@ while true; do
 done
 echo -e "${GREEN}Password successfully created${NORMAL}"
 
-#update password in config files
-sed -i "s/<password>/$password1/g" config/db.php || { echo 'Updating password in config/db.php failed' ; exit 1; }
-sed -i "s/<password>/$password1/g" config/anomaly_config.ini || { echo 'Updating password in config/anomaly_config.ini failed' ; exit 1; }
-sed -i "s/<password>/$password1/g" config/secmon_config.ini || { echo 'Updating password in config/secmon_config.ini failed' ; exit 1; }
-sed -i "s/<password>/$password1/g" docker-compose.yml || { echo 'Updating password in docker-compose.yml failed' ; exit 1; }
+#update password in configuration files
+sed -i "s/<password>/$password1/g" config/db.php \
+&& sed -i "s/<password>/$password1/g" config/anomaly_config.ini \
+&& sed -i "s/<password>/$password1/g" config/secmon_config.ini \
+&& sed -i "s/<password>/$password1/g" docker-compose.yml \
+|| { echo 'Updating password in configuration files failed' ; exit 1; }
 
-docker pull php:7.4-fpm
-docker build -t secmon_base -f deployment/dockerfiles/secmon_base.Dockerfile ./ || { echo 'docker build secmon_base image failed' ; exit 1; }
-docker build -t secmon_geoip -f deployment/dockerfiles/secmon_geoip.Dockerfile ./deployment || { echo 'docker build secmon_geoip image failed' ; exit 1; }
-docker build -t secmon_network_model -f deployment/dockerfiles/secmon_network_model.Dockerfile ./deployment || { echo 'docker build secmon_network_model image failed' ; exit 1; }
-docker build -t secmon_correlator -f deployment/dockerfiles/secmon_correlator.Dockerfile ./deployment || { echo 'docker build secmon_correlator image failed' ; exit 1; }
-docker build -t secmon_db_retention -f deployment/dockerfiles/secmon_db_retention.Dockerfile ./deployment || { echo 'docker build secmon_db_retention image failed' ; exit 1; }
+docker pull php:7.4-fpm || { echo 'Pulling docker image failed' ; exit 1; }
+docker build -t secmon_base -f deployment/dockerfiles/secmon_base.Dockerfile ./ \
+&& docker build -t secmon_geoip -f deployment/dockerfiles/secmon_geoip.Dockerfile ./deployment \
+&& docker build -t secmon_network_model -f deployment/dockerfiles/secmon_network_model.Dockerfile ./deployment \
+&& docker build -t secmon_correlator -f deployment/dockerfiles/secmon_correlator.Dockerfile ./deployment \
+&& docker build -t secmon_db_retention -f deployment/dockerfiles/secmon_db_retention.Dockerfile ./deployment \
+|| { echo 'Building docker images failed' ; exit 1; }
 
 docker compose build || { echo 'docker compose build failed' ; exit 1; }
 
