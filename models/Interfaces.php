@@ -74,7 +74,7 @@ class Interfaces extends BaseEvent
         }
     }
 
-    public function getInterfacesByNetworkModel($network_model_id){
+    public static function getInterfacesByNetworkModel($network_model_id){
         $query = self::find();
 
         // add conditions that should always apply here
