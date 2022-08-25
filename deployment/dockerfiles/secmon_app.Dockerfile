@@ -6,7 +6,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update
 
 # Install useful packages
-RUN apt-get install -y git zip curl gcc build-essential apt-utils libpq-dev libdbus-1-dev libdbus-glib-1-dev nmap \
+RUN apt-get install -y git zip curl gcc build-essential net-tools apt-utils libpq-dev libdbus-1-dev libdbus-glib-1-dev nmap \
     && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
     && docker-php-ext-install pdo pdo_pgsql pgsql
 
