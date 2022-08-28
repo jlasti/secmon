@@ -12,6 +12,13 @@ class Navigation extends \yii\base\Component
 	{
 		$this->_items =
 		[
+			[
+				'label' => 'Security Events',
+				'url' => ['/security-events'],
+				'visible' => true,
+				'active' => 'security-events',
+				'icon' => 'event'
+	    ],
 	  	[
 				'label' => 'Correlated Events',
 				'url' => ['/events-correlated'],
