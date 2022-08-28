@@ -18,14 +18,6 @@ $this->params['dst_device'] = NetworkModel::getNetworkDevice($model->dst_ip_netw
     <?php endif; ?>
     <?= Html::a("<i class='material-icons' title=\"Group events\">group_work</i>" . Yii::t('app', 'Get'), ['analyse', 'id' => $model->id, 'norm' => 'true'], ['class' => 'btn-floating waves-effect waves-light btn-large blue']) ?>
     <?= Html::a("<i class='material-icons' title=\"Search clusters\">filter_alt</i>" . Yii::t('app', 'Get'), ['searchclusters', 'id' => $model->id], ['class' => 'btn-floating waves-effect waves-light btn-large blue']) ?>
-    <?= Html::a("<i class='material-icons' title=\"Delete event\">delete</i>" . Yii::t('app', 'Delete'),
-        ['delete', 'id' => $model->id],
-        ['class' => 'btn-floating waves-effect waves-light btn-large red',
-            'data' => [
-                'confirm' => Yii::t('app', 'Are you sure you want to delete this item?'),
-                'method' => 'post',
-            ],
-        ]) ?>
 </div>
 
 <div class="collapsible-header light-blue accent-4" style="font-size:20px; color: white;"><i class="material-icons">event</i>Event information</div>
