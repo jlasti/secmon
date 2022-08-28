@@ -28,13 +28,6 @@ class Navigation extends \yii\base\Component
             ],
             [
                 'label' => 'Clustered Events',
-                'url' => ['/events-clustered'],
-                'visible' => true,
-                'active' => 'events-clustered',
-                'icon' => 'event'
-            ],
-            [
-                'label' => 'Clustering',
                 'url' => ['/events-clustered-runs'],
                 'visible' => true,
                 'active' => 'events-clustered-runs',
