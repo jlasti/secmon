@@ -63,7 +63,7 @@ cd secmon
 ./secmon_preconfig.sh
 
 #Start deploying process
-python3 secmon_manage.py deploy
+python3 secmon_manager.py deploy
 
 #Crete password for database user 'secmon' during installation
 
