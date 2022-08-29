@@ -524,11 +524,15 @@ class FilterController extends Controller
 		}
 
 		// fit the length of array
-        $count = count($postFilters) - count($array);
-        for($i = 0; $i < $count; $i++)
+        if($postFilters)
         {
-            $array[] = new FilterRule();
+            $count = count($postFilters) - count($array);
+            for($i = 0; $i < $count; $i++)
+            {
+                $array[] = new FilterRule();
+            }
         }
+        
 
 		return $array;
 	}
