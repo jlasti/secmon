@@ -76,7 +76,7 @@ class m220828_181727_create_table_security_events extends Migration
           'device_address' => $this->string(),
           'device_host_name' => $this->string(100),
           'device_mac_address' => $this->string(),
-          'device_process_id '=> $this->integer(),
+          'device_process_id' => $this->integer(),
           'destination_host_name' => $this->string(1023),
           'destination_mac_address' =>$this->string(),
           'destination_nt_domain' => $this->string(255),
