@@ -2,8 +2,8 @@
 
 namespace app\commands;
 
-use app\models\Event;
-use app\models\Event\Normalized;
+//use app\models\EventsNormalized;
+use app\models\SecurityEvents;
 use Yii;
 use yii\console\Controller;
 use yii\console\Exception;
@@ -74,11 +74,11 @@ class NetworkController extends Controller{
 			$save_to_db = 1;
 		}
 
-        if (!is_numeric($portIn) || !is_numeric($portOut)) {
-		    throw new Exception('One of ports is not a numeric value');
-        }
+		if (!is_numeric($portIn) || !is_numeric($portOut)) {
+			throw new Exception('One of ports is not a numeric value');
+		}
         
-        $zmq = new ZMQContext();
+		$zmq = new ZMQContext();
 		$recSocket = $zmq->getSocket(ZMQ::SOCKET_PULL);  
 		$recSocket->bind("tcp://*:" . $portIn);
 
@@ -86,9 +86,9 @@ class NetworkController extends Controller{
 		$sendSocket->connect("tcp://secmon_" . $next_module . ":" . $portOut);
 		
 		date_default_timezone_set("Europe/Bratislava");
-        echo "[" . date("Y-m-d H:i:s") . "] Network model module started!" . PHP_EOL;
+		echo "[" . date("Y-m-d H:i:s") . "] Network model module started!" . PHP_EOL;
 
-        while(true){
+		while(true){
 			$srcIp = $dstIp = -1;
 			$msg = $recSocket->recv(ZMQ::MODE_NOBLOCK);
 			if(empty($msg)){
@@ -126,7 +126,7 @@ class NetworkController extends Controller{
 				}
 				//print($msg);
 				if($save_to_db){
-					$event = Normalized::fromCef($msg);
+					$event = SecurityEvents::extractCefFields($msg);
 					if($event->save()) {
 						$sendSocket->send($event->id . ':' . $msg, ZMQ::MODE_NOBLOCK);
 					}	

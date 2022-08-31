@@ -2,8 +2,8 @@
 
 namespace app\commands;
 
-use app\models\Event;
-use app\models\Event\Normalized;
+//use app\models\EventsCorrelated;
+use app\models\SecurityEvents;
 use Yii;
 use yii\console\Controller;
 use yii\console\Exception;
@@ -71,7 +71,7 @@ class CorrelatorController extends Controller{
 			while (($line = fgets($corrOutputStream)) != FALSE) {
 				if (!empty($line)) {
 				    Yii::info(sprintf("Correlated:\n%s\n", $line));
-				    $event = Event::fromCef($line);
+				    $event = SecurityEvents::extractCefHeader($line);
 				    $event->save();
 				}
             		}

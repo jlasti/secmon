@@ -2,8 +2,8 @@
 
 namespace app\commands;
 
-use app\models\Event;
-use app\models\Event\Normalized;
+//use app\models\EventsNormalized;
+use app\models\SecurityEvents;
 use Yii;
 use yii\console\Controller;
 use yii\console\Exception;
@@ -116,7 +116,7 @@ class NormalizerController extends Controller{
 				if (!empty($line)) {
 					Yii::info(sprintf("Normalized:\n%s\n", $line));
 					if($save_to_db){
-						$event = Normalized::fromCef($line);
+						$event = SecurityEvents::extractCefFields($line);
 						if ($event->save()) {
 							$sendSocket->send($event->id . ':' . $line, ZMQ::MODE_NOBLOCK);
 						}	
