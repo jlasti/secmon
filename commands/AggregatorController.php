@@ -2,8 +2,6 @@
 
 namespace app\commands;
 
-use app\models\Event;
-use app\models\Event\Normalized;
 use Yii;
 use yii\console\Controller;
 use yii\console\Exception;
