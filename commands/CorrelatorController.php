@@ -70,10 +70,9 @@ class CorrelatorController extends Controller{
 			}
 
 			while (($line = fgets($corrOutputStream)) != FALSE) {
-				echo "Received Event:" . $line . PHP_EOL;
 				if (!empty($line)) {
 				    Yii::info(sprintf("Correlated:\n%s\n", $line));
-				    $event = SecurityEvents::extractCefFields($line, 'correlated');//extractCefHeader($line);
+				    $event = SecurityEvents::extractCefFields($line, 'correlated');
 				    $event->save();
 				}
       }
