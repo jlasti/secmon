@@ -17,7 +17,7 @@ class m220828_181727_create_table_security_events extends Migration
         $this->createTable('{{%security_events}}', [
           'id' => $this->bigPrimaryKey(),
           'datetime' => $this->timestamp(),
-          'type' => $this->integer(),
+          'type' => $this->string(),
           'cef_version' => $this->string(31)->notNull(),
           'cef_severity' => $this->integer()->notNull(),
           'cef_event_class_id' => $this->string(1023)->notNull(),
