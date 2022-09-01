@@ -115,7 +115,7 @@ class NormalizerController extends Controller{
 				if (!empty($line)) {
 					Yii::info(sprintf("Normalized:\n%s\n", $line));
 					if($save_to_db){
-						$event = SecurityEvents::extractCefFields($line);
+						$event = SecurityEvents::extractCefFields($line, 'normalized');
 						if ($event->save()) {
 							$sendSocket->send($event->id . ':' . $line, ZMQ::MODE_NOBLOCK);
 						}	
