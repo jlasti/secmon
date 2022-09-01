@@ -33,14 +33,14 @@ use app\components\filter\FilterQuery;
  * @property string|null $device_custom_ipv6_address4
  * @property string|null $device_custom_ipv6_address4_label
  * @property string|null $device_event_category
- * @property float|null $device_customfloating_point1
- * @property string|null $device_customfloating_point1_label
- * @property float|null $device_customfloating_point2
- * @property string|null $device_customfloating_point2_label
- * @property float|null $device_customfloating_point3
- * @property string|null $device_customfloating_point3_label
- * @property float|null $device_customfloating_point4
- * @property string|null $device_customfloating_point4_label
+ * @property float|null $device_custom_floating_point1
+ * @property string|null $device_custom_floating_point1_label
+ * @property float|null $device_custom_floating_point2
+ * @property string|null $device_custom_floating_point2_label
+ * @property float|null $device_custom_floating_point3
+ * @property string|null $device_custom_floating_point3_label
+ * @property float|null $device_custom_floating_point4
+ * @property string|null $device_custom_floating_point4_label
  * @property int|null $device_custom_number1
  * @property string|null $device_custom_number1_label
  * @property int|null $device_custom_number2
@@ -209,11 +209,11 @@ class SecurityEvents extends \yii\db\ActiveRecord
             [['cef_severity', 'device_custom_number1', 'device_custom_number2', 'device_custom_number3', 'baseEventCount', 'device_direction', 'device_process_id', 'destination_translated_port', 'destination_process_id', 'destination_port', 'file_size', 'old_file_size', 'bytes_in', 'bytes_out', 'source_translated_port', 'source_process_id', 'source_port', 'agent_translated_zone_key', 'agent_zone_key', 'customer_key', 'destination_translated_zone_key', 'destination_zone_key', 'device_translated_zone_key', 'device_zone_key', 'source_translated_zone_key', 'source_zone_key', 'reported_duration', 'destination_ip_network_model', 'source_ip_network_model'], 'default', 'value' => null],
             [['cef_severity', 'device_custom_number1', 'device_custom_number2', 'device_custom_number3', 'baseEventCount', 'device_direction', 'device_process_id', 'destination_translated_port', 'destination_process_id', 'destination_port', 'file_size', 'old_file_size', 'bytes_in', 'bytes_out', 'source_translated_port', 'source_process_id', 'source_port', 'agent_translated_zone_key', 'agent_zone_key', 'customer_key', 'destination_translated_zone_key', 'destination_zone_key', 'device_translated_zone_key', 'device_zone_key', 'source_translated_zone_key', 'source_zone_key', 'reported_duration', 'destination_ip_network_model', 'source_ip_network_model'], 'integer'],
             [['cef_version', 'cef_severity', 'cef_event_class_id', 'cef_device_product', 'cef_vendor', 'cef_device_version', 'cef_name'], 'required'],
-            [['device_customfloating_point1', 'device_customfloating_point2', 'device_customfloating_point3', 'device_customfloating_point4', 'source_geo_longitude', 'source_geo_latitude', 'destination_geo_longitude', 'destination_geo_latitude'], 'number'],
+            [['device_custom_floating_point1', 'device_custom_floating_point2', 'device_custom_floating_point3', 'device_custom_floating_point4', 'source_geo_longitude', 'source_geo_latitude', 'destination_geo_longitude', 'destination_geo_latitude'], 'number'],
             [['parent_events', 'cef_extensions', 'raw_event'], 'string'],
             [['analyzed'], 'boolean'],
             [['type', 'cef_version', 'application_protocol', 'transport_protocol'], 'string', 'max' => 31],
-            [['cef_event_class_id', 'device_custom_ipv6_address1_label', 'device_custom_ipv6_address2_label', 'device_custom_ipv6_address3_label', 'device_custom_ipv6_address4_label', 'device_event_category', 'device_customfloating_point1_label', 'device_customfloating_point2_label', 'device_customfloating_point3_label', 'device_customfloating_point4_label', 'device_custom_number1_label', 'device_custom_number2_label', 'device_custom_number3_label', 'device_custom_string1_label', 'device_custom_string2_label', 'device_custom_string3_label', 'device_custom_string4_label', 'device_custom_string5_label', 'device_custom_string6_label', 'device_custom_date1_label', 'device_custom_date2_label', 'device_facility', 'device_process_name', 'destination_host_name', 'destination_service_name', 'destination_user_privileges', 'destination_process_name', 'destination_user_id', 'destination_user_name', 'destination_group_id', 'destination_group_name', 'file_id', 'file_name', 'file_path', 'file_permission', 'file_type', 'old_file_id', 'old_file_name', 'old_file_path', 'old_file_permission', 'old_file_type', 'flex_string1', 'flex_string2', 'message', 'reason', 'request_url', 'request_client_application', 'request_cookies', 'request_method', 'source_host_name', 'source_service_name', 'source_user_privileges', 'source_process_name', 'source_user_id', 'source_user_name', 'source_group_id', 'source_group_name'], 'string', 'max' => 1023],
+            [['cef_event_class_id', 'device_custom_ipv6_address1_label', 'device_custom_ipv6_address2_label', 'device_custom_ipv6_address3_label', 'device_custom_ipv6_address4_label', 'device_event_category', 'device_custom_floating_point1_label', 'device_custom_floating_point2_label', 'device_custom_floating_point3_label', 'device_custom_floating_point4_label', 'device_custom_number1_label', 'device_custom_number2_label', 'device_custom_number3_label', 'device_custom_string1_label', 'device_custom_string2_label', 'device_custom_string3_label', 'device_custom_string4_label', 'device_custom_string5_label', 'device_custom_string6_label', 'device_custom_date1_label', 'device_custom_date2_label', 'device_facility', 'device_process_name', 'destination_host_name', 'destination_service_name', 'destination_user_privileges', 'destination_process_name', 'destination_user_id', 'destination_user_name', 'destination_group_id', 'destination_group_name', 'file_id', 'file_name', 'file_path', 'file_permission', 'file_type', 'old_file_id', 'old_file_name', 'old_file_path', 'old_file_permission', 'old_file_type', 'flex_string1', 'flex_string2', 'message', 'reason', 'request_url', 'request_client_application', 'request_cookies', 'request_method', 'source_host_name', 'source_service_name', 'source_user_privileges', 'source_process_name', 'source_user_id', 'source_user_name', 'source_group_id', 'source_group_name'], 'string', 'max' => 1023],
             [['cef_device_product', 'cef_vendor', 'device_action', 'event_outcome'], 'string', 'max' => 63],
             [['cef_device_version', 'device_custom_ipv6_address1', 'device_custom_ipv6_address2', 'device_custom_ipv6_address3', 'device_custom_ipv6_address4', 'device_dns_domain', 'device_external_id', 'device_nt_domain', 'device_translated_address', 'device_time_zone', 'device_address', 'device_mac_address', 'destination_mac_address', 'destination_nt_domain', 'destination_dns_domain', 'destination_translated_address', 'destination_address', 'file_hash', 'old_file_hash', 'source_mac_address', 'source_nt_domain', 'source_dns_domain', 'source_translated_address', 'source_address', 'source_code', 'destination_code'], 'string', 'max' => 255],
             [['cef_name'], 'string', 'max' => 512],
@@ -255,14 +255,14 @@ class SecurityEvents extends \yii\db\ActiveRecord
             'device_custom_ipv6_address4' => 'Device Custom Ipv6 Address4',
             'device_custom_ipv6_address4_label' => 'Device Custom Ipv6 Address4 Label',
             'device_event_category' => 'Device Event Category',
-            'device_customfloating_point1' => 'Device Customfloating Point1',
-            'device_customfloating_point1_label' => 'Device Customfloating Point1 Label',
-            'device_customfloating_point2' => 'Device Customfloating Point2',
-            'device_customfloating_point2_label' => 'Device Customfloating Point2 Label',
-            'device_customfloating_point3' => 'Device Customfloating Point3',
-            'device_customfloating_point3_label' => 'Device Customfloating Point3 Label',
-            'device_customfloating_point4' => 'Device Customfloating Point4',
-            'device_customfloating_point4_label' => 'Device Customfloating Point4 Label',
+            'device_custom_floating_point1' => 'Device Custom Floating Point1',
+            'device_custom_floating_point1_label' => 'Device Custom Floating Point1 Label',
+            'device_custom_floating_point2' => 'Device Custom Floating Point2',
+            'device_custom_floating_point2_label' => 'Device Custom Floating Point2 Label',
+            'device_custom_floating_point3' => 'Device Custom Floating Point3',
+            'device_custom_floating_point3_label' => 'Device Custom Floating Point3 Label',
+            'device_custom_floating_point4' => 'Device Custom Floating Point4',
+            'device_custom_floating_point4_label' => 'Device Custom Floating Point4 Label',
             'device_custom_number1' => 'Device Custom Number1',
             'device_custom_number1_label' => 'Device Custom Number1 Label',
             'device_custom_number2' => 'Device Custom Number2',
@@ -536,14 +536,14 @@ class SecurityEvents extends \yii\db\ActiveRecord
         $event->device_custom_ipv6_address4 = $values['c6a4'] ?? "";
         $event->device_custom_ipv6_address4_label = $values['c6a4Label'] ?? "";
         $event->device_event_category = $values['cat'] ?? "";
-        $event->device_customfloating_point1 = $values['cfp1'] ?? "";
-        $event->device_customfloating_point1_label = $values['cfp1Label'] ?? "";
-        $event->device_customfloating_point2 = $values['cfp2'] ?? "";
-        $event->device_customfloating_point2_label = $values['cfp2Label'] ?? "";
-        $event->device_customfloating_point3 = $values['cfp3'] ?? "";
-        $event->device_customfloating_point3_label = $values['cfp3Label'] ?? "";
-        $event->device_customfloating_point4 = $values['cfp4'] ?? "";
-        $event->device_customfloating_point4_label = $values['cfp4Label'] ?? "";
+        $event->device_custom_floating_point1 = $values['cfp1'] ?? "";
+        $event->device_custom_floating_point1_label = $values['cfp1Label'] ?? "";
+        $event->device_custom_floating_point2 = $values['cfp2'] ?? "";
+        $event->device_custom_floating_point2_label = $values['cfp2Label'] ?? "";
+        $event->device_custom_floating_point3 = $values['cfp3'] ?? "";
+        $event->device_custom_floating_point3_label = $values['cfp3Label'] ?? "";
+        $event->device_custom_floating_point4 = $values['cfp4'] ?? "";
+        $event->device_custom_floating_point4_label = $values['cfp4Label'] ?? "";
         $event->device_custom_number1 = $values['cn1'] ?? "";
         $event->device_custom_number1_label = $values['cn1Label'] ?? "";
         $event->device_custom_number2 = $values['cn2'] ?? "";
