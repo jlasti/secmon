@@ -55,7 +55,7 @@ class CorrelatorController extends Controller{
 		$recSocket->bind("tcp://*:" . $portIn);
 
 		date_default_timezone_set("Europe/Bratislava");
-        echo "[" . date("Y-m-d H:i:s") . "] Worker correlator started!" . PHP_EOL;
+    echo "[" . date("Y-m-d H:i:s") . "] Worker correlator started!" . PHP_EOL;
 
 		while(true){
 			$msg = $recSocket->recv(ZMQ::MODE_NOBLOCK);
@@ -64,9 +64,9 @@ class CorrelatorController extends Controller{
 			}
 
 			if (!empty($msg)) {
-                fwrite($corrInputStream, $msg);
-                flush();
-            }
+				fwrite($corrInputStream, $msg);
+				flush();
+			}
 
 			while (($line = fgets($corrOutputStream)) != FALSE) {
 				if (!empty($line)) {
@@ -74,29 +74,29 @@ class CorrelatorController extends Controller{
 				    $event = SecurityEvents::extractCefHeader($line);
 				    $event->save();
 				}
-            		}
+      }
 		}
 	}
 
 	function openPipe($file){
-            $pipe = posix_mkfifo($file, 0666);
-            $openPipe = fopen($file, 'r+');
-            stream_set_blocking($openPipe, false);
+		$pipe = posix_mkfifo($file, 0666);
+		$openPipe = fopen($file, 'r+');
+		stream_set_blocking($openPipe, false);
 
-            return $openPipe;
-        }
+		return $openPipe;
+	}
 
 	function openNonBlockingStream($file){
-            $stream = fopen($file, 'r+');
+		$stream = fopen($file, 'r+');
 
-            if ($stream === false) {
-                return null;
-            }
+		if ($stream === false) {
+				return null;
+		}
 
-            stream_set_blocking($stream, false);
+		stream_set_blocking($stream, false);
 
-            return $stream;
-       }
+		return $stream;
+	}
 }
 
 ?>
