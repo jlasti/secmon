@@ -9,6 +9,11 @@ class m220828_181727_create_table_security_events extends Migration
 {
     public function up()
     {
+        $tableOptions = null;
+        if ($this->db->driverName === 'mysql') {
+            $tableOptions = 'CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB';
+        }
+
         $this->createTable('{{%security_events}}', [
           'id' => $this->bigPrimaryKey(),
           'datetime' => $this->timestamp(),
@@ -18,7 +23,7 @@ class m220828_181727_create_table_security_events extends Migration
           'cef_event_class_id' => $this->string(1023)->notNull(),
           'cef_device_product' => $this->string(63)->notNull(),
           'cef_vendor' => $this->string(63)->notNull(),
-          'cef_device_version' => $this->string()->notNull(),
+          'cef_device_version' => $this->string(31)->notNull(),
           'cef_name' => $this->string(512)->notNull(),
           'device_action' => $this->string(63),
           'application_protocol' => $this->string(31),
@@ -182,7 +187,7 @@ class m220828_181727_create_table_security_events extends Migration
           'analyzed' => $this->boolean(), //not from CEF
           'cef_extensions' => $this->text(), //asi toto bude useless, keďže tu máme už všetky CEF polia
           'raw_event' => $this->text(),
-        ]);
+        ], $tableOptions);
 
         $this->createIndex('idx_security_events_datetime', '{{%security_events}}', 'datetime');
         $this->createIndex('idx_security_events_device_host_name', '{{%security_events}}', 'device_host_name');
