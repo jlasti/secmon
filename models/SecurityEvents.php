@@ -14,7 +14,7 @@ use app\components\filter\FilterQuery;
  *
  * @property int $id
  * @property string|null $datetime
- * @property int|null $type
+ * @property string $type
  * @property string $cef_version
  * @property int $cef_severity
  * @property string $cef_event_class_id
