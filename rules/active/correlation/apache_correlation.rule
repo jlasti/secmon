@@ -6,7 +6,7 @@ ptype=RegExp
 continue=EndMatch
 pattern=^( *\d+):([A-Za-z0-9: ]*) (\S+) (\S+)\|Apache\|httpd\|access\|(?P<status_code>\d+)\|HTTP Request\|(?P<severity>\d+)\| app=(\S+) src=(?P<remote_ip>([0-9.]*)) request_method=(?P<request_method>.*?) request=(?i)(?P<request_url>([^,\n ]*)(((((%20|\+|\s|\(|%2A%2A|\/|\\|;|%3B|\'|%27|)(select|union|insert|update|delete|replace| truncate|null|count|drop))([^,\n ]*))|((\')|(\%27)|(\\)|(#)|(\%23))|((\%27)|(\'))(\s|\+|\%20)*((\%6F)|o|(\%4F))((\%72)|r|(\%52)))([^,\n ]*))) requestClientApplication=(.*) rawEvent=(?P<rawEvent>.*?).$
 desc=Suspicious URL request - possible XSS attack from IP $+{remote_ip}
-action=write /var/www/html/secmon/__secInput $2 $3 CEF:0|Apache|HTTP Request|0|13|SQLi pattern detected - Possible SQL Injection attack|13|att=sql_injection src=$+{remote_ip}  rawEvent=$+{rawEvent}
+action=write /var/www/html/secmon/__secInput $2 $3 CEF:0|Apache|HTTP Request|0|13|SQLi pattern detected - Possible SQL Injection attack|9|att=sql_injection src=$+{remote_ip}  rawEvent=$+{rawEvent}
 
 ##################################
 #  Directory Traversal Attack    #
@@ -19,7 +19,7 @@ desc=Possible direcotory traversal attack from IP $+{remote_ip}
 action=write /var/www/html/secmon/__secInput $2 $3 CEF:0|Apache|HTTP Request|0|16|Traversal pattern detected - Possible directory traversal attack|6|att=directory_traversal src=$+{remote_ip} rawEvent=$+{rawEvent}
 
 ###################################
-#  Directory Eenumeration Attack  #
+#  Directory Enumeration Attack  #
 ###################################
 type=Suppress
 ptype=RegExp
