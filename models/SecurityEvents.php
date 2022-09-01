@@ -724,14 +724,14 @@ class SecurityEvents extends \yii\db\ActiveRecord
 		if($position != FALSE){
             $start_position = $position + strlen("src_location_latitude=");
             $end_position = strpos($cefString, " ", $start_position);
-            $event->source_latitude = substr($cefString, $start_position, $end_position - $start_position);
+            $event->source_geo_latitude = substr($cefString, $start_position, $end_position - $start_position);
 		}
 
 		$position = strpos($cefString, "src_location_longitude=");
 		if($position != FALSE){
             $start_position = $position + strlen("src_location_longitude=");
             $end_position = strpos($cefString, " ", $start_position);
-            $event->source_longitude = substr($cefString, $start_position, $end_position - $start_position);
+            $event->source_geo_longitude = substr($cefString, $start_position, $end_position - $start_position);
 		}
 		
 		//map geoIP for dst IP
@@ -760,14 +760,14 @@ class SecurityEvents extends \yii\db\ActiveRecord
 		if($position != FALSE){
             $start_position = $position + strlen("dst_location_latitude=");
             $end_position = strpos($cefString, " ", $start_position);
-            $event->destination_latitude = substr($cefString, $start_position, $end_position - $start_position);
+            $event->destination_geo_latitude = substr($cefString, $start_position, $end_position - $start_position);
 		}
 
 		$position = strpos($cefString, "dst_location_longitude=");
 		if($position != FALSE){
             $start_position = $position + strlen("dst_location_longitude=");
             $end_position = strpos($cefString, " ", $start_position);
-            $event->destination_longitude = substr($cefString, $start_position, $end_position - $start_position);
+            $event->destination_geo_longitude = substr($cefString, $start_position, $end_position - $start_position);
 		}
 
 		return $event;
