@@ -40,6 +40,7 @@ class SecurityEventsController extends Controller
     {
         $searchModel = new SecurityEventsSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
+        $dataProvider->sort->defaultOrder = ['id' => SORT_DESC];
 
         return $this->render('index', [
             'searchModel' => $searchModel,
