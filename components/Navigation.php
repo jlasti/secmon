@@ -19,20 +19,6 @@ class Navigation extends \yii\base\Component
 				'active' => 'security-events',
 				'icon' => 'event'
 	    ],
-	  	[
-				'label' => 'Correlated Events',
-				'url' => ['/events-correlated'],
-				'visible' => true,
-				'active' => 'events-correlated',
-				'icon' => 'event'
-	    ],
-			[
-				'label' => 'Normalized Events',
-				'url' => ['/events-normalized'],
-				'visible' => true,
-				'active' => 'events-normalized',
-				'icon' => 'event'
-			],
 			[
 				'label' => 'Clustered Events',
 				'url' => ['/events-clustered-runs'],
