@@ -206,13 +206,13 @@ class SecurityEvents extends \yii\db\ActiveRecord
     {
         return [
             [['datetime', 'device_custom_date1', 'device_custom_date2', 'end_time', 'file_create_time', 'file_modification_time', 'old_file_create_time', 'old_file_modification_time', 'flex_date1', 'device_receipt_time', 'start_time'], 'safe'],
-            [['type', 'cef_severity', 'device_custom_number1', 'device_custom_number2', 'device_custom_number3', 'baseEventCount', 'device_direction', 'device_process_id', 'destination_translated_port', 'destination_process_id', 'destination_port', 'file_size', 'old_file_size', 'bytes_in', 'bytes_out', 'source_translated_port', 'source_process_id', 'source_port', 'agent_translated_zone_key', 'agent_zone_key', 'customer_key', 'destination_translated_zone_key', 'destination_zone_key', 'device_translated_zone_key', 'device_zone_key', 'source_translated_zone_key', 'source_zone_key', 'reported_duration', 'destination_ip_network_model', 'source_ip_network_model'], 'default', 'value' => null],
-            [['type', 'cef_severity', 'device_custom_number1', 'device_custom_number2', 'device_custom_number3', 'baseEventCount', 'device_direction', 'device_process_id', 'destination_translated_port', 'destination_process_id', 'destination_port', 'file_size', 'old_file_size', 'bytes_in', 'bytes_out', 'source_translated_port', 'source_process_id', 'source_port', 'agent_translated_zone_key', 'agent_zone_key', 'customer_key', 'destination_translated_zone_key', 'destination_zone_key', 'device_translated_zone_key', 'device_zone_key', 'source_translated_zone_key', 'source_zone_key', 'reported_duration', 'destination_ip_network_model', 'source_ip_network_model'], 'integer'],
+            [['cef_severity', 'device_custom_number1', 'device_custom_number2', 'device_custom_number3', 'baseEventCount', 'device_direction', 'device_process_id', 'destination_translated_port', 'destination_process_id', 'destination_port', 'file_size', 'old_file_size', 'bytes_in', 'bytes_out', 'source_translated_port', 'source_process_id', 'source_port', 'agent_translated_zone_key', 'agent_zone_key', 'customer_key', 'destination_translated_zone_key', 'destination_zone_key', 'device_translated_zone_key', 'device_zone_key', 'source_translated_zone_key', 'source_zone_key', 'reported_duration', 'destination_ip_network_model', 'source_ip_network_model'], 'default', 'value' => null],
+            [['cef_severity', 'device_custom_number1', 'device_custom_number2', 'device_custom_number3', 'baseEventCount', 'device_direction', 'device_process_id', 'destination_translated_port', 'destination_process_id', 'destination_port', 'file_size', 'old_file_size', 'bytes_in', 'bytes_out', 'source_translated_port', 'source_process_id', 'source_port', 'agent_translated_zone_key', 'agent_zone_key', 'customer_key', 'destination_translated_zone_key', 'destination_zone_key', 'device_translated_zone_key', 'device_zone_key', 'source_translated_zone_key', 'source_zone_key', 'reported_duration', 'destination_ip_network_model', 'source_ip_network_model'], 'integer'],
             [['cef_version', 'cef_severity', 'cef_event_class_id', 'cef_device_product', 'cef_vendor', 'cef_device_version', 'cef_name'], 'required'],
             [['device_customfloating_point1', 'device_customfloating_point2', 'device_customfloating_point3', 'device_customfloating_point4', 'source_geo_longitude', 'source_geo_latitude', 'destination_geo_longitude', 'destination_geo_latitude'], 'number'],
             [['parent_events', 'cef_extensions', 'raw_event'], 'string'],
             [['analyzed'], 'boolean'],
-            [['cef_version', 'application_protocol', 'transport_protocol'], 'string', 'max' => 31],
+            [['type', 'cef_version', 'application_protocol', 'transport_protocol'], 'string', 'max' => 31],
             [['cef_event_class_id', 'device_custom_ipv6_address1_label', 'device_custom_ipv6_address2_label', 'device_custom_ipv6_address3_label', 'device_custom_ipv6_address4_label', 'device_event_category', 'device_customfloating_point1_label', 'device_customfloating_point2_label', 'device_customfloating_point3_label', 'device_customfloating_point4_label', 'device_custom_number1_label', 'device_custom_number2_label', 'device_custom_number3_label', 'device_custom_string1_label', 'device_custom_string2_label', 'device_custom_string3_label', 'device_custom_string4_label', 'device_custom_string5_label', 'device_custom_string6_label', 'device_custom_date1_label', 'device_custom_date2_label', 'device_facility', 'device_process_name', 'destination_host_name', 'destination_service_name', 'destination_user_privileges', 'destination_process_name', 'destination_user_id', 'destination_user_name', 'destination_group_id', 'destination_group_name', 'file_id', 'file_name', 'file_path', 'file_permission', 'file_type', 'old_file_id', 'old_file_name', 'old_file_path', 'old_file_permission', 'old_file_type', 'flex_string1', 'flex_string2', 'message', 'reason', 'request_url', 'request_client_application', 'request_cookies', 'request_method', 'source_host_name', 'source_service_name', 'source_user_privileges', 'source_process_name', 'source_user_id', 'source_user_name', 'source_group_id', 'source_group_name'], 'string', 'max' => 1023],
             [['cef_device_product', 'cef_vendor', 'device_action', 'event_outcome'], 'string', 'max' => 63],
             [['cef_device_version', 'device_custom_ipv6_address1', 'device_custom_ipv6_address2', 'device_custom_ipv6_address3', 'device_custom_ipv6_address4', 'device_dns_domain', 'device_external_id', 'device_nt_domain', 'device_translated_address', 'device_time_zone', 'device_address', 'device_mac_address', 'destination_mac_address', 'destination_nt_domain', 'destination_dns_domain', 'destination_translated_address', 'destination_address', 'file_hash', 'old_file_hash', 'source_mac_address', 'source_nt_domain', 'source_dns_domain', 'source_translated_address', 'source_address', 'source_code', 'destination_code'], 'string', 'max' => 255],
@@ -448,7 +448,7 @@ class SecurityEvents extends \yii\db\ActiveRecord
 		$dateHost = explode(' ', strrev(array_shift($data)), 3);
 		$event->cef_version = str_replace('CEF:', '', strrev(array_shift($dateHost)));
         $event->device_host_name= strrev(array_shift($dateHost));
-        $event->type = 2;
+        $event->type = 'correlated';
         
         // osetrenie ak na zaciatku logu nie je timestamp
         $strDate = array_shift($dateHost);
@@ -492,7 +492,7 @@ class SecurityEvents extends \yii\db\ActiveRecord
 	{
 		$event = new self();
         $event = $event->extractCefHeader($cefString);
-        $event->type = 0;
+        $event->type = 'normalized';
 
 		$data = explode('|', $cefString);
 
