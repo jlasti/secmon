@@ -438,17 +438,16 @@ class SecurityEvents extends \yii\db\ActiveRecord
     {
         return $this->hasMany(ClusteredEventsRelations::className(), ['fk_event_id' => 'id']);
     }
-    
-    public static function extractCefHeader($cefString)
+
+    public static function getCefHeader($cefString)
 	{
-		$event = new self();
+        $event = new self();
 
 		$data = explode('|', $cefString);
 
 		$dateHost = explode(' ', strrev(array_shift($data)), 3);
 		$event->cef_version = str_replace('CEF:', '', strrev(array_shift($dateHost)));
         $event->device_host_name= strrev(array_shift($dateHost));
-        $event->type = 'correlated';
         
         // osetrenie ak na zaciatku logu nie je timestamp
         $strDate = array_shift($dateHost);
@@ -468,31 +467,14 @@ class SecurityEvents extends \yii\db\ActiveRecord
 		$event->cef_event_class_id = array_shift($data);
 		$event->cef_name = array_shift($data);
 		$event->cef_severity = array_shift($data);
+        return $event;
+    }
 
-        $data = array_shift($data);
-        $exData = explode(" ", $data);
-        $values = [];
-        foreach($exData as $val) {
-            $tmp = explode("=", $val);
-            if($tmp[0] == "rawEvent" || $tmp[0] == "reason")
-            {
-                break;
-            }
-            $values[$tmp[0]] = isset($tmp[1]) ? $tmp[1] : "";
-        }
-
-        $event->parent_events = $values['cs1'] ?? "";
-        $event->attack_type = $values['att'] ?? "";
-		$event->raw_event = $cefString;
-
-		return $event;
-	}
-
-    public static function extractCefFields($cefString)
+    public static function extractCefFields($cefString, $eventType)
 	{
 		$event = new self();
-        $event = $event->extractCefHeader($cefString);
-        $event->type = 'normalized';
+        $event = $event->getCefHeader($cefString);
+        $event->type = $eventType;
 
 		$data = explode('|', $cefString);
 
@@ -526,7 +508,7 @@ class SecurityEvents extends \yii\db\ActiveRecord
             		$values[$tmp[0]] = isset($tmp[1]) ? $tmp[1] : "";
 		}
 		
-		//nevyhnutne dva if-y, lebo delimiter " " a "=" kazia vstup do atributov request_url a request_client_application
+		//get HTTP Request from event
 		if(preg_match('/request=/', $data)){
 			$start_pos = strpos($data, 'request=');
 			$start_pos += strlen('request=');
@@ -534,35 +516,174 @@ class SecurityEvents extends \yii\db\ActiveRecord
 			$length = $end_pos - $start_pos;
 			$request_url = substr($data, $start_pos, $length);
 		}
+        //get Request Client Application
 		if(preg_match('/requestClientApplication=/', $data)){
 			$start_pos = strpos($data, 'requestClientApplication=');
 			$start_pos += strlen('requestClientApplication=');
 			$end_pos = strpos($data, ' rawEvent=', $start_pos);
 			$length = $end_pos - $start_pos;
 			$request_client_application = substr($data, $start_pos, $length);
-		}	
-
-		$event->source_address = $values['src'] ?? "";
-		if($event->source_address == "localhost"){
-			$event->source_address = "127.0.0.1";
 		}
-		$event->destination_address = $values['dst'] ?? "";
-		$event->source_mac_address = $values['smac'] ?? "";
-		$event->destination_mac_address = $values['dmac'] ?? "";
-		$event->source_port = $values['spt'] ?? "";
-		$event->destination_port = $values['dpt'] ?? "";
-		$event->application_protocol = $values['proto'] ?? $values['app'] ?? "";
-		$event->request_method = $values['request_method'] ?? "";
+
+        $event->device_action = $values['act'] ?? "";
+        $event->application_protocol = $values['app'] ?? "";
+        $event->device_custom_ipv6_address1 = $values['c6a1'] ?? "";
+        $event->device_custom_ipv6_address1_label = $values['c6a1Label'] ?? "";
+        $event->device_custom_ipv6_address2 = $values['c6a2'] ?? "";
+        $event->device_custom_ipv6_address2_label = $values['c6a2Label'] ?? "";
+        $event->device_custom_ipv6_address3 = $values['c6a3'] ?? "";
+        $event->device_custom_ipv6_address3_label = $values['c6a3Label'] ?? "";
+        $event->device_custom_ipv6_address4 = $values['c6a4'] ?? "";
+        $event->device_custom_ipv6_address4_label = $values['c6a4Label'] ?? "";
+        $event->device_event_category = $values['cat'] ?? "";
+        $event->device_customfloating_point1 = $values['cfp1'] ?? "";
+        $event->device_customfloating_point1_label = $values['cfp1Label'] ?? "";
+        $event->device_customfloating_point2 = $values['cfp2'] ?? "";
+        $event->device_customfloating_point2_label = $values['cfp2Label'] ?? "";
+        $event->device_customfloating_point3 = $values['cfp3'] ?? "";
+        $event->device_customfloating_point3_label = $values['cfp3Label'] ?? "";
+        $event->device_customfloating_point4 = $values['cfp4'] ?? "";
+        $event->device_customfloating_point4_label = $values['cfp4Label'] ?? "";
+        $event->device_custom_number1 = $values['cn1'] ?? "";
+        $event->device_custom_number1_label = $values['cn1Label'] ?? "";
+        $event->device_custom_number2 = $values['cn2'] ?? "";
+        $event->device_custom_number2_label = $values['cn2Label'] ?? "";
+        $event->device_custom_number3 = $values['cn3'] ?? "";
+        $event->device_custom_number3_label = $values['cn3Label'] ?? "";
+        $event->baseEventCount = $values['cnt'] ?? "";
+        $event->device_custom_string1 = $values['cs1'] ?? "";
+        $event->device_custom_string1_label = $values['cs1Label'] ?? "";
+        $event->device_custom_string2 = $values['cs2'] ?? "";
+        $event->device_custom_string2_label = $values['cs2Label'] ?? "";
+        $event->device_custom_string3 = $values['cs3'] ?? "";
+        $event->device_custom_string3_label = $values['cs3Label'] ?? "";
+        $event->device_custom_string4 = $values['cs4'] ?? "";
+        $event->device_custom_string4_label = $values['cs4Label'] ?? "";
+        $event->device_custom_string5 = $values['cs5'] ?? "";
+        $event->device_custom_string5_label = $values['cs5Label'] ?? "";
+        $event->device_custom_string6 = $values['cs6'] ?? "";
+        $event->device_custom_string6_label = $values['cs6Label'] ?? "";
+        $event->device_custom_date1 = $values['deviceCustomDate1'] ?? "";
+        $event->device_custom_date1_label = $values['deviceCustomDate1Label'] ?? "";
+        $event->device_custom_date2 = $values['deviceCustomDate2'] ?? "";
+        $event->device_custom_date2_label = $values['deviceCustomDate2Label'] ?? "";
+        $event->device_direction = $values['deviceDirection'] ?? "";
+        $event->device_dns_domain = $values['deviceDns Domain'] ?? "";
+        $event->device_external_id = $values['device ExternalId'] ?? "";
+        $event->device_facility = $values['deviceFacility'] ?? "";
+        $event->device_inbound_interface = $values['deviceInboundInterface'] ?? "";
+        $event->device_nt_domain = $values['deviceNt Domain'] ?? "";
+        $event->device_outbound_interface = $values['deviceOutboundInterface'] ?? "";
+        $event->device_payload_id = $values['devicePayloadId'] ?? "";
+        $event->device_process_name = $values['deviceProcess Name'] ?? "";
+        $event->device_translated_address = $values['deviceTranslatedAddress'] ?? "";
+        $event->device_time_zone = $values['dtz'] ?? "";
+        $event->device_address = $values['dvc'] ?? "";
+        if(!$event->device_host_name)
+            $event->device_host_name = $values['dvchost'] ?? "";
+        $event->device_mac_address = $values['dvcmac'] ?? "";
+        $event->device_process_id = $values['dvcpid'] ?? "";
+        $event->destination_host_name = $values['dhost'] ?? "";
+        $event->destination_mac_address = $values['dmac'] ?? "";
+        $event->destination_nt_domain = $values['dntdom'] ?? "";
+        $event->destination_dns_domain = $values[''] ?? "";
+        $event->destination_service_name = $values[''] ?? "";
+        $event->destination_translated_address = $values[''] ?? "";
+        $event->destination_translated_port = $values[''] ?? "";
+        $event->destination_process_id = $values['dpid'] ?? "";
+        $event->destination_user_privileges = $values['dpriv'] ?? "";
+        $event->destination_process_name = $values['dproc'] ?? "";
+        $event->destination_port = $values['dpt'] ?? "";
+        $event->destination_address = $values['dst'] ?? "";
+        $event->destination_user_id = $values['duid'] ?? "";
+        $event->destination_user_name = $values['duser'] ?? "";
+        $event->destination_group_id = $values['dgid'] ?? ""; //cs1
+        $event->destination_group_name = $values['dgroup'] ?? "";//cn1
+        $event->end_time = $values['end'] ?? "";
+        $event->external_id = $values['externalId'] ?? "";
+        $event->file_create_time = $values['fileCreateTime'] ?? "";
+        $event->file_hash = $values['fileHash'] ?? "";
+        $event->file_id = $values['fileId'] ?? "";
+        $event->file_modification_time = $values['fileModificationTime'] ?? "";
+        $event->file_name = $values['fname'] ?? "";
+        $event->file_path = $values['filePath'] ?? "";
+        $event->file_permission = $values['filePermission'] ?? "";
+        $event->file_size = $values['fsize'] ?? "";
+        $event->file_type = $values['fileType'] ?? "";
+        $event->old_file_create_time = $values['oldFileCreateTime'] ?? "";
+        $event->old_file_hash = $values['oldFileHash'] ?? "";
+        $event->old_file_id = $values['oldFileId'] ?? "";
+        $event->old_file_modification_time = $values['oldFileModificationTime'] ?? "";
+        $event->old_file_name = $values['oldFileName'] ?? "";
+        $event->old_file_path = $values['oldFilePath'] ?? "";
+        $event->old_file_permission = $values['oldFile Permission'] ?? "";
+        $event->old_file_size = $values['oldFileSize'] ?? "";
+        $event->old_file_type = $values['oldFileType'] ?? "";
+        $event->flex_date1 = $values['flexDate1'] ?? "";
+        $event->flex_date1_label = $values['flexDate1Label'] ?? "";
+        $event->flex_string1 = $values['flexString1'] ?? "";
+        $event->flex_string1_label = $values['flexString1Label'] ?? "";
+        $event->flex_string2 = $values['flexString2'] ?? "";
+        $event->flex_string2_label = $values['flexString2Label'] ?? "";
+        $event->bytes_in = $values['in'] ?? "";
+        $event->bytes_out = $values['out'] ?? "";
+        $event->message = $values['msg'] ?? "";
+        $event->event_outcome = $values['outcome'] ?? "";
+        $event->transport_protocol = $values['proto'] ?? $values['app'] ?? "";
+        $event->reason = $values['reason'] ?? "";
+        $event->request_method = $values['requestMethod'] ?? "";
 		$event->request_url = $request_url ?? "";
 		$event->request_client_application = $request_client_application ?? "";
-		$event->destination_user_name = $values['duser'] ?? "";
-		$event->destination_user_id = $values['duid'] ?? "";
-		$event->destination_group_name = $values['cs1'] ?? "";
-		$event->destination_group_id = $values['cn1'] ?? "";
-		$event->device_process_id = $values['dvcpid'] ?? "";
-		$event->source_user_privileges = $values['spriv'] ?? "";
-		$event->destination_user_name = $values['cs2'] ?? "";
-		$event->raw_event = $raw;
+        $event->request_context = $values['requestContext'] ?? "";
+        $event->request_cookies = $values['requestCookies'] ?? "";
+        $event->device_receipt_time = $values['rt'] ?? "";
+        $event->source_host_name = $values['shost'] ?? "";
+        $event->source_mac_address = $values['smac'] ?? "";
+        $event->source_nt_domain = $values['sntdom'] ?? "";
+        $event->source_dns_domain = $values['sourceDnsDomain'] ?? "";
+        $event->source_service_name = $values['sourceServiceName'] ?? "";
+        $event->source_translated_address = $values['sourceTranslatedAddress'] ?? "";
+        $event->source_translated_port = $values['sourceTranslatedPort'] ?? "";
+        $event->source_process_id = $values['spid'] ?? "";
+        $event->source_user_privileges = $values['spriv'] ?? "";
+        $event->source_process_name = $values['sproc'] ?? "";
+        $event->source_port = $values['spt'] ?? "";
+        $event->source_address = $values['src'] ?? "";
+        if($event->source_address == "localhost"){
+        $event->source_address = "127.0.0.1";
+        }
+        $event->source_user_id = $values['suid'] ?? "";
+        $event->source_user_name = $values['suser'] ?? "";
+        $event->source_group_id = $values['sgid'] ?? "";
+        $event->source_group_name = $values['sgroup'] ?? "";
+        $event->start_time = $values['start'] ?? "";
+        $event->agent_translated_zone_key = $values['agentTranslatedZoneKey'] ?? "";
+        $event->agent_zone_key = $values['agentZoneKey'] ?? "";
+        $event->customer_key = $values['customerKey'] ?? "";
+        $event->destination_translated_zone_key = $values['dTranslatedZoneKey'] ?? "";
+        $event->destination_zone_key = $values['dZoneKey'] ?? "";
+        $event->device_translated_zone_key = $values['deviceTranslatedZoneKey'] ?? "";
+        $event->device_zone_key = $values['deviceZoneKey'] ?? "";
+        $event->source_translated_zone_key = $values['sTranslatedZoneKey'] ?? "";
+        $event->source_zone_key = $values['sZoneKey'] ?? "";
+        $event->reported_duration = $values['reportedDuration'] ?? "";
+        $event->reported_resource_group_name = $values['reportedResourceGroupName'] ?? "";
+        $event->reported_resource_id = $values['reportedResourceID'] ?? "";
+        $event->reported_resource_name = $values['reportedResourceName'] ?? "";
+        $event->reported_resource_type = $values['reportedResourceType'] ?? "";
+        $event->framework_name = $values['frameworkName'] ?? "";
+        $event->threat_actor = $values['threatActor'] ?? "";
+        $event->threat_attack_id = $values['threatAttackID'] ?? "";
+        $event->attack_type = $values['att'] ?? "";
+        $event->parent_events = $values['cs1'] ?? "";
+        //$event->cef_extensions = $values[''] ?? "";
+
+        if($event->type == 'normalized'){
+            $event->cef_severity = SeverityCalculator::calculateSeverity($event);
+            $event->raw_event = $raw;
+        }
+        else
+            $event->raw_event = $cefString;
 
 		//map netwrok model for src IP
 		$position = strpos($cefString, "src_network_model_id=");
@@ -613,7 +734,6 @@ class SecurityEvents extends \yii\db\ActiveRecord
             $event->source_longitude = substr($cefString, $start_position, $end_position - $start_position);
 		}
 		
-
 		//map geoIP for dst IP
 		$position = strpos($cefString, "dst_country_isoCode=");
 		if($position != FALSE){
@@ -649,8 +769,6 @@ class SecurityEvents extends \yii\db\ActiveRecord
             $end_position = strpos($cefString, " ", $start_position);
             $event->destination_longitude = substr($cefString, $start_position, $end_position - $start_position);
 		}
-
-		$event->cef_severity = SeverityCalculator::calculateSeverity($event);
 
 		return $event;
 	}
