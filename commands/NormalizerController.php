@@ -121,6 +121,7 @@ class NormalizerController extends Controller{
 						}	
 					} else {
 						$sendSocket->send($line, ZMQ::MODE_NOBLOCK);
+
 					}
 				} 
 			}
