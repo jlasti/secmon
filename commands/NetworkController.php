@@ -2,7 +2,6 @@
 
 namespace app\commands;
 
-//use app\models\EventsNormalized;
 use app\models\SecurityEvents;
 use Yii;
 use yii\console\Controller;
@@ -126,7 +125,7 @@ class NetworkController extends Controller{
 				}
 				//print($msg);
 				if($save_to_db){
-					$event = SecurityEvents::extractCefFields($msg);
+					$event = SecurityEvents::extractCefFields($msg, 'normalized');
 					if($event->save()) {
 						$sendSocket->send($event->id . ':' . $msg, ZMQ::MODE_NOBLOCK);
 					}	

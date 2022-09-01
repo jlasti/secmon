@@ -2,7 +2,6 @@
 
 namespace app\commands;
 
-//use app\models\Event\Normalized;
 use app\models\SecurityEvents;
 use Yii;
 use yii\console\Controller;
@@ -150,10 +149,9 @@ class GeoipController extends Controller{
                         $msg = $msg . " "; 
                     } 
                 }
-                //print($msg);
                 
 				if($save_to_db){
-					$event = SecurityEvents::extractCefFields($msg);
+					$event = SecurityEvents::extractCefFields($msg, 'normalized');
 					if($event->save()) {
 						$sendSocket->send($event->id . ':' . $msg, ZMQ::MODE_NOBLOCK);
 					}	
