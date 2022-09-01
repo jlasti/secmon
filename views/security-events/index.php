@@ -54,6 +54,7 @@ $this->registerJs('
                         ])
                     ],
                     'device_host_name',
+                    'type',
                     'cef_name',
                     [
                         'attribute' => 'cef_severity',
@@ -80,7 +81,6 @@ $this->registerJs('
                         }
                     ],
                     'source_address',
-                    'destination_address',
                     'application_protocol',
                     [
                         'class' => '\dosamigos\grid\columns\BooleanColumn',
