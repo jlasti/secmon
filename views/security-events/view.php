@@ -40,8 +40,6 @@ $this->params['dst_device'] = NetworkModel::getNetworkDevice($model->destination
             'event_outcome',
             'application_protocol',
             'transport_protocol',
-            'bytes_in',
-            'bytes_out',
             'external_id',
             'analyzed:boolean',
             'baseEventCount',
@@ -174,6 +172,19 @@ $this->params['dst_device'] = NetworkModel::getNetworkDevice($model->destination
           </li>
         </ul>
       </div>
+    </li>
+  </ul>
+
+  <ul class="collapsible">
+    <li>
+      <div class="collapsible-header light-blue accent-4" style="font-size:20px; color: white;"><i class="material-icons">data_usage</i>Data Usage Information</div>
+      <div class="collapsible-body"><?= DetailView::widget([
+        'model' => $model,
+        'attributes' => [
+          'bytes_in',
+          'bytes_out',
+        ],
+      ]) ?></div>
     </li>
   </ul>
 
