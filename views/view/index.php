@@ -75,7 +75,7 @@ $this->params['title'] = $select;
 
 <?php
 
-$columns = array_keys(\app\models\EventsNormalized::columns());
+$columns = array_keys(\app\models\SecurityEvents::columns());
 
 $this->registerJs(
     sprintf("var global = (function () { return this; })();

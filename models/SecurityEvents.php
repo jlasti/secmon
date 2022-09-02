@@ -191,7 +191,7 @@ use app\models\BaseEvent;
  * @property AnalyzedSecurityEventsList[] $analyzedSecurityEventsLists
  * @property ClusteredEventsRelations[] $clusteredEventsRelations
  */
-class SecurityEvents extends BaseEvent //\yii\db\ActiveRecord
+class SecurityEvents extends BaseEvent //\yii\db\ActiveRecord 
 {
     /**
      * {@inheritdoc}
@@ -587,6 +587,19 @@ class SecurityEvents extends BaseEvent //\yii\db\ActiveRecord
             'cef_extensions' => 'Cef Extensions',
             'raw_event' => 'Raw Event',
         ];
+    }
+
+    /**
+     * @return object
+     * @throws \yii\base\InvalidConfigException
+     */
+    public static function find()
+    {
+        try {
+                return Yii::createObject(FilterQuery::className(), [get_called_class()]);
+        } catch (InvalidConfigException $e) {
+                echo 'Message: ' .$e->getMessage();
+        }
     }
 
     /**
