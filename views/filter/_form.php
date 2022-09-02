@@ -1,6 +1,8 @@
 <?php
 use yii\helpers\Html;
 use macgyer\yii2materializecss\widgets\form\ActiveForm;
+use app\models\SecurityEvents;
+use app\models\FilterRule;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Filter */
@@ -9,11 +11,11 @@ use macgyer\yii2materializecss\widgets\form\ActiveForm;
 
 $this->registerJsFile('@web/js/filter_form.js', ['depends' => 'yii\web\YiiAsset']);
 
-$colsDown = \app\models\EventsNormalized::getColumnsDropdown();
-$colsDownOptions = \app\models\EventsNormalized::getColumnsDropdownOptions();
-$types = \app\models\FilterRule::types();
-$typesDown = \app\models\FilterRule::getTypesForDropdown();
-$logicalOperatorsDown = \app\models\FilterRule::getLogicalOperatorsForDropdown();
+$colsDown = SecurityEvents::getColumnsDropdown();
+$colsDownOptions = SecurityEvents::getColumnsDropdownOptions();
+$types = FilterRule::types();
+$typesDown = FilterRule::getTypesForDropdown();
+$logicalOperatorsDown = FilterRule::getLogicalOperatorsForDropdown();
 ?>
 
 <div class="filter-form">
