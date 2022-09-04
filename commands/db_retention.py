@@ -19,7 +19,7 @@ def is_db_ready():
     if connection is False:
         return False
     cur = connection.cursor()
-    cur.execute("select * from information_schema.tables where table_name=%s", ('events_normalized',))
+    cur.execute("select * from information_schema.tables where table_name=%s", ('security_events',))
     return bool(cur.rowcount)
 
 def connect():
@@ -40,11 +40,11 @@ def size_check(max_db_size):
     db_size = cursor.fetchone()
     act_size = db_size[0].split()
     if int(act_size[0]) > int(max_db_size):
-        cursor.execute("SELECT count(id) from events_normalized")
+        cursor.execute("SELECT count(id) from security_events")
         no_of_events = cursor.fetchone()
         events_to_delete = (no_of_events[0] / 100) * 15
-        querry = ("DELETE from events_normalized where id in ("
-            "SELECT id from events_normalized order by datetime asc limit (%s))")
+        querry = ("DELETE from security_events where id in ("
+            "SELECT id from security_events order by datetime asc limit (%s))")
         data = (events_to_delete,)
         cursor.execute(querry, data)
         connection.commit()
@@ -54,8 +54,8 @@ def timestamp_check(last_date):
     os.system('echo -e "Proceeding database timestamp check"')
     connection = connect()
     cursor = connection.cursor()
-    querry = ("DELETE from events_normalized where id in ("
-            "SELECT id from events_normalized where datetime < (%s::TIMESTAMP))")
+    querry = ("DELETE from security_events where id in ("
+            "SELECT id from security_events where datetime < (%s::TIMESTAMP))")
     data = (last_date,)
     cursor.execute(querry, data)
     connection.commit()
