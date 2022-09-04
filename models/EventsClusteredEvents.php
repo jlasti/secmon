@@ -2,7 +2,7 @@
 
 namespace app\models;
 
-use app\models\EventsNormalized;
+use app\models\SecurityEvents;
 use app\components\filter\FilterQuery;
 use app\components\filter\FilterTypeEnum;
 use Yii;
@@ -20,7 +20,7 @@ class EventsClusteredEvents extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'events_normalized';
+        return 'security_events';
     }
 
     /**
@@ -30,8 +30,8 @@ class EventsClusteredEvents extends \yii\db\ActiveRecord
     {
         return [
             [['datetime'], 'safe'],
-            [['host', 'cef_name', 'src_ip', 'dst_ip', 'protocol'], 'string', 'max' => 255],
-            [['id', 'cef_severity'], 'integer'],
+            [['device_host_name', 'cef_name', 'source_address', 'destination_address', 'application_protocol'], 'string', 'max' => 255],
+            [['id', 'cef_severity', 'source_port', 'destination_port'], 'integer'],
         ];
     }
 
@@ -43,14 +43,14 @@ class EventsClusteredEvents extends \yii\db\ActiveRecord
         return [
             'id' => [ FilterTypeEnum::COMPARE ],
             'datetime' => [ FilterTypeEnum::DATE ],
-            'host' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'device_host_name' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
             'cef_name' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
             'cef_severity' => [ FilterTypeEnum::COMPARE ],
-            'src_ip' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
-            'dst_ip' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
-            'src_port' => [ FilterTypeEnum::COMPARE ],
-            'dst_port' => [ FilterTypeEnum::COMPARE ],
-            'protocol' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'source_address' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'destination_address' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+            'source_port' => [ FilterTypeEnum::COMPARE ],
+            'destination_port' => [ FilterTypeEnum::COMPARE ],
+            'application_protocol' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
         ];
     }
 
@@ -62,14 +62,14 @@ class EventsClusteredEvents extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'datetime' => 'Datetime',
-            'host' => 'Host',
+            'device_host_name' => 'Device Host Name',
             'cef_name' => 'Cef Name',
             'cef_severity' => 'Cef Severity',
-            'src_ip' => 'Src Ip',
-            'dst_ip' => 'Dst Ip',
-            'src_port' => 'Src Port',
-            'dst_port' => 'Dst Port',
-            'protocol' => 'Protocol',
+            'source_address' => 'Source Address',
+            'destination_address' => 'Destination Address',
+            'source_port' => 'Source Port',
+            'destination_port' => 'Destination Port',
+            'application_protocol' => 'Application Protocol',
         ];
     }
 
