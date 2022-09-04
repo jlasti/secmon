@@ -143,7 +143,7 @@ def prepare_data(raw_data):
             raw_data[column] = raw_data[column].str.replace('.', 'x', ipOctet - 1).str.replace('.', ' ')
         else:
             # clean text from special characters
-            if cleanText: raw_data[column] = raw_data[column].str.replace(regexPattern, ' ')
+            if cleanText: raw_data[column] = raw_data[column].str.replace(regexPattern, ' ', regex=True)
 
             # remove white space from text -> analyze according whole text
             if wholeText: raw_data[column] = raw_data[column].str.replace(' ', '')
