@@ -2,13 +2,11 @@
 
 namespace app\controllers;
 
-use app\models\EventsCorrelated;
-use app\models\EventsNormalized;
+use app\models\SecurityEvents;
 use app\models\FilterRule;
 use app\models\View;
 use Yii;
 use app\models\Filter;
-use app\models\Event;
 use app\models\Filter\FilterSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -173,7 +171,7 @@ class FilterController extends Controller
             {
                 if ($contentTypeId == 'table')
                 {
-                    $dbCols = array_keys(EventsNormalized::columns());
+                    $dbCols = array_keys(SecurityEvents::columns());
                     $cols = explode(',', $dataTypeParameter);
                     $res = [];
                     foreach ($cols as $idx => $col)
@@ -314,7 +312,7 @@ class FilterController extends Controller
     protected function getFilteredEvents($filterId, $page)
     {
         unset($filteredData);
-        $query = EventsNormalized::find();
+        $query = SecurityEvents::find();
         $page -= 1;
 
         $filter = $this->findModel($filterId);
@@ -333,7 +331,7 @@ class FilterController extends Controller
     protected function getFilteredEventsCount($filterId)
     {
         unset($filteredData);
-        $query = EventsNormalized::find();
+        $query = SecurityEvents::find();
 
         $filter = $this->findModel($filterId);
 
@@ -358,7 +356,7 @@ class FilterController extends Controller
 
         $filter = $this->findModel($filterId);
 
-        $query = EventsNormalized::find();
+        $query = SecurityEvents::find();
         $label = "CAST(" . $dataTypeParameter . " AS text) as label";
         $value = "count(" . $dataTypeParameter . ") as count";
         $query->select([$label, $value])
@@ -396,7 +394,7 @@ class FilterController extends Controller
 
         $filter = $this->findModel($filterId);
 
-        $query = EventsNormalized::find();
+        $query = SecurityEvents::find();
         $query->select(["to_char(datetime,'YYYY-DD-MM HH24:00') as x", "count(to_char(datetime,'HH24 MM-DD-YYYY')) as y"])
             ->groupBy(["x"])
             ->orderBy([ 'x' => SORT_ASC ])
@@ -523,17 +521,16 @@ class FilterController extends Controller
 			$transaction->commit();
 		}
 
-		// fit the length of array
-        if($postFilters)
+    // fit the length of array
+    if($postFilters)
+    {
+        $count = count($postFilters) - count($array);
+        for($i = 0; $i < $count; $i++)
         {
-            $count = count($postFilters) - count($array);
-            for($i = 0; $i < $count; $i++)
-            {
-                $array[] = new FilterRule();
-            }
+            $array[] = new FilterRule();
         }
+    }
         
-
 		return $array;
 	}
 

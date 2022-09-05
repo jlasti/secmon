@@ -8,9 +8,9 @@ use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * EventsAnalyzedNormalizedListSearch represents the model behind the search form about `app\models\EventsAnalyzedNormalizedList`.
+ * AnalyzedSecurityEventsListSearch represents the model behind the search form about `app\models\AnalyzedSecurityEventsList`.
  */
-class EventsAnalyzedNormalizedListSearch extends EventsAnalyzedNormalizedList
+class AnalyzedSecurityEventsListSearch extends AnalyzedSecurityEventsList
 {
     /**
      * @inheritdoc
@@ -18,7 +18,7 @@ class EventsAnalyzedNormalizedListSearch extends EventsAnalyzedNormalizedList
     public function rules()
     {
         return [
-            [['id', 'events_analyzed_iteration', 'events_analyzed_normalized_id'], 'integer'],
+            [['id', 'events_analyzed_iteration', 'analyzed_security_events_id'], 'integer'],
         ];
     }
 
@@ -40,10 +40,10 @@ class EventsAnalyzedNormalizedListSearch extends EventsAnalyzedNormalizedList
      */
     public function search($params)
     {
-        $query = EventsAnalyzedNormalizedList::find()->select(['id'=> 'events_analyzed_normalized_id']);
+        $query = AnalyzedSecurityEventsList::find()->select(['id'=> 'analyzed_security_events_id']);
 
         // Get max, maybe it can be done in more optimal way
-        $max = EventsAnalyzedNormalizedList::find()->max('events_analyzed_iteration');
+        $max = AnalyzedSecurityEventsList::find()->max('events_analyzed_iteration');
 
         // add conditions that should always apply here
         $dataProvider = new ActiveDataProvider([
@@ -61,10 +61,10 @@ class EventsAnalyzedNormalizedListSearch extends EventsAnalyzedNormalizedList
         // grid filtering conditions
         $query->andFilterWhere([
             'events_analyzed_iteration' => $max,
-            'events_analyzed_normalized_id' => $this->events_analyzed_normalized_id,
+            'analyzed_security_events_id' => $this->analyzed_security_events_id,
         ]);
 
-        $query->orderBy(['events_analyzed_normalized_id' => SORT_DESC]);
+        $query->orderBy(['analyzed_security_events_id' => SORT_DESC]);
 
         Yii::$app->cache->flush();
 

@@ -33,7 +33,7 @@ $this->registerJs('
     <?= Html::a('k-median', ['/events-clustered-runs/kmedian'], ['class' => 'btn', 'title' => 'k-median', 'style' => ' border-radius: 10px']) ?>
 </div>
 
-<div class="events-normalized-index clickable-table">
+<div class="security-events-index clickable-table">
     <?php Pjax::begin(['id' => 'pjaxContainer']); ?>
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,

@@ -10,7 +10,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Events Clustered Clusters', 'url' 
 $this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>
-<div class="events-normalized-update">
+<div class="security-events-update">
 
     <h1><?= Html::encode($this->title) ?></h1>
 

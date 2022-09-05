@@ -2,32 +2,36 @@
 
 namespace app\controllers;
 
-use app\models\EventsNormalized;
 use Yii;
 use app\models\Event;
+use app\models\SecurityEvents;
+use app\models\AnalyzedSecurityEventsList;
+use app\models\AnalyzedSecurityEventsListSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use app\models\EventsAnalyzedNormalizedListSearch;
 
 /**
- * EventController implements the CRUD actions for Event model.
+ * SecurityEventsListController implements the CRUD actions for AnalyzedSecurityEventsList model.
  */
-class EventsNormalizedListController extends Controller
+class SecurityEventsListController extends Controller
 {
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function behaviors()
     {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
+        return array_merge(
+            parent::behaviors(),
+            [
+                'verbs' => [
+                    'class' => VerbFilter::className(),
+                    'actions' => [
+                        'delete' => ['POST'],
+                    ],
                 ],
-            ],
-        ];
+            ]
+        );
     }
 
     /**
@@ -36,7 +40,7 @@ class EventsNormalizedListController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new EventsAnalyzedNormalizedListSearch();
+        $searchModel = new AnalyzedSecurityEventsListSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -53,12 +57,10 @@ class EventsNormalizedListController extends Controller
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModelNormalized($id),
-        ]);
+        return $this->redirect(['/security-events/view', 'id' => $id]);
     }
 
-    /**
+   /**
      * Finds the Event model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
@@ -76,12 +78,12 @@ class EventsNormalizedListController extends Controller
 
     /**
      * @param $id
-     * @return EventsNormalized|null
+     * @return SecurityEvents|null
      * @throws NotFoundHttpException
      */
-    protected function findModelNormalized($id)
+    protected function findModelSecurity($id)
     {
-        if (($model = EventsNormalized::findOne($id)) !== null) {
+        if (($model = SecurityEvents::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

@@ -6,10 +6,10 @@ use kartik\cmenu\ContextMenu;
 use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\EventsNormalizedSearch */
+/* @var $searchModel app\models\SecurityEventsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->params['title'] = 'Normalized Events';
+$this->params['title'] = 'Security Events';
 
 $this->registerJs('
     setInterval(function() {
@@ -26,7 +26,7 @@ $this->registerJs('
     }, 5000);
 ');
 ?>
-<div class="events-normalized-index clickable-table">
+<div class="security-events-index clickable-table">
     <?php Pjax::begin(['id' => 'pjaxContainer']); ?>
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
@@ -53,7 +53,8 @@ $this->registerJs('
                             ]
                         ])
                     ],
-                    'host',
+                    'device_host_name',
+                    'type',
                     'cef_name',
                     [
                         'attribute' => 'cef_severity',
@@ -79,9 +80,8 @@ $this->registerJs('
                             }
                         }
                     ],
-                    'src_ip',
-                    'dst_ip',
-                    'protocol',
+                    'source_address',
+                    'application_protocol',
                     [
                         'class' => '\dosamigos\grid\columns\BooleanColumn',
                         'attribute' => 'analyzed',
@@ -92,5 +92,3 @@ $this->registerJs('
             ]); ?>
     <?php Pjax::end(); ?>
 </div>
-
-

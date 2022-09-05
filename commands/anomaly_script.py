@@ -126,9 +126,9 @@ def insert_to_db(connection, clusters, ids):
     )
 
     selectClusterStatisticsSql = (
-        "SELECT MAX(cef_severity), COUNT(*) FROM events_normalized "
+        "SELECT MAX(cef_severity), COUNT(*) FROM security_events "
         "LEFT JOIN clustered_events_relations "
-        "ON events_normalized.id=clustered_events_relations.fk_event_id "
+        "ON security_events.id=clustered_events_relations.fk_event_id "
         "WHERE clustered_events_relations.fk_cluster_id=%s"
     )
 
@@ -198,7 +198,7 @@ def make_euclidian_distance(vectorX, vectorY):
 
 
 def loadDataFromDB(connection):
-    selectSql = "SELECT * FROM events_normalized"
+    selectSql = "SELECT * FROM security_events"
     selectData = ()
 
     if config['KMEDIAN']['not_older_than']:
@@ -220,17 +220,17 @@ def loadDataFromDB(connection):
     if not rawData:
         exit("Input data are empty!")
 
-    # get column headers from events_normalized table
+    # get column headers from security_events table
     print('Loading headers from SecMon database...')
     headersSql = (
         "SELECT column_name FROM information_schema.columns "
         "WHERE table_schema = 'public' AND table_name = %s"
     )
-    headersData = ('events_normalized',)
+    headersData = ('security_events',)
 
     columnHeaders = [columnName[0] for columnName in select_from_db(connection, headersSql, headersData)]
 
-    # convert rawData from events_normalized table to dataFrame
+    # convert rawData from security_events table to dataFrame
     print('Converting data to dataFrame...')
     dataFrame = pandas.DataFrame(rawData, columns=columnHeaders, dtype=str)
 
@@ -242,7 +242,7 @@ if __name__ == '__main__':
     print('Connecting to SecMon database...')
     connection = connect_to_db()
 
-    # get rawData from events_normalized table
+    # get rawData from security_events table
     print('Loading data from SecMon database...')
     dataFrame = loadDataFromDB(connection)
 

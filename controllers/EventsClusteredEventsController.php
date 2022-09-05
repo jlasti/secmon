@@ -54,7 +54,7 @@ class EventsClusteredEventsController extends Controller
      */
     public function actionView($id)
     {
-        return $this->redirect(['/events-normalized/view', 'id' => $id]);
+        return $this->redirect(['/security-events/view', 'id' => $id]);
     }
 
     /**

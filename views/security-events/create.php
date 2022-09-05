@@ -2,15 +2,14 @@
 
 use yii\helpers\Html;
 
-
 /* @var $this yii\web\View */
-/* @var $model app\models\EventsNormalized */
+/* @var $model app\models\SecurityEvents */
 
-$this->title = 'Create Events Normalized';
-$this->params['breadcrumbs'][] = ['label' => 'Events Normalizeds', 'url' => ['index']];
+$this->title = 'Create Security Events';
+$this->params['breadcrumbs'][] = ['label' => 'Security Events', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="events-normalized-create">
+<div class="security-events-create">
 
     <h1><?= Html::encode($this->title) ?></h1>
 

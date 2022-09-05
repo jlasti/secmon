@@ -3,14 +3,14 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\EventsNormalized */
+/* @var $model app\models\SecurityEvents */
 
-$this->title = 'Update Events Normalized: ' . $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Events Normalizeds', 'url' => ['index']];
+$this->title = 'Update Security Events: ' . $model->id;
+$this->params['breadcrumbs'][] = ['label' => 'Security Events', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>
-<div class="events-normalized-update">
+<div class="security-events-update">
 
     <h1><?= Html::encode($this->title) ?></h1>
 

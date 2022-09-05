@@ -27,7 +27,7 @@ $this->registerJs('
 ');
 
 ?>
-<div class="events-normalized-index clickable-table">
+<div class="security-events-index clickable-table">
     <?php Pjax::begin(['id' => 'pjaxContainer']); ?>
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
@@ -42,7 +42,7 @@ $this->registerJs('
                         'class' => 'yii\grid\SerialColumn',
                     ],
                     'datetime',
-                    'host',
+                    'device_host_name',
                     'cef_name',
                     [
                         'attribute' => 'cef_severity',
@@ -68,9 +68,9 @@ $this->registerJs('
                             }
                         }
                     ],
-                    'src_ip',
-                    'dst_ip',
-                    'protocol',
+                    'source_address',
+                    'destination_address',
+                    'application_protocol',
                     ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}'],
                     ],
             ]); ?>

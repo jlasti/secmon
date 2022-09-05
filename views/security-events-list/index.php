@@ -2,12 +2,11 @@
 
 use macgyer\yii2materializecss\widgets\grid\GridView;
 use yii\widgets\Pjax;
-
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\EventsCorrelatedSearch */
+/* @var $searchModel app\models\AnalyzedSecurityEventsListSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->params['title'] = 'Correlated Events';
+$this->params['title'] = 'Analyzed Security Events List';
 
 $this->registerJs('
     setInterval(function() {
@@ -25,33 +24,28 @@ $this->registerJs('
 ');
 
 ?>
-<div class="events-correlated-index clickable-table">
+<div class="security-events-index clickable-table">
     <?php Pjax::begin(['id' => 'pjaxContainer']); ?>
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
             'layout' => '{items}<div id="pagination">{pager}</div>',
             'tableOptions' => [
-                'id' => 'eventsContent',
+                'analyzed_security_events_id' => 'eventsContent',
                 'class' => 'responsive-table striped'
             ],
             'columns' => [
                 ['class' => 'yii\grid\SerialColumn'],
-                [
-                    'attribute' => 'datetime',
-                    'value' => 'datetime',
-                    'format' => 'raw',
-                    'filter' => \macgyer\yii2materializecss\widgets\form\DatePicker::widget([
-                        'model' => $searchModel,
-                        'attribute' => 'datetime',
-                        'clientOptions' => [
-                            'format' => 'yyyy-mm-dd'
-                        ]
-                    ])
-                ],
-                'host',
-                'cef_name',
-                'cef_severity',
+                'securityEvent.datetime',
+                'securityEvent.cef_name',
+                'securityEvent.device_host_name',
+                'securityEvent.source_address',
+                'securityEvent.destination_address',
+                'securityEvent.source_country',
+                'securityEvent.destination_country',
+                'securityEvent.source_code',
+                'securityEvent.destination_code',
+
                 ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}'],
             ],
         ]); ?>

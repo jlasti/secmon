@@ -27,7 +27,7 @@ $this->registerJs('
 ');
 
 ?>
-<div class="events-normalized-index clickable-table">
+<div class="security-events-index clickable-table">
     <?php Pjax::begin(['id' => 'pjaxContainer']); ?>
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
