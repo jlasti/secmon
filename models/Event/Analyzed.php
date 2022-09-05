@@ -7,8 +7,8 @@
  */
 
 namespace app\models\Event;
-use app\models\EventsAnalyzedNormalizedList;
-use app\models\EventsNormalized;
+use app\models\AnalyzedSecurityEventsList;
+use app\models\SecurityEvents;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\db\Exception;
@@ -32,7 +32,7 @@ use yii\db\Exception;
  * @property string $src_code
  * @property integer $events_count
  * @property integer $iteration
- * @property integer $events_normalized_id
+ * @property integer $security_events_id
  * @property boolean $flag
  */
 
@@ -55,7 +55,7 @@ class Analyzed extends \yii\db\ActiveRecord
     {
         return [
             [['time'], 'safe'],
-            [['events_count', 'iteration', 'events_normalized_id'], 'integer'],
+            [['events_count', 'iteration', 'security_events_id'], 'integer'],
             [['flag'], 'boolean'],
             [['src_latitude', 'latitude', 'src_longitude', 'longitude'], 'double'],
             [['src_ip', 'dst_ip', 'country','city', 'src_city', 'code', 'src_code'], 'string', 'max' => 255],
@@ -67,38 +67,41 @@ class Analyzed extends \yii\db\ActiveRecord
      */
     public function Analyse($params){
 
-        // get normalized events, both src and dst by IP
-        $eventsNormalizedSrc = self::getNormalizedSRC($params[':id']);
-        $eventsNormalizedDst = self::getNormalizedDST($params[':id']);
+        // get security events, both src and dst by IP
+        $securityEventsSrc = self::getSecuritySrcIP($params[':id']);
+        $securityEventsDst = self::getSecurityDstIP($params[':id']);
+        /*print('securityEventsSrc');
+        print_r($securityEventsSrc);
+        print('securityEventsDst');
+        print_r($securityEventsDst);*/
 
         // group by IPs
         $countsSRC = [];
-        $groupedSrc = self::array_group_byCustom($countsSRC, $eventsNormalizedSrc, "src_ip", "dst_ip");
-
+        $groupedSrc = self::array_group_byCustom($countsSRC, $securityEventsSrc, "source_address", "destination_address");
         $countsDST = [];
-        $groupedDst = self::array_group_byCustom($countsDST, $eventsNormalizedDst, "src_ip", "dst_ip");
+        $groupedDst = self::array_group_byCustom($countsDST, $securityEventsDst, "source_address", "destination_address");
 
-        // save normalized events to analyzed_normalized_events_list and change status of event to analyzed (true)
+        // save security events to analyzed_security_events_list and change status of event to analyzed (true)
         $iteration = 0;
         self::saveAnalyzedSRC($groupedSrc,$countsSRC,$params,$iteration);
         self::saveAnalyzedDST($groupedDst,$countsDST,$params,$iteration);
 
         // to remove duplicity in analyse
-        $result = array_merge($eventsNormalizedDst, $eventsNormalizedSrc);
+        $result = array_merge($securityEventsDst, $securityEventsSrc);
         $resultEvents = (array_values(array_unique($result, SORT_REGULAR)));
 
-        // save normalized to analyzed_normalized_events_list
-        self::saveNormalized($resultEvents, $params[':id'], $iteration);
+        // save security to analyzed_security_events_list
+        self::saveSecurityEvent($resultEvents, $params[':id'], $iteration);
     }
 
     /**
      * @param $params
      * @return array
      */
-    private static function getNormalizedSRC($params){
+    private static function getSecuritySrcIP($params){
         try {
             return Yii::$app->db->createCommand(/** @lang text */
-                "SELECT * FROM events_normalized n where n.dst_ip = (SELECT src_ip FROM events_normalized where id=:id AND src_ip != '') OR n.src_ip = (SELECT src_ip FROM events_normalized where id=:id AND src_ip != '')")
+                "SELECT * FROM security_events n where n.destination_address = (SELECT source_address FROM security_events where id=:id AND source_address != '') OR n.source_address = (SELECT source_address FROM security_events where id=:id AND source_address != '')")
                 ->bindValue(':id',$params)
                 ->queryAll();
         }
@@ -111,10 +114,10 @@ class Analyzed extends \yii\db\ActiveRecord
      * @param $params
      * @return array
      */
-    private static function getNormalizedDST($params){
+    private static function getSecurityDstIP($params){
         try {
             return Yii::$app->db->createCommand(/** @lang text */
-                "SELECT * FROM events_normalized n where n.dst_ip = (SELECT dst_ip FROM events_normalized where id=:id AND dst_ip != '') OR n.src_ip = (SELECT dst_ip FROM events_normalized where id=:id AND dst_ip != '') ORDER BY CASE WHEN id=:id THEN '1' ELSE id END ASC")
+                "SELECT * FROM security_events n where n.destination_address = (SELECT destination_address FROM security_events where id=:id AND destination_address != '') OR n.source_address = (SELECT destination_address FROM security_events where id=:id AND destination_address != '') ORDER BY CASE WHEN id=:id THEN '1' ELSE id END ASC")
                 ->bindValue(':id', $params)
                 ->queryAll();
         } catch (Exception $e) {
@@ -123,25 +126,25 @@ class Analyzed extends \yii\db\ActiveRecord
     }
 
     /**
-     * @param $eventsNormalized
+     * @param $securityEvents
      * @param $id
      * @param $fieldVal2
      */
 
-    private static function saveNormalized($eventsNormalized, $id, $fieldVal2){
-        if(is_array($eventsNormalized) && count($eventsNormalized) > 0){
-            $max = sizeof($eventsNormalized);
+    private static function saveSecurityEvent($securityEvents, $id, $fieldVal2){
+        if(is_array($securityEvents) && count($securityEvents) > 0){
+            $max = sizeof($securityEvents);
             for ($i = 0; $i< $max;$i++){
-                $eventsAnalyzedNormalizedList = new EventsAnalyzedNormalizedList;
-                $eventsAnalyzedNormalizedList->events_analyzed_iteration = $fieldVal2;
-                $eventsAnalyzedNormalizedList->events_analyzed_normalized_id = pg_escape_string($eventsNormalized[$i]["id"]);
-                $eventsAnalyzedNormalizedList->events_normalized_id = $id;
-                $eventsAnalyzedNormalizedList->save(true);
+                $analyzedSecurityEventsList = new AnalyzedSecurityEventsList;
+                $analyzedSecurityEventsList->events_analyzed_iteration = $fieldVal2;
+                $analyzedSecurityEventsList->analyzed_security_events_id = pg_escape_string($securityEvents[$i]["id"]);
+                $analyzedSecurityEventsList->security_events_id = $id;
+                $analyzedSecurityEventsList->save(true);
             }
         }
 
         if ($id != 0) {
-            $model = EventsNormalized::findOne($id);
+            $model = SecurityEvents::findOne($id);
             $model->analyzed = true;
             $model->save(false);
         }
@@ -174,21 +177,21 @@ class Analyzed extends \yii\db\ActiveRecord
                 $max = sizeof($value);
                 for ($i = 0; $i < $max; $i++) {
                     $model->time = date("Y-m-d H:i:s") ?? "";
-                    $model->src_ip = $value[$i]["src_ip"] ?? "";
-                    $model->dst_ip = $value[$i]["dst_ip"] ?? "";
-                    $model->code = $value[$i]["dst_code"] ?? "";
-                    $model->country = $value[$i]["dst_country"] ?? "";
-                    $model->city = $value[$i]["dst_city"] ?? "";
-                    $model->latitude = $value[$i]["dst_latitude"] ?? 0;
-                    $model->longitude = $value[$i]["dst_longitude"] ?? 0;
-                    $model->src_latitude = $value[$i]["src_latitude"] ?? 0;
-                    $model->src_longitude = $value[$i]["src_longitude"] ?? 0;
-                    $model->src_city = $value[$i]["src_city"] ?? "";
-                    $model->events_count = $counts[$value[$i]["src_ip"]] ?? 0;
-                    $model->events_normalized_id = $params[':id'] ?? "";
+                    $model->src_ip = $value[$i]["source_address"] ?? "";
+                    $model->dst_ip = $value[$i]["destination_address"] ?? "";
+                    $model->code = $value[$i]["destination_code"] ?? "";
+                    $model->country = $value[$i]["destination_country"] ?? "";
+                    $model->city = $value[$i]["destination_city"] ?? "";
+                    $model->latitude = $value[$i]["destination_geo_latitude"] ?? 0;
+                    $model->longitude = $value[$i]["destination_geo_longitude"] ?? 0;
+                    $model->src_latitude = $value[$i]["source_geo_latitude"] ?? 0;
+                    $model->src_longitude = $value[$i]["source_geo_longitude"] ?? 0;
+                    $model->src_city = $value[$i]["source_city"] ?? "";
+                    $model->events_count = $counts[$value[$i]["source_address"]] ?? 0;
+                    $model->security_events_id = $params[':id'] ?? "";
                     $model->iteration = $fieldVal2;
                     $model->flag = false;
-                    $model->src_code = $value[$i]["src_code"] ?? "";
+                    $model->src_code = $value[$i]["source_code"] ?? "";
                 }
                 $model->save(true);
             }
@@ -211,21 +214,21 @@ class Analyzed extends \yii\db\ActiveRecord
                 $max = sizeof($value);
                 for ($i = 0; $i < $max; $i++) {
                     $model->time = date("Y-m-d H:i:s") ?? "";
-                    $model->src_ip = $value[$i]["dst_ip"] ?? "";
-                    $model->dst_ip = $value[$i]["src_ip"] ?? "";
-                    $model->code = $value[$i]["src_code"] ?? "";
-                    $model->country = $value[$i]["src_country"] ?? "";
-                    $model->city = $value[$i]["src_city"] ?? "";
-                    $model->latitude = $value[$i]["src_latitude"] ?? 0;
-                    $model->longitude = $value[$i]["src_longitude"] ?? 0;
-                    $model->src_latitude = $value[$i]["dst_latitude"] ?? 0;
-                    $model->src_longitude = $value[$i]["dst_longitude"] ?? 0;
-                    $model->src_city = $value[$i]["dst_city"] ?? "";
-                    $model->events_count = $counts[$value[$i]["src_ip"]] ?? 0;
-                    $model->events_normalized_id = $params[':id'] ?? "";
+                    $model->src_ip = $value[$i]["destination_address"] ?? "";
+                    $model->dst_ip = $value[$i]["source_address"] ?? "";
+                    $model->code = $value[$i]["source_code"] ?? "";
+                    $model->country = $value[$i]["source_country"] ?? "";
+                    $model->city = $value[$i]["source_city"] ?? "";
+                    $model->latitude = $value[$i]["source_geo_latitude"] ?? 0;
+                    $model->longitude = $value[$i]["source_geo_longitude"] ?? 0;
+                    $model->src_latitude = $value[$i]["destination_geo_latitude"] ?? 0;
+                    $model->src_longitude = $value[$i]["destination_geo_longitude"] ?? 0;
+                    $model->src_city = $value[$i]["destination_city"] ?? "";
+                    $model->events_count = $counts[$value[$i]["source_address"]] ?? 0;
+                    $model->security_events_id = $params[':id'] ?? "";
                     $model->iteration = $fieldVal2;
                     $model->flag = true;
-                    $model->src_code = $value[$i]["dst_code"] ?? "";
+                    $model->src_code = $value[$i]["destination_code"] ?? "";
                 }
                 $model->save(true);
             }
