@@ -99,95 +99,95 @@ class Normalized extends Event
 		$event->destination_group_name = $values['cs1'] ?? "";
 		$event->destination_group_id = $values['cn1'] ?? "";
 		$event->device_process_id = $values['dvcpid'] ?? "";
-        $event->source_user_privileges = $values['spriv'] ?? "";
-        $event->exec_user = $values['cs2'] ?? "";
+		$event->source_user_privileges = $values['spriv'] ?? "";
+		$event->exec_user = $values['cs2'] ?? "";
 		$event->raw = $raw;
 
 		//map netwrok model for src IP
-        $position = strpos($cefString, "src_network_model_id=");
-        if($position != FALSE){
-            $event->src_ip_network_model = $cefString[$position + strlen("src_network_model_id=")];
-        }
+		$position = strpos($cefString, "src_network_model_id=");
+		if($position != FALSE){
+				$event->src_ip_network_model = $cefString[$position + strlen("src_network_model_id=")];
+		}
 
-        //map network model for dst IP
-        $position = strpos($cefString, "dst_network_model_id=");
-        if($position != FALSE){
-            $event->dst_ip_network_model = $cefString[$position + strlen("dst_network_model_id=")];
-        }
-        
-        //map geoIP for src IP
-        $position = strpos($cefString, "src_country_isoCode=");
-        if($position != FALSE){
-            $start_position = $position + strlen("src_country_isoCode=");
-            $end_position = strpos($cefString, " ", $start_position);
-            $event->src_code = substr($cefString, $start_position, $end_position - $start_position);
-        }
-        
+		//map network model for dst IP
+		$position = strpos($cefString, "dst_network_model_id=");
+		if($position != FALSE){
+				$event->dst_ip_network_model = $cefString[$position + strlen("dst_network_model_id=")];
+		}
+		
+		//map geoIP for src IP
+		$position = strpos($cefString, "src_country_isoCode=");
+		if($position != FALSE){
+				$start_position = $position + strlen("src_country_isoCode=");
+				$end_position = strpos($cefString, " ", $start_position);
+				$event->src_code = substr($cefString, $start_position, $end_position - $start_position);
+		}
+		
 
-        $position = strpos($cefString, "src_country_name=");
-        if($position != FALSE){
-            $start_position = $position + strlen("src_country_name=");
-            $end_position = strpos($cefString, "src_", $start_position) - 1;
-            $event->src_country = substr($cefString, $start_position, $end_position - $start_position);
-        }
+		$position = strpos($cefString, "src_country_name=");
+		if($position != FALSE){
+				$start_position = $position + strlen("src_country_name=");
+				$end_position = strpos($cefString, "src_", $start_position) - 1;
+				$event->src_country = substr($cefString, $start_position, $end_position - $start_position);
+		}
 
-        $position = strpos($cefString, "src_city_name=");
-        if($position != FALSE){
-            $start_position = $position + strlen("src_city_name=");
-            $end_position = strpos($cefString, "src_", $start_position) - 1;
-            $event->src_city = substr($cefString, $start_position, $end_position - $start_position);
-        }
+		$position = strpos($cefString, "src_city_name=");
+		if($position != FALSE){
+				$start_position = $position + strlen("src_city_name=");
+				$end_position = strpos($cefString, "src_", $start_position) - 1;
+				$event->src_city = substr($cefString, $start_position, $end_position - $start_position);
+		}
 
-        $position = strpos($cefString, "src_location_latitude=");
-        if($position != FALSE){
-            $start_position = $position + strlen("src_location_latitude=");
-            $end_position = strpos($cefString, " ", $start_position);
-            $event->src_latitude = substr($cefString, $start_position, $end_position - $start_position);
-        }
+		$position = strpos($cefString, "src_location_latitude=");
+		if($position != FALSE){
+				$start_position = $position + strlen("src_location_latitude=");
+				$end_position = strpos($cefString, " ", $start_position);
+				$event->src_latitude = substr($cefString, $start_position, $end_position - $start_position);
+		}
 
-        $position = strpos($cefString, "src_location_longitude=");
-        if($position != FALSE){
-            $start_position = $position + strlen("src_location_longitude=");
-            $end_position = strpos($cefString, " ", $start_position);
-            $event->src_longitude = substr($cefString, $start_position, $end_position - $start_position);
-        }
-        
+		$position = strpos($cefString, "src_location_longitude=");
+		if($position != FALSE){
+				$start_position = $position + strlen("src_location_longitude=");
+				$end_position = strpos($cefString, " ", $start_position);
+				$event->src_longitude = substr($cefString, $start_position, $end_position - $start_position);
+		}
+		
 
-        //map geoIP for dst IP
-        $position = strpos($cefString, "dst_country_isoCode=");
-        if($position != FALSE){
-            $start_position = $position + strlen("dst_country_isoCode=");
-            $end_position = strpos($cefString, " ", $start_position);
-            $event->dst_code = substr($cefString, $start_position, $end_position - $start_position);
-        }
+		//map geoIP for dst IP
+		$position = strpos($cefString, "dst_country_isoCode=");
+		if($position != FALSE){
+				$start_position = $position + strlen("dst_country_isoCode=");
+				$end_position = strpos($cefString, " ", $start_position);
+				$event->dst_code = substr($cefString, $start_position, $end_position - $start_position);
+		}
 
-        $position = strpos($cefString, "dst_country_name=");
-        if($position != FALSE){
-            $start_position = $position + strlen("dst_country_name=");
-            $end_position = strpos($cefString, "dst_", $start_position) - 1;
-            $event->dst_country = substr($cefString, $start_position, $end_position - $start_position);
-        }
+		$position = strpos($cefString, "dst_country_name=");
+		if($position != FALSE){
+				$start_position = $position + strlen("dst_country_name=");
+				$end_position = strpos($cefString, "dst_", $start_position) - 1;
+				$event->dst_country = substr($cefString, $start_position, $end_position - $start_position);
+		}
 
-        $position = strpos($cefString, "dst_city_name=");
-        if($position != FALSE){
-            $start_position = $position + strlen("dst_city_name=");
-            $end_position = strpos($cefString, "dst_", $start_position) - 1;
-            $event->dst_city = substr($cefString, $start_position, $end_position - $start_position);
-        }
+		$position = strpos($cefString, "dst_city_name=");
+		if($position != FALSE){
+				$start_position = $position + strlen("dst_city_name=");
+				$end_position = strpos($cefString, "dst_", $start_position) - 1;
+				$event->dst_city = substr($cefString, $start_position, $end_position - $start_position);
+		}
 
-        $position = strpos($cefString, "dst_location_latitude=");
-        if($position != FALSE){
-            $start_position = $position + strlen("dst_location_latitude=");
-            $end_position = strpos($cefString, " ", $start_position);
-            $event->dst_latitude = substr($cefString, $start_position, $end_position - $start_position);
-        }
+		$position = strpos($cefString, "dst_location_latitude=");
+		if($position != FALSE){
+				$start_position = $position + strlen("dst_location_latitude=");
+				$end_position = strpos($cefString, " ", $start_position);
+				$event->dst_latitude = substr($cefString, $start_position, $end_position - $start_position);
+		}
 
-        $position = strpos($cefString, "dst_location_longitude=");
-        if($position != FALSE){
-            $start_position = $position + strlen("dst_location_longitude=");
-            $end_position = strpos($cefString, " ", $start_position);
-            $event->dst_longitude = substr($cefString, $start_position, $end_position - $start_position);
-        }
+		$position = strpos($cefString, "dst_location_longitude=");
+		if($position != FALSE){
+				$start_position = $position + strlen("dst_location_longitude=");
+				$end_position = strpos($cefString, " ", $start_position);
+				$event->dst_longitude = substr($cefString, $start_position, $end_position - $start_position);
+		}
 
 		$event->cef_severity = SeverityCalculator::calculateSeverity($event);
 
