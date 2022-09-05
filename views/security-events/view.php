@@ -5,7 +5,7 @@ use yii\helpers\Html;
 use app\models\NetworkModel;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\EventsNormalized */
+/* @var $model app\models\SecurityEvents */
 
 $this->params['title'] = 'Security Event ID: ' . $model->id;
 $this->params['src_device'] = NetworkModel::getNetworkDevice($model->source_ip_network_model);
