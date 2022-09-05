@@ -57,9 +57,7 @@ class SecurityEventsListController extends Controller
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModelSecurity($id),
-        ]);
+        return $this->redirect(['/security-events/view', 'id' => $id]);
     }
 
    /**
