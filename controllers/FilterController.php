@@ -521,14 +521,15 @@ class FilterController extends Controller
 			$transaction->commit();
 		}
 
-		// fit the length of array
-        if($postFilters){
-            $count = count($postFilters) - count($array);
-            for($i = 0; $i < $count; $i++)
-            {
-                $array[] = new FilterRule();
-            }
+    // fit the length of array
+    if($postFilters)
+    {
+        $count = count($postFilters) - count($array);
+        for($i = 0; $i < $count; $i++)
+        {
+            $array[] = new FilterRule();
         }
+    }
         
 		return $array;
 	}
