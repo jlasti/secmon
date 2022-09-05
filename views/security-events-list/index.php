@@ -3,7 +3,6 @@
 use macgyer\yii2materializecss\widgets\grid\GridView;
 use yii\widgets\Pjax;
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\AnalyzedSecurityEventsListSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->params['title'] = 'Analyzed Security Events List';
@@ -28,7 +27,6 @@ $this->registerJs('
     <?php Pjax::begin(['id' => 'pjaxContainer']); ?>
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
-            'filterModel' => $searchModel,
             'layout' => '{items}<div id="pagination">{pager}</div>',
             'tableOptions' => [
                 'analyzed_security_events_id' => 'eventsContent',
