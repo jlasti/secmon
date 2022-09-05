@@ -13,11 +13,11 @@ class m220830_215114_create_table_analyzed_security_events_list extends Migratio
             'id' => $this->primaryKey(),
             'events_analyzed_iteration' => $this->integer(),
             'security_events_id' => $this->integer(),
-            'analzyed_security_events_id' => $this->integer(),
+            'analyzed_security_events_id' => $this->integer(),
         ]);
 
         $this->createIndex('idx_analyzed_security_events_list_id', '{{%analyzed_security_events_list}}', 'id');
-        $this->addForeignKey('fk_analzyed_security_events_id', '{{%analyzed_security_events_list}}', 'analzyed_security_events_id', '{{%security_events}}', 'id', 'SET NULL', 'SET NULL');
+        $this->addForeignKey('fk_analyzed_security_events_id', '{{%analyzed_security_events_list}}', 'analyzed_security_events_id', '{{%security_events}}', 'id', 'SET NULL', 'SET NULL');
     }
 
     public function down()
