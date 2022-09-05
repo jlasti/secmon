@@ -2,8 +2,11 @@
 
 namespace app\controllers;
 
+use Yii;
 use app\models\SecurityEvents;
 use app\models\SecurityEventsSearch;
+use app\models\Event\Analyzed;
+use app\models\Event\AnalyzedConfig;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -117,6 +120,54 @@ class SecurityEventsController extends Controller
         return $this->redirect(['index']);
     }
 
+    // perform analyse
+    public function actionAnalyse(){
+        $params = [':id' => $_GET['id'], ':norm' => $_GET['norm']];
+
+        $event = new Analyzed();
+        $event->Analyse($params);
+
+        return $this->redirect(['/security-events-list/index']);
+    }
+
+    /**
+     * Search for clusters which contains event_id
+     * @param string $id
+     * @return mixed
+     */
+    public function actionSearchclusters($id){
+        return $this->redirect(['/events-clustered-filtered-clusters', 'event_id' => $id]);
+    }
+
+    // show map
+    public function actionShow(){
+        $params = [':id' => $_GET['id']];
+
+        return $this->render('show');
+    }
+
+    // show heat map
+    public function actionAll(){
+        $params = [':id' => $_GET['id']];
+
+        $analyzedConfig = new AnalyzedConfig();
+
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        return json_encode($analyzedConfig->getAnalyzedCodeCount($params));
+    }
+
+    // show points map
+    public function actionPoint(){
+        $params = [':id' => $_GET['id']];
+
+        $analyzedConfig = new AnalyzedConfig();
+
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        return json_encode($analyzedConfig->getAnalyzedAllPoints($params));
+    }
+
     /**
      * Finds the SecurityEvents model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
@@ -126,10 +177,12 @@ class SecurityEventsController extends Controller
      */
     protected function findModel($id)
     {
-        if (($model = SecurityEvents::findOne(['id' => $id])) !== null) {
-            return $model;
-        }
+        $secId = preg_replace('/[^0-9]/','',$id);
 
-        throw new NotFoundHttpException('The requested page does not exist.');
+        if (($model = SecurityEvents::findOne($secId)) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
     }
 }
