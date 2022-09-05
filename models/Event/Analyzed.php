@@ -70,10 +70,6 @@ class Analyzed extends \yii\db\ActiveRecord
         // get security events, both src and dst by IP
         $securityEventsSrc = self::getSecuritySrcIP($params[':id']);
         $securityEventsDst = self::getSecurityDstIP($params[':id']);
-        /*print('securityEventsSrc');
-        print_r($securityEventsSrc);
-        print('securityEventsDst');
-        print_r($securityEventsDst);*/
 
         // group by IPs
         $countsSRC = [];
