@@ -67,7 +67,7 @@ thresh=2
 
 # type=Single
 # ptype=RegExp
-# pattern=(\d+):(\w{3} [\s\d]\d [\d:]+) (\S+).(.*)CEF.*Sucess login.*src=(.*)spt=(\d+).*duser=(\S+).*dhost=(\S+)
+# pattern=(\d+):(\w{3} [\s\d]\d [\d:]+) (\S+).(.*)CEF.*Success login.*src=(.*)spt=(\d+).*duser=(\S+).*dhost=(\S+)
 # desc=Investigate Possible Successful break-in against user $7 from host $4
 # context=SSH_BRUTE_AGAINST_$7
 # action=write /var/www/html/secmon/__secInput $2 $3 CEF:0|Security|sshd|0|131|Wrong passwords - Possible burte force attacks|6|att=brute_force src=$5 rawEvent=$0 ; delete SSH_BRUTE_AGAINST_$7;
