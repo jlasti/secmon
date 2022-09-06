@@ -215,7 +215,7 @@ class FilterController extends Controller
                         $columns = array_merge(['id'], $columns);
                     }
                     else
-                        $columns = ['id', 'datetime', 'host', 'protocol'];
+                        $columns = ['id', 'datetime', 'device_host_name', 'application_protocol'];
 
                     return [
                         'contentTypeId' => $contentTypeId,
@@ -269,7 +269,7 @@ class FilterController extends Controller
                         $columns = array_merge(['id'], $columns);
                     }
                     else
-                        $columns = ['id', 'datetime', 'host', 'protocol'];
+                        $columns = ['id', 'datetime', 'device_host_name', 'application_protocol'];
 
                     return [
                         'contentTypeId' => $contentTypeId,
@@ -316,8 +316,10 @@ class FilterController extends Controller
         $page -= 1;
 
         $filter = $this->findModel($filterId);
+        //$timefilter = $this->findModel($timeFilterId);
         $filteredData = $query
                         ->applyFilter($filter)
+                        ///->applyFilter($timefilter)
                         ->orderBy([ 'datetime' => SORT_DESC, 'id' => SORT_DESC ])
                         ->limit(10)
                         ->offset(10 * $page)
