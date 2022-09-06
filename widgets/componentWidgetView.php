@@ -127,7 +127,7 @@
                     <?php foreach ($contentTypes as $key => $type): ?>
                         <div data-content-type="<?= $key ?>" class="input-field col s11">
                             <?php if ($key == 'table') : ?>
-                                <input type="hidden" name="dataTypeParameter" id="componentDataTypeParameter<?= $component->id ?>" />
+                                <input name="dataTypeParameter" id="componentDataTypeParameter<?= $component->id ?>" hidden />
                                 <p class="caption">Table columns</p>
                                 <div id="chipsTable<?= $component->id ?>" class="chips chips-table" data-id="<?= $component->id ?>"
                                      data-table-columns="<?= ($component->data_type ?? "") == $key && !empty($component->data_param) ? $component->data_param : 'id,datetime,device_host_name,application_protocol'
