@@ -130,7 +130,7 @@
                                 <input type="hidden" name="dataTypeParameter" id="componentDataTypeParameter<?= $component->id ?>" />
                                 <p class="caption">Table columns</p>
                                 <div id="chipsTable<?= $component->id ?>" class="chips chips-table" data-id="<?= $component->id ?>"
-                                     data-table-columns="<?= ($component->data_type ?? "") == $key && !empty($component->data_param) ? $component->data_param : 'datetime,device_host_name,application_protocol'
+                                     data-table-columns="<?= ($component->data_type ?? "") == $key && !empty($component->data_param) ? $component->data_param : 'id,datetime,device_host_name,application_protocol'
                                      ?>">
                                 </div>
                             <?php elseif ($key == 'barChart') : ?>
