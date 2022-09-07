@@ -16,7 +16,7 @@ use Yii;
  *
  * @property Filters $filter
  * @property TimeFilters $timeFilter
- * @property Users $user
+ * @property User $user
  */
 class SecurityEventsPage extends \yii\db\ActiveRecord
 {
@@ -39,7 +39,7 @@ class SecurityEventsPage extends \yii\db\ActiveRecord
             [['refresh_time', 'data_columns'], 'string'],
             [['filter_id'], 'exist', 'skipOnError' => true, 'targetClass' => Filters::class, 'targetAttribute' => ['filter_id' => 'id']],
             [['time_filter_id'], 'exist', 'skipOnError' => true, 'targetClass' => TimeFilters::class, 'targetAttribute' => ['time_filter_id' => 'id']],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['user_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 
