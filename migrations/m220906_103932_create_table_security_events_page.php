@@ -15,7 +15,7 @@ class m220906_103932_create_table_security_events_page extends Migration
             'filter_id' => $this->integer(),
             'time_filter_id' => $this->integer(),
             'refresh_time' => $this->text(),
-            'columns' => $this->text(),
+            'data_columns' => $this->text(),
         ]);
 
         $this->addForeignKey('fk-security_events_page-user_id', '{{%security_events_page}}', 'user_id', '{{%users}}', 'id', 'CASCADE', 'CASCADE');
