@@ -10,6 +10,9 @@ use yii\helpers\ArrayHelper;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->params['title'] = 'Security Events';
+//$selectedColumns = [['class' => 'yii\grid\SerialColumn'],'datetime','application_protocol','id','source_address',['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}']];
+
+$refreshTime = 5000;
 
 $this->registerJs('
     setInterval(function() {
@@ -23,9 +26,66 @@ $this->registerJs('
                     fragment:"#pagination"
                 });
             });
-    }, 5000);
+    }, ' . $refreshTime . ');
 ');
 ?>
+
+
+<div class="security-events-page-panel">
+    <div class="row">
+        <div class="col" style="width:37%">
+            <div class="row">
+                <h6>Events Filter:</h6>
+                <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+                    <button type="button" class="btn">Create</button>
+                    <button type="button" class="btn">Edit</button>
+
+                    <div class="btn-group" role="group">
+                        <button id="btnGroupDrop1" type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        Add
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                        <li><a class="dropdown-item" href="#">Dropdown link</a></li>
+                        <li><a class="dropdown-item" href="#">Dropdown link</a></li>
+                        </ul>
+                    </div>
+                    <button type="button" class="btn ">Remove</button>
+                </div>
+            </div>
+            <div class="filter-rule-rext">
+                <p>datetime > 2022-09-06 14:30 AND datetime < 2022-09-06 14:53</p>
+            </div>
+        </div>
+        <div class="col">
+            <div class="row">
+                <h6>Time Filter:</h6>
+                <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                    <input type="radio" class="btn btn-check" style="height:30px;" name="btnradio" id="btnradio1" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="btnradio1">Absolute</label>
+
+                    <input type="radio" class="btn btn-check" name="btnradio" id="btnradio2" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btnradio2">Relative</label>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <h6>Automatic Update:</h6>
+            <div class="row">
+                <div class="col">
+                    <button type="button" class="btn">Refresh</button>
+                </div>
+                <div class="col">
+                    <button type="button" class="btn">Pause</button>
+                </div>
+                <div class="col">
+                    <button type="button" class="btn">Update</button>
+                </div>
+            </div>      
+            <input type="text" name="refreshTime" placeholder="nY/nM/nW/nD/nH/nm/nS"/>
+        </div>
+    </div>
+</div>
+
 <div class="security-events-index clickable-table">
     <?php Pjax::begin(['id' => 'pjaxContainer']); ?>
             <?= GridView::widget([
