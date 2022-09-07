@@ -4,15 +4,18 @@ use macgyer\yii2materializecss\widgets\grid\GridView;
 use yii\widgets\Pjax;
 use kartik\cmenu\ContextMenu;
 use yii\helpers\ArrayHelper;
+use app\models\SecurityEventsPage;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\SecurityEventsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->params['title'] = 'Security Events';
-//$selectedColumns = [['class' => 'yii\grid\SerialColumn'],'datetime','application_protocol','id','source_address',['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}']];
-
-$refreshTime = 5000;
+$loggedUserId = Yii::$app->user->getId();
+$securityEventsPage = SecurityEventsPage::findOne(['user_id' => $loggedUserId]);
+$refreshTime = $securityEventsPage->refresh_time;
+$dataColumns = explode(",", $securityEventsPage->data_columns);
+array_push($dataColumns, ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}']);
 
 $this->registerJs('
     setInterval(function() {
@@ -96,7 +99,15 @@ $this->registerJs('
                     'id' => 'eventsContent',
                     'class' => 'responsive-table striped'
                 ],
-                'columns' => [
+                'columns' => $dataColumns,
+            ]); ?>
+    <?php Pjax::end(); ?>
+</div>
+
+
+<?php
+/*
+'columns' => [
                     [
                             'class' => 'yii\grid\SerialColumn',
                     ],
@@ -149,6 +160,5 @@ $this->registerJs('
                     ],
                     ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}'],
                 ],
-            ]); ?>
-    <?php Pjax::end(); ?>
-</div>
+*/
+?>
