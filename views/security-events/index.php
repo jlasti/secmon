@@ -15,12 +15,13 @@ use yii\helpers\Html;
 $this->params['title'] = 'Security Events';
 $loggedUserId = Yii::$app->user->getId();
 $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $loggedUserId]);
+$autoRefrash = $securityEventsPage->auto_refresh;
 $refreshTime = $securityEventsPage->refresh_time;
 $dataColumns = explode(",", $securityEventsPage->data_columns);
 array_push($dataColumns, ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}']);
 
-// If $refreshTime si a valid value set interval for content update
-if($refreshTime != null)
+// If $autoRefrash is set to true, then set interval for content update
+if($autoRefrash)
 {
     $this->registerJs('
     setInterval(function() {
@@ -80,7 +81,18 @@ if($refreshTime != null)
 
         <div class="view-form">
         <div class="col">
-                <?php $form = ActiveForm::begin(['action' => ['update-refresh-time']]); ?>
+            <?php $form = ActiveForm::begin(['action' => ['start-pause-auto-refresh']]); ?>
+                <div class="row">
+                    <div class="col">
+                        <?= $form->field($securityEventsPage, 'user_id')->hiddenInput(['value' => Yii::$app->user->getId()])->label(false) ?>
+                        <div class="form-group">
+                            <?= Html::submitButton($securityEventsPage->auto_refresh ? "<i class='material-icons'>pause</i>" : "<i class='material-icons'>play_arrow</i>", ['class' => $securityEventsPage->auto_refresh ? 'btn btn-success' : 'btn btn-primary']) ?>
+                        </div>
+                    </div>
+                </div>
+            <?php ActiveForm::end(); ?>
+            
+            <?php $form = ActiveForm::begin(['action' => ['update-refresh-time']]); ?>
                 <div class="row">
                     <div class="col">
                         <?= $form->field($securityEventsPage, 'user_id')->hiddenInput(['value' => Yii::$app->user->getId()])->label(false) ?>
