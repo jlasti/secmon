@@ -118,33 +118,22 @@ if($autoRefresh)
             </div>
         </div>
 
-        <div class="view-form">
         <div class="col">
-            <?php $form = ActiveForm::begin(['action' => ['start-pause-auto-refresh']]); ?>
-                <div class="row">
-                    <div class="col">
-                        <?= $form->field($securityEventsPage, 'user_id')->hiddenInput(['value' => Yii::$app->user->getId()])->label(false) ?>
-                        <div class="form-group">
-                            <?= Html::submitButton($securityEventsPage->auto_refresh ? "<i class='material-icons'>pause</i>" : "<i class='material-icons'>play_arrow</i>", ['class' => $securityEventsPage->auto_refresh ? 'btn btn-success' : 'btn btn-primary']) ?>
-                        </div>
-                    </div>
-                </div>
-            <?php ActiveForm::end(); ?>
-
             <?php $form = ActiveForm::begin(['action' => ['update-refresh-time']]); ?>
-                <div class="row">
+                <?= $form->field($securityEventsPage, 'user_id')->hiddenInput(['value' => Yii::$app->user->getId()])->label(false) ?>
+                <?= $form->field($securityEventsPage, 'refresh_time')->textInput(['placeholder' => 'nY/nM/nW/nD/nH/nm/nS']) ?>
+                <div class="form-group">
                     <div class="col">
-                        <?= $form->field($securityEventsPage, 'user_id')->hiddenInput(['value' => Yii::$app->user->getId()])->label(false) ?>
-                        <?= $form->field($securityEventsPage, 'refresh_time')->textInput(['placeholder' => 'nY/nM/nW/nD/nH/nm/nS']) ?> 
+                        <?= Html::a(Yii::t('app', 'Refresh'), ['index'], ['class' => 'btn btn-success']) ?>
                     </div>
                     <div class="col">
-                        <div class="form-group">
-                            <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success']) ?>
-                        </div>
+                        <?= Html::a($securityEventsPage->auto_refresh ? "<i class='material-icons'>pause</i>" : "<i class='material-icons'>play_arrow</i>", ['start-pause-auto-refresh'], ['class' => $securityEventsPage->auto_refresh ? 'btn btn-success' : 'btn btn-primary']) ?>
+                    </div>
+                    <div class="col">
+                        <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success']) ?>
                     </div>
                 </div>
             <?php ActiveForm::end(); ?>
-        </div>
         </div>
     </div>
 </div>
