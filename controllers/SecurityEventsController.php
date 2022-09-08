@@ -51,7 +51,7 @@ class SecurityEventsController extends Controller
             $securityEventsPage->user_id = $userId;
             $securityEventsPage->refresh_time = '10S';
             $securityEventsPage->data_columns = 'id,datetime,type,application_protocol,source_address,destination_address,analyzed';
-            return $securityEventsPage->save();
+            $securityEventsPage->save();
         }
 
         $searchModel = new SecurityEventsSearch();
@@ -197,5 +197,20 @@ class SecurityEventsController extends Controller
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    public function actionUpdateRefreshTime()
+    {
+        $model = new SecurityEventsPage();
+
+        if($model->load(Yii::$app->request->post()) && $model->validate())
+        {
+            $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $model->user_id]);
+            $securityEventsPage->refresh_time = $model->refresh_time;
+            if(!empty($securityEventsPage))
+                $securityEventsPage->update();
+        }
+
+        return $this->redirect(['index']);
     }
 }
