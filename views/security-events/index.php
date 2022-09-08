@@ -5,6 +5,8 @@ use yii\widgets\Pjax;
 use kartik\cmenu\ContextMenu;
 use yii\helpers\ArrayHelper;
 use app\models\SecurityEventsPage;
+use yii\widgets\ActiveForm;
+use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\SecurityEventsSearch */
@@ -17,7 +19,10 @@ $refreshTime = $securityEventsPage->refresh_time;
 $dataColumns = explode(",", $securityEventsPage->data_columns);
 array_push($dataColumns, ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}']);
 
-$this->registerJs('
+// If $refreshTime si a valid value set interval for content update
+if($refreshTime != null)
+{
+    $this->registerJs('
     setInterval(function() {
         $.pjax.reload({
             container:"#pjaxContainer table#eventsContent tbody:last", 
@@ -29,10 +34,11 @@ $this->registerJs('
                     fragment:"#pagination"
                 });
             });
-    }, ' . $refreshTime . ');
-');
-?>
+        }, ' . 10000 . ');
+    ');
+}
 
+?>
 
 <div class="security-events-page-panel">
     <div class="row">
@@ -71,20 +77,23 @@ $this->registerJs('
                 </div>
             </div>
         </div>
+
+        <div class="view-form">
         <div class="col">
-            <h6>Automatic Update:</h6>
-            <div class="row">
-                <div class="col">
-                    <button type="button" class="btn">Refresh</button>
+                <?php $form = ActiveForm::begin(['action' => ['update-refresh-time']]); ?>
+                <div class="row">
+                    <div class="col">
+                        <?= $form->field($securityEventsPage, 'user_id')->hiddenInput(['value' => Yii::$app->user->getId()])->label(false) ?>
+                        <?= $form->field($securityEventsPage, 'refresh_time')->textInput(['placeholder' => 'nY/nM/nW/nD/nH/nm/nS']) ?> 
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success']) ?>
+                        </div>
+                    </div>
                 </div>
-                <div class="col">
-                    <button type="button" class="btn">Pause</button>
-                </div>
-                <div class="col">
-                    <button type="button" class="btn">Update</button>
-                </div>
-            </div>      
-            <input type="text" name="refreshTime" placeholder="nY/nM/nW/nD/nH/nm/nS"/>
+            <?php ActiveForm::end(); ?>
+        </div>
         </div>
     </div>
 </div>
