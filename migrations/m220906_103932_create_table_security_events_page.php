@@ -14,6 +14,7 @@ class m220906_103932_create_table_security_events_page extends Migration
             'user_id' => $this->integer(),
             'filter_id' => $this->integer(),
             'time_filter_id' => $this->integer(),
+            'auto_refresh' => $this->boolean()->defaultValue(true),
             'refresh_time' => $this->text(),
             'data_columns' => $this->text(),
         ]);
