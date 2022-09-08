@@ -217,20 +217,21 @@ class SecurityEventsController extends Controller
     // Set Opposite value for Auto refresh
     public function actionStartPauseAutoRefresh()
     {
-        $model = new SecurityEventsPage();
+        $userId = Yii::$app->user->getId();
+        $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
+        if($securityEventsPage->auto_refresh == false)
+            $securityEventsPage->auto_refresh = true;
+        else
+            $securityEventsPage->auto_refresh = false;
 
-        if($model->load(Yii::$app->request->post()) && $model->validate())
-        {
-            $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $model->user_id]);
-            if($securityEventsPage->auto_refresh == false)
-                $securityEventsPage->auto_refresh = true;
-            else
-                $securityEventsPage->auto_refresh = false;
+        if(!empty($securityEventsPage))
+            $securityEventsPage->update();
 
-            if(!empty($securityEventsPage))
-                $securityEventsPage->update();
-        }
+        return $this->redirect(['index']);
+    }
 
+    public function actionRefresh()
+    {
         return $this->redirect(['index']);
     }
 }
