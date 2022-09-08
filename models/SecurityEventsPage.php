@@ -11,12 +11,13 @@ use Yii;
  * @property int|null $user_id
  * @property int|null $filter_id
  * @property int|null $time_filter_id
+ * @property bool|null $auto_refresh
  * @property string|null $refresh_time
  * @property string|null $data_columns
  *
  * @property Filters $filter
  * @property TimeFilters $timeFilter
- * @property User $user
+ * @property Users $user
  */
 class SecurityEventsPage extends \yii\db\ActiveRecord
 {
@@ -36,10 +37,12 @@ class SecurityEventsPage extends \yii\db\ActiveRecord
         return [
             [['user_id', 'filter_id', 'time_filter_id'], 'default', 'value' => null],
             [['user_id', 'filter_id', 'time_filter_id'], 'integer'],
-            [['refresh_time', 'data_columns'], 'string'],
+            [['auto_refresh'], 'boolean'],
+            [['refresh_time'], 'match', 'pattern' => '/^\d{1,5}[YMWDHmS]{1}$/',
+            'message' => 'Enter valid format(nY/nM/nW/nD/nH/nm/nS)!'],
             [['filter_id'], 'exist', 'skipOnError' => true, 'targetClass' => Filters::class, 'targetAttribute' => ['filter_id' => 'id']],
             [['time_filter_id'], 'exist', 'skipOnError' => true, 'targetClass' => TimeFilters::class, 'targetAttribute' => ['time_filter_id' => 'id']],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 
@@ -53,6 +56,7 @@ class SecurityEventsPage extends \yii\db\ActiveRecord
             'user_id' => 'User ID',
             'filter_id' => 'Filter ID',
             'time_filter_id' => 'Time Filter ID',
+            'auto_refresh' => 'Auto Refresh',
             'refresh_time' => 'Refresh Time',
             'data_columns' => 'Data Columns',
         ];
