@@ -15,15 +15,54 @@ use yii\helpers\Html;
 $this->params['title'] = 'Security Events';
 $loggedUserId = Yii::$app->user->getId();
 $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $loggedUserId]);
-$autoRefrash = $securityEventsPage->auto_refresh;
+$autoRefresh = $securityEventsPage->auto_refresh;
 $refreshTime = $securityEventsPage->refresh_time;
 $dataColumns = explode(",", $securityEventsPage->data_columns);
 array_push($dataColumns, ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}']);
 
-// If $autoRefrash is set to true, then set interval for content update
-if($autoRefrash)
+// If $autoRefresh is set to true, then set interval for content update
+if($autoRefresh)
 {
     $this->registerJs('
+    var refreshString = "' . $refreshTime .'" ;
+    
+    function getRefreshTime(refreshString) {
+        if (refreshString == "0") {
+            return 0;
+        }
+        var timeUnit = refreshString.substring(
+        refreshString.length - 1,
+        refreshString.length
+        );
+        var refreshTime = parseInt(
+        refreshString.substring(0, refreshString.length - 1)
+        );
+        if (timeUnit == "S") {
+            return refreshTime;
+        }
+        refreshTime *= 60;
+        if (timeUnit == "m") {
+            return refreshTime;
+        }
+        refreshTime *= 60;
+        if (timeUnit == "H") {
+            return refreshTime;
+        }
+        return refreshTime * 24;
+        if (timeUnit == "D") {
+            return refreshTime;
+        }
+        if (timeUnit == "W") {
+            return refreshTime * 7;
+        }
+        if (timeUnit == "M") {
+            return refreshTime * 30;
+        }
+        if (timeUnit == "Y") {
+            return refreshTime * 365;
+        }
+    }
+
     setInterval(function() {
         $.pjax.reload({
             container:"#pjaxContainer table#eventsContent tbody:last", 
@@ -35,7 +74,7 @@ if($autoRefrash)
                     fragment:"#pagination"
                 });
             });
-        }, ' . 10000 . ');
+        }, getRefreshTime(refreshString)*1000 );
     ');
 }
 
@@ -91,7 +130,7 @@ if($autoRefrash)
                     </div>
                 </div>
             <?php ActiveForm::end(); ?>
-            
+
             <?php $form = ActiveForm::begin(['action' => ['update-refresh-time']]); ?>
                 <div class="row">
                     <div class="col">
