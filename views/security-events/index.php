@@ -85,24 +85,7 @@ if($autoRefresh)
         <div class="col" style="width:37%">
             <div class="row">
                 <h6>Events Filter:</h6>
-                <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
-                    <button type="button" class="btn">Create</button>
-                    <button type="button" class="btn">Edit</button>
-
-                    <div class="btn-group" role="group">
-                        <button id="btnGroupDrop1" type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                        Add
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                        <li><a class="dropdown-item" href="#">Dropdown link</a></li>
-                        <li><a class="dropdown-item" href="#">Dropdown link</a></li>
-                        </ul>
-                    </div>
-                    <button type="button" class="btn ">Remove</button>
-                </div>
-            </div>
-            <div class="filter-rule-rext">
-                <p>datetime > 2022-09-06 14:30 AND datetime < 2022-09-06 14:53</p>
+                <?= Html::a('Create', ['filter/create'], ['class' => 'btn btn-success']) ?>
             </div>
         </div>
         <div class="col">
