@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\models\SecurityEvents;
 use app\models\SecurityEventsSearch;
+use app\models\SecurityEventsPage;
 use app\models\Event\Analyzed;
 use app\models\Event\AnalyzedConfig;
 use yii\web\Controller;
@@ -41,6 +42,18 @@ class SecurityEventsController extends Controller
      */
     public function actionIndex()
     {
+        $userId = Yii::$app->user->getId();
+        $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
+
+        // Security Events Page need to be created
+        if (empty($securityEventsPage)) {
+            $securityEventsPage = new SecurityEventsPage();
+            $securityEventsPage->user_id = $userId;
+            $securityEventsPage->refresh_time = '10S';
+            $securityEventsPage->data_columns = 'id,datetime,type,application_protocol,source_address,destination_address,analyzed';
+            return $securityEventsPage->save();
+        }
+
         $searchModel = new SecurityEventsSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
         $dataProvider->sort->defaultOrder = ['id' => SORT_DESC];
