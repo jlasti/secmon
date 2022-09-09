@@ -101,7 +101,6 @@ if($autoRefresh)
 
         <div class="col">
             <?php $form = ActiveForm::begin(['action' => ['update-refresh-time']]); ?>
-                <?= $form->field($securityEventsPage, 'user_id')->hiddenInput(['value' => Yii::$app->user->getId()])->label(false) ?>
                 <?= $form->field($securityEventsPage, 'refresh_time')->textInput(['placeholder' => 'nY/nM/nW/nD/nH/nm/nS']) ?>
                 <div class="form-group">
                     <div class="col">
