@@ -9,6 +9,7 @@ use yii\db\StaleObjectException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 /**
  * EventsClusteredRunsController implements the CRUD actions for EventsClusteredRuns model.
@@ -21,6 +22,17 @@ class EventsClusteredRunsController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class'=> AccessControl::className(),
+                'only' =>  ['index','view','create','update','delete','minisom','kmedian'],
+                'rules' => [
+                    [
+                        'actions' => ['index','view','create','update','delete','minisom','kmedian'],
+                        'allow' => true,
+                        'roles' => ['@']
+                    ]
+                ]
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
