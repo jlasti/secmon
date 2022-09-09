@@ -87,17 +87,17 @@ if($autoRefresh)
     <div class="row">
         <div class="col">
             <div class="form-group">
-                <label for="appliedFilterId<?= $securityEventsPage->id ?>">Selected Filter</label>
                 <select id="appliedFilterId<?= $securityEventsPage->id ?>" name="filterId">
                     <option value="" disabled selected>Select filter</option>
                     <?php foreach ($filters as $filter):  ?>
                         <option value="<?= $filter->id ?>"<?= $securityEventsPage->filter_id == $filter->id ? " selected='selected'" : "" ?>><?= $filter->name; ?></option>
                     <?php endforeach; ?>
                 </select>
-                    <?= Html::submitButton(Yii::t('app', 'Apply'), ['class' => 'btn btn-success']) ?>
-                    <?= Html::a('Create', ['filter/create'], ['class' => 'btn btn-success']) ?>
-                    <?= Html::a('Edit', ['filter/update', 'id' => 1], ['class' => 'btn btn-success']) ?>
-                    <?= Html::a('Remove', ['index'], ['class' => 'btn btn-success']) ?>
+                <label for="appliedFilterId<?= $securityEventsPage->id ?>">Selected Filter</label>
+                <?= Html::submitButton(Yii::t('app', 'Apply'), ['class' => 'btn btn-success']) ?>
+                <?= Html::a('Create', ['filter/create'], ['class' => 'btn btn-success']) ?>
+                <?= Html::a('Edit', ['filter/update', 'id' => 1], ['class' => 'btn btn-success']) ?>
+                <?= Html::a('Remove', ['index'], ['class' => 'btn btn-success']) ?>
 
             </div>
         </div>
@@ -108,13 +108,19 @@ if($autoRefresh)
                 <?= $form->field($securityEventsPage, 'refresh_time')->textInput(['placeholder' => 'nY/nM/nW/nD/nH/nm/nS']) ?>
                 <div class="form-group">
                     <div class="col">
-                        <?= Html::a(Yii::t('app', 'Refresh'), ['index'], ['class' => 'btn btn-success']) ?>
+                        <?= Html::a("<i class='material-icons'>refresh</i>", ['index'], ['class' => 'btn btn-success', 'title' => 'Refresh page']) ?>
                     </div>
                     <div class="col">
-                        <?= Html::a($securityEventsPage->auto_refresh ? "<i class='material-icons'>pause</i>" : "<i class='material-icons'>play_arrow</i>", ['start-pause-auto-refresh'], ['class' => $securityEventsPage->auto_refresh ? 'btn btn-success' : 'btn btn-primary']) ?>
+                        <?= Html::a($securityEventsPage->auto_refresh ? "<i class='material-icons'>pause</i>" : "<i class='material-icons'>play_arrow</i>",
+                            ['start-pause-auto-refresh'],
+                            [
+                                'class' => $securityEventsPage->auto_refresh ? 'btn btn-success' : 'btn btn-primary',
+                                'title' => $securityEventsPage->auto_refresh ? 'Pause auto refresh' : 'Resume auto refresh'
+                            ]
+                        )?>
                     </div>
                     <div class="col">
-                        <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success']) ?>
+                        <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time']) ?>
                     </div>
                 </div>
             <?php ActiveForm::end(); ?>
