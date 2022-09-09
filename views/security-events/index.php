@@ -86,23 +86,20 @@ if($autoRefresh)
 <div class="security-events-page-panel">
     <div class="row">
         <div class="col">
-            <div class="form-group">
-                <select id="appliedFilterId<?= $securityEventsPage->id ?>" name="filterId">
-                    <option value="" disabled selected>Select filter</option>
-                    <?php foreach ($filters as $filter):  ?>
-                        <option value="<?= $filter->id ?>"<?= $securityEventsPage->filter_id == $filter->id ? " selected='selected'" : "" ?>><?= $filter->name; ?></option>
-                    <?php endforeach; ?>
-                </select>
-                <label for="appliedFilterId<?= $securityEventsPage->id ?>">Selected Filter</label>
-                <?= Html::submitButton(Yii::t('app', 'Apply'), ['class' => 'btn btn-success']) ?>
-                <?= Html::a('Create', ['filter/create'], ['class' => 'btn btn-success']) ?>
-                <?= Html::a('Edit', ['filter/update', 'id' => 1], ['class' => 'btn btn-success']) ?>
-                <?= Html::a('Remove', ['index'], ['class' => 'btn btn-success']) ?>
-
-            </div>
+            <label for="appliedFilterId<?= $securityEventsPage->id ?>">Selected Filter</label>
+            <select id="appliedFilterId<?= $securityEventsPage->id ?>" name="filterId">
+                <option value="" disabled selected>Select filter</option>
+                <?php foreach ($filters as $filter):  ?>
+                    <option value="<?= $filter->id ?>"<?= $securityEventsPage->filter_id == $filter->id ? " selected='selected'" : "" ?>><?= $filter->name; ?></option>
+                <?php endforeach; ?>
+            </select>
+            <?= Html::submitButton(Yii::t('app', 'Apply'), ['class' => 'btn btn-success']) ?>
+            <?= Html::a('Create', ['filter/create'], ['class' => 'btn btn-success']) ?>
+            <?= Html::a('Edit', ['filter/update', 'id' => 1], ['class' => 'btn btn-success']) ?>
+            <?= Html::a('Remove', ['index'], ['class' => 'btn btn-success']) ?>
         </div>
 
-        <div class="col" style="valign: top;">
+        <div class="col">
             <?php $form = ActiveForm::begin(['action' => ['update-refresh-time']]); ?>
                 <?= $form->field($securityEventsPage, 'user_id')->hiddenInput(['value' => Yii::$app->user->getId()])->label(false) ?>
                 <?= $form->field($securityEventsPage, 'refresh_time')->textInput(['placeholder' => 'nY/nM/nW/nD/nH/nm/nS']) ?>
