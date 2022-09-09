@@ -2,11 +2,13 @@
 
 use macgyer\yii2materializecss\widgets\grid\GridView;
 use yii\widgets\Pjax;
+use yii\widgets\ActiveForm;
 use kartik\cmenu\ContextMenu;
 use yii\helpers\ArrayHelper;
-use app\models\SecurityEventsPage;
-use yii\widgets\ActiveForm;
 use yii\helpers\Html;
+use app\models\SecurityEventsPage;
+use app\models\Filter;
+use \app\controllers\FilterController;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\SecurityEventsSearch */
@@ -19,6 +21,7 @@ $autoRefresh = $securityEventsPage->auto_refresh;
 $refreshTime = $securityEventsPage->refresh_time;
 $dataColumns = explode(",", $securityEventsPage->data_columns);
 array_push($dataColumns, ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}']);
+$filters = FilterController::getFiltersOfUser($loggedUserId);
 
 // If $autoRefresh is set to true, then set interval for content update
 if($autoRefresh)
@@ -82,26 +85,24 @@ if($autoRefresh)
 
 <div class="security-events-page-panel">
     <div class="row">
-        <div class="col" style="width:37%">
-            <div class="row">
-                <h6>Events Filter:</h6>
-                <?= Html::a('Create', ['filter/create'], ['class' => 'btn btn-success']) ?>
-            </div>
-        </div>
         <div class="col">
-            <div class="row">
-                <h6>Time Filter:</h6>
-                <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-                    <input type="radio" class="btn btn-check" style="height:30px;" name="btnradio" id="btnradio1" autocomplete="off" checked>
-                    <label class="btn btn-outline-primary" for="btnradio1">Absolute</label>
+            <div class="form-group">
+                <label for="appliedFilterId<?= $securityEventsPage->id ?>">Selected Filter</label>
+                <select id="appliedFilterId<?= $securityEventsPage->id ?>" name="filterId">
+                    <option value="" disabled selected>Select filter</option>
+                    <?php foreach ($filters as $filter):  ?>
+                        <option value="<?= $filter->id ?>"<?= $securityEventsPage->filter_id == $filter->id ? " selected='selected'" : "" ?>><?= $filter->name; ?></option>
+                    <?php endforeach; ?>
+                </select>
+                    <?= Html::submitButton(Yii::t('app', 'Apply'), ['class' => 'btn btn-success']) ?>
+                    <?= Html::a('Create', ['filter/create'], ['class' => 'btn btn-success']) ?>
+                    <?= Html::a('Edit', ['filter/update', 'id' => 1], ['class' => 'btn btn-success']) ?>
+                    <?= Html::a('Remove', ['index'], ['class' => 'btn btn-success']) ?>
 
-                    <input type="radio" class="btn btn-check" name="btnradio" id="btnradio2" autocomplete="off">
-                    <label class="btn btn-outline-primary" for="btnradio2">Relative</label>
-                </div>
             </div>
         </div>
 
-        <div class="col">
+        <div class="col" style="valign: top;">
             <?php $form = ActiveForm::begin(['action' => ['update-refresh-time']]); ?>
                 <?= $form->field($securityEventsPage, 'user_id')->hiddenInput(['value' => Yii::$app->user->getId()])->label(false) ?>
                 <?= $form->field($securityEventsPage, 'refresh_time')->textInput(['placeholder' => 'nY/nM/nW/nD/nH/nm/nS']) ?>
