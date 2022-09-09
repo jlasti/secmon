@@ -11,6 +11,7 @@ use app\models\Event\AnalyzedConfig;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 /**
  * SecurityEventsController implements the CRUD actions for SecurityEvents model.
@@ -25,6 +26,17 @@ class SecurityEventsController extends Controller
         return array_merge(
             parent::behaviors(),
             [
+                'access' => [
+                    'class'=> AccessControl::className(),
+                    'only' =>  ['index','view'],
+                    'rules' => [
+                        [
+                            'actions' => ['index', 'view'],
+                            'allow' => true,
+                            'roles' => ['@']
+                        ]
+                    ]
+                ],
                 'verbs' => [
                     'class' => VerbFilter::className(),
                     'actions' => [
