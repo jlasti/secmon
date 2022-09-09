@@ -199,11 +199,12 @@ class SecurityEventsController extends Controller
 
     public function actionUpdateRefreshTime()
     {
+        $userId = Yii::$app->user->getId();
         $model = new SecurityEventsPage();
 
         if($model->load(Yii::$app->request->post()) && $model->validate())
         {
-            $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $model->user_id]);
+            $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
             $securityEventsPage->refresh_time = $model->refresh_time;
             if(!empty($securityEventsPage))
                 $securityEventsPage->update();
