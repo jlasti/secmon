@@ -241,10 +241,19 @@ class SecurityEventsController extends Controller
         $model = new Filter();
 
         if($model->load(Yii::$app->request->post()) && $model->validate())
-        {   $filterId = Filter::findOne(['user_id' => $userId, 'name' => $model->name])->getAttribute('id');
+        {
+            $filterId = Filter::findOne(['user_id' => $userId, 'name' => $model->name])->getAttribute('id');
             $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
             if(!empty($securityEventsPage) && $filterId){
                 $securityEventsPage->filter_id = $filterId;
+                $securityEventsPage->update();
+            }
+        }
+        else
+        {
+            $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
+            if(!empty($securityEventsPage)){
+                $securityEventsPage->filter_id = null;
                 $securityEventsPage->update();
             }
         }
