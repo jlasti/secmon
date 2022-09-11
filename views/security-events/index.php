@@ -22,6 +22,9 @@ $refreshTime = $securityEventsPage->refresh_time;
 $dataColumns = explode(",", $securityEventsPage->data_columns);
 array_push($dataColumns, ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}']);
 $filters = FilterController::getFiltersOfUser($loggedUserId);
+$selectedFilterId = SecurityEventsPage::findOne(['user_id' => $loggedUserId])->getAttribute('filter_id');
+$selectedFilter = Filter::findOne(['id' => $selectedFilterId]);
+$filter = new Filter()  ;
 
 // If $autoRefresh is set to true, then set interval for content update
 if($autoRefresh)
@@ -86,22 +89,22 @@ if($autoRefresh)
 <div class="security-events-page-panel">
     <div class="row">
         <div class="col">
-            <label for="appliedFilterId<?= $securityEventsPage->id ?>">Selected Filter</label>
-            <select id="appliedFilterId<?= $securityEventsPage->id ?>" name="filterId">
-                <option value="" disabled selected>Select filter</option>
-                <?php foreach ($filters as $filter):  ?>
-                    <option value="<?= $filter->id ?>"<?= $securityEventsPage->filter_id == $filter->id ? " selected='selected'" : "" ?>><?= $filter->name; ?></option>
-                <?php endforeach; ?>
-            </select>
-            <?= Html::submitButton("<i class='material-icons'>done</i>", ['class' => 'btn btn-success', 'title' => 'Apply selected filter']) ?>
-            <?= Html::a("<i class='material-icons'>add</i>", ['filter/create'], ['class' => 'btn btn-success', 'title' => 'Create new filter']) ?>
-            <?= Html::a("<i class='material-icons'>edit</i>", ['filter/update', 'id' => 1], ['class' => 'btn btn-success', 'title' => 'Edit selected filter']) ?>
-            <?= Html::a("<i class='material-icons'>delete</i>", ['index'], ['class' => 'btn btn-danger', 'style' => 'background-color: red;', 'title' => 'Remove selected filter']) ?>
+            <label class="active" for="name">Selected Filter</label>
+            <?= Html::beginForm(['apply-selected-filter'],'post'); ?>
+                <?= Html::activeDropDownList($filter, 'name', ArrayHelper::map($filters,'name','name'), ['value' => !empty($selectedFilter) ? $selectedFilter->name : '', 'prompt' => 'None', 'style' => !empty($selectedFilter) ? 'color: black;' : 'color: gray;', 'id' => 'eventFilterSelect', 'onchange' => 'this.form.submit()']); ?>
+                <div class="form-group">
+                    <?= Html::submitButton("<i class='material-icons'>done</i>", ['class' => 'btn btn-success', 'title' => 'Apply selected filter']) ?>
+                    <?= Html::a("<i class='material-icons'>add</i>", ['filter/create'], ['class' => 'btn btn-success', 'title' => 'Create new filter']) ?>
+                    <?= Html::a("<i class='material-icons'>edit</i>", ['filter/update', 'id' => 1], ['class' => 'btn btn-success', 'title' => 'Edit selected filter']) ?>
+                    <?= Html::a("<i class='material-icons'>delete</i>", ['index'], ['class' => 'btn btn-danger', 'style' => 'background-color: red;', 'title' => 'Remove selected filter']) ?>
+                </div>
+            <?= Html::endForm(); ?>
         </div>
 
         <div class="col">
-            <?php $form = ActiveForm::begin(['action' => ['update-refresh-time']]); ?>
-                <?= $form->field($securityEventsPage, 'refresh_time')->textInput(['placeholder' => 'nY/nM/nW/nD/nH/nm/nS']) ?>
+            <label class="active" for="name">Refresh Time</label>
+            <?= Html::beginForm(['update-refresh-time'],'post'); ?>
+                <?= Html::activeInput('text', $securityEventsPage, 'refresh_time', ['placeholder' => 'nY/nM/nW/nD/nH/nm/nS']) ?>
                 <div class="form-group">
                         <?= Html::a("<i class='material-icons'>refresh</i>", ['index'], ['class' => 'btn btn-success', 'title' => 'Refresh page']) ?>
                         <?= Html::a($securityEventsPage->auto_refresh ? "<i class='material-icons'>pause</i>" : "<i class='material-icons'>play_arrow</i>",
@@ -113,7 +116,7 @@ if($autoRefresh)
                         )?>
                         <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time']) ?>
                 </div>
-            <?php ActiveForm::end(); ?>
+            <?= Html::endForm(); ?>
         </div>
     </div>
 </div>
