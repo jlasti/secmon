@@ -8,6 +8,7 @@ use app\models\SecurityEventsSearch;
 use app\models\SecurityEventsPage;
 use app\models\Event\Analyzed;
 use app\models\Event\AnalyzedConfig;
+use app\models\Filter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -231,6 +232,23 @@ class SecurityEventsController extends Controller
 
     public function actionRefresh()
     {
+        return $this->redirect(['index']);
+    }
+
+    public function actionApplySelectedFilter()
+    {
+        $userId = Yii::$app->user->getId();
+        $model = new Filter();
+
+        if($model->load(Yii::$app->request->post()) && $model->validate())
+        {   $filterId = Filter::findOne(['user_id' => $userId, 'name' => $model->name])->getAttribute('id');
+            $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
+            if(!empty($securityEventsPage) && $filterId){
+                $securityEventsPage->filter_id = $filterId;
+                $securityEventsPage->update();
+            }
+        }
+
         return $this->redirect(['index']);
     }
 }
