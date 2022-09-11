@@ -260,4 +260,16 @@ class SecurityEventsController extends Controller
 
         return $this->redirect(['index']);
     }
+
+    public function actionRemoveSelectedFilter()
+    {
+        $userId = Yii::$app->user->getId();
+        $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
+        if(!empty($securityEventsPage)){
+            $securityEventsPage->filter_id = null;
+            $securityEventsPage->update();
+        }
+
+        return $this->redirect(['index']);
+    }
 }
