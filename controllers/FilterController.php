@@ -90,6 +90,7 @@ class FilterController extends Controller
      */
     public function actionUpdate($id)
     {
+        $url =  $_SERVER['REQUEST_URI'];
 		$model = $this->findModel($id);
 
         $postRules = Yii::$app->request->post('FilterRule');
@@ -103,6 +104,8 @@ class FilterController extends Controller
 
             if ($this->save($model, $rules))
             {
+                if(str_contains($url, 'securityEventsPage=1'))
+                    return $this->redirect(['security-events/index']);
       			return $this->redirect(['view', 'id' => $model->id]);
             }
 
