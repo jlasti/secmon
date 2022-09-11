@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\SecurityEvents;
 use app\models\FilterRule;
 use app\models\View;
+use app\models\SecurityEventsPage;
 use Yii;
 use app\models\Filter;
 use app\models\Filter\FilterSearch;
@@ -67,12 +68,24 @@ class FilterController extends Controller
      */
     public function actionCreate()
     {
+        $url =  $_SERVER['REQUEST_URI'];
         $model = new Filter(['user_id' => Yii::$app->user->id]);
 
 		$rules = $this->_createRulesArray();
-
+        
 		if($this->save($model, $rules))
 		{
+            if(str_contains($url, 'securityEventsPage=1')){
+                $userId = Yii::$app->user->getId();
+                $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
+                
+                if(!empty($securityEventsPage) && $model->id){
+                    $securityEventsPage->filter_id = $model->id;
+                    $securityEventsPage->update();
+                }
+                return $this->redirect(['security-events/index']);
+            }
+                
 			return $this->redirect(['view', 'id' => $model->id]);
 		}
 
