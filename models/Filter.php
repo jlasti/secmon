@@ -36,6 +36,7 @@ class Filter extends \yii\db\ActiveRecord
 			[['user_id'], 'integer'],
 			[['name'], 'string', 'max' => 255],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
+			['name', 'unique', 'targetAttribute' => ['name', 'user_id'], 'message' => 'Choosen filter name has already been taken.']
 		];
 	}
 
