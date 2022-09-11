@@ -92,13 +92,10 @@ if($autoRefresh)
             <label class="active" for="name">Selected Filter</label>
             <?= Html::beginForm(['apply-selected-filter'],'post'); ?>
                 <?= Html::activeDropDownList($filter, 'name', ArrayHelper::map($filters,'name','name'), ['value' => !empty($selectedFilter) ? $selectedFilter->name : '', 'prompt' => 'None', 'style' => !empty($selectedFilter) ? 'color: black;' : 'color: gray;', 'id' => 'eventFilterSelect', 'onchange' => 'this.form.submit()']); ?>
-                <div class="form-group">
-                    <?= Html::submitButton("<i class='material-icons'>done</i>", ['class' => 'btn btn-success', 'title' => 'Apply selected filter']) ?>
-                    <?= Html::a("<i class='material-icons'>add</i>", ['filter/create'], ['class' => 'btn btn-success', 'title' => 'Create new filter']) ?>
-                    <?= Html::a("<i class='material-icons'>edit</i>", ['filter/update', 'id' => 1], ['class' => 'btn btn-success', 'title' => 'Edit selected filter']) ?>
-                    <?= Html::a("<i class='material-icons'>delete</i>", ['index'], ['class' => 'btn btn-danger', 'style' => 'background-color: red;', 'title' => 'Remove selected filter']) ?>
-                </div>
             <?= Html::endForm(); ?>
+            <?= Html::a("<i class='material-icons'>add</i>", ['filter/create'], ['class' => 'btn btn-success', 'title' => 'Create new filter']) ?>
+            <?= Html::a("<i class='material-icons'>edit</i>", ['filter/update'], ['class' => 'btn btn-success', 'title' => 'Edit selected filter']) ?>
+            <?= Html::a("<i class='material-icons'>delete</i>", ['remove-selected-filter'], ['class' => 'btn btn-danger', 'style' => 'background-color: red;', 'title' => 'Remove selected filter']) ?>
         </div>
 
         <div class="col">
