@@ -8,6 +8,7 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use app\models\SecurityEventsPage;
 use app\models\Filter;
+use app\models\FilterRule;
 use \app\controllers\FilterController;
 
 /* @var $this yii\web\View */
@@ -88,7 +89,7 @@ if($autoRefresh)
 
 <div class="security-events-page-panel">
     <div class="row">
-        <div class="col">
+        <div class="col" style="width:33%;">
             <label class="active" for="name">Selected Filter</label>
             <?= Html::beginForm(['apply-selected-filter'],'post'); ?>
                 <?= Html::activeDropDownList($filter, 'name', ArrayHelper::map($filters,'name','name'), ['value' => !empty($selectedFilter) ? $selectedFilter->name : '', 'prompt' => 'None', 'style' => !empty($selectedFilter) ? 'color: black;' : 'color: gray;', 'id' => 'eventFilterSelect', 'onchange' => 'this.form.submit()']); ?>
@@ -96,6 +97,23 @@ if($autoRefresh)
             <?= Html::a("<i class='material-icons'>add</i>", ['filter/create', 'securityEventsPage' => true], ['class' => 'btn btn-success', 'title' => 'Create new filter']) ?>
             <?= Html::a("<i class='material-icons'>edit</i>", ['filter/update', 'id' => $selectedFilterId, 'securityEventsPage' => true], ['class' => 'btn btn-success', 'title' => 'Edit selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]); ?>
             <?= Html::a("<i class='material-icons'>delete</i>", ['remove-selected-filter'], ['class' => 'btn btn-danger', 'style' => 'background-color: red;', 'title' => 'Remove selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]) ?>
+            <div <?= $selectedFilterId ? 'class="filter-rule"' : ''?>>
+                <p>
+                    <?php
+                        if($selectedFilter)
+                        {
+                            $rules = FilterRule::find()->where(['filter_id' => $selectedFilterId])->orderBy(['position' => SORT_ASC])->all();
+                            foreach($rules as $idx => $rule)
+                            {
+                                if($idx == 0)
+                                    echo $rule->column . " " . $rule->operator . " " . $rule->value . " ";
+                                else
+                                    echo $rule->logic_operator . " " . $rule->column . " " . $rule->operator . " " . $rule->value . " ";
+                            }
+                        }
+                    ?>
+                </p>
+            </div>    
         </div>
 
         <div class="col">
