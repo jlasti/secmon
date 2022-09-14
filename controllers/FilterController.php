@@ -28,6 +28,12 @@ class FilterController extends Controller
         return [
             'access' => [
                 'class'=> AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@']
+                    ]
+                ]
             ],
             'verbs' => [
                 'class' => VerbFilter::className(),
