@@ -16,7 +16,7 @@ use Yii;
  * @property string|null $data_columns
  *
  * @property Filter $filter
- * @property TimeFilters $timeFilter
+ * @property TimeFilter $timeFilter
  * @property Users $user
  */
 class SecurityEventsPage extends \yii\db\ActiveRecord
@@ -79,7 +79,7 @@ class SecurityEventsPage extends \yii\db\ActiveRecord
      */
     public function getTimeFilter()
     {
-        return $this->hasOne(TimeFilters::class, ['id' => 'time_filter_id']);
+        return $this->hasOne(TimeFilter::class, ['id' => 'time_filter_id']);
     }
 
     /**
