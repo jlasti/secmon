@@ -10,6 +10,7 @@ use Yii;
  * @property integer $id
  * @property integer $user_id
  * @property string $name
+ * @property boolean $time_filter
  *
  * @property FilterRule[] $filterRules
  * @property User $user
@@ -35,6 +36,8 @@ class Filter extends \yii\db\ActiveRecord
 			['name', 'required'],
 			[['user_id'], 'integer'],
 			[['name'], 'string', 'max' => 255],
+			[['time_filter'], 'default', 'value' => false],
+			[['time_filter'], 'boolean'],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
 			['name', 'unique', 'targetAttribute' => ['name', 'user_id'], 'message' => 'Choosen filter name has already been taken.']
 		];
