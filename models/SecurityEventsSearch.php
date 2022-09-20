@@ -34,15 +34,16 @@ class SecurityEventsSearch extends SecurityEvents
     }
 
     /**
-     * Creates data provider instance with search query applied
+     * Creates data provider instance with selected filter and search query applied
      *
      * @param array $params
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params, $filterId)
     {
         $query = SecurityEvents::find();
+        $filter = Filter::findOne(['id' => $filterId]);
 
         // add conditions that should always apply here
 
@@ -56,6 +57,10 @@ class SecurityEventsSearch extends SecurityEvents
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
             return $dataProvider;
+        }
+
+        if (!empty($filter)) {
+            $query->applyFilter($filter);
         }
 
         // grid filtering conditions

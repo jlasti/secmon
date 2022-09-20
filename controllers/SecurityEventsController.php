@@ -13,6 +13,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
+use yii\data\ActiveDataProvider;
 
 /**
  * SecurityEventsController implements the CRUD actions for SecurityEvents model.
@@ -57,6 +58,7 @@ class SecurityEventsController extends Controller
     {
         $userId = Yii::$app->user->getId();
         $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
+        $filterId = $securityEventsPage->filter_id;
 
         // Security Events Page need to be created
         if (empty($securityEventsPage)) {
@@ -68,7 +70,7 @@ class SecurityEventsController extends Controller
         }
 
         $searchModel = new SecurityEventsSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams);
+        $dataProvider = $searchModel->search($this->request->queryParams, $filterId);
         $dataProvider->sort->defaultOrder = ['id' => SORT_DESC];
 
         return $this->render('index', [
