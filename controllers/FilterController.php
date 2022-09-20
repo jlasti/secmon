@@ -175,7 +175,7 @@ class FilterController extends Controller
 
         if ( $loggedUserId != intval($userId)) return null;
 
-        $filters = Filter::findAll(['user_id' => $userId]);
+        $filters = Filter::findAll(['user_id' => $userId, 'time_filter' => false]);
 
         return $filters;
     }
