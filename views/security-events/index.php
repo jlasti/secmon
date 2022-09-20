@@ -25,7 +25,7 @@ array_push($dataColumns, ['class' => 'macgyer\yii2materializecss\widgets\grid\Ac
 $filters = FilterController::getFiltersOfUser($loggedUserId);
 $selectedFilterId = SecurityEventsPage::findOne(['user_id' => $loggedUserId])->getAttribute('filter_id');
 $selectedFilter = Filter::findOne(['id' => $selectedFilterId]);
-$filter = new Filter()  ;
+$filter = new Filter();
 
 // If $autoRefresh is set to true, then set interval for content update
 if($autoRefresh)
@@ -150,7 +150,6 @@ if($autoRefresh)
             ]); ?>
     <?php Pjax::end(); ?>
 </div>
-
 
 <?php
 /*
