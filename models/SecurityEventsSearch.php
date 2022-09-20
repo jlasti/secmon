@@ -49,6 +49,9 @@ class SecurityEventsSearch extends SecurityEvents
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => [
+                'pageSize' => 10,
+            ],
         ]);
 
         $this->load($params);
@@ -239,6 +242,8 @@ class SecurityEventsSearch extends SecurityEvents
             ->andFilterWhere(['ilike', 'parent_events', $this->parent_events])
             ->andFilterWhere(['ilike', 'cef_extensions', $this->cef_extensions])
             ->andFilterWhere(['ilike', 'raw_event', $this->raw_event]);
+        
+        $query->asArray()->all();
 
         return $dataProvider;
     }
