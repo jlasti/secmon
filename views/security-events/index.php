@@ -6,14 +6,19 @@ use yii\widgets\ActiveForm;
 use kartik\cmenu\ContextMenu;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use app\models\SecurityEventsPage;
 use app\models\Filter;
 use app\models\FilterRule;
+use \app\models\SecurityEvents;
 use \app\controllers\FilterController;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\SecurityEventsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+
+//$this->registerJsFile('@web/js/security-events-page.js', ['depends' => 'yii\web\YiiAsset']);
+$this->registerJsFile('https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js');
 
 $this->params['title'] = 'Security Events';
 $loggedUserId = Yii::$app->user->getId();
@@ -26,6 +31,10 @@ $filters = FilterController::getFiltersOfUser($loggedUserId);
 $selectedFilterId = SecurityEventsPage::findOne(['user_id' => $loggedUserId])->getAttribute('filter_id');
 $selectedFilter = Filter::findOne(['id' => $selectedFilterId]);
 $filter = new Filter();
+$colsDown = SecurityEvents::getColumnsDropdown();
+
+//$columns = array_keys(\app\models\SecurityEvents::columns());
+$columns = explode(",", $securityEventsPage->data_columns);
 
 // If $autoRefresh is set to true, then set interval for content update
 if($autoRefresh)
@@ -84,7 +93,6 @@ if($autoRefresh)
         }, getRefreshTime(refreshString)*1000 );
     ');
 }
-
 ?>
 
 <div class="security-events-page-panel">
@@ -150,6 +158,135 @@ if($autoRefresh)
             ]); ?>
     <?php Pjax::end(); ?>
 </div>
+
+
+<a href="#modal<?= $securityEventsPage->id ?>" class="btn-floating waves-effect waves-light btn-small blue"
+    style="position:absolute; top: 30px; right: 40px; display: 'block' ?>" id="contentEdit">
+    <i class="material-icons">edit</i>
+</a>
+
+<!-- Modal Structure -->
+<div class="modal" id="modal<?= $securityEventsPage->id ?>">
+    <div class="modal-content">
+        <form action="#" id="contentSettingsForm<?= $securityEventsPage->id ?>">
+            <div class="row">
+                <input name="dataTypeParameter" id="componentDataTypeParameter<?= $securityEventsPage->id ?>" hidden />
+                <p class="caption">Table columns</p>
+                <div id="chipsTable<?= $securityEventsPage->id ?>" class="chips chips-table" data-id="<?= $securityEventsPage->id ?>"
+                        data-table-columns="<?= !empty($securityEventsPage->data_columns) ? $securityEventsPage->data_columns : 'id,datetime,device_host_name,application_protocol'
+                        ?>">
+                    <?php foreach ($columns as $column ) : ?>
+                        <div class="chip">
+                            <?= $column ?>
+                            <i class="close material-icons">close</i>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+
+                <div class=" input-field col s11">
+                    <select id="columnsSelect<?= $securityEventsPage->id ?>">
+                        <?php foreach ($colsDown as $key1 => $val1) : ?>
+                        <option value="<?= $key1 ?>"><?= $val1 ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <label>Add column</label>
+                </div>
+
+                <div class="input-field col s1">
+                    <div class="help-block left-align">
+                        <a href="#" data-type="columnsSelectAdd" data-id="<?= $securityEventsPage->id ?>" class="btn-floating btn-small waves-effect waves-light red"
+                            title="Add new column">
+                            <i class="material-icons">add</i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="modal-footer">
+        <div class="right">
+            <button data-id="<?= $securityEventsPage->id ?>" data-action="saveComponentContent" class="modal-action modal-close waves-effect waves-green btn-flat">Save</button>
+            <button class=" modal-close waves-effect waves-green btn-flat">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<?php foreach ($columns as $column ) : ?>
+    <div class="chip">
+        <?= $column ?>
+        <i class="close material-icons">close</i>
+    </div>
+<?php endforeach; ?>
+
+
+
+<table class="table table-bordered table-striped" id="tablelist">
+    <thead>
+        <tr>
+        <th>#</th><th>Column name</th><th>Remove Item</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        if ($columns<1){}
+        else
+        {
+            foreach ($columns as $index => $column) {
+            ?>
+            <tr id="<?= $column; ?>">
+                <td><?= $index+1; ?></td>
+                <td><?= $column; ?></td>
+                <td><button class="btn" style="background-color: red;" id ="deleteRow"><i class='material-icons'>delete</i></button</td>
+                <input type="hidden" value="<?= $index; ?>" id="item" name="item">
+            </tr>
+            <?php
+            }
+        }
+        ?>
+    </tbody>
+</table>
+
+<div class=" input-field col s11">
+    <select id="columnsSelect<?= $securityEventsPage->id ?>">
+        <?php foreach ($colsDown as $key1 => $val1) : ?>
+        <option value="<?= $key1 ?>"><?= $val1 ?></option>
+        <?php endforeach; ?>
+    </select>
+    <label>Add column</label>
+</div>
+
+<a class="btn btn-primary" id="addColum" href="#">Add Column</a>
+<a class="btn btn-primary" id="saveSelectedColumns" href="#">Save selected columns</a>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+<script>
+    var $sortable = $( "#tablelist > tbody" );
+    $sortable.sortable({
+        stop: function ( event, ui ) {
+            var parameters = $sortable.sortable( "toArray" );
+            $.post("./update-selected-columns", {value:parameters});
+        }
+    });
+
+    $("#addColum").on("click", function (event) {
+        //treba vytiahnuť údaje z dropdownlistu, aký stĺpec sa má pridať a následne sa pridá riadok do tabuľky a dingo.
+        var numberOfRows = document.getElementById("tablelist").rows.length - 1;
+        var selectedColumn = document.getElementById("select-dropdown").value;
+        alert('selectedColumn: ' + selectedColumn);
+    });
+
+    $("table").on("click", "#deleteRow", function (event) {
+        $(this).closest("tr").remove();
+    });
+
+    $("#saveSelectedColumns").on("click", function (event, ui) {
+        var parameters = $sortable.sortable( "toArray" );
+        $.post("./update-selected-columns", {value:parameters});
+    });
+
+</script>
 
 <?php
 /*
