@@ -274,4 +274,49 @@ class SecurityEventsController extends Controller
 
         return $this->redirect(['index']);
     }
+
+    public function actionGetRefreshTime()
+    {
+        $userId = Yii::$app->user->getId();
+        $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
+        
+        if($securityEventsPage->refresh_time != null && $securityEventsPage->refresh_time != "")
+            return Json::encode($securityEventsPage->refresh_time);
+        else
+            return Json::encode('10S');
+    }
+
+    public function actionUpdateSelectedColumns()
+    {
+        $userId = Yii::$app->user->getId();
+        $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
+
+        if (Yii::$app->request->post()) {
+            
+            $columns = Yii::$app->request->post('value');
+            $selectedColumns = "";
+
+            foreach ($columns as $index => $column)
+            {
+                if($index)
+                    $selectedColumns .= ',' . $column ;
+                else
+                    $selectedColumns .= $column ;
+            }
+                
+            $securityEventsPage->data_columns = $selectedColumns;
+            if(!empty($securityEventsPage))
+                $securityEventsPage->update();
+
+            return $this->redirect(['index']);
+        }
+        else
+        {
+            $securityEventsPage->data_columns = 'id,datetime,type,application_protocol,source_address,destination_address,analyzed';
+            if(!empty($securityEventsPage))
+                $securityEventsPage->update();
+
+            return $this->redirect(['index']);
+        }
+    }
 }
