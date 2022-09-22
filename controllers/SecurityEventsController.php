@@ -14,6 +14,7 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\data\ActiveDataProvider;
+use yii\helpers\ArrayHelper;
 
 /**
  * SecurityEventsController implements the CRUD actions for SecurityEvents model.
@@ -313,5 +314,69 @@ class SecurityEventsController extends Controller
 
             return $this->redirect(['index']);
         }
+    }
+
+    public static function replaceColumns($rawDataColumns, $searchModel)
+    {
+        $replaceDataColumns = [];
+        array_push($replaceDataColumns, ['class' => 'yii\grid\SerialColumn',]);
+
+        foreach($rawDataColumns as $column)
+        {
+            switch ($column) {
+                case 'cef_severity':
+                    array_push($replaceDataColumns, [
+                        'attribute' => 'cef_severity',
+                        'value' => 'cef_severity',
+                        'contentOptions' => function ($dataProvider, $key, $index, $column) {
+                            $array = [
+                                ['id' => '1', 'data' => '#00DBFF'],
+                                ['id' => '2', 'data' => '#00DBFF'],
+                                ['id' => '3', 'data' => '#00FF00'],
+                                ['id' => '4', 'data' => '#00FF00'],
+                                ['id' => '5', 'data' => '#FFFF00'],
+                                ['id' => '6', 'data' => '#FFFF00'],
+                                ['id' => '7', 'data' => '#CC5500'],
+                                ['id' => '8', 'data' => '#CC5500'],
+                                ['id' => '9', 'data' => '#FF0000'],
+                                ['id' => '10', 'data' => '#FF0000'],
+                            ];
+                            if (0 < $dataProvider->cef_severity && $dataProvider->cef_severity < 11){
+                                $map = ArrayHelper::map($array, 'id', 'data');
+                                return ['style' => 'background-color:'.$map[$dataProvider->cef_severity]];
+                            } else {
+                                return ['style' => 'background-color:#FFFFFF'];
+                            }
+                        }
+                    ]);
+                    break;
+                case 'datetime':
+                    array_push($replaceDataColumns, [
+                        'attribute' => 'datetime',
+                        'value' => 'datetime',
+                        'format' => 'raw',
+                        'filter' => \macgyer\yii2materializecss\widgets\form\DatePicker::widget([
+                            'model' => $searchModel,
+                            'attribute' => 'datetime',
+                            'clientOptions' => [
+                                'format' => 'yyyy-mm-dd'
+                            ]
+                        ])
+                    ]);
+                    break;
+                case 'analyzed':
+                    array_push($replaceDataColumns, [
+                        'class' => '\dosamigos\grid\columns\BooleanColumn',
+                        'attribute' => 'analyzed',
+                        'treatEmptyAsFalse' => true
+                    ]);
+                    break;
+                default:
+                    array_push($replaceDataColumns, $column);
+            }
+        }
+        array_push($replaceDataColumns, ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}']);
+
+        return $replaceDataColumns;
     }
 }
