@@ -212,40 +212,14 @@ if($autoRefresh)
     </div>
 </div>
 
-<?php foreach ($columns as $column ) : ?>
-    <div class="chip">
-        <?= $column ?>
-        <i class="close material-icons">close</i>
-    </div>
-<?php endforeach; ?>
-
-
-
-<table class="table table-bordered table-striped" id="tablelist">
-    <thead>
-        <tr>
-        <th>#</th><th>Column name</th><th>Remove Item</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php
-        if ($columns<1){}
-        else
-        {
-            foreach ($columns as $index => $column) {
-            ?>
-            <tr id="<?= $column; ?>">
-                <th><?= $index+1; ?></th>
-                <td><?= $column; ?></td>
-                <td><button class="btn" style="background-color: red;" id ="deleteRow"><i class='material-icons'>delete</i></button</td>
-                <input type="hidden" value="<?= $index; ?>" id="item" name="item">
-            </tr>
-            <?php
-            }
-        }
-        ?>
-    </tbody>
-</table>
+<div class="chips-table" id="chipstable">
+    <?php foreach ($columns as $column ) : ?>
+        <div class="chip" value="<?= $column ?>">
+            <?= $column ?>
+            <i class="close material-icons">close</i>
+        </div>
+    <?php endforeach; ?>
+</div>
 
 <div class="input-field col s11">
     <label class="active" for="name">Add Column</label>
@@ -256,49 +230,67 @@ if($autoRefresh)
     </select>
 </div>
 
-<a class="btn btn-primary" id="addColum" href="#">Add Column</a>
+<a class="btn btn-primary" id="addColumn" href="#">Add column</a>
 <a class="btn btn-primary" id="saveSelectedColumns" href="#">Save selected columns</a>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
 
 <script>
-    var numberOfRows = document.getElementById("tablelist").rows.length;
-    var $sortable = $( "#tablelist > tbody" );
-    $sortable.sortable();
+    var $sortableChips = $( "#chipstable" );
+    $sortableChips.sortable();
 
-    $("#addColum").on("click", function (event) {
-        event.preventDefault();
+    var $sortable = $( "#eventsContent > thead > tr" );
+    $sortable.sortable({
+        stop: function (event, ui) {
+            const eventTable = document.getElementById("eventsContent");
+            const thElements = eventTable.getElementsByTagName('chip > a');
+            const columnsList = document.querySelectorAll('[data-sort]');
+            var selectedColumns = [];
+            
+            for (let i = 0; i < columnsList.length; i++) {
+                selectedColumns.push(columnsList[i].getAttribute('data-sort').replace('-', ''))
+            }
 
-        //check if column is already there...
-
+            $.post("/secmon/web/security-events/update-selected-columns", {value:selectedColumns});
+        }
+    });
+    
+    // Create new column chip based on selected from dropdown list
+    $("#addColumn").on("click", function (event) {
+        // Get selected Column value
         var element = document.getElementById("selectColumnDropdown");
         var value = element.value;
 
-        var newRow = $('<tr id="' + value + '" class="ui-sortable-handle">');
-        var cols = '';
+        // Create a "div" node for column chip:
+        const chipNode = document.createElement("div");
+        chipNode.className = "chip ui-sortable-handle";
+        chipNode.setAttribute('value', value);
 
-        // Table columns
-        cols += '<th>' + numberOfRows + '</th>';
-        cols += '<td>' + value + '</td>';
-        cols += '<td><button class="btn" style="background-color: red;" id ="deleteRow"><i class="material-icons">delete</i></button</td>';
-        cols += '<input type="hidden" value="' + numberOfRows + '" id="item" name="item">'
+        // Create a text node for column chip:
+        const chipText = document.createTextNode(value);
+        
+        // Create an "icon" node:
+        const icon = document.createElement("i");
+        const iconText = document.createTextNode('close');
+        icon.className = "close material-icons";
+        icon.appendChild(iconText);
 
-        // Insert the columns inside a row
-        newRow.append(cols);
+        // Append the text node and icon to the "div" node:
+        chipNode.appendChild(chipText);
+        chipNode.appendChild(icon);
 
-        // Insert the row inside a table
-        $("table").append(newRow);
+        // Append the "div" node to the list of chips:
+        document.getElementById("chipstable").appendChild(chipNode);
     });
 
-    $("table").on("click", "#deleteRow", function (event) {
-        $(this).closest("tr").remove();
-    });
-
+    // Save selected columns into database
     $("#saveSelectedColumns").on("click", function (event, ui) {
-        var parameters = $sortable.sortable( "toArray" );
-        $.post("/secmon/web/security-events/update-selected-columns", {value:parameters}, function (result) {
-            alert(result);
-        });
+        const chipstable = document.getElementById("chipstable");
+        const elements = chipstable.getElementsByClassName('chip');
+        var chips = Array.prototype.slice.call( elements );
+        var selectedColumns = [];
+        chips.forEach(chip => selectedColumns.push(chip.getAttribute('value')));
+        $.post("/secmon/web/security-events/update-selected-columns", {value:selectedColumns});
     });
 
 </script>
