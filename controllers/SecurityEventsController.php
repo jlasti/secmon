@@ -232,11 +232,6 @@ class SecurityEventsController extends Controller
         return $this->redirect(['index']);
     }
 
-    public function actionRefresh()
-    {
-        return $this->redirect(['index']);
-    }
-
     public function actionApplySelectedFilter()
     {
         $userId = Yii::$app->user->getId();
