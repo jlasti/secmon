@@ -158,8 +158,8 @@ if($autoRefresh)
 </div>
 
 <a href="#modalColumsSettings" class="btn-floating waves-effect waves-light btn-small blue"
-    style="position:absolute; top: 30px; right: 40px; display: 'block' ?>">
-    <i class="material-icons">edit</i>
+    style="position:absolute; top: 30px; right: 40px; display: 'block' ?>" data-toggle="tooltip" data-placement="bottom" title="Columns settings">
+    <i class="material-icons">settings</i>
 </a>
 
 <!-- Modal Structure -->
