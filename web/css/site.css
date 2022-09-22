@@ -392,6 +392,11 @@ main .container {
   top: 5% !important;
 }
 
+#modalColumsSettings {
+  max-height: 70%;
+  top: 5% !important;
+}
+
 .profile-btn {
   margin-left: -21px;
   width: 218px;
@@ -430,4 +435,8 @@ button.security-events-page-panel {
 
 .filter-rule p {
   margin: 0;
+}
+
+div.chip {
+  cursor: pointer;
 }
