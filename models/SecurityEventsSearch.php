@@ -243,7 +243,8 @@ class SecurityEventsSearch extends SecurityEvents
             ->andFilterWhere(['ilike', 'cef_extensions', $this->cef_extensions])
             ->andFilterWhere(['ilike', 'raw_event', $this->raw_event]);
         
-        $query->asArray()->all();
+        $query->all();
+
 
         return $dataProvider;
     }
