@@ -26,7 +26,68 @@ $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $loggedUserId]);
 $autoRefresh = $securityEventsPage->auto_refresh;
 $refreshTime = $securityEventsPage->refresh_time;
 $dataColumns = explode(",", $securityEventsPage->data_columns);
-array_push($dataColumns, ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}']);
+$replaceDataColumns = [];
+array_push($replaceDataColumns, ['class' => 'yii\grid\SerialColumn',]);
+
+foreach($dataColumns as $column)
+{
+    switch ($column) {
+        case 'cef_severity':
+            array_push($replaceDataColumns, [
+                'attribute' => 'cef_severity',
+                'value' => 'cef_severity',
+                'contentOptions' => function ($dataProvider, $key, $index, $column) {
+                    $array = [
+                        ['id' => '1', 'data' => '#00DBFF'],
+                        ['id' => '2', 'data' => '#00DBFF'],
+                        ['id' => '3', 'data' => '#00FF00'],
+                        ['id' => '4', 'data' => '#00FF00'],
+                        ['id' => '5', 'data' => '#FFFF00'],
+                        ['id' => '6', 'data' => '#FFFF00'],
+                        ['id' => '7', 'data' => '#CC5500'],
+                        ['id' => '8', 'data' => '#CC5500'],
+                        ['id' => '9', 'data' => '#FF0000'],
+                        ['id' => '10', 'data' => '#FF0000'],
+                    ];
+                    if (0 < $dataProvider->cef_severity && $dataProvider->cef_severity < 11){
+                        $map = ArrayHelper::map($array, 'id', 'data');
+                        return ['style' => 'background-color:'.$map[$dataProvider->cef_severity]];
+                    } else {
+                        return ['style' => 'background-color:#FFFFFF'];
+                    }
+                }
+            ]);
+            break;
+        case 'datetime':
+            array_push($replaceDataColumns, [
+                'attribute' => 'datetime',
+                'value' => 'datetime',
+                'format' => 'raw',
+                'filter' => \macgyer\yii2materializecss\widgets\form\DatePicker::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'datetime',
+                    'clientOptions' => [
+                        'format' => 'yyyy-mm-dd'
+                    ]
+                ])
+            ]);
+            break;
+        case 'analyzed':
+            array_push($replaceDataColumns, [
+                'class' => '\dosamigos\grid\columns\BooleanColumn',
+                'attribute' => 'analyzed',
+                'treatEmptyAsFalse' => true
+            ]);
+            break;
+        default:
+            array_push($replaceDataColumns, $column);
+    }
+}
+
+array_push($replaceDataColumns, ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}']);
+
+
+
 $filters = FilterController::getFiltersOfUser($loggedUserId);
 $selectedFilterId = SecurityEventsPage::findOne(['user_id' => $loggedUserId])->getAttribute('filter_id');
 $selectedFilter = Filter::findOne(['id' => $selectedFilterId]);
@@ -152,7 +213,7 @@ if($autoRefresh)
                     'id' => 'eventsContent',
                     'class' => 'responsive-table striped'
                 ],
-                'columns' => $dataColumns,
+                'columns' => $replaceDataColumns,
             ]); ?>
     <?php Pjax::end(); ?>
 </div>
@@ -287,61 +348,3 @@ if($autoRefresh)
     }
 
 </script>
-
-<?php
-/*
-'columns' => [
-                    [
-                            'class' => 'yii\grid\SerialColumn',
-                    ],
-                    'id',
-                    [
-                        'attribute' => 'datetime',
-                        'value' => 'datetime',
-                        'format' => 'raw',
-                        'filter' => \macgyer\yii2materializecss\widgets\form\DatePicker::widget([
-                            'model' => $searchModel,
-                            'attribute' => 'datetime',
-                            'clientOptions' => [
-                                'format' => 'yyyy-mm-dd'
-                            ]
-                        ])
-                    ],
-                    'device_host_name',
-                    'type',
-                    'cef_name',
-                    [
-                        'attribute' => 'cef_severity',
-                        'value' => 'cef_severity',
-                        'contentOptions' => function ($dataProvider, $key, $index, $column) {
-                            $array = [
-                                ['id' => '1', 'data' => '#00DBFF'],
-                                ['id' => '2', 'data' => '#00DBFF'],
-                                ['id' => '3', 'data' => '#00FF00'],
-                                ['id' => '4', 'data' => '#00FF00'],
-                                ['id' => '5', 'data' => '#FFFF00'],
-                                ['id' => '6', 'data' => '#FFFF00'],
-                                ['id' => '7', 'data' => '#CC5500'],
-                                ['id' => '8', 'data' => '#CC5500'],
-                                ['id' => '9', 'data' => '#FF0000'],
-                                ['id' => '10', 'data' => '#FF0000'],
-                            ];
-                            if (0 < $dataProvider->cef_severity && $dataProvider->cef_severity < 11){
-                                $map = ArrayHelper::map($array, 'id', 'data');
-                                return ['style' => 'background-color:'.$map[$dataProvider->cef_severity]];
-                            } else {
-                                return ['style' => 'background-color:#FFFFFF'];
-                            }
-                        }
-                    ],
-                    'source_address',
-                    'application_protocol',
-                    [
-                        'class' => '\dosamigos\grid\columns\BooleanColumn',
-                        'attribute' => 'analyzed',
-                        'treatEmptyAsFalse' => true
-                    ],
-                    ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}'],
-                ],
-*/
-?>
