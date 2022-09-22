@@ -32,8 +32,6 @@ $selectedFilterId = SecurityEventsPage::findOne(['user_id' => $loggedUserId])->g
 $selectedFilter = Filter::findOne(['id' => $selectedFilterId]);
 $filter = new Filter();
 $colsDown = SecurityEvents::getColumnsDropdown();
-
-//$columns = array_keys(\app\models\SecurityEvents::columns());
 $columns = explode(",", $securityEventsPage->data_columns);
 
 // If $autoRefresh is set to true, then set interval for content update
@@ -159,42 +157,40 @@ if($autoRefresh)
     <?php Pjax::end(); ?>
 </div>
 
-
-<a href="#modal<?= $securityEventsPage->id ?>" class="btn-floating waves-effect waves-light btn-small blue"
-    style="position:absolute; top: 30px; right: 40px; display: 'block' ?>" id="contentEdit">
+<a href="#modalColumsSettings" class="btn-floating waves-effect waves-light btn-small blue"
+    style="position:absolute; top: 30px; right: 40px; display: 'block' ?>">
     <i class="material-icons">edit</i>
 </a>
 
 <!-- Modal Structure -->
-<div class="modal" id="modal<?= $securityEventsPage->id ?>">
+<div class="modal" id="modalColumsSettings">
     <div class="modal-content">
-        <form action="#" id="contentSettingsForm<?= $securityEventsPage->id ?>">
+    <h4>Table columns</h4>
+        <form action="#">
             <div class="row">
-                <input name="dataTypeParameter" id="componentDataTypeParameter<?= $securityEventsPage->id ?>" hidden />
-                <p class="caption">Table columns</p>
-                <div id="chipsTable<?= $securityEventsPage->id ?>" class="chips chips-table" data-id="<?= $securityEventsPage->id ?>"
-                        data-table-columns="<?= !empty($securityEventsPage->data_columns) ? $securityEventsPage->data_columns : 'id,datetime,device_host_name,application_protocol'
-                        ?>">
-                    <?php foreach ($columns as $column ) : ?>
-                        <div class="chip">
-                            <?= $column ?>
-                            <i class="close material-icons">close</i>
-                        </div>
-                    <?php endforeach; ?>
+                <div class="input-field col s11">
+                    <div class="chips chips-table" id="chipstable">
+                        <?php foreach ($columns as $column ) : ?>
+                            <div class="chip" value="<?= $column ?>">
+                                <?= $column ?>
+                                <i class="close material-icons">close</i>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
 
-                <div class=" input-field col s11">
-                    <select id="columnsSelect<?= $securityEventsPage->id ?>">
-                        <?php foreach ($colsDown as $key1 => $val1) : ?>
-                        <option value="<?= $key1 ?>"><?= $val1 ?></option>
-                        <?php endforeach; ?>
+                <div class="input-field col s11">
+                    <label class="active" for="name">Add Column</label>
+                    <select class="form-select" id="selectColumnDropdown" aria-label="Default select example">
+                    <?php foreach ($colsDown as $key => $value) : ?>
+                        <option value="<?= $key ?>"><?= $value ?></option>
+                    <?php endforeach; ?>
                     </select>
-                    <label>Add column</label>
                 </div>
 
                 <div class="input-field col s1">
                     <div class="help-block left-align">
-                        <a href="#" data-type="columnsSelectAdd" data-id="<?= $securityEventsPage->id ?>" class="btn-floating btn-small waves-effect waves-light red"
+                        <a href="#" id="addColumn" class="btn-floating btn-small waves-effect waves-light red"
                             title="Add new column">
                             <i class="material-icons">add</i>
                         </a>
@@ -203,35 +199,13 @@ if($autoRefresh)
             </div>
         </form>
     </div>
-
     <div class="modal-footer">
-        <div class="right">
-            <button data-id="<?= $securityEventsPage->id ?>" data-action="saveComponentContent" class="modal-action modal-close waves-effect waves-green btn-flat">Save</button>
-            <button class=" modal-close waves-effect waves-green btn-flat">Cancel</button>
-        </div>
+    <div class="right">
+        <button id="saveSelectedColumns" class="modal-action modal-close waves-effect waves-green btn-flat">Save</button>
+        <button class=" modal-close waves-effect waves-green btn-flat">Cancel</button>
     </div>
+    </div>    
 </div>
-
-<div class="chips-table" id="chipstable">
-    <?php foreach ($columns as $column ) : ?>
-        <div class="chip" value="<?= $column ?>">
-            <?= $column ?>
-            <i class="close material-icons">close</i>
-        </div>
-    <?php endforeach; ?>
-</div>
-
-<div class="input-field col s11">
-    <label class="active" for="name">Add Column</label>
-    <select class="form-select" id="selectColumnDropdown" aria-label="Default select example">
-    <?php foreach ($colsDown as $key => $value) : ?>
-        <option value="<?= $key ?>"><?= $value ?></option>
-    <?php endforeach; ?>
-    </select>
-</div>
-
-<a class="btn btn-primary" id="addColumn" href="#">Add column</a>
-<a class="btn btn-primary" id="saveSelectedColumns" href="#">Save selected columns</a>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
 
@@ -261,6 +235,15 @@ if($autoRefresh)
         var element = document.getElementById("selectColumnDropdown");
         var value = element.value;
 
+        if(checkColumnExistence(value)){
+            Materialize.toast(
+              'Column "' + value + '" already in list!',
+              2000
+            );
+            return;
+        }
+        
+
         // Create a "div" node for column chip:
         const chipNode = document.createElement("div");
         chipNode.className = "chip ui-sortable-handle";
@@ -285,13 +268,23 @@ if($autoRefresh)
 
     // Save selected columns into database
     $("#saveSelectedColumns").on("click", function (event, ui) {
-        const chipstable = document.getElementById("chipstable");
-        const elements = chipstable.getElementsByClassName('chip');
+        var selectedColumns = extractColumnsFromChips()
+        $.post("/secmon/web/security-events/update-selected-columns", {value:selectedColumns});
+    });
+
+    function extractColumnsFromChips() {
+        const chipsTable = document.getElementById("chipstable");
+        const elements = chipsTable.getElementsByClassName('chip');
         var chips = Array.prototype.slice.call( elements );
         var selectedColumns = [];
         chips.forEach(chip => selectedColumns.push(chip.getAttribute('value')));
-        $.post("/secmon/web/security-events/update-selected-columns", {value:selectedColumns});
-    });
+        return selectedColumns;
+    }
+
+    function checkColumnExistence(newColumn) {
+        var selectedColumns = extractColumnsFromChips();
+        return selectedColumns.includes(newColumn);
+    }
 
 </script>
 
