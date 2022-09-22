@@ -235,7 +235,7 @@ if($autoRefresh)
             foreach ($columns as $index => $column) {
             ?>
             <tr id="<?= $column; ?>">
-                <td><?= $index+1; ?></td>
+                <th><?= $index+1; ?></th>
                 <td><?= $column; ?></td>
                 <td><button class="btn" style="background-color: red;" id ="deleteRow"><i class='material-icons'>delete</i></button</td>
                 <input type="hidden" value="<?= $index; ?>" id="item" name="item">
@@ -247,34 +247,47 @@ if($autoRefresh)
     </tbody>
 </table>
 
-<div class=" input-field col s11">
-    <select id="columnsSelect<?= $securityEventsPage->id ?>">
-        <?php foreach ($colsDown as $key1 => $val1) : ?>
-        <option value="<?= $key1 ?>"><?= $val1 ?></option>
-        <?php endforeach; ?>
+<div class="input-field col s11">
+    <label class="active" for="name">Add Column</label>
+    <select class="form-select" id="selectColumnDropdown" aria-label="Default select example">
+    <?php foreach ($colsDown as $key => $value) : ?>
+        <option value="<?= $key ?>"><?= $value ?></option>
+    <?php endforeach; ?>
     </select>
-    <label>Add column</label>
 </div>
 
 <a class="btn btn-primary" id="addColum" href="#">Add Column</a>
 <a class="btn btn-primary" id="saveSelectedColumns" href="#">Save selected columns</a>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+
 <script>
+    var numberOfRows = document.getElementById("tablelist").rows.length;
     var $sortable = $( "#tablelist > tbody" );
-    $sortable.sortable({
-        stop: function ( event, ui ) {
-            var parameters = $sortable.sortable( "toArray" );
-            $.post("./update-selected-columns", {value:parameters});
-        }
-    });
+    $sortable.sortable();
 
     $("#addColum").on("click", function (event) {
-        //treba vytiahnuť údaje z dropdownlistu, aký stĺpec sa má pridať a následne sa pridá riadok do tabuľky a dingo.
-        var numberOfRows = document.getElementById("tablelist").rows.length - 1;
-        var selectedColumn = document.getElementById("select-dropdown").value;
-        alert('selectedColumn: ' + selectedColumn);
+        event.preventDefault();
+
+        //check if column is already there...
+
+        var element = document.getElementById("selectColumnDropdown");
+        var value = element.value;
+
+        var newRow = $('<tr id="' + value + '" class="ui-sortable-handle">');
+        var cols = '';
+
+        // Table columns
+        cols += '<th>' + numberOfRows + '</th>';
+        cols += '<td>' + value + '</td>';
+        cols += '<td><button class="btn" style="background-color: red;" id ="deleteRow"><i class="material-icons">delete</i></button</td>';
+        cols += '<input type="hidden" value="' + numberOfRows + '" id="item" name="item">'
+
+        // Insert the columns inside a row
+        newRow.append(cols);
+
+        // Insert the row inside a table
+        $("table").append(newRow);
     });
 
     $("table").on("click", "#deleteRow", function (event) {
@@ -283,7 +296,9 @@ if($autoRefresh)
 
     $("#saveSelectedColumns").on("click", function (event, ui) {
         var parameters = $sortable.sortable( "toArray" );
-        $.post("./update-selected-columns", {value:parameters});
+        $.post("/secmon/web/security-events/update-selected-columns", {value:parameters}, function (result) {
+            alert(result);
+        });
     });
 
 </script>
