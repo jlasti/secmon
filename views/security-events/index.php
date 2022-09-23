@@ -27,7 +27,7 @@ $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $loggedUserId]);
 $autoRefresh = $securityEventsPage->auto_refresh;
 $refreshTime = $securityEventsPage->refresh_time;
 $rawDataColumns = explode(",", $securityEventsPage->data_columns);
-$dataColumns = SecurityEventsController::replaceColumns($rawDataColumns, $searchModel);
+$dataColumns = SecurityEventsPage::replaceColumns($rawDataColumns, $searchModel);
 $filters = FilterController::getFiltersOfUser($loggedUserId);
 $selectedFilterId = SecurityEventsPage::findOne(['user_id' => $loggedUserId])->getAttribute('filter_id');
 $selectedFilter = Filter::findOne(['id' => $selectedFilterId]);
