@@ -14,7 +14,6 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\data\ActiveDataProvider;
-use yii\helpers\ArrayHelper;
 
 /**
  * SecurityEventsController implements the CRUD actions for SecurityEvents model.
