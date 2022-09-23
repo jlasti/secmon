@@ -93,7 +93,7 @@ if($autoRefresh)
 
 <div class="security-events-page-panel">
     <div class="row">
-        <div class="col" style="width:33%;">
+        <div class="col" style="width:30%;">
             <label class="active" for="name">Selected Filter</label>
             <?= Html::beginForm(['apply-selected-filter'],'post'); ?>
                 <?= Html::activeDropDownList($filter, 'name', ArrayHelper::map($filters,'name','name'), ['value' => !empty($selectedFilter) ? $selectedFilter->name : '', 'prompt' => 'None', 'style' => !empty($selectedFilter) ? 'color: black;' : 'color: gray;', 'id' => 'eventFilterSelect', 'onchange' => 'this.form.submit()']); ?>
@@ -118,6 +118,35 @@ if($autoRefresh)
                     ?>
                 </p>
             </div>    
+        </div>
+
+        <div class="col" style="width:40%;">
+            <label class="active" for="name">Time Filter</label>
+            <?= Html::beginForm(['update-time-filter'],'post'); ?>
+                <div id="absoluteTimeForm">
+                    <?= Html::activeInput('text', $securityEventsPage, 'refresh_time', ['placeholder' => 'nY/nM/nW/nD/nH/nm/nS']) ?>
+                    <?= Html::activeInput('text', $securityEventsPage, 'refresh_time', ['placeholder' => 'nY/nM/nW/nD/nH/nm/nS']) ?>
+                </div>
+                <div id="relativeTimeForm">
+                    <input type="text" list="relativeTime" placeholder="nY/nM/nW/nD/nH/nm/nS">
+                        <datalist id="relativeTime">
+                        <option value="10m"></option>
+                        <option value="30m"></option>
+                        <option value="1H"></option>
+                        <option value="24H"></option>
+                        <option value="7D"></option>
+                    </datalist>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadioAbsolute" value="absolute" <?= $securityEventsPage->refresh_time ? 'checked=""' : '' ?> >
+                        <label class="form-check-label" for="inlineRadioAbsolute">Absolute</label>
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadioRelative" value="relative" <?= $securityEventsPage->refresh_time ? '' : 'checked=""' ?> >
+                        <label class="form-check-label" for="inlineRadioRelative">Relative</label>
+                        <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time', 'style' => 'float: right; margin-right: 0.75rem;']) ?>
+                    </div>
+                </div>
+            <?= Html::endForm(); ?>
         </div>
 
         <div class="col">
