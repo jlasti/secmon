@@ -18,9 +18,6 @@ use \app\controllers\SecurityEventsController;
 /* @var $searchModel app\models\SecurityEventsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-//$this->registerJsFile('@web/js/security-events-page.js', ['depends' => 'yii\web\YiiAsset']);
-$this->registerJsFile('https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js');
-
 $this->params['title'] = 'Security Events';
 $loggedUserId = Yii::$app->user->getId();
 $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $loggedUserId]);
