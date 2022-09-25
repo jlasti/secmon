@@ -4,6 +4,7 @@ services:
     build:
       context:  ./
       dockerfile: deployment/dockerfiles/secmon_app.Dockerfile
+    image: secmon_app
     container_name: secmon_app
     restart: always
     ports:
@@ -27,6 +28,7 @@ services:
     build:
       context:  ./
       dockerfile: deployment/dockerfiles/secmon_aggregator.Dockerfile
+    image: secmon_aggregator
     container_name: secmon_aggregator
     restart: unless-stopped
     volumes:
@@ -41,6 +43,7 @@ services:
     build:
       context:  ./
       dockerfile: deployment/dockerfiles/secmon_normalizer.Dockerfile
+    image: secmon_normalizer
     container_name: secmon_normalizer
     restart: unless-stopped
     expose: 
@@ -57,6 +60,7 @@ services:
     build:
       context:  ./
       dockerfile: deployment/dockerfiles/secmon_db_retention.Dockerfile
+    image: secmon_db_retention
     container_name: secmon_db_retention
     restart: unless-stopped
     volumes:
