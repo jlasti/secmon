@@ -59,6 +59,7 @@ class SecurityEventsController extends Controller
         $userId = Yii::$app->user->getId();
         $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
         $filterId = $securityEventsPage->filter_id;
+        $timeFilterId = $securityEventsPage->time_filter_id;
 
         // Security Events Page need to be created
         if (empty($securityEventsPage)) {
@@ -70,7 +71,7 @@ class SecurityEventsController extends Controller
         }
 
         $searchModel = new SecurityEventsSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams, $filterId);
+        $dataProvider = $searchModel->search($this->request->queryParams, $filterId, $timeFilterId);
         $dataProvider->sort->defaultOrder = ['id' => SORT_DESC];
 
         return $this->render('index', [
