@@ -342,10 +342,8 @@ class FilterController extends Controller
         $page -= 1;
 
         $filter = $this->findModel($filterId);
-        //$timefilter = $this->findModel($timeFilterId);
         $filteredData = $query
                         ->applyFilter($filter)
-                        ///->applyFilter($timefilter)
                         ->orderBy([ 'datetime' => SORT_DESC, 'id' => SORT_DESC ])
                         ->limit(10)
                         ->offset(10 * $page)
@@ -465,6 +463,39 @@ class FilterController extends Controller
         }
 
         return false;
+    }
+
+    public static function getRelativeTimeFilterValue()
+    {
+        $userId = Yii::$app->user->getId();
+        $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
+
+        if(!empty($securityEventsPage->time_filter_id))
+        {
+            return FilterRule::findOne(['filter_id' => $securityEventsPage->time_filter_id])->getAttribute('value');
+        }
+        return null;
+    }
+
+    public static function getAbsoluteTimeFilterValue()
+    {
+        $userId = Yii::$app->user->getId();
+        $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
+
+        if(!empty($securityEventsPage->time_filter_id))
+        {
+            $absoluteTimeFilterRules = FilterRule::findAll(['filter_id' => $securityEventsPage->time_filter_id]);
+            $absoluteTimeFilter = (object) [
+                'from' => '',
+                'to' => '',
+              ];
+
+            $absoluteTimeFilter->from = FilterRule::findOne(['filter_id' => $securityEventsPage->time_filter_id, 'type' => 'date', 'operator' => '>='])->getAttribute('value');
+            $absoluteTimeFilter->to = FilterRule::findOne(['filter_id' => $securityEventsPage->time_filter_id, 'type' => 'date', 'operator' => '<='])->getAttribute('value');
+
+            return $absoluteTimeFilter;
+        }
+        return null;
     }
 
     /**
