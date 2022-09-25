@@ -40,10 +40,11 @@ class SecurityEventsSearch extends SecurityEvents
      *
      * @return ActiveDataProvider
      */
-    public function search($params, $filterId)
+    public function search($params, $filterId, $timeFilterId)
     {
         $query = SecurityEvents::find();
         $filter = Filter::findOne(['id' => $filterId]);
+        $timeFilterId = Filter::findOne(['id' => $timeFilterId]);
 
         // add conditions that should always apply here
 
@@ -64,6 +65,10 @@ class SecurityEventsSearch extends SecurityEvents
 
         if (!empty($filter)) {
             $query->applyFilter($filter);
+        }
+
+        if (!empty($timeFilterId)) {
+            $query->applyFilter($timeFilterId);
         }
 
         // grid filtering conditions
