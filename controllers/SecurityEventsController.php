@@ -58,8 +58,6 @@ class SecurityEventsController extends Controller
     {
         $userId = Yii::$app->user->getId();
         $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
-        $filterId = $securityEventsPage->filter_id;
-        $timeFilterId = $securityEventsPage->time_filter_id;
 
         // Security Events Page need to be created
         if (empty($securityEventsPage)) {
@@ -69,6 +67,9 @@ class SecurityEventsController extends Controller
             $securityEventsPage->data_columns = 'id,datetime,type,application_protocol,source_address,destination_address,analyzed';
             $securityEventsPage->save();
         }
+
+        $filterId = $securityEventsPage->filter_id;
+        $timeFilterId = $securityEventsPage->time_filter_id;
 
         $searchModel = new SecurityEventsSearch();
         $dataProvider = $searchModel->search($this->request->queryParams, $filterId, $timeFilterId);
