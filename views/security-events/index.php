@@ -151,7 +151,7 @@ if($securityEventsPage->auto_refresh)
                                 'type' => DateTimePicker::TYPE_INPUT,
                                 'pluginOptions' => [
                                     'autoclose'=>true,
-                                    'format' => 'yyyy-mm-dd hh:ii:ss',
+                                    'format' => 'yyyy-mm-dd hh:ii',
                                     'todayHighlight' => true
                                 ]
                             ]);
@@ -166,7 +166,7 @@ if($securityEventsPage->auto_refresh)
                                 'type' => DateTimePicker::TYPE_INPUT,
                                 'pluginOptions' => [
                                     'autoclose' => true,
-                                    'format' => 'yyyy-mm-dd hh:ii:ss',
+                                    'format' => 'yyyy-mm-dd hh:ii',
                                     'todayHighlight' => true
                                 ]
                             ]);
