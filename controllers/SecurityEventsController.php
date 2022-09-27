@@ -9,6 +9,7 @@ use app\models\SecurityEventsPage;
 use app\models\Event\Analyzed;
 use app\models\Event\AnalyzedConfig;
 use app\models\Filter;
+use app\models\FilterRule;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -315,5 +316,98 @@ class SecurityEventsController extends Controller
 
             return $this->redirect(['index']);
         }
+    }
+
+    public function actionUpdateTimeFilter()
+    {
+        $userId = Yii::$app->user->getId();
+        $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
+        
+        if(!empty($securityEventsPage->time_filter_id))
+            $timeFilter = Filter::findOne(['id' => $securityEventsPage->time_filter_id])->delete();
+
+        if (Yii::$app->request->post()) {
+            $timeFilterType = Yii::$app->request->post('timeFilterType');
+            $absoluteTimeFrom = Yii::$app->request->post('absoluteTimeFrom');
+            $absoluteTimeTo = Yii::$app->request->post('absoluteTimeTo');
+            $relativeTime = Yii::$app->request->post('relativeTime');
+
+            if($timeFilterType == 'absolute')
+            {
+                if(empty($absoluteTimeFrom) && empty($absoluteTimeTo))
+                {
+                    $securityEventsPage->time_filter_type = 'absolute';
+                    $securityEventsPage->time_filter_id = null;
+                    $securityEventsPage->save();
+                    return $this->redirect(['index']);
+                }
+                
+                $timeFilterRules = [];
+                $timeFilter = new Filter();
+                $timeFilter->user_id = $userId;
+                $timeFilter->name = 'AbsoluteTimeFilter_' . $userId;
+                $timeFilter->time_filter = true;
+                $timeFilter->save();
+                $position = 0;
+
+                if($absoluteTimeFrom)
+                {
+                    $timeFilterRule = new FilterRule();
+                    $timeFilterRule->filter_id = $timeFilter->id;
+                    $timeFilterRule->type = 'date';
+                    $timeFilterRule->value = $absoluteTimeFrom;
+                    $timeFilterRule->operator = '>=';
+                    $timeFilterRule->position = $position++;
+                    $timeFilterRule->column = 'datetime';
+                    $timeFilterRule->save();
+                    array_push($timeFilterRules, $timeFilterRule);
+                }
+
+                if($absoluteTimeTo)
+                {
+                    $timeFilterRule = new FilterRule();
+                    $timeFilterRule->filter_id = $timeFilter->id;
+                    $timeFilterRule->type = 'date';
+                    $timeFilterRule->value = $absoluteTimeTo;
+                    $timeFilterRule->operator = '<=';
+                    if($absoluteTimeFrom)
+                        $timeFilterRule->logic_operator = '\AND';
+                    $timeFilterRule->position = $position;
+                    $timeFilterRule->column = 'datetime';
+                    $timeFilterRule->save();
+                    array_push($timeFilterRules, $timeFilterRule);
+                }
+
+                //$timeFilter->save($timeFilter, $timeFilterRules);
+                $securityEventsPage->time_filter_type = 'absolute';
+                $securityEventsPage->time_filter_id = $timeFilter->id;
+                $securityEventsPage->update();
+            }
+            
+            if($timeFilterType == 'relative')
+            {
+                if(empty($relativeTime))
+                    $relativeTime = '10m';
+
+                $timeFilter = new Filter();
+                $timeFilter->user_id = $userId;
+                $timeFilter->name = 'AbsoluteTimeFilter_' . $userId;
+                $timeFilter->time_filter = true;
+                $timeFilter->save();
+
+                $timeFilterRule = new FilterRule();
+                $timeFilterRule->filter_id = $timeFilter->id;
+                $timeFilterRule->type = 'date';
+                $timeFilterRule->value = $relativeTime;
+                $timeFilterRule->operator = 'Last';
+                $timeFilterRule->column = 'datetime';
+                $timeFilterRule->save();
+
+                $securityEventsPage->time_filter_type = 'relative';
+                $securityEventsPage->time_filter_id = $timeFilter->id;
+                $securityEventsPage->save();
+            }
+        }
+        return $this->redirect(['index']);
     }
 }
