@@ -22,7 +22,7 @@ class m220906_103932_create_table_security_events_page extends Migration
 
         $this->addForeignKey('fk-security_events_page-user_id', '{{%security_events_page}}', 'user_id', '{{%users}}', 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey('fk-security_events_page-filter_id', '{{%security_events_page}}', 'filter_id', '{{%filters}}', 'id', 'CASCADE', 'CASCADE');
-        $this->addForeignKey('fk-security_events_page-time_filter_id', '{{%security_events_page}}', 'time_filter_id', '{{%time_filters}}', 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKey('fk-security_events_page-time_filter_id', '{{%security_events_page}}', 'time_filter_id', '{{%filters}}', 'id', 'CASCADE', 'CASCADE');
     }
 
     public function down()
