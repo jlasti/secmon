@@ -41,6 +41,7 @@ class SecurityEventsPage extends \yii\db\ActiveRecord
             [['user_id', 'filter_id', 'time_filter_id'], 'integer'],
             [['auto_refresh'], 'default', 'value' => true],
             [['auto_refresh'], 'boolean'],
+            [['time_filter_type'], 'default', 'value' => 'absolute'],
             [['time_filter_type'], 'string'],
             [['refresh_time'], 'match', 'pattern' => '/^\d{1,5}[YMWDHmS]{1}$/',
             'message' => 'Enter valid format(nY/nM/nW/nD/nH/nm/nS)!'],
