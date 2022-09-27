@@ -4,6 +4,7 @@ use macgyer\yii2materializecss\widgets\grid\GridView;
 use yii\widgets\Pjax;
 use yii\widgets\ActiveForm;
 use kartik\cmenu\ContextMenu;
+use kartik\datetime\DateTimePicker;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -21,22 +22,39 @@ use \app\controllers\SecurityEventsController;
 $this->params['title'] = 'Security Events';
 $loggedUserId = Yii::$app->user->getId();
 $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $loggedUserId]);
-$autoRefresh = $securityEventsPage->auto_refresh;
-$refreshTime = $securityEventsPage->refresh_time;
 $rawDataColumns = explode(",", $securityEventsPage->data_columns);
 $dataColumns = SecurityEventsPage::replaceColumns($rawDataColumns, $searchModel);
 $filters = FilterController::getFiltersOfUser($loggedUserId);
 $selectedFilterId = SecurityEventsPage::findOne(['user_id' => $loggedUserId])->getAttribute('filter_id');
+$timeFilterId = SecurityEventsPage::findOne(['user_id' => $loggedUserId])->getAttribute('time_filter_id');
 $selectedFilter = Filter::findOne(['id' => $selectedFilterId]);
+$timeFilter = Filter::findOne(['id' => $timeFilterId]);
 $filter = new Filter();
 $colsDown = SecurityEvents::getColumnsDropdown();
 $columns = explode(",", $securityEventsPage->data_columns);
 
-// If $autoRefresh is set to true, then set interval for content update
-if($autoRefresh)
+$relativeTimeFilter = '';
+$absoluteTimeFilter = (object) [
+    'from' => '',
+    'to' => '',
+  ];
+ 
+
+if($securityEventsPage->time_filter_type == 'relative')
+{
+    $relativeTimeFilter = FilterController::getRelativeTimeFilterValue();
+}
+
+if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->time_filter_id)
+{
+    $absoluteTimeFilter = FilterController::getAbsoluteTimeFilterValue();
+}
+
+// If auto_refresh is set to true, then set interval for content update
+if($securityEventsPage->auto_refresh)
 {
     $this->registerJs('
-    var refreshString = "' . $refreshTime .'" ;
+    var refreshString = "' . $securityEventsPage->refresh_time .'" ;
     
     function getRefreshTime(refreshString) {
         if (refreshString == "0") {
@@ -123,29 +141,60 @@ if($autoRefresh)
         <div class="col" style="width:40%;">
             <label class="active" for="name">Time Filter</label>
             <?= Html::beginForm(['update-time-filter'],'post'); ?>
-                <div id="absoluteTimeForm">
-                    <?= Html::activeInput('text', $securityEventsPage, 'refresh_time', ['placeholder' => 'nY/nM/nW/nD/nH/nm/nS']) ?>
-                    <?= Html::activeInput('text', $securityEventsPage, 'refresh_time', ['placeholder' => 'nY/nM/nW/nD/nH/nm/nS']) ?>
-                </div>
-                <div id="relativeTimeForm">
-                    <input type="text" list="relativeTime" placeholder="nY/nM/nW/nD/nH/nm/nS">
-                        <datalist id="relativeTime">
-                        <option value="10m"></option>
-                        <option value="30m"></option>
-                        <option value="1H"></option>
-                        <option value="24H"></option>
-                        <option value="7D"></option>
-                    </datalist>
-                </div>
-                <div class="form-group">
-                    <div class="row">
-                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadioAbsolute" value="absolute" <?= $securityEventsPage->refresh_time ? 'checked=""' : '' ?> >
-                        <label class="form-check-label" for="inlineRadioAbsolute">Absolute</label>
-                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadioRelative" value="relative" <?= $securityEventsPage->refresh_time ? '' : 'checked=""' ?> >
-                        <label class="form-check-label" for="inlineRadioRelative">Relative</label>
-                        <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time', 'style' => 'float: right; margin-right: 0.75rem;']) ?>
+                <div id="absoluteTimeForm" style="display:none;">
+                    <div class="col" style="width:50%; padding-left: 0;">
+                        <?php
+                            echo DateTimePicker::widget([
+                                'name' => 'absoluteTimeFrom',
+                                'options' => ['placeholder' => 'From'],
+                                'value' => $absoluteTimeFilter->from,
+                                'type' => DateTimePicker::TYPE_INPUT,
+                                'pluginOptions' => [
+                                    'autoclose'=>true,
+                                    'format' => 'yyyy-mm-dd hh:ii:ss',
+                                    'todayHighlight' => true
+                                ]
+                            ]);
+                        ?>
+                    </div>
+                    <div class="col" style="width:50%; padding-right: 0;">
+                        <?php
+                            echo DateTimePicker::widget([
+                                'name' => 'absoluteTimeTo',
+                                'options' => ['placeholder' => 'To'],
+                                'value' => $absoluteTimeFilter->to,
+                                'type' => DateTimePicker::TYPE_INPUT,
+                                'pluginOptions' => [
+                                    'autoclose' => true,
+                                    'format' => 'yyyy-mm-dd hh:ii:ss',
+                                    'todayHighlight' => true
+                                ]
+                            ]);
+                        ?>
                     </div>
                 </div>
+                <div id="relativeTimeForm" style="display:none; padding-right: 20px">
+                    <select id="relativeTimeFormSelect" name="relativeTime" placeholder="nY/nM/nW/nD/nH/nm/nS" value="<?php $relativeTimeFilter ?>">
+                        <option value="10m">10m</option>
+                        <option value="30m">30m</option>
+                        <option value="1H">1H</option>
+                        <option value="24H">24H</option>
+                        <option value="7D">7D</option>
+                    </select>
+                </div>
+                
+                <div class="col" style="width:50%;">
+                    <input class="form-check-input" type="radio" name="timeFilterType" id="inlineRadioAbsolute" value="absolute" onclick="showAbsoluteTimeForm()" <?= $securityEventsPage->time_filter_type == 'absolute' ? 'checked=""' : '' ?> >
+                    <label class="form-check-label" for="inlineRadioAbsolute">Absolute</label>
+                    <input class="form-check-input" type="radio" name="timeFilterType" id="inlineRadioRelative" value="relative" onclick="showRelativeTimeForm()" <?= $securityEventsPage->time_filter_type == 'relative' ? 'checked=""' : '' ?> >
+                    <label class="form-check-label" for="inlineRadioRelative">Relative</label>
+                </div>
+
+                <div class="col" style="width:50%; padding: 0;">
+                    <div class="form-group">
+                        <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time', 'style' => 'float: right; margin-right: 0;']) ?>
+                    </div>
+                 </div>
             <?= Html::endForm(); ?>
         </div>
 
@@ -235,8 +284,20 @@ if($autoRefresh)
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+<script src="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.js"></script>
+<link href="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.css" rel="stylesheet">
 
 <script>
+    // Check which radio button is checked
+    if($('input[id="inlineRadioAbsolute"]:checked').val() == 'absolute')
+        showAbsoluteTimeForm();
+    
+    if($('input[id="inlineRadioAbsolute"]:checked').val() == 'relative')
+        showRelativeTimeForm();
+
+    // Create relative time form editable
+    $('#relativeTimeFormSelect').editableSelect();
+
     var $sortableChips = $( "#chipstable" );
     $sortableChips.sortable();
 
@@ -269,7 +330,6 @@ if($autoRefresh)
             );
             return;
         }
-        
 
         // Create a "div" node for column chip:
         const chipNode = document.createElement("div");
@@ -311,6 +371,16 @@ if($autoRefresh)
     function checkColumnExistence(newColumn) {
         var selectedColumns = extractColumnsFromChips();
         return selectedColumns.includes(newColumn);
+    }
+
+    function showAbsoluteTimeForm() {
+        $("#absoluteTimeForm").show();
+        $("#relativeTimeForm").hide();
+    }
+
+    function showRelativeTimeForm() {
+        $("#absoluteTimeForm").hide();
+        $("#relativeTimeForm").show();
     }
 
 </script>
