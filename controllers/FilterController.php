@@ -493,7 +493,7 @@ class FilterController extends Controller
             if(FilterRule::findOne(['filter_id' => $securityEventsPage->time_filter_id, 'type' => 'date', 'operator' => '>=']))
                 $absoluteTimeFilter->from = FilterRule::findOne(['filter_id' => $securityEventsPage->time_filter_id, 'type' => 'date', 'operator' => '>='])->getAttribute('value');
             
-                if(FilterRule::findOne(['filter_id' => $securityEventsPage->time_filter_id, 'type' => 'date', 'operator' => '<=']))
+            if(FilterRule::findOne(['filter_id' => $securityEventsPage->time_filter_id, 'type' => 'date', 'operator' => '<=']))
                 $absoluteTimeFilter->to = FilterRule::findOne(['filter_id' => $securityEventsPage->time_filter_id, 'type' => 'date', 'operator' => '<='])->getAttribute('value');
 
             return $absoluteTimeFilter;
