@@ -393,7 +393,7 @@ class SecurityEventsController extends Controller
 
                 $timeFilter = new Filter();
                 $timeFilter->user_id = $userId;
-                $timeFilter->name = 'AbsoluteTimeFilter_' . $userId;
+                $timeFilter->name = 'RelativeTimeFilter_' . $userId;
                 $timeFilter->time_filter = true;
                 $timeFilter->insert();
 
