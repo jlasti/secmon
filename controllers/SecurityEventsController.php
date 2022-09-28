@@ -213,7 +213,7 @@ class SecurityEventsController extends Controller
             $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
             $securityEventsPage->refresh_time = $model->refresh_time;
             if(!empty($securityEventsPage))
-                $securityEventsPage->update();
+                $securityEventsPage->save();
         }
 
         return $this->redirect(['index']);
@@ -329,6 +329,9 @@ class SecurityEventsController extends Controller
             $absoluteTimeTo = Yii::$app->request->post('absoluteTimeTo');
             $relativeTime = Yii::$app->request->post('relativeTime');
 
+            if($timeFilterType == 'relative' && (empty($relativeTime) || !preg_match('/^\d{1,5}[YMWDHmS]{1}$/', $relativeTime)))
+                return $this->redirect(['security-events/index']);
+
             if(!empty($securityEventsPage->time_filter_id))
             {
                 $timeFilter = Filter::findOne(['id' => $securityEventsPage->time_filter_id])->delete();
@@ -380,7 +383,8 @@ class SecurityEventsController extends Controller
                     $timeFilterRule->column = 'datetime';
                     $timeFilterRule->save();
                 }
-              
+                
+                // Update Security Events Page Settings
                 $securityEventsPage->time_filter_type = 'absolute';
                 $securityEventsPage->time_filter_id = $timeFilter->id;
                 $securityEventsPage->update();
@@ -388,15 +392,14 @@ class SecurityEventsController extends Controller
             
             if($timeFilterType == 'relative')
             {
-                if(empty($relativeTime))
-                    $relativeTime = '10m';
-
+                // Create new Time Filter
                 $timeFilter = new Filter();
                 $timeFilter->user_id = $userId;
                 $timeFilter->name = 'RelativeTimeFilter_' . $userId;
                 $timeFilter->time_filter = true;
                 $timeFilter->insert();
 
+                // Create Relative Filter Rule
                 $timeFilterRule = new FilterRule();
                 $timeFilterRule->filter_id = $timeFilter->id;
                 $timeFilterRule->type = 'date';
@@ -405,9 +408,11 @@ class SecurityEventsController extends Controller
                 $timeFilterRule->column = 'datetime';
                 $timeFilterRule->save();
 
+                // Update Security Events Page Settings
                 $securityEventsPage->time_filter_type = 'relative';
                 $securityEventsPage->time_filter_id = $timeFilter->id;
                 $securityEventsPage->update();
+
             }
         }
         return $this->redirect(['security-events/index']);
