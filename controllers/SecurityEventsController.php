@@ -322,15 +322,17 @@ class SecurityEventsController extends Controller
     {
         $userId = Yii::$app->user->getId();
         $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
-        
-        if(!empty($securityEventsPage->time_filter_id))
-            $timeFilter = Filter::findOne(['id' => $securityEventsPage->time_filter_id])->delete();
 
-        if (Yii::$app->request->post()) {
+        if(Yii::$app->request->post() && $securityEventsPage) {
             $timeFilterType = Yii::$app->request->post('timeFilterType');
             $absoluteTimeFrom = Yii::$app->request->post('absoluteTimeFrom');
             $absoluteTimeTo = Yii::$app->request->post('absoluteTimeTo');
             $relativeTime = Yii::$app->request->post('relativeTime');
+
+            if(!empty($securityEventsPage->time_filter_id))
+            {
+                $timeFilter = Filter::findOne(['id' => $securityEventsPage->time_filter_id])->delete();
+            }
 
             if($timeFilterType == 'absolute')
             {
@@ -338,18 +340,20 @@ class SecurityEventsController extends Controller
                 {
                     $securityEventsPage->time_filter_type = 'absolute';
                     $securityEventsPage->time_filter_id = null;
-                    $securityEventsPage->save();
-                    return $this->redirect(['index']);
+                    $securityEventsPage->update();
+                    return $this->redirect(['security-events/index']);
                 }
-                
-                $timeFilterRules = [];
+
+                // Create new Time Filter
                 $timeFilter = new Filter();
                 $timeFilter->user_id = $userId;
                 $timeFilter->name = 'AbsoluteTimeFilter_' . $userId;
                 $timeFilter->time_filter = true;
-                $timeFilter->save();
+                $timeFilter->insert();
+                
                 $position = 0;
 
+                // Create Filter Rule for Time From
                 if($absoluteTimeFrom)
                 {
                     $timeFilterRule = new FilterRule();
@@ -360,9 +364,9 @@ class SecurityEventsController extends Controller
                     $timeFilterRule->position = $position++;
                     $timeFilterRule->column = 'datetime';
                     $timeFilterRule->save();
-                    array_push($timeFilterRules, $timeFilterRule);
                 }
 
+                // Create Filter Rule for Time To
                 if($absoluteTimeTo)
                 {
                     $timeFilterRule = new FilterRule();
@@ -371,14 +375,12 @@ class SecurityEventsController extends Controller
                     $timeFilterRule->value = $absoluteTimeTo;
                     $timeFilterRule->operator = '<=';
                     if($absoluteTimeFrom)
-                        $timeFilterRule->logic_operator = '\AND';
+                        $timeFilterRule->logic_operator = 'AND';
                     $timeFilterRule->position = $position;
                     $timeFilterRule->column = 'datetime';
                     $timeFilterRule->save();
-                    array_push($timeFilterRules, $timeFilterRule);
                 }
-
-                //$timeFilter->save($timeFilter, $timeFilterRules);
+              
                 $securityEventsPage->time_filter_type = 'absolute';
                 $securityEventsPage->time_filter_id = $timeFilter->id;
                 $securityEventsPage->update();
@@ -393,7 +395,7 @@ class SecurityEventsController extends Controller
                 $timeFilter->user_id = $userId;
                 $timeFilter->name = 'AbsoluteTimeFilter_' . $userId;
                 $timeFilter->time_filter = true;
-                $timeFilter->save();
+                $timeFilter->insert();
 
                 $timeFilterRule = new FilterRule();
                 $timeFilterRule->filter_id = $timeFilter->id;
@@ -405,9 +407,9 @@ class SecurityEventsController extends Controller
 
                 $securityEventsPage->time_filter_type = 'relative';
                 $securityEventsPage->time_filter_id = $timeFilter->id;
-                $securityEventsPage->save();
+                $securityEventsPage->update();
             }
         }
-        return $this->redirect(['index']);
+        return $this->redirect(['security-events/index']);
     }
 }
