@@ -109,7 +109,7 @@ if($securityEventsPage->auto_refresh)
 }
 ?>
 
-<div class="security-events-page-panel">
+<div class="security-events-page-panel" style="padding-top: 0;">
     <div class="row">
         <div class="col" style="width:30%;">
             <label class="active" for="name">Selected Filter</label>
@@ -199,9 +199,8 @@ if($securityEventsPage->auto_refresh)
         </div>
 
         <div class="col">
-            <label class="active" for="name">Refresh Time</label>
-            <?= Html::beginForm(['update-refresh-time'],'post'); ?>
-                <?= Html::activeInput('text', $securityEventsPage, 'refresh_time', ['placeholder' => 'nY/nM/nW/nD/nH/nm/nS']) ?>
+            <?php $form = ActiveForm::begin(['action' =>['update-refresh-time'], 'method' => 'post',]); ?>
+                <?= $form->field($securityEventsPage, 'refresh_time')->textInput(['placeholder' => 'nY/nM/nW/nD/nH/nm/nS']) ?>
                 <div class="form-group">
                         <?= Html::a("<i class='material-icons'>refresh</i>", ['index'], ['class' => 'btn btn-success', 'title' => 'Refresh page']) ?>
                         <?= Html::a($securityEventsPage->auto_refresh ? "<i class='material-icons'>pause</i>" : "<i class='material-icons'>play_arrow</i>",
@@ -213,7 +212,7 @@ if($securityEventsPage->auto_refresh)
                         )?>
                         <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time']) ?>
                 </div>
-            <?= Html::endForm(); ?>
+            <?php ActiveForm::end(); ?>
         </div>
     </div>
 </div>
