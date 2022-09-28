@@ -174,7 +174,7 @@ if($securityEventsPage->auto_refresh)
                     </div>
                 </div>
                 <div id="relativeTimeForm" style="display:none; padding-right: 20px">
-                    <select id="relativeTimeFormSelect" name="relativeTime" placeholder="nY/nM/nW/nD/nH/nm/nS" value="<?php $relativeTimeFilter ?>">
+                    <select id="relativeTimeFormSelect" name="relativeTime" placeholder="nY/nM/nW/nD/nH/nm/nS" value="<?= $relativeTimeFilter ?>">
                         <option value="10m">10m</option>
                         <option value="30m">30m</option>
                         <option value="1H">1H</option>
@@ -289,11 +289,13 @@ if($securityEventsPage->auto_refresh)
 
 <script>
     // Check which radio button is checked
-    if($('input[id="inlineRadioAbsolute"]:checked').val() == 'absolute')
+    if($('input[name="timeFilterType"]:checked').val() == 'absolute')
         showAbsoluteTimeForm();
     
-    if($('input[id="inlineRadioAbsolute"]:checked').val() == 'relative')
+    if($('input[name="timeFilterType"]:checked').val() == 'relative'){
         showRelativeTimeForm();
+    }
+        
 
     // Create relative time form editable
     $('#relativeTimeFormSelect').editableSelect();
@@ -382,5 +384,4 @@ if($securityEventsPage->auto_refresh)
         $("#absoluteTimeForm").hide();
         $("#relativeTimeForm").show();
     }
-
 </script>
