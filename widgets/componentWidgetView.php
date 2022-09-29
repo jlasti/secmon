@@ -1,8 +1,9 @@
 <?php
   use yii\helpers\Json;
   use yii\helpers\Url;
+  use \app\models\SecurityEvents;
 
-  $colsDown = \app\models\EventsNormalized::getColumnsDropdown();
+  $colsDown = SecurityEvents::getColumnsDropdown();
   $loggedUserId = Yii::$app->user->getId();
   $options =  Json::decode($component->config);
   $filters = \app\controllers\FilterController::getFiltersOfUser($loggedUserId);
@@ -11,7 +12,7 @@
       'barChart' => 'Bar chart',
       'pieChart' => 'Pie chart',
   ];
-  $columns = \app\models\EventsNormalized::getColumnsDropdown();
+  $columns = SecurityEvents::getColumnsDropdown();
 ?>
 
 <div  id='component_<?= $component->id ?>'>
@@ -126,10 +127,10 @@
                     <?php foreach ($contentTypes as $key => $type): ?>
                         <div data-content-type="<?= $key ?>" class="input-field col s11">
                             <?php if ($key == 'table') : ?>
-                                <input type="hidden" name="dataTypeParameter" id="componentDataTypeParameter<?= $component->id ?>" />
+                                <input name="dataTypeParameter" id="componentDataTypeParameter<?= $component->id ?>" hidden />
                                 <p class="caption">Table columns</p>
                                 <div id="chipsTable<?= $component->id ?>" class="chips chips-table" data-id="<?= $component->id ?>"
-                                     data-table-columns="<?= ($component->data_type ?? "") == $key && !empty($component->data_param) ? $component->data_param : 'datetime,host,protocol'
+                                     data-table-columns="<?= ($component->data_type ?? "") == $key && !empty($component->data_param) ? $component->data_param : 'id,datetime,device_host_name,application_protocol'
                                      ?>">
                                 </div>
                             <?php elseif ($key == 'barChart') : ?>

@@ -1,5 +1,40 @@
+######################################################
+#     Normalization rules for Apache Access Logs     #
+######################################################
 type=single
 ptype=regexp
+continue=EndMatch
 pattern=^([0-9]|[1-9][0-9]|1[0-8][0-9]|19[01]) ([A-Za-z0-9: ]*) (\S+) (?P<tag>.*?) (?P<remote_ip>.*?) (\S+) (\S+) \[([\w:\/]+\s[+\-]\d{4})\] \"(?P<request_method>.*?) (?P<request_url>.*?) (?<protocol>HTTP.?)\/(?P<request_version>.*)?\" (?P<status_code>.*?) (\d+|-)\s?"?([^"]*)"?\s?\"(?P<referrer>.*?)\" \"(?P<user_agent>.*?)\"
-desc=httpd accesslog from host IP $+{remote_ip}
-action=write /var/log/secmon/__secInput $2 $3 CEF:0|Apache|httpd||$+{status_code}|HTTP Request|$1| app=$+{protocol} src=$+{remote_ip} request_method=$+{request_method} request=$+{request_url} requestClientApplication=$+{user_agent} rawEvent=$0
+desc=Apache access log from host $3 with IP $+{remote_ip}
+action=write /var/log/secmon/__secInput $2 $3 CEF:0|Apache|httpd|access|$+{status_code}|HTTP Request|$1| app=$+{protocol} src=$+{remote_ip} requestMethod=$+{request_method} request=$+{request_url} requestClientApplication=$+{user_agent} rawEvent=$0
+
+#####################################################
+#     Normalization rules for Apache Error Logs     #
+#####################################################
+type=single
+ptype=regexp
+continue=EndMatch
+pattern=^([0-9]|[1-9][0-9]|1[0-8][0-9]|19[01]) ([A-Za-z0-9: ]*) (\S+) (?P<tag>.*?) \[(?P<date>.*?)\] \[(?P<Module>.*?):(?P<Log_Level>.*?)\] \[pid (?P<pid>\d+)\] \[client (?P<remote_ip>.*?):(?P<remote_port>.*?)\] (?P<Message_ID>.*?): (?P<Message>.*?), referer: (?P<referer>.*?).*$
+desc=Apache error log from host $3 with IP $+{remote_ip}
+action=write /var/log/secmon/__secInput $2 $3 CEF:0|Apache|httpd|$+{Module}|0|HTTP Request|$1| app=HTTP src=$+{remote_ip} spt=$+{remote_port} request=$+{referer} rawEvent=$0
+
+type=single
+ptype=regexp
+continue=EndMatch
+pattern=^([0-9]|[1-9][0-9]|1[0-8][0-9]|19[01]) ([A-Za-z0-9: ]*) (\S+) (?P<tag>.*?) \[(?P<date>.*?)\] \[(?P<Module>.*?):(?P<Log_Level>.*?)\] \[pid (?P<pid>\d+)\] \[client (?P<remote_ip>.*?):(?P<remote_port>.*?)\] (?P<Message_ID>.*?): ((?P<Message>.*?)).*$
+desc=Apache error log from host $3 with IP $+{remote_ip}
+action=write /var/log/secmon/__secInput $2 $3 CEF:0|Apache|httpd|$+{Module}|0|HTTP Request|$1| app=HTTP src=$+{remote_ip} spt=$+{remote_port} rawEvent=$0
+
+type=single
+ptype=regexp
+continue=EndMatch
+pattern=^([0-9]|[1-9][0-9]|1[0-8][0-9]|19[01]) ([A-Za-z0-9: ]*) (\S+) (?P<tag>.*?) \[(?P<date>.*?)\] \[(?P<Module>.*?):(?P<Log_Level>.*?)\] \[(?P<pid>.*?)\] (?P<Message_ID>.*?): (?P<Message>.*?), (?P<referer>.*?).*$
+desc=Apache error log from host $3 
+action=write /var/log/secmon/__secInput $2 $3 CEF:0|Apache|httpd|$+{Module}|0|HTTP Request|$1| app=HTTP request=$+{referer} rawEvent=$0
+
+type=single
+ptype=regexp
+continue=EndMatch
+pattern=^([0-9]|[1-9][0-9]|1[0-8][0-9]|19[01]) ([A-Za-z0-9: ]*) (\S+) (?P<tag>.*?) \[(?P<date>.*?)\] \[(?P<Module>.*?):(?P<Log_Level>.*?)\] \[pid (?P<pid>\d+)\] (?P<Message_ID>(\S+)): (?P<Message>.*?).*$
+desc=Apache error log from host $3
+action=write /var/log/secmon/__secInput $2 $3 CEF:0|Apache|httpd|$+{Module}|0|HTTP Request|$1| app=HTTP rawEvent=$0

@@ -2,8 +2,6 @@
 
 namespace app\commands;
 
-use app\models\Event;
-use app\models\Event\Normalized;
 use Yii;
 use yii\console\Controller;
 use yii\console\Exception;
@@ -64,7 +62,7 @@ class AggregatorController extends Controller{
 
         $zmq = new ZMQContext();
         $socket = $zmq->getSocket(ZMQ::SOCKET_PUSH);    
-        $socket->bind("tcp://127.0.0.1:" . $port);
+        $socket->connect("tcp://secmon_normalizer:" . $port);
 
         $streamPosition = [];
         $streams = [];

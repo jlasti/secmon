@@ -2,18 +2,18 @@
 
 namespace app\controllers;
 
-use app\models\EventsCorrelated;
-use app\models\EventsNormalized;
+use app\models\SecurityEvents;
 use app\models\FilterRule;
 use app\models\View;
+use app\models\SecurityEventsPage;
 use Yii;
 use app\models\Filter;
-use app\models\Event;
 use app\models\Filter\FilterSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\Json;
+use yii\filters\AccessControl;
 
 /**
  * FilterController implements the CRUD actions for Filter model.
@@ -26,6 +26,15 @@ class FilterController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class'=> AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@']
+                    ]
+                ]
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -69,12 +78,24 @@ class FilterController extends Controller
      */
     public function actionCreate()
     {
+        $url =  $_SERVER['REQUEST_URI'];
         $model = new Filter(['user_id' => Yii::$app->user->id]);
 
 		$rules = $this->_createRulesArray();
-
+        
 		if($this->save($model, $rules))
 		{
+            if(str_contains($url, 'securityEventsPage=1')){
+                $userId = Yii::$app->user->getId();
+                $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
+                
+                if(!empty($securityEventsPage) && $model->id){
+                    $securityEventsPage->filter_id = $model->id;
+                    $securityEventsPage->update();
+                }
+                return $this->redirect(['security-events/index']);
+            }
+                
 			return $this->redirect(['view', 'id' => $model->id]);
 		}
 
@@ -92,6 +113,7 @@ class FilterController extends Controller
      */
     public function actionUpdate($id)
     {
+        $url =  $_SERVER['REQUEST_URI'];
 		$model = $this->findModel($id);
 
         $postRules = Yii::$app->request->post('FilterRule');
@@ -105,6 +127,8 @@ class FilterController extends Controller
 
             if ($this->save($model, $rules))
             {
+                if(str_contains($url, 'securityEventsPage=1'))
+                    return $this->redirect(['security-events/index']);
       			return $this->redirect(['view', 'id' => $model->id]);
             }
 
@@ -151,7 +175,7 @@ class FilterController extends Controller
 
         if ( $loggedUserId != intval($userId)) return null;
 
-        $filters = Filter::findAll(['user_id' => $userId]);
+        $filters = Filter::findAll(['user_id' => $userId, 'time_filter' => false]);
 
         return $filters;
     }
@@ -173,7 +197,7 @@ class FilterController extends Controller
             {
                 if ($contentTypeId == 'table')
                 {
-                    $dbCols = array_keys(EventsNormalized::columns());
+                    $dbCols = array_keys(SecurityEvents::columns());
                     $cols = explode(',', $dataTypeParameter);
                     $res = [];
                     foreach ($cols as $idx => $col)
@@ -217,7 +241,7 @@ class FilterController extends Controller
                         $columns = array_merge(['id'], $columns);
                     }
                     else
-                        $columns = ['id', 'datetime', 'host', 'protocol'];
+                        $columns = ['id', 'datetime', 'device_host_name', 'application_protocol'];
 
                     return [
                         'contentTypeId' => $contentTypeId,
@@ -271,7 +295,7 @@ class FilterController extends Controller
                         $columns = array_merge(['id'], $columns);
                     }
                     else
-                        $columns = ['id', 'datetime', 'host', 'protocol'];
+                        $columns = ['id', 'datetime', 'device_host_name', 'application_protocol'];
 
                     return [
                         'contentTypeId' => $contentTypeId,
@@ -314,7 +338,7 @@ class FilterController extends Controller
     protected function getFilteredEvents($filterId, $page)
     {
         unset($filteredData);
-        $query = EventsNormalized::find();
+        $query = SecurityEvents::find();
         $page -= 1;
 
         $filter = $this->findModel($filterId);
@@ -333,7 +357,7 @@ class FilterController extends Controller
     protected function getFilteredEventsCount($filterId)
     {
         unset($filteredData);
-        $query = EventsNormalized::find();
+        $query = SecurityEvents::find();
 
         $filter = $this->findModel($filterId);
 
@@ -358,7 +382,7 @@ class FilterController extends Controller
 
         $filter = $this->findModel($filterId);
 
-        $query = EventsNormalized::find();
+        $query = SecurityEvents::find();
         $label = "CAST(" . $dataTypeParameter . " AS text) as label";
         $value = "count(" . $dataTypeParameter . ") as count";
         $query->select([$label, $value])
@@ -396,7 +420,7 @@ class FilterController extends Controller
 
         $filter = $this->findModel($filterId);
 
-        $query = EventsNormalized::find();
+        $query = SecurityEvents::find();
         $query->select(["to_char(datetime,'YYYY-DD-MM HH24:00') as x", "count(to_char(datetime,'HH24 MM-DD-YYYY')) as y"])
             ->groupBy(["x"])
             ->orderBy([ 'x' => SORT_ASC ])
@@ -439,6 +463,42 @@ class FilterController extends Controller
         }
 
         return false;
+    }
+
+    public static function getRelativeTimeFilterValue()
+    {
+        $userId = Yii::$app->user->getId();
+        $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
+
+        if(!empty($securityEventsPage->time_filter_id))
+        {
+            return FilterRule::findOne(['filter_id' => $securityEventsPage->time_filter_id])->getAttribute('value');
+        }
+        return null;
+    }
+
+    public static function getAbsoluteTimeFilterValue()
+    {
+        $userId = Yii::$app->user->getId();
+        $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
+
+        if(!empty($securityEventsPage->time_filter_id))
+        {
+            $absoluteTimeFilterRules = FilterRule::findAll(['filter_id' => $securityEventsPage->time_filter_id]);
+            $absoluteTimeFilter = (object) [
+                'from' => '',
+                'to' => '',
+              ];
+            
+            if(FilterRule::findOne(['filter_id' => $securityEventsPage->time_filter_id, 'type' => 'date', 'operator' => '>=']))
+                $absoluteTimeFilter->from = FilterRule::findOne(['filter_id' => $securityEventsPage->time_filter_id, 'type' => 'date', 'operator' => '>='])->getAttribute('value');
+            
+            if(FilterRule::findOne(['filter_id' => $securityEventsPage->time_filter_id, 'type' => 'date', 'operator' => '<=']))
+                $absoluteTimeFilter->to = FilterRule::findOne(['filter_id' => $securityEventsPage->time_filter_id, 'type' => 'date', 'operator' => '<='])->getAttribute('value');
+
+            return $absoluteTimeFilter;
+        }
+        return null;
     }
 
     /**
@@ -523,13 +583,16 @@ class FilterController extends Controller
 			$transaction->commit();
 		}
 
-		// fit the length of array
+    // fit the length of array
+    if($postFilters)
+    {
         $count = count($postFilters) - count($array);
         for($i = 0; $i < $count; $i++)
         {
             $array[] = new FilterRule();
         }
-
+    }
+        
 		return $array;
 	}
 

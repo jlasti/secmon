@@ -23,6 +23,7 @@ composer.phar
 
 # phpunit itself is not needed
 phpunit.phar
+
 # local phpunit config
 /phpunit.xml
 
@@ -31,13 +32,12 @@ phpunit.phar
 /secdb/config.ini
 /config/config_secdb.ini
 /config/anomaly_config.ini
+/config/secmon_config.ini
+/config/aggregator_config.ini
 docker-compose.yml
 composer.lock
 lastdepoy.txt
 output/
-
-# sec rules folder
-rules/uploads/
 
 # pycache is not needed
 __pycache__/

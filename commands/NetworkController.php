@@ -2,8 +2,7 @@
 
 namespace app\commands;
 
-use app\models\Event;
-use app\models\Event\Normalized;
+use app\models\SecurityEvents;
 use Yii;
 use yii\console\Controller;
 use yii\console\Exception;
@@ -19,19 +18,28 @@ class NetworkController extends Controller{
 	public function actionIndex(){
 
 		$aggregator_config_file = $this->openNonBlockingStream("/var/www/html/secmon/config/aggregator_config.ini");
-        $save_to_db = 0;
+		$save_to_db = 0;
+		$module_loaded = false;			#variable used for reading line after Network model module in config file
+		$next_module = "correlator";
 		if($aggregator_config_file){
 			while(($line = fgets($aggregator_config_file)) !== false){
+				if($module_loaded == true ){
+					$parts = explode(":", $line);
+					$next_module = strtolower(trim($parts[0]));
+					$module_loaded = false;
+				}
+
 				if(strpos($line, "Network_model:") !== FALSE){
 					$parts = explode(":", $line);
 					$portOut = trim($parts[1]);
+					$module_loaded = true;
 				}
 			}
 		}else{
 		     throw new Exception('Could not open a config file');
 		}
 
-		$middleware_config_file = $this->openNonBlockingStream("/var/www/html/secmon/config/middleware_config.ini");
+		$middleware_config_file = $this->openNonBlockingStream("/var/www/html/secmon/config/secmon_config.ini");
 		if($middleware_config_file){
 			while(($line = fgets($middleware_config_file)) !== false){
 				if(strpos($line, "host =") !== FALSE){
@@ -65,21 +73,21 @@ class NetworkController extends Controller{
 			$save_to_db = 1;
 		}
 
-        if (!is_numeric($portIn) || !is_numeric($portOut)) {
-		    throw new Exception('One of ports is not a numeric value');
-        }
+		if (!is_numeric($portIn) || !is_numeric($portOut)) {
+			throw new Exception('One of ports is not a numeric value');
+		}
         
-        $zmq = new ZMQContext();
+		$zmq = new ZMQContext();
 		$recSocket = $zmq->getSocket(ZMQ::SOCKET_PULL);  
-		$recSocket->connect("tcp://127.0.0.1:" . $portIn);
+		$recSocket->bind("tcp://*:" . $portIn);
 
 		$sendSocket = $zmq->getSocket(ZMQ::SOCKET_PUSH);
-		$sendSocket->bind("tcp://127.0.0.1:" . $portOut);
+		$sendSocket->connect("tcp://secmon_" . $next_module . ":" . $portOut);
 		
 		date_default_timezone_set("Europe/Bratislava");
-        echo "[" . date("Y-m-d H:i:s") . "] Network model module started!" . PHP_EOL;
+		echo "[" . date("Y-m-d H:i:s") . "] Network model module started!" . PHP_EOL;
 
-        while(true){
+		while(true){
 			$srcIp = $dstIp = -1;
 			$msg = $recSocket->recv(ZMQ::MODE_NOBLOCK);
 			if(empty($msg)){
@@ -117,7 +125,7 @@ class NetworkController extends Controller{
 				}
 				//print($msg);
 				if($save_to_db){
-					$event = Normalized::fromCef($msg);
+					$event = SecurityEvents::extractCefFields($msg, 'normalized');
 					if($event->save()) {
 						$sendSocket->send($event->id . ':' . $msg, ZMQ::MODE_NOBLOCK);
 					}	

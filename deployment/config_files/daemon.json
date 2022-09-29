@@ -1,0 +1,7 @@
+{
+  "log-driver": "syslog",
+  "log-opts": {
+    "syslog-address": "unixgram:///dev/log",
+    "tag": "docker/{{.Name}}"
+  }
+}

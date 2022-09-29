@@ -9,6 +9,7 @@ use yii\db\StaleObjectException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 /**
  * EventsClusteredRunsController implements the CRUD actions for EventsClusteredRuns model.
@@ -21,6 +22,17 @@ class EventsClusteredRunsController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class'=> AccessControl::className(),
+                'only' =>  ['index','view','create','update','delete','minisom','kmedian'],
+                'rules' => [
+                    [
+                        'actions' => ['index','view','create','update','delete','minisom','kmedian'],
+                        'allow' => true,
+                        'roles' => ['@']
+                    ]
+                ]
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -122,7 +134,7 @@ class EventsClusteredRunsController extends Controller
      */
     public function actionMinisom()
     {
-        $command = escapeshellcmd('/usr/bin/python3.6 /var/www/html/secmon/commands/miniSOM.py');
+        $command = escapeshellcmd('/usr/bin/python3.9 /var/www/html/secmon/commands/miniSOM.py');
         shell_exec($command);
 
         return $this->redirect(['/events-clustered-runs']);
@@ -134,7 +146,7 @@ class EventsClusteredRunsController extends Controller
      */
     public function actionKmedian()
     {
-        $command = escapeshellcmd('/usr/bin/python3.6 /var/www/html/secmon/commands/anomaly_script.py');
+        $command = escapeshellcmd('/usr/bin/python3.9 /var/www/html/secmon/commands/anomaly_script.py');
         shell_exec($command);
 
         return $this->redirect(['/events-clustered-runs']);

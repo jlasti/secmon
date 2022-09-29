@@ -1,73 +1,82 @@
 {
-    "name": "yiisoft/yii2-app-basic",
-    "description": "Yii 2 Basic Project Template",
-    "keywords": ["yii2", "framework", "basic", "project template"],
-    "homepage": "http://www.yiiframework.com/",
-    "type": "project",
-    "license": "BSD-3-Clause",
-    "support": {
-        "issues": "https://github.com/yiisoft/yii2/issues?state=open",
-        "forum": "http://www.yiiframework.com/forum/",
-        "wiki": "http://www.yiiframework.com/wiki/",
-        "irc": "irc://irc.freenode.net/yii",
-        "source": "https://github.com/yiisoft/yii2"
-    },
-    "minimum-stability": "stable",
-    "require": {
-        "php": ">=5.4.0",
-        "yiisoft/yii2": ">=2.0.5",
-        "yiisoft/yii2-bootstrap": "*",
-        "yiisoft/yii2-swiftmailer": "*",
-        "frostealth/yii2-presenter": "@stable",
-        "macgyer/yii2-materializecss": "*",
-        "bower-asset/materialize": "0.98.0",
-        "php-ds/php-ds": "^1.2",
-        "2amigos/yii2-grid-view-library": "~1.0",
-        "mcaskill/php-array-group-by": "^1.0",
-        "kartik-v/yii2-context-menu": "dev-master",
-        "liyunfang/yii2-contextmenu": "^1.0",
-        "ext-pgsql": "*",
-        "ext-json": "*",
-        "geoip2/geoip2": "~2.0",
-        "beaten-sect0r/yii2-flatpickr": "*"
-    },
-    "require-dev": {
-        "codeception/codeception": "*",
-        "yiisoft/yii2-debug": "*",
-        "yiisoft/yii2-gii": "*",
-        "yiisoft/yii2-faker": "*",
-        "phpdocumentor/phpdocumentor": "2.*"
-    },
-    "config": {
-      "process-timeout": 1800
-    },
-    "scripts": {
-        "post-create-project-cmd": [
-            "yii\\composer\\Installer::postCreateProject"
-        ]
-    },
-    "extra": {
-        "yii\\composer\\Installer::postCreateProject": {
-            "setPermission": [
-                {
-                    "runtime": "0777",
-                    "web/assets": "0777",
-                    "yii": "0755"
-                }
-            ],
-            "generateCookieValidationKey": [
-                "config/web.php"
-            ]
-        },
-        "asset-installer-paths": {
-            "npm-asset-library": "vendor/npm",
-            "bower-asset-library": "vendor/bower"
-        }
-    },
-    "repositories": [
-    {
-        "type": "composer",
-        "url": "https://asset-packagist.org"
+  "name": "yiisoft/yii2-app-basic",
+  "description": "Yii 2 Basic Project Template",
+  "keywords": [
+    "yii2",
+    "framework",
+    "basic",
+    "project template"
+  ],
+  "homepage": "http://www.yiiframework.com/",
+  "type": "project",
+  "license": "BSD-3-Clause",
+  "support": {
+    "issues": "https://github.com/yiisoft/yii2/issues?state=open",
+    "forum": "http://www.yiiframework.com/forum/",
+    "wiki": "http://www.yiiframework.com/wiki/",
+    "irc": "irc://irc.freenode.net/yii",
+    "source": "https://github.com/yiisoft/yii2"
+  },
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=5.4.0",
+    "yiisoft/yii2": ">=2.0.5",
+    "yiisoft/yii2-bootstrap": "*",
+    "yiisoft/yii2-swiftmailer": "*",
+    "frostealth/yii2-presenter": "@stable",
+    "macgyer/yii2-materializecss": "*",
+    "bower-asset/materialize": "0.98.0",
+    "php-ds/php-ds": "^1.2",
+    "2amigos/yii2-grid-view-library": "~1.0",
+    "mcaskill/php-array-group-by": "^1.0",
+    "kartik-v/yii2-context-menu": "dev-master",
+    "liyunfang/yii2-contextmenu": "^1.0",
+    "ext-pgsql": "*",
+    "ext-json": "*",
+    "geoip2/geoip2": "~2.0",
+    "beaten-sect0r/yii2-flatpickr": "*",
+    "kartik-v/yii2-widget-datetimepicker": "*"
+  },
+  "require-dev": {
+    "codeception/codeception": "*",
+    "yiisoft/yii2-debug": "*",
+    "yiisoft/yii2-gii": "*",
+    "yiisoft/yii2-faker": "*",
+    "phpdocumentor/phpdocumentor": "2.*"
+  },
+  "config": {
+    "process-timeout": 1800,
+    "allow-plugins": {
+      "yiisoft/yii2-composer": true
     }
+  },
+  "scripts": {
+    "post-create-project-cmd": [
+      "yii\\composer\\Installer::postCreateProject"
     ]
+  },
+  "extra": {
+    "yii\\composer\\Installer::postCreateProject": {
+      "setPermission": [
+        {
+          "runtime": "0777",
+          "web/assets": "0777",
+          "yii": "0755"
+        }
+      ],
+      "generateCookieValidationKey": [
+        "config/web.php"
+      ]
+    },
+    "asset-installer-paths": {
+      "npm-asset-library": "vendor/npm",
+      "bower-asset-library": "vendor/bower"
+    }
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://asset-packagist.org"
+    }
+  ]
 }

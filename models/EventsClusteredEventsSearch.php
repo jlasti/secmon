@@ -6,10 +6,10 @@ use yii\db\Query;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\EventsNormalized;
+use app\models\SecurityEvents;
 
 /**
- * EventsClusteredEventsSearch represents the model behind the search form about `app\models\EventsClusteredEvetns`.
+ * EventsClusteredEventsSearch represents the model behind the search form about `app\models\EventsClusteredEvents`.
  */
 class EventsClusteredEventsSearch extends EventsClusteredEvents
 {
@@ -19,8 +19,8 @@ class EventsClusteredEventsSearch extends EventsClusteredEvents
     public function rules()
     {
         return [
-             [['id', 'cef_severity', 'src_port', 'dst_port'], 'integer'],
-             [['datetime', 'host', 'cef_version', 'cef_vendor', 'cef_dev_prod', 'cef_dev_version', 'cef_name', 'src_ip', 'dst_ip', 'protocol', 'src_mac', 'dst_mac', 'extensions', 'raw', 'src_country', 'dst_country', 'src_city', 'dst_city', 'src_latitude', 'dst_latitude', 'src_longitude', 'dst_longitude'], 'safe'],
+             [['id', 'cef_severity', 'source_port', 'destination_port'], 'integer'],
+             [['datetime', 'device_host_name', 'cef_version', 'cef_vendor', 'cef_device_product', 'cef_device_version', 'cef_name', 'source_address', 'destination_address', 'application_protocol', 'source_mac_address', 'destiantion_mac_address', 'extensions', 'raw_event', 'source_country', 'destination_country', 'source_city', 'destination_city', 'sorce_geo_latitude', 'destination_geo_latitude', 'source_geo_longitude', 'destination_geo_longitude'], 'safe'],
         ];
     }
 
@@ -43,7 +43,7 @@ class EventsClusteredEventsSearch extends EventsClusteredEvents
     public function search($params)
     {
 
-        $query = EventsNormalized::find()->leftJoin('clustered_events_relations', 'clustered_events_relations.fk_event_id=events_normalized.id');
+        $query = SecurityEvents::find()->leftJoin('clustered_events_relations', 'clustered_events_relations.fk_event_id=security_events.id');
 
         // add conditions that should always apply here
 

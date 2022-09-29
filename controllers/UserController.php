@@ -205,12 +205,12 @@ class UserController extends Controller
             $model->rolesList = [1, 100];
             $model->email = 'root@localhost';
             if ($model->save(false))
-                echo 'done';
+                return('done');
             else
-                echo 'error';
+                return('error');
         }
         else
-            echo 'user allready exists';
+            return('user allready exists');
     }
 
     /**
