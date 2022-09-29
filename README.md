@@ -56,7 +56,7 @@ sudo ufw allow 443/tcp
 sudo ufw allow 514/tcp
 
 #Download SecMon repository
-git clone https://github.com/Miropanak/dockerized_secmon.git secmon
+git clone -b dockerized-secmon https://github.com/jlasti/secmon_backend.git secmon
 
 #Start preconfig script
 cd secmon
