@@ -1,57 +1,60 @@
 .tooltip {
-    background: #eee;
-    box-shadow: 0 0 5px #999999;
-    color: #333;
-    display: none;
-    font-size: 16px;
-    left: 130px;
-    padding: 5px;
-    position: absolute;
-    text-align: center;
-    top: 95px;
-    width: 150px;
-    z-index: 4;
+  background: #eee;
+  box-shadow: 0 0 5px #999999;
+  color: #333;
+  display: none;
+  font-size: 16px;
+  left: 130px;
+  padding: 5px;
+  position: absolute;
+  text-align: center;
+  top: 95px;
+  width: 150px;
+  z-index: 4;
 }
 
 .not-set {
-    color: #c55;
-    font-style: italic;
+  color: #c55;
+  font-style: italic;
 }
 
 /* add sorting icons to gridview sort links */
-a.asc:after, a.desc:after {
-    position: relative;
-    top: 1px;
-    display: inline-block;
-    font-family: 'Material Icons';
-    font-style: normal;
-    font-weight: normal;
-    line-height: 1;
-    padding-left: 5px;
+a.asc:after,
+a.desc:after {
+  position: relative;
+  top: 1px;
+  display: inline-block;
+  font-family: "Material Icons";
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  padding-left: 5px;
 }
 
 a.asc:after {
-    content: "\E5DB";
+  content: "\E5DB";
 }
 
 a.desc:after {
-    content: "\E5D8";
+  content: "\E5D8";
 }
 
 a.button {
-    -webkit-appearance: button;
-    -moz-appearance: button;
-    appearance: button;
+  -webkit-appearance: button;
+  -moz-appearance: button;
+  appearance: button;
 
-    text-decoration: none;
-    color: initial;
+  text-decoration: none;
+  color: initial;
 }
 
 body .side-nav {
   width: 250px;
   z-index: 2;
 }
-header, main, footer {
+header,
+main,
+footer {
   margin-left: 250px;
   transition: all 0.2s ease;
 }
@@ -65,62 +68,70 @@ body footer .material-icons {
   vertical-align: middle;
   margin-right: 5px;
 }
-.no-sidebar > header, .no-sidebar > main, .no-sidebar > footer {
+.no-sidebar > header,
+.no-sidebar > main,
+.no-sidebar > footer {
   margin-left: 0;
 }
 .no-sidebar .button-collapse.top-nav {
-    display: none;
+  display: none;
 }
-@media only screen and (max-width : 992px) {
-    header, main, footer {
-        margin-left: 0 !important;
-    }
-    .compact-button {
-      display: none;
-    }
-    nav .nav-wrapper {
-        text-align: center;
-    }
-    nav .nav-wrapper a.page-title {
-        font-size: 36px !important;
-    }
+@media only screen and (max-width: 992px) {
+  header,
+  main,
+  footer {
+    margin-left: 0 !important;
+  }
+  .compact-button {
+    display: none;
+  }
+  nav .nav-wrapper {
+    text-align: center;
+  }
+  nav .nav-wrapper a.page-title {
+    font-size: 36px !important;
+  }
 }
 
 nav .nav-wrapper {
-    position: relative;
-    height: 100%;
+  position: relative;
+  height: 100%;
 }
 nav.top-nav a.page-title {
-    line-height: 102px;
-    font-size: 36px;
+  line-height: 102px;
+  font-size: 36px;
 }
 nav.top-nav a.page-title .col {
-    padding-top: 27px;
+  padding-top: 27px;
 }
 nav.top-nav a.page-title .select-wrapper input {
-    font-size: 36px;    
-    border-bottom: 1px solid #fff;
+  font-size: 36px;
+  border-bottom: 1px solid #fff;
 }
 nav.top-nav a.page-title .select-wrapper .caret {
-    color: #fff;
+  color: #fff;
 }
-nav, nav .nav-wrapper i, nav a.button-collapse, nav a.button-collapse i {
-    height: 102px;
-    line-height: 102px;
+nav,
+nav .nav-wrapper i,
+nav a.button-collapse,
+nav a.button-collapse i {
+  height: 102px;
+  line-height: 102px;
 }
 body {
-    display: flex;
-    min-height: 100vh;
-    flex-direction: column;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
 }
 
 main {
-    position: relative;
-    flex: 1 0 auto;
+  position: relative;
+  flex: 1 0 auto;
 }
 main > .container {
-    padding-top: 35px;
+  padding-top: 35px;
 }
+
 .centered-horizontal {
   position: absolute;
   top: 0;
@@ -129,28 +140,28 @@ main > .container {
   transform: translate(-50%, -50%);
 }
 .main-actions > a {
-    margin: 0 5px;
+  margin: 0 5px;
 }
 .container {
-    width: 90% !important;
-    max-width: 100% !important;
+  width: 90% !important;
+  max-width: 100% !important;
 }
 .help-block {
-    color: #F44336;
+  color: #f44336;
 }
 
 .side-nav .userView {
-    padding: 1px 16px 0;
-    height: 102px;
+  padding: 1px 16px 0;
+  height: 102px;
 }
 .side-nav .userView .email {
-    padding-bottom: 0px;
+  padding-bottom: 0px;
 }
 .side-nav > li > a {
   padding: 0 16px;
 }
 body.compact .side-nav {
-    width: 56px !important;
+  width: 56px !important;
 }
 body.compact .side-nav .userView > a {
   visibility: hidden;
@@ -160,68 +171,70 @@ body.compact .side-nav .userView > a {
 }
 
 body.compact .side-nav .subheader {
-    display: none;
+  display: none;
 }
 
 body.compact .side-nav .userView {
-    padding: 1px 0;
+  padding: 1px 0;
 }
 body.compact header,
 body.compact main,
 body.compact footer {
-    margin-left: 56px; 
+  margin-left: 56px;
 }
 .side-nav {
   transition: all 0.2s ease;
 }
 
 button.white-text.btn-flat.logout-button {
-    font-weight: bolder;
-    text-transform: none;
-    padding: 0 5px;
-    margin-top: -20px;
-    margin-left: -21px;
-    width: 218px;
-    text-align: left;
+  font-weight: bolder;
+  text-transform: none;
+  padding: 0 5px;
+  margin-top: -20px;
+  margin-left: -21px;
+  width: 218px;
+  text-align: left;
 }
 button.white-text.btn-flat.logout-button:before {
-    content: "\e879";
-    font-family: 'Material Icons';
-    font-style: normal;
-    font-weight: normal;
-    float: left;
-    font-size: 24px;
-    margin: 0 16px;
+  content: "\e879";
+  font-family: "Material Icons";
+  font-style: normal;
+  font-weight: normal;
+  float: left;
+  font-size: 24px;
+  margin: 0 16px;
 }
 body.compact .side-nav button.white-text.btn-flat.logout-button {
-    padding-left: 22px;
+  padding-left: 22px;
 }
 .compact-button {
-    width: 40px;
-    height: 40px;
-    position: absolute;
-    top: 31px;
-    display: block;
-    box-shadow: 1px 2px 4px 0 rgba(0,0,0,0.16), 4px 2px 6px 0 rgba(0,0,0,0.12);
-    border-radius: 50%;
-    transform: translateX(-50%);
-    z-index: 3;
-    background-color: white;
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  top: 31px;
+  display: block;
+  box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.16),
+    4px 2px 6px 0 rgba(0, 0, 0, 0.12);
+  border-radius: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  background-color: white;
 }
 .compact-button i {
-    color: rgba(0,0,0,0.54);
-    width: inherit;
-    display: inline-block;
-    text-align: center;
-    font-size: 32px;
-    line-height: 40px;
+  color: rgba(0, 0, 0, 0.54);
+  width: inherit;
+  display: inline-block;
+  text-align: center;
+  font-size: 32px;
+  line-height: 40px;
 }
 .compact-button:hover {
-    background-color: #F3F3F3;
+  background-color: #f3f3f3;
 }
 body.compact .compact-button i {
-    transform: rotate(180deg);
-    box-shadow: -1px -2px 4px 0 rgba(0,0,0,0.16), -4px -2px 6px 0 rgba(0,0,0,0.12);
+  transform: rotate(180deg);
+  box-shadow: -1px -2px 4px 0 rgba(0, 0, 0, 0.16),
+    -4px -2px 6px 0 rgba(0, 0, 0, 0.12);
 }
 
 /*
@@ -234,15 +247,15 @@ body.compact .compact-button i {
   float: left;
   min-width: 60px;
   min-height: 60px;
-  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
   margin: 0 !important;
 }
 .card .card-content,
-.card .card-reveal{
+.card .card-reveal {
   padding: 0;
 }
 .card .card-header,
-.card .card-body{
+.card .card-body {
   padding: 10px;
 }
 .grid-item .card-header {
@@ -250,51 +263,61 @@ body.compact .compact-button i {
   position: relative;
 }
 .grid-item .card-header::before {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 42px;
-    bottom: 0;
-    content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 42px;
+  bottom: 0;
+  content: "";
 }
 .grid-item .card-header .card-title {
   font-size: 1.3rem;
   line-height: initial;
   font-weight: normal;
 }
-.gutter-sizer { width: 1%; }
+.gutter-sizer {
+  width: 1%;
+}
 .grid-sizer,
-.grid-item { width: 24%; }
-.grid-item.width2 { width: 49%; }
-.grid-item.width3 { width: 74%; }
-.grid-item.width4 { width: 100%; }
+.grid-item {
+  width: 24%;
+}
+.grid-item.width2 {
+  width: 49%;
+}
+.grid-item.width3 {
+  width: 74%;
+}
+.grid-item.width4 {
+  width: 100%;
+}
 /* Draggabilly adds is-dragging */
 .grid-item.is-dragging,
 /* Packery adds class while transitioning to drop position */
 .grid-item.is-positioning-post-drag {
-  background-color: rgba(0,0,0,0.05);
+  background-color: rgba(0, 0, 0, 0.05);
   z-index: 2; /* keep dragged item on top */
 }
 
 .grid-item.card .card-body {
-    min-height: 300px;
-    overflow: hidden;
+  min-height: 300px;
+  overflow: hidden;
 }
 .packery-drop-placeholder {
-  background-color: rgba(0,0,0,0.05);
+  background-color: rgba(0, 0, 0, 0.05);
   /* transition position changing */
   -webkit-transition: -webkit-transform 0.2s;
-          transition: transform 0.2s;
+  transition: transform 0.2s;
 }
 /* Line graph axis*/
 .axis--x path {
-    display: none;
+  display: none;
 }
 /* Line graph LINE*/
 .line {
-    fill: none;
-    stroke: steelblue;
-    stroke-width: 1.5px;
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
 }
 
 .preload * {
@@ -305,80 +328,115 @@ body.compact .compact-button i {
   transition: none !important;
 }
 
-.clickable-table table tbody tr, .close-modal, .component-row {
-    cursor: pointer;
+.clickable-table table tbody tr,
+.close-modal,
+.component-row {
+  cursor: pointer;
 }
 .clickable-table table tbody tr:hover {
-    background-color: rgba(0,0,0,0.1);
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .invisible {
-    visibility: hidden;
+  visibility: hidden;
 }
 
 .input-field.field-secrule-secconfigfile {
-    position: static;
+  position: static;
 }
 .input-field.field-normalizationrule-normalizationrulefile {
-    position: static;
+  position: static;
 }
 
 .file-field .help-block {
-    font-size: .8rem;
-    -webkit-transform: translateY(-50%);
-    transform: translateY(-50%);
-    margin-left: -30px;
+  font-size: 0.8rem;
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%);
+  margin-left: -30px;
 }
 
 /* Table style override */
-td, th {
-    padding: 5px;
-    font-size: 14px;
-    line-height: normal;
+td,
+th {
+  padding: 5px;
+  font-size: 14px;
+  line-height: normal;
 }
 
 .no-sidebar main .container {
-    width: 90% !important;
+  width: 90% !important;
 }
 
 main .container {
-    width: 96% !important;
+  width: 96% !important;
 }
 
-/* TODO zistti, ci sa pouziva a odstranit */ 
-.btn-primary{
-    margin-bottom: 5px;
+/* TODO zistti, ci sa pouziva a odstranit */
+.btn-primary {
+  margin-bottom: 5px;
 }
 
 #chartdiv {
-    width: 100%;
-    height: 90%;
+  width: 100%;
+  height: 90%;
 }
 /*************/
 
 .modal .dropdown-content {
-    position: relative !important;
-    max-height:200px !important;
+  position: relative !important;
+  max-height: 200px !important;
 }
 
 .modal {
-    max-height: 90%;
-    top: 5% !important;
+  max-height: 90%;
+  top: 5% !important;
+}
+
+#modalColumsSettings {
+  max-height: 70%;
+  top: 5% !important;
 }
 
 .profile-btn {
-    margin-left: -21px;
-    width: 218px;
-    background-color: transparent !important;
-    -webkit-transition: background-color 0.2s;
-    -moz-transition: background-color 0.2s;
-    -ms-transition: background-color 0.2s;
-    -o-transition: background-color 0.2s;
-    transition: background-color 0.2s;
+  margin-left: -21px;
+  width: 218px;
+  background-color: transparent !important;
+  -webkit-transition: background-color 0.2s;
+  -moz-transition: background-color 0.2s;
+  -ms-transition: background-color 0.2s;
+  -o-transition: background-color 0.2s;
+  transition: background-color 0.2s;
 }
 .profile-btn:hover {
-    background-color: rgba(0,0,0,0.1) !important;
+  background-color: rgba(0, 0, 0, 0.1) !important;
 }
 .profile-btn span {
-    margin-left: 20px;
+  margin-left: 20px;
+}
+
+.security-events-page-panel {
+  border: #333;
+}
+
+button.security-events-page-panel {
+  text-transform: none;
+}
+
+.caret {
+  display: none;
+}
+
+.filter-rule {
+  margin: 10px 0 5px 0;
+  padding: 5px 5px 5px 5px;
+  border-radius: 5px;
+  background-color: #d9d9d9;
+}
+
+.filter-rule p {
+  margin: 0;
+}
+
+div.chip {
+  cursor: pointer;
 }

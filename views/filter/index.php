@@ -25,7 +25,6 @@ $this->params['title'] = 'Filters';
                 ['class' => 'yii\grid\SerialColumn'],
 
                 'id',
-                'user_id',
                 'name',
 
                 ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn'],

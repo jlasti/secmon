@@ -42,6 +42,7 @@ class FilterSearch extends Filter
     public function search($params)
     {
         $query = Filter::find();
+        $userId = Yii::$app->user->getId();
 
         // add conditions that should always apply here
 
@@ -57,10 +58,19 @@ class FilterSearch extends Filter
             return $dataProvider;
         }
 
+        // Show only event filters without time filters
+        $query->andFilterWhere([
+            'user_id' => $userId,
+            'time_filter' => false,
+        ]);
+
+        $query->andFilterWhere([
+            'user_id' => $userId,
+        ]);
+
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'user_id' => $this->user_id,
         ]);
 
         $query->andFilterWhere(['like', 'name', $this->name]);

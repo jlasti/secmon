@@ -50,7 +50,7 @@ ptype=regexp
 continue=dontcont
 pattern=^([1-9]|[1-9][0-9]|1[0-8][0-9]|19[01]) ([A-Za-z0-9: ]*) (\S+) sshd\[(\d+)\]: Accepted (password|publickey) for (\S+) from (.*) port (\d+) ssh2([A-Za-z0-9: ]*)$
 desc=$2 ssh login to $3 from $7 for user $6 on port $8
-action=write /var/log/secmon/__secInput $2 $3 CEF:0|Linux|sshd|0|134|Sucess login|$1|src=$7 spt=$8 outcome=success app=SSHv2 destinationServiceName=sshd duser=$6 dpid=$4 reason=$5$9 rawEvent=$0
+action=write /var/log/secmon/__secInput $2 $3 CEF:0|Linux|sshd|0|134|Success login|$1|src=$7 spt=$8 outcome=success app=SSHv2 destinationServiceName=sshd duser=$6 dpid=$4 reason=$5$9 rawEvent=$0
 
 # !!! ZATIAL NEFUNKCNE !!!
 #type=single

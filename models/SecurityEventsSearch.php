@@ -34,20 +34,25 @@ class SecurityEventsSearch extends SecurityEvents
     }
 
     /**
-     * Creates data provider instance with search query applied
+     * Creates data provider instance with selected filter and search query applied
      *
      * @param array $params
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params, $filterId, $timeFilterId)
     {
         $query = SecurityEvents::find();
+        $filter = Filter::findOne(['id' => $filterId]);
+        $timeFilterId = Filter::findOne(['id' => $timeFilterId]);
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => [
+                'pageSize' => 10,
+            ],
         ]);
 
         $this->load($params);
@@ -56,6 +61,14 @@ class SecurityEventsSearch extends SecurityEvents
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
             return $dataProvider;
+        }
+
+        if (!empty($filter)) {
+            $query->applyFilter($filter);
+        }
+
+        if (!empty($timeFilterId)) {
+            $query->applyFilter($timeFilterId);
         }
 
         // grid filtering conditions
@@ -234,6 +247,9 @@ class SecurityEventsSearch extends SecurityEvents
             ->andFilterWhere(['ilike', 'parent_events', $this->parent_events])
             ->andFilterWhere(['ilike', 'cef_extensions', $this->cef_extensions])
             ->andFilterWhere(['ilike', 'raw_event', $this->raw_event]);
+        
+        $query->all();
+
 
         return $dataProvider;
     }

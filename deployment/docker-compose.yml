@@ -9,6 +9,7 @@ services:
     restart: always
     ports:
       - 8080:80
+      - 8443:443
     volumes:
       - .:/var/www/html/secmon
       - /var/log/secmon:/var/log/secmon
