@@ -282,8 +282,6 @@ if($securityEventsPage->auto_refresh)
     </div>    
 </div>
 
-<button type="button" id="table-cell-button-1-id-8" operator="AND" negation="false" value="10.10.19.168" onclick="submitAddToFilterForm()">AND is 10.10.19.168</button>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
 <script src="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.js"></script>
 <link href="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.css" rel="stylesheet">
@@ -362,78 +360,78 @@ if($securityEventsPage->auto_refresh)
         $.post("/secmon/web/security-events/update-selected-columns", {value:selectedColumns});
     });
 
+
     //bude treba dat event na spustenie aj pri prekliknuti page
+    // TODO co ked je filter event prazdny??
 
     const tableBody = document.getElementsByTagName("tbody")[0];
     const columnsList = document.querySelectorAll('[data-sort]');
     const tableRowsLength = tableBody.getElementsByTagName("tr").length;
     var tableCells = tableBody.getElementsByTagName("td");
-
-    alert(columnsList[1].getAttribute('data-sort').replace('-', ''));
-    // Create hidden element for add attribute to event filter
-    // TODO co ked je filter event prazdny??
-    addHoverElementOnTableCells(tableCells[4], 4, columnsList[4].getAttribute('data-sort').replace('-', ''));
-    addHoverElementOnTableCells(tableCells[5], 5, columnsList[5].getAttribute('data-sort').replace('-', ''));
-    addHoverElementOnTableCells(tableCells[6], 6, columnsList[6].getAttribute('data-sort').replace('-', ''));
-
-
-
     
-    //tableCells[0].innerHTML = "Milk";
-    // for each cyklus, s tym ze vzdy musi vynechat cisla
 
-    //Jquery hover on element with id
+    addHoverElementOnTableCells(tableCells, columnsList, tableRowsLength);
 
-    // Add Hover Elements on each cell in table
-    function addHoverElementOnTableCells(cell, id, column) {
+    /*$( "#pagination > ul > li" ).on("click", function () {
+        addHoverElementOnTableCells(tableCells, columnsList, tableRowsLength)
+    });
+
+    $('span').on("click"), function () {
+        alert('hello');
+        var element = getElementById('#table-cell-window-5')
+        show(element, 'inline-block');   
+    }*/
+
+    function addHoverElementOnTableCells(rawTableCells, columnsList, tableRowsLength) {
+        console.log(rawTableCells);
+        var tableCells = [];
+        const numberOfCells = rawTableCells.length;
+
+        // Create new array of table cells without cells in last column with detailed view
+        for (let index = 0; index < numberOfCells; index++) {
+            if((index % (columnsList.length + 2) != 0 && index % (columnsList.length + 2) != columnsList.length + 1 )){
+                tableCells.push(rawTableCells[index]); 
+            }
+        }
+
+        for (let index = 0; index < tableCells.length; ++index) {
+            idx = index % columnsList.length;
+            column = columnsList[idx].getAttribute('data-sort').replace('-', '');
+            addHoverElementOnTableCell(tableCells[index], index, column);
+        }
+    }
+
+    function addHoverElementOnTableCell(cell, id, column) {
         cellContent = cell.textContent;
 
-        $('<div class="table-cell-window" id="table-cell-window' + id +'">\
-            <p>Add to filter: </p>\
+        /*<span class="add-filter-button glyphicon glyphicon-plus-sign"></span>*/
+        $('<div class="table-cell-window" id="table-cell-window-' + id +'">\
+            <p>Add to filter:</p>\
+            <form action="/secmon/web/security-events/add-attribute-to-filter" method="post">\
+            <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />\
+            <input type="hidden" name="operator" value="AND">\
+            <input type="hidden" name="negation" value=false>\
+            <input type="hidden" name="value" value="' + cellContent + '">\
+            <input type="hidden" name="column" value="' + column + '">\
+            <input type="submit" value="+ AND is ' + cellContent + '">\
+            </form>\
+            <form action="/secmon/web/security-events/add-attribute-to-filter" method="post">\
+            <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />\
+            <input type="hidden" name="operator" value="AND">\
+            <input type="hidden" name="negation" value=true>\
+            <input type="hidden" name="value" value="' + cellContent + '">\
+            <input type="hidden" name="column" value="' + column + '">\
+            <input type="submit" value="+ AND is not ' + cellContent + '">\
+            </form>\
+            <form action="/secmon/web/security-events/add-attribute-to-filter" method="post">\
+            <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />\
+            <input type="hidden" name="operator" value="OR">\
+            <input type="hidden" name="negation" value=false>\
+            <input type="hidden" name="value" value="' + cellContent + '">\
+            <input type="hidden" name="column" value="' + column + '">\
+            <input type="submit" value="+ OR is ' + cellContent + '">\
+            </form>\
             </div>').appendTo(cell);
-
-        var btn1 = $('<button />', {
-            type : 'button',
-            id : 'table-cell-button-1-id-' + id,
-            text : 'AND is ' + cellContent,
-            operator: 'AND',
-            negation: false,
-            value : cellContent,
-            columnName: column,
-            on    : {
-                click: submitAddToFilterForm
-            }
-          }).appendTo('#table-cell-window' + id);
-          
-        $('<br>').appendTo('#table-cell-window' + id);
-          
-        var btn1 = $('<button />', {
-            type : 'button',
-            id : 'table-cell-button-2-id-' + id,
-            text : 'AND is not ' + cellContent,
-            operator: 'AND',
-            negation: true,
-            value : cellContent,
-            columnName: column,
-            on    : {
-                click: submitAddToFilterForm
-            }
-          }).appendTo('#table-cell-window' + id);
-        
-        $('<br>').appendTo('#table-cell-window' + id);
-        
-        var btn1 = $('<button />', {
-            type : 'button',
-            id : 'table-cell-button-3-id-' + id,
-            text : 'OR is ' + cellContent,
-            operator: 'OR',
-            negation: false,
-            value : cellContent,
-            columnName: column,
-            on    : {
-                click: submitAddToFilterForm
-            }
-          }).appendTo('#table-cell-window' + id);
     }
 
     function extractColumnsFromChips() {
@@ -458,25 +456,5 @@ if($securityEventsPage->auto_refresh)
     function showRelativeTimeForm() {
         $("#absoluteTimeForm").hide();
         $("#relativeTimeForm").show();
-    }
-
-    function submitAddToFilterForm() {
-        $.ajax({
-            type: "POST",
-            url: 'security-events/add-attribute-to-filter',
-            data: JSON.stringify({ 
-                opperator: $(this).attr('operator'),
-                negation: $(this).attr('negation'),
-                value: $(this).attr('value'),
-                columnName: $(this).attr('columnName'),
-            }),
-            contentType: "application/json",
-            success: function (result) {
-                console.log(result);
-            },
-            error: function (result, status) {
-                console.log(result);
-            },
-        });
     }
 </script>
