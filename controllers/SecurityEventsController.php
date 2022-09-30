@@ -420,6 +420,72 @@ class SecurityEventsController extends Controller
 
     public function actionAddAttributeToFilter()
     {
-        return 10;
+        $userId = Yii::$app->user->getId();
+        $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
+        
+        if(Yii::$app->request->post() && $securityEventsPage) {
+            $logicOperator = Yii::$app->request->post('operator');
+            $negation = Yii::$app->request->post('negation');
+            $value = Yii::$app->request->post('value');
+            $column = Yii::$app->request->post('column');
+
+            // If none Event Filter is Applied, therefore new Filter need to be created
+            if(empty($securityEventsPage->filter_id))
+            {
+                // Create new Event Filter
+                $eventFilter = new Filter();
+                $eventFilter->user_id = $userId;
+                $eventFilter->name = $column . '_' . time();
+                $eventFilter->insert();
+
+                // Create Event Filter Rule
+                $eventFilterRule = new FilterRule();
+                $eventFilterRule->filter_id = $eventFilter->id;
+                
+                if($column == 'datetime')
+                    $eventFilterRule->type = 'date';
+                else
+                    $eventFilterRule->type = 'compare';
+                
+                if($negation == 'true')
+                    $eventFilterRule->operator = '!=';
+                else
+                    $eventFilterRule->operator = '=';
+
+                $eventFilterRule->value = $value;
+                $eventFilterRule->position = 0;
+                $eventFilterRule->column = $column;
+                $eventFilterRule->save();
+
+                // Update Security Events Page Settings
+                $securityEventsPage->filter_id = $eventFilter->id;
+                $securityEventsPage->update();
+            }
+            else
+            {
+                $eventFilterRules = FilterRule::findAll(['filter_id' => $securityEventsPage->filter_id]);
+
+                // Create Event Filter Rule
+                $eventFilterRule = new FilterRule();
+                $eventFilterRule->filter_id = $securityEventsPage->filter_id;
+                
+                if($column == 'datetime')
+                    $eventFilterRule->type = 'date';
+                else
+                    $eventFilterRule->type = 'compare';
+                
+                if($negation == 'true')
+                    $eventFilterRule->operator = '!=';
+                else
+                    $eventFilterRule->operator = '=';
+
+                $eventFilterRule->logic_operator = $logicOperator;
+                $eventFilterRule->value = $value;
+                $eventFilterRule->position = count($eventFilterRules);
+                $eventFilterRule->column = $column;
+                $eventFilterRule->save();
+            }
+        }
+        return $this->redirect(['security-events/index']);
     }
 }
