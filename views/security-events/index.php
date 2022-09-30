@@ -389,8 +389,8 @@ if($securityEventsPage->auto_refresh)
         div.setAttribute("id", "table-cell-" + id);
 
         // Create Header element
-        //var header = document.createElement("p");
-        //header.appendChild(document.createTextNode("Add to filter: "));
+        var header = document.createElement("p");
+        header.appendChild(document.createTextNode("Add to filter: "));
 
         // Create Link elements
         var andIsLink = document.createElement("a");
@@ -404,7 +404,7 @@ if($securityEventsPage->auto_refresh)
         andIsNotLink.appendChild(document.createTextNode("AND is not " + cell.textContent));
         orIsLink.appendChild(document.createTextNode("OR is " + cell.textContent));
 
-        //div.appendChild(header);
+        div.appendChild(header);
         div.appendChild(andIsLink);
         div.appendChild(document.createElement("br"));
         div.appendChild(andIsNotLink);

@@ -452,8 +452,10 @@ div.chip {
 .table-cell-window {
   background: none repeat scroll 0 0 #eeeeee;
   border: 1px solid #dadada;
+  border-radius: 3% 3% 5% 5%;
+  padding: 5px;
   color: #333333;
-  width: 150px;
+  width: fit-content;
   height: 0;
   overflow: hidden;
   line-height: 20px;
@@ -464,9 +466,14 @@ div.chip {
   -o-transition: all 0.3s ease;
   transition: all 0.3s ease;
 }
+
 td:hover > .table-cell-window {
   display: block;
   position: absolute;
   left: inherit;
   height: inherit;
+}
+
+.table-cell-window p {
+  font-weight: bold;
 }
