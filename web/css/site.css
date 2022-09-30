@@ -444,3 +444,29 @@ div.chip {
 .table-cell-window {
   display: none;
 }
+
+/*td:hover > .table-cell-window {
+  display: block;
+}*/
+
+.table-cell-window {
+  background: none repeat scroll 0 0 #eeeeee;
+  border: 1px solid #dadada;
+  color: #333333;
+  width: 150px;
+  height: 0;
+  overflow: hidden;
+  line-height: 20px;
+  position: absolute;
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+td:hover > .table-cell-window {
+  display: block;
+  position: absolute;
+  left: inherit;
+  height: inherit;
+}
