@@ -440,3 +440,7 @@ button.security-events-page-panel {
 div.chip {
   cursor: pointer;
 }
+
+.table-cell-window {
+  display: none;
+}
