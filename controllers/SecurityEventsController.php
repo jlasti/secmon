@@ -442,8 +442,10 @@ class SecurityEventsController extends Controller
                 $eventFilterRule = new FilterRule();
                 $eventFilterRule->filter_id = $eventFilter->id;
                 
-                if($column == 'datetime')
+                if($column == 'datetime'){
                     $eventFilterRule->type = 'date';
+                    $value = substr($value, 0, -3);
+                }
                 else
                     $eventFilterRule->type = 'compare';
                 
@@ -469,8 +471,10 @@ class SecurityEventsController extends Controller
                 $eventFilterRule = new FilterRule();
                 $eventFilterRule->filter_id = $securityEventsPage->filter_id;
                 
-                if($column == 'datetime')
+                if($column == 'datetime'){
                     $eventFilterRule->type = 'date';
+                    $value = substr($value, 0, -3);
+                }
                 else
                     $eventFilterRule->type = 'compare';
                 
