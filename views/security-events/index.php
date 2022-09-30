@@ -118,7 +118,17 @@ if($securityEventsPage->auto_refresh)
             <?= Html::endForm(); ?>
             <?= Html::a("<i class='material-icons'>add</i>", ['filter/create', 'securityEventsPage' => true], ['class' => 'btn btn-success', 'title' => 'Create new filter']) ?>
             <?= Html::a("<i class='material-icons'>edit</i>", ['filter/update', 'id' => $selectedFilterId, 'securityEventsPage' => true], ['class' => 'btn btn-success', 'title' => 'Edit selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]); ?>
-            <?= Html::a("<i class='material-icons'>delete</i>", ['remove-selected-filter'], ['class' => 'btn btn-danger', 'style' => 'background-color: red;', 'title' => 'Remove selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]) ?>
+            <?= Html::a("<i class='material-icons'>delete</i>", ['remove-selected-filter'], ['class' => 'btn btn-danger', 'style' => 'background-color: orange;', 'title' => 'Remove selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]) ?>
+            <?= Html::a("<i class='material-icons'>delete</i>",
+                ['delete-selected-filter'],
+                ['class' => 'btn btn-danger',
+                'style' => 'background-color: red;',
+                'title' => 'Delete selected filter',
+                'disabled' => !empty($selectedFilter) ? false : true ,
+                'data' => [
+                    'confirm' => Yii::t('app', 'Filter will be permanently deleted! Are you sure you want to delete this item?'),
+                ],
+                ]) ?>
             <div <?= $selectedFilterId ? 'class="filter-rule"' : ''?>>
                 <p>
                     <?php
@@ -372,18 +382,11 @@ if($securityEventsPage->auto_refresh)
 
     addHoverElementOnTableCells(tableCells, columnsList, tableRowsLength);
 
-    /*$( "#pagination > ul > li" ).on("click", function () {
+    $( "#pagination > ul > li" ).on("click", function () {
         addHoverElementOnTableCells(tableCells, columnsList, tableRowsLength)
     });
 
-    $('span').on("click"), function () {
-        alert('hello');
-        var element = getElementById('#table-cell-window-5')
-        show(element, 'inline-block');   
-    }*/
-
     function addHoverElementOnTableCells(rawTableCells, columnsList, tableRowsLength) {
-        console.log(rawTableCells);
         var tableCells = [];
         const numberOfCells = rawTableCells.length;
 
