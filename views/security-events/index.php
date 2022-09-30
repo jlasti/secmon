@@ -360,6 +360,58 @@ if($securityEventsPage->auto_refresh)
         $.post("/secmon/web/security-events/update-selected-columns", {value:selectedColumns});
     });
 
+    //bude treba dat event na spustenie aj pri prekliknuti page
+
+    const tableBody = document.getElementsByTagName("tbody")[0];
+    const columnsList = document.querySelectorAll('[data-sort]');
+    const tableRowsLength = tableBody.getElementsByTagName("tr").length;
+    var tableCells = tableBody.getElementsByTagName("td");
+
+    // Create hidden element for add attribute to event filter
+    // TODO co ked je filter event prazdny??
+    addHoverElementOnTableCells(tableCells[4], 4);
+
+
+
+    
+    //tableCells[0].innerHTML = "Milk";
+    // for each cyklus, s tym ze vzdy musi vynechat cisla
+
+    //Jquery hover on element with id
+
+    // Add Hover Elements on each cell in table
+    function addHoverElementOnTableCells(cell, id) {
+        var div = document.createElement("div");
+        //div.classList.add("table-cell-window");
+        div.setAttribute("id", "table-cell-" + id);
+
+        // Create Header element
+        var header = document.createElement("p");
+        header.appendChild(document.createTextNode("Add to filter: "));
+
+        // Create Link elements
+        var andIsLink = document.createElement("a");
+        var andIsNotLink = document.createElement("a");
+        var orIsLink = document.createElement("a");
+
+        // Post action
+        andIsLink.setAttribute("href", "#");
+
+        andIsLink.appendChild(document.createTextNode("AND is " + cell.textContent));
+        andIsNotLink.appendChild(document.createTextNode("AND is not " + cell.textContent));
+        orIsLink.appendChild(document.createTextNode("OR is " + cell.textContent));
+
+        div.appendChild(header);
+        div.appendChild(andIsLink);
+        div.appendChild(document.createElement("br"));
+        div.appendChild(andIsNotLink);
+        div.appendChild(document.createElement("br"));
+        div.appendChild(orIsLink);
+
+        cell.appendChild(div);
+
+    }
+
     function extractColumnsFromChips() {
         const chipsTable = document.getElementById("chipstable");
         const elements = chipsTable.getElementsByClassName('chip');
