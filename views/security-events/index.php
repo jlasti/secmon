@@ -282,6 +282,8 @@ if($securityEventsPage->auto_refresh)
     </div>    
 </div>
 
+<button type="button" id="table-cell-button-1-id-8" operator="AND" negation="false" value="10.10.19.168" onclick="submitAddToFilterForm()">AND is 10.10.19.168</button>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
 <script src="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.js"></script>
 <link href="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.css" rel="stylesheet">
@@ -384,35 +386,51 @@ if($securityEventsPage->auto_refresh)
 
     // Add Hover Elements on each cell in table
     function addHoverElementOnTableCells(cell, id) {
-        var div = document.createElement("div");
-        div.classList.add("table-cell-window");
-        div.setAttribute("id", "table-cell-" + id);
+        cellContent = cell.textContent;
 
-        // Create Header element
-        var header = document.createElement("p");
-        header.appendChild(document.createTextNode("Add to filter: "));
+        $('<div class="table-cell-window" id="table-cell-window' + id +'">\
+            <p>Add to filter: </p>\
+            </div>').appendTo(cell);
 
-        // Create Link elements
-        var andIsLink = document.createElement("a");
-        var andIsNotLink = document.createElement("a");
-        var orIsLink = document.createElement("a");
-
-        // Post action
-        andIsLink.setAttribute("href", "#");
-
-        andIsLink.appendChild(document.createTextNode("AND is " + cell.textContent));
-        andIsNotLink.appendChild(document.createTextNode("AND is not " + cell.textContent));
-        orIsLink.appendChild(document.createTextNode("OR is " + cell.textContent));
-
-        div.appendChild(header);
-        div.appendChild(andIsLink);
-        div.appendChild(document.createElement("br"));
-        div.appendChild(andIsNotLink);
-        div.appendChild(document.createElement("br"));
-        div.appendChild(orIsLink);
-
-        cell.appendChild(div);
-
+        var btn1 = $('<button />', {
+            type : 'button',
+            id : 'table-cell-button-1-id-' + id,
+            text : 'AND is ' + cellContent,
+            operator: 'AND',
+            negation: false,
+            value : cellContent,
+            on    : {
+                click: submitAddToFilterForm
+            }
+          }).appendTo('#table-cell-window' + id);
+          
+        $('<br>').appendTo('#table-cell-window' + id);
+          
+        var btn1 = $('<button />', {
+            type : 'button',
+            id : 'table-cell-button-2-id-' + id,
+            text : 'AND is not ' + cellContent,
+            operator: 'AND',
+            negation: true,
+            value : cellContent,
+            on    : {
+                click: submitAddToFilterForm
+            }
+          }).appendTo('#table-cell-window' + id);
+        
+        $('<br>').appendTo('#table-cell-window' + id);
+        
+        var btn1 = $('<button />', {
+            type : 'button',
+            id : 'table-cell-button-3-id-' + id,
+            text : 'OR is ' + cellContent,
+            operator: 'OR',
+            negation: false,
+            value : cellContent,
+            on    : {
+                click: submitAddToFilterForm
+            }
+          }).appendTo('#table-cell-window' + id);
     }
 
     function extractColumnsFromChips() {
@@ -437,5 +455,25 @@ if($securityEventsPage->auto_refresh)
     function showRelativeTimeForm() {
         $("#absoluteTimeForm").hide();
         $("#relativeTimeForm").show();
+    }
+
+    function submitAddToFilterForm() {
+        $.ajax({
+            type: "POST",
+            url: 'security-events/add-attribute-to-filter',
+            data: JSON.stringify({ 
+                opperator: $(this).attr('operator'),
+                negation: $(this).attr('negation'),
+                value: $(this).attr('value'),
+                column: "TODO"
+            }),
+            contentType: "application/json",
+            success: function (result) {
+                console.log(result);
+            },
+            error: function (result, status) {
+                console.log(result);
+            },
+        });
     }
 </script>

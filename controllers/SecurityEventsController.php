@@ -417,4 +417,9 @@ class SecurityEventsController extends Controller
         }
         return $this->redirect(['security-events/index']);
     }
+
+    public function actionAddAttributeToFilter()
+    {
+        return 10;
+    }
 }
