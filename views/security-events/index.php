@@ -294,11 +294,11 @@ if($securityEventsPage->auto_refresh)
     if($('input[name="timeFilterType"]:checked').val() == 'relative'){
         showRelativeTimeForm();
     }
-        
 
     // Create relative time form editable
     $('#relativeTimeFormSelect').editableSelect();
 
+    // Create sortable chips for security events table
     var $sortableChips = $( "#chipstable" );
     $sortableChips.sortable();
 
@@ -318,7 +318,7 @@ if($securityEventsPage->auto_refresh)
         }
     });
     
-    // Create new column chip based on selected from dropdown list
+    // Create new column chip based on selected chip from dropdown list
     $("#addColumn").on("click", function (event) {
         // Get selected Column value
         var element = document.getElementById("selectColumnDropdown");
