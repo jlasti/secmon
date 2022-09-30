@@ -369,12 +369,12 @@ if($securityEventsPage->auto_refresh)
     const tableRowsLength = tableBody.getElementsByTagName("tr").length;
     var tableCells = tableBody.getElementsByTagName("td");
 
+    alert(columnsList[1].getAttribute('data-sort').replace('-', ''));
     // Create hidden element for add attribute to event filter
     // TODO co ked je filter event prazdny??
-    addHoverElementOnTableCells(tableCells[4], 4);
-    addHoverElementOnTableCells(tableCells[5], 5);
-    addHoverElementOnTableCells(tableCells[6], 6);
-    addHoverElementOnTableCells(tableCells[7], 7);
+    addHoverElementOnTableCells(tableCells[4], 4, columnsList[4].getAttribute('data-sort').replace('-', ''));
+    addHoverElementOnTableCells(tableCells[5], 5, columnsList[5].getAttribute('data-sort').replace('-', ''));
+    addHoverElementOnTableCells(tableCells[6], 6, columnsList[6].getAttribute('data-sort').replace('-', ''));
 
 
 
@@ -385,7 +385,7 @@ if($securityEventsPage->auto_refresh)
     //Jquery hover on element with id
 
     // Add Hover Elements on each cell in table
-    function addHoverElementOnTableCells(cell, id) {
+    function addHoverElementOnTableCells(cell, id, column) {
         cellContent = cell.textContent;
 
         $('<div class="table-cell-window" id="table-cell-window' + id +'">\
@@ -399,6 +399,7 @@ if($securityEventsPage->auto_refresh)
             operator: 'AND',
             negation: false,
             value : cellContent,
+            columnName: column,
             on    : {
                 click: submitAddToFilterForm
             }
@@ -413,6 +414,7 @@ if($securityEventsPage->auto_refresh)
             operator: 'AND',
             negation: true,
             value : cellContent,
+            columnName: column,
             on    : {
                 click: submitAddToFilterForm
             }
@@ -427,6 +429,7 @@ if($securityEventsPage->auto_refresh)
             operator: 'OR',
             negation: false,
             value : cellContent,
+            columnName: column,
             on    : {
                 click: submitAddToFilterForm
             }
@@ -465,7 +468,7 @@ if($securityEventsPage->auto_refresh)
                 opperator: $(this).attr('operator'),
                 negation: $(this).attr('negation'),
                 value: $(this).attr('value'),
-                column: "TODO"
+                columnName: $(this).attr('columnName'),
             }),
             contentType: "application/json",
             success: function (result) {
