@@ -119,17 +119,7 @@ if($securityEventsPage->auto_refresh)
             <?= Html::a("<i class='material-icons'>add</i>", ['filter/create', 'securityEventsPage' => true], ['class' => 'btn btn-success', 'title' => 'Create new filter']) ?>
             <?= Html::a("<i class='material-icons'>edit</i>", ['filter/update', 'id' => $selectedFilterId, 'securityEventsPage' => true], ['class' => 'btn btn-success', 'title' => 'Edit selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]); ?>
             <?= Html::a("<i class='material-icons'>delete</i>", ['remove-selected-filter'], ['class' => 'btn btn-danger', 'style' => 'background-color: orange;', 'title' => 'Remove selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]) ?>
-            <?= Html::a("<i class='material-icons'>delete</i>",['delete-selected-filter'],
-                [
-                    'class' => 'btn btn-danger',
-                    'style' => 'background-color: red;',
-                    'title' => 'Delete selected filter',
-                    'disabled' => !empty($selectedFilter) ? false : true ,
-                    'data' => [
-                        'confirm' => Yii::t('app', 'Filter will be permanently deleted! Are you sure you want to delete this item?'),
-                    ],
-                ])
-            ?>
+            <?= Html::a("<i class='material-icons'>delete</i>", ['delete-selected-filter'], ['class' => 'btn btn-danger', 'style' => 'background-color: red;', 'title' => 'Remove selected filter', 'disabled' => !empty($selectedFilter) ? false : true]) ?>
             <div <?= $selectedFilterId ? 'class="filter-rule"' : ''?>>
                 <p>
                     <?php
@@ -233,7 +223,7 @@ if($securityEventsPage->auto_refresh)
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
                 'filterModel' => $searchModel,
-                'layout' => '{items}<div id="pagination">{pager}</div>',
+                'layout' => '{items}<div id="pagination" onclick="location.reload()">{pager}</div>',
                 'tableOptions' => [
                     'id' => 'eventsContent',
                     'class' => 'responsive-table striped'
@@ -371,26 +361,16 @@ if($securityEventsPage->auto_refresh)
         $.post("/secmon/web/security-events/update-selected-columns", {value:selectedColumns});
     });
 
+    addHoverElementOnTableCells();
 
-    //bude treba dat event na spustenie aj pri prekliknuti page
-    // TODO co ked je filter event prazdny??
-
-    const tableBody = document.getElementsByTagName("tbody")[0];
-    const columnsList = document.querySelectorAll('[data-sort]');
-    const tableRowsLength = tableBody.getElementsByTagName("tr").length;
-    var tableCells = tableBody.getElementsByTagName("td");
-    
-
-    addHoverElementOnTableCells(tableCells, columnsList, tableRowsLength);
-
-    $( "#pagination > ul > li" ).on("click", function () {
-        addHoverElementOnTableCells(tableCells, columnsList, tableRowsLength)
-    });
-
-    function addHoverElementOnTableCells(rawTableCells, columnsList, tableRowsLength) {
-        var tableCells = [];
+    function addHoverElementOnTableCells() {
+        const tableBody = document.getElementsByTagName("tbody")[0];
+        const columnsList = document.querySelectorAll('[data-sort]');
+        const tableRowsLength = tableBody.getElementsByTagName("tr").length;
+        const rawTableCells = tableBody.getElementsByTagName("td");
         const numberOfCells = rawTableCells.length;
-
+        var tableCells = [];
+    
         // Create new array of table cells without cells in last column with detailed view
         for (let index = 0; index < numberOfCells; index++) {
             if((index % (columnsList.length + 2) != 0 && index % (columnsList.length + 2) != columnsList.length + 1 )){
@@ -401,15 +381,15 @@ if($securityEventsPage->auto_refresh)
         for (let index = 0; index < tableCells.length; ++index) {
             idx = index % columnsList.length;
             column = columnsList[idx].getAttribute('data-sort').replace('-', '');
-            addHoverElementOnTableCell(tableCells[index], index, column);
+            addHoverElementOnTableCell(tableCells[index], column);
         }
     }
 
-    function addHoverElementOnTableCell(cell, id, column) {
+    function addHoverElementOnTableCell(cell, column) {
         cellContent = cell.textContent;
-
+        alert(cellContent);
         /*<span class="add-filter-button glyphicon glyphicon-plus-sign"></span>*/
-        $('<div class="table-cell-window" id="table-cell-window-' + id +'">\
+        $('<div class="table-cell-window">\
             <p>Add to filter:</p>\
             <form action="/secmon/web/security-events/add-attribute-to-filter" method="post">\
             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />\
