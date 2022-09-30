@@ -370,6 +370,9 @@ if($securityEventsPage->auto_refresh)
     // Create hidden element for add attribute to event filter
     // TODO co ked je filter event prazdny??
     addHoverElementOnTableCells(tableCells[4], 4);
+    addHoverElementOnTableCells(tableCells[5], 5);
+    addHoverElementOnTableCells(tableCells[6], 6);
+    addHoverElementOnTableCells(tableCells[7], 7);
 
 
 
@@ -382,12 +385,12 @@ if($securityEventsPage->auto_refresh)
     // Add Hover Elements on each cell in table
     function addHoverElementOnTableCells(cell, id) {
         var div = document.createElement("div");
-        //div.classList.add("table-cell-window");
+        div.classList.add("table-cell-window");
         div.setAttribute("id", "table-cell-" + id);
 
         // Create Header element
-        var header = document.createElement("p");
-        header.appendChild(document.createTextNode("Add to filter: "));
+        //var header = document.createElement("p");
+        //header.appendChild(document.createTextNode("Add to filter: "));
 
         // Create Link elements
         var andIsLink = document.createElement("a");
@@ -401,7 +404,7 @@ if($securityEventsPage->auto_refresh)
         andIsNotLink.appendChild(document.createTextNode("AND is not " + cell.textContent));
         orIsLink.appendChild(document.createTextNode("OR is " + cell.textContent));
 
-        div.appendChild(header);
+        //div.appendChild(header);
         div.appendChild(andIsLink);
         div.appendChild(document.createElement("br"));
         div.appendChild(andIsNotLink);
