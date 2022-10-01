@@ -442,14 +442,7 @@ div.chip {
 }
 
 .table-cell-window {
-  display: none;
-}
-
-/*td:hover > .table-cell-window {
-  display: block;
-}*/
-
-.table-cell-window {
+  visibility: hidden;
   background: none repeat scroll 0 0 #eeeeee;
   border: 1px solid #dadada;
   border-radius: 3% 3% 5% 5%;
@@ -460,18 +453,14 @@ div.chip {
   overflow: hidden;
   line-height: 20px;
   position: absolute;
-  -webkit-transition: all 1.3s ease;
-  -moz-transition: all 1.3s ease;
-  -ms-transition: all 1.3s ease;
-  -o-transition: all 1.3s ease;
-  transition: all 1.3s ease;
 }
 
 td:hover > .table-cell-window {
-  display: block;
+  visibility: visible;
   position: absolute;
   left: inherit;
   height: inherit;
+  transition: all 0.4s 1s ease;
 }
 
 .table-cell-window p {
