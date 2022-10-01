@@ -251,7 +251,7 @@ if($securityEventsPage->auto_refresh)
 </div>
 
 <a href="#modalColumsSettings" class="btn-floating waves-effect waves-light btn-small blue"
-    style="position:absolute; top: 30px; right: 40px; display: 'block' ?>" data-toggle="tooltip" data-placement="bottom" title="Columns settings">
+    style="position:absolute; top: 200px; right: 40px; display: 'block' ?>" data-toggle="tooltip" data-placement="bottom" title="Columns settings">
     <i class="material-icons">settings</i>
 </a>
 
@@ -475,3 +475,28 @@ if($securityEventsPage->auto_refresh)
     });
 
 </script>
+
+<!-- druhy pristup na pridavanie attributu do filtra
+<div class="table-cell-window-tmp" style="width: 10%">
+    <div class="row">
+        <div class="col" style="width: 30%; padding: 0;">   
+            <select class="form-select form-select-sm" aria-label=".form-select-sm logic-operator" style="text-align-last:center;">
+                <option value="AND" selected >AND</option>
+                <option value="OR">OR</option>
+            </select>
+        </div>
+        <div class="col" style="width: 15%; padding: 0;"> 
+            <select class="form-select form-select-sm" aria-label=".form-select-sm operator" style="horizontal-align: middle">
+                <option value="=" selected>=</option>
+                <option value="!=">!=</option>
+                <option value=">" >></option>
+                <option value="<"><</option>
+                <option value=">=" >>=</option>
+                <option value="<="><=</option>
+            </select>
+        </div>
+        <div class="col" style="width: 40%; padding: 0;"> 
+            <input type="text" value="SSHv2" disabled>
+        </div>
+    </div>
+</div>-->
