@@ -398,17 +398,16 @@ if($securityEventsPage->auto_refresh)
         for (let index = 0; index < tableCells.length; ++index) {
             idx = index % columnsList.length;
             column = columnsList[idx].getAttribute('data-sort').replace('-', '');
-            addHoverElementOnTableCell(tableCells[index], column);
+            addHoverElementOnTableCell(tableCells[index], index, column);
         }
     }
 
-    function addHoverElementOnTableCell(cell, column) {
+    function addHoverElementOnTableCell(cell, index, column) {
         cellContent = cell.textContent;
 
-        /*<span class="add-filter-button glyphicon glyphicon-plus-sign"></span>*/
         $('<div class="table-cell-window">\
             <p>Add to filter:</p>\
-            <form action="/secmon/web/security-events/add-attribute-to-filter" method="post">\
+            <form id="addAttributeToFilterForm-1-' + index + '" action="/secmon/web/security-events/add-attribute-to-filter" method="post">\
             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />\
             <input type="hidden" name="operator" value="AND">\
             <input type="hidden" name="negation" value=false>\
@@ -416,7 +415,7 @@ if($securityEventsPage->auto_refresh)
             <input type="hidden" name="column" value="' + column + '">\
             <input type="submit" value="+ AND is ' + cellContent + '">\
             </form>\
-            <form action="/secmon/web/security-events/add-attribute-to-filter" method="post">\
+            <form id="addAttributeToFilterForm-2-' + index + '" action="/secmon/web/security-events/add-attribute-to-filter" method="post">\
             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />\
             <input type="hidden" name="operator" value="AND">\
             <input type="hidden" name="negation" value=true>\
@@ -424,7 +423,7 @@ if($securityEventsPage->auto_refresh)
             <input type="hidden" name="column" value="' + column + '">\
             <input type="submit" value="+ AND is not ' + cellContent + '">\
             </form>\
-            <form action="/secmon/web/security-events/add-attribute-to-filter" method="post">\
+            <form id="addAttributeToFilterForm-3-' + index + '" action="/secmon/web/security-events/add-attribute-to-filter" method="post">\
             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />\
             <input type="hidden" name="operator" value="OR">\
             <input type="hidden" name="negation" value=false>\
@@ -460,16 +459,19 @@ if($securityEventsPage->auto_refresh)
     }
 
     // Validation of input values which should be added to filter
-    $('.table-cell-window form').submit(function() {
-        var $inputs = $('.table-cell-window form :input');
+    $(".table-cell-window form").submit(function(){
+        var form = $(this);
+        var id = '#'+form.attr('id');
+        var $inputs = $(id+' :input');
         var values = {};
         $inputs.each(function() {
             values[this.name] = $(this).val();
         });
-        
-        if(values['value'].length === 0){
-            Materialize.toast('Selected value "' + values['value'] + '" of column ' + values['column'] + ' can not be added to filter!', 3500);
+
+        if(values['value'] === "(not set)" || values['value'].length === 0){
+            Materialize.toast('Selected value "' + values['value'] + '" of column "' + values['column'] + '" can not be added to filter!', 3500);
             return false;
         }
     });
+
 </script>
