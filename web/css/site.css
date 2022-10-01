@@ -460,6 +460,7 @@ td:hover > .table-cell-window {
   position: absolute;
   left: inherit;
   height: inherit;
+  z-index: 4;
   transition: all 0.4s 1s ease;
 }
 
