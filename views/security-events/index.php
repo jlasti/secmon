@@ -421,7 +421,7 @@ if($securityEventsPage->auto_refresh)
             <input type="hidden" name="negation" value=true>\
             <input type="hidden" name="value" value="' + cellContent + '">\
             <input type="hidden" name="column" value="' + column + '">\
-            <input type="submit" value="+ AND is not ' + cellContent + '">\
+            <input type="submit" value="+ AND is NOT ' + cellContent + '">\
             </form>\
             <form id="addAttributeToFilterForm-3-' + index + '" action="/secmon/web/security-events/add-attribute-to-filter" method="post">\
             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />\
@@ -473,7 +473,6 @@ if($securityEventsPage->auto_refresh)
             return false;
         }
     });
-
 </script>
 
 <!-- druhy pristup na pridavanie attributu do filtra
