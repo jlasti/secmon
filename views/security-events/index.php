@@ -119,7 +119,18 @@ if($securityEventsPage->auto_refresh)
             <?= Html::a("<i class='material-icons'>add</i>", ['filter/create', 'securityEventsPage' => true], ['class' => 'btn btn-success', 'title' => 'Create new filter']) ?>
             <?= Html::a("<i class='material-icons'>edit</i>", ['filter/update', 'id' => $selectedFilterId, 'securityEventsPage' => true], ['class' => 'btn btn-success', 'title' => 'Edit selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]); ?>
             <?= Html::a("<i class='material-icons'>delete</i>", ['remove-selected-filter'], ['class' => 'btn btn-danger', 'style' => 'background-color: orange;', 'title' => 'Remove selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]) ?>
-            <?= Html::a("<i class='material-icons'>delete</i>", ['delete-selected-filter'], ['class' => 'btn btn-danger', 'style' => 'background-color: red;', 'title' => 'Remove selected filter', 'disabled' => !empty($selectedFilter) ? false : true]) ?>
+            <?= Html::a("<i class='material-icons'>delete</i>", ['delete-selected-filter'],
+                [
+                    'class' => 'btn btn-danger',
+                    'style' => 'background-color: red;',
+                    'title' => 'Remove selected filter',
+                    'disabled' => !empty($selectedFilter) ? false : true,
+                    'data' => [
+                        'confirm' => Yii::t('app', 'Selected filter will be permanently deleted. Are you sure you want to delete this filter?'),
+                        'method' => 'post',
+                    ],
+                ])
+            ?>
             <div <?= $selectedFilterId ? 'class="filter-rule"' : ''?>>
                 <p>
                     <?php
@@ -203,7 +214,13 @@ if($securityEventsPage->auto_refresh)
             <?php $form = ActiveForm::begin(['action' =>['update-refresh-time'], 'method' => 'post',]); ?>
                 <?= $form->field($securityEventsPage, 'refresh_time')->textInput(['placeholder' => 'nY/nM/nW/nD/nH/nm/nS']) ?>
                 <div class="form-group">
-                        <?= Html::a("<i class='material-icons'>refresh</i>", ['index'], ['class' => 'btn btn-success', 'title' => 'Refresh page']) ?>
+                        <?= Html::button("<i class='material-icons'>refresh</i>",
+                            [
+                                'class' => 'btn btn-success',
+                                'title' => 'Refresh page',
+                                'onclick' => 'location.reload()'
+                            ])
+                        ?>
                         <?= Html::a($securityEventsPage->auto_refresh ? "<i class='material-icons'>pause</i>" : "<i class='material-icons'>play_arrow</i>",
                             ['start-pause-auto-refresh'],
                             [
@@ -387,7 +404,7 @@ if($securityEventsPage->auto_refresh)
 
     function addHoverElementOnTableCell(cell, column) {
         cellContent = cell.textContent;
-        alert(cellContent);
+
         /*<span class="add-filter-button glyphicon glyphicon-plus-sign"></span>*/
         $('<div class="table-cell-window">\
             <p>Add to filter:</p>\
