@@ -458,4 +458,18 @@ if($securityEventsPage->auto_refresh)
         $("#absoluteTimeForm").hide();
         $("#relativeTimeForm").show();
     }
+
+    // Validation of input values which should be added to filter
+    $('.table-cell-window form').submit(function() {
+        var $inputs = $('.table-cell-window form :input');
+        var values = {};
+        $inputs.each(function() {
+            values[this.name] = $(this).val();
+        });
+        
+        if(values['value'].length === 0){
+            Materialize.toast('Selected value "' + values['value'] + '" of column ' + values['column'] + ' can not be added to filter!', 3500);
+            return false;
+        }
+    });
 </script>
