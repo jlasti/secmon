@@ -441,6 +441,10 @@ class SecurityEventsController extends Controller
             $value = Yii::$app->request->post('value');
             $column = Yii::$app->request->post('column');
 
+            // If one of 
+            if(empty($logicOperator) || empty($negation) || empty($value)|| empty($column) || $value == '(not set)' )
+                return $this->redirect(['index']);
+
             // If none Event Filter is Applied, therefore new Filter need to be created
             if(empty($securityEventsPage->filter_id))
             {
@@ -454,9 +458,10 @@ class SecurityEventsController extends Controller
                 $eventFilterRule = new FilterRule();
                 $eventFilterRule->filter_id = $eventFilter->id;
                 
-                if($column == 'datetime'){
+                if($column == 'datetime' || $column == 'start_time' || $column == 'end_time' || $column == 'file_create_time' || $column == 'file_modification_time'
+                    || $column == 'old_file_create_time' || $column == 'old_file_modification_time' || $column == 'device_receipt_time'){
                     $eventFilterRule->type = 'date';
-                    $value = substr($value, 0, -3);
+                    $value = date("Y-m-d h:i", strtotime($value));
                 }
                 else
                     $eventFilterRule->type = 'compare';
@@ -483,9 +488,10 @@ class SecurityEventsController extends Controller
                 $eventFilterRule = new FilterRule();
                 $eventFilterRule->filter_id = $securityEventsPage->filter_id;
                 
-                if($column == 'datetime'){
+                if($column == 'datetime' || $column == 'start_time' || $column == 'end_time' || $column == 'file_create_time' || $column == 'file_modification_time'
+                    || $column == 'old_file_create_time' || $column == 'old_file_modification_time' || $column == 'device_receipt_time'){
                     $eventFilterRule->type = 'date';
-                    $value = substr($value, 0, -3);
+                    $value = date("Y-m-d h:i", strtotime($value));
                 }
                 else
                     $eventFilterRule->type = 'compare';
