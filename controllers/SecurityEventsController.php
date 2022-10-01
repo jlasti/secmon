@@ -342,7 +342,7 @@ class SecurityEventsController extends Controller
             $relativeTime = Yii::$app->request->post('relativeTime');
 
             if($timeFilterType == 'relative' && (empty($relativeTime) || !preg_match('/^\d{1,5}[YMWDHmS]{1}$/', $relativeTime)))
-                return $this->redirect(['security-events/index']);
+                return $this->redirect(['index']);
 
             if(!empty($securityEventsPage->time_filter_id))
             {
@@ -356,7 +356,7 @@ class SecurityEventsController extends Controller
                     $securityEventsPage->time_filter_type = 'absolute';
                     $securityEventsPage->time_filter_id = null;
                     $securityEventsPage->update();
-                    return $this->redirect(['security-events/index']);
+                    return $this->redirect(['index']);
                 }
 
                 // Create new Time Filter
@@ -427,7 +427,7 @@ class SecurityEventsController extends Controller
 
             }
         }
-        return $this->redirect(['security-events/index']);
+        return $this->redirect(['index']);
     }
 
     public function actionAddAttributeToFilter()
@@ -502,6 +502,6 @@ class SecurityEventsController extends Controller
                 $eventFilterRule->save();
             }
         }
-        return $this->redirect(['security-events/index']);
+        return $this->redirect(['index']);
     }
 }
