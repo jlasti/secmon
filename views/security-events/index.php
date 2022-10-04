@@ -49,64 +49,6 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
 {
     $absoluteTimeFilter = FilterController::getAbsoluteTimeFilterValue();
 }
-
-// If auto_refresh is set to true, then set interval for content update
-if($securityEventsPage->auto_refresh)
-{
-    $this->registerJs('
-    var refreshString = "' . $securityEventsPage->refresh_time .'" ;
-    
-    function getRefreshTime(refreshString) {
-        if (refreshString == "0") {
-            return 0;
-        }
-        var timeUnit = refreshString.substring(
-        refreshString.length - 1,
-        refreshString.length
-        );
-        var refreshTime = parseInt(
-        refreshString.substring(0, refreshString.length - 1)
-        );
-        if (timeUnit == "S") {
-            return refreshTime;
-        }
-        refreshTime *= 60;
-        if (timeUnit == "m") {
-            return refreshTime;
-        }
-        refreshTime *= 60;
-        if (timeUnit == "H") {
-            return refreshTime;
-        }
-        return refreshTime * 24;
-        if (timeUnit == "D") {
-            return refreshTime;
-        }
-        if (timeUnit == "W") {
-            return refreshTime * 7;
-        }
-        if (timeUnit == "M") {
-            return refreshTime * 30;
-        }
-        if (timeUnit == "Y") {
-            return refreshTime * 365;
-        }
-    }
-
-    setInterval(function() {
-        $.pjax.reload({
-            container:"#pjaxContainer table#eventsContent tbody:last", 
-            fragment:"table#eventsContent tbody:last"})
-            .done(function() {
-                activateEventsRows();
-                $.pjax.reload({
-                    container:"#pjaxContainer #pagination", 
-                    fragment:"#pagination"
-                });
-            });
-        }, getRefreshTime(refreshString)*1000 );
-    ');
-}
 ?>
 
 <div class="security-events-page-panel" style="padding-top: 0;">
@@ -305,6 +247,27 @@ if($securityEventsPage->auto_refresh)
 <link href="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.css" rel="stylesheet">
 
 <script>
+    
+    // If auto_refresh is set to true, then set interval for content update
+    if("<?php echo $securityEventsPage->auto_refresh; ?>")
+    {
+        var refreshString = "<?php echo $securityEventsPage->refresh_time; ?>";
+
+        setInterval(function() {
+            $.pjax.reload({
+                container:"#pjaxContainer table#eventsContent", 
+                fragment:"table#eventsContent"})
+                .done(function() {
+                    activateEventsRows();
+                    $.pjax.reload({
+                        container:"#pjaxContainer #pagination", 
+                        fragment:"#pagination"
+                    });
+                    addHoverElementOnTableCells();
+                });
+            }, getRefreshTime(refreshString)*1000 );
+    }
+
     // Check which radio button is checked
     if($('input[name="timeFilterType"]:checked').val() == 'absolute')
         showAbsoluteTimeForm();
@@ -379,6 +342,43 @@ if($securityEventsPage->auto_refresh)
     });
 
     addHoverElementOnTableCells();
+
+    function getRefreshTime(refreshString) {
+        if (refreshString == "0") {
+            return 0;
+        }
+        var timeUnit = refreshString.substring(
+        refreshString.length - 1,
+        refreshString.length
+        );
+        var refreshTime = parseInt(
+        refreshString.substring(0, refreshString.length - 1)
+        );
+        if (timeUnit == "S") {
+            return refreshTime;
+        }
+        refreshTime *= 60;
+        if (timeUnit == "m") {
+            return refreshTime;
+        }
+        refreshTime *= 60;
+        if (timeUnit == "H") {
+            return refreshTime;
+        }
+        return refreshTime * 24;
+        if (timeUnit == "D") {
+            return refreshTime;
+        }
+        if (timeUnit == "W") {
+            return refreshTime * 7;
+        }
+        if (timeUnit == "M") {
+            return refreshTime * 30;
+        }
+        if (timeUnit == "Y") {
+            return refreshTime * 365;
+        }
+    }
 
     function addHoverElementOnTableCells() {
         const tableBody = document.getElementsByTagName("tbody")[0];
@@ -474,28 +474,3 @@ if($securityEventsPage->auto_refresh)
         }
     });
 </script>
-
-<!-- druhy pristup na pridavanie attributu do filtra
-<div class="table-cell-window-tmp" style="width: 10%">
-    <div class="row">
-        <div class="col" style="width: 30%; padding: 0;">   
-            <select class="form-select form-select-sm" aria-label=".form-select-sm logic-operator" style="text-align-last:center;">
-                <option value="AND" selected >AND</option>
-                <option value="OR">OR</option>
-            </select>
-        </div>
-        <div class="col" style="width: 15%; padding: 0;"> 
-            <select class="form-select form-select-sm" aria-label=".form-select-sm operator" style="horizontal-align: middle">
-                <option value="=" selected>=</option>
-                <option value="!=">!=</option>
-                <option value=">" >></option>
-                <option value="<"><</option>
-                <option value=">=" >>=</option>
-                <option value="<="><=</option>
-            </select>
-        </div>
-        <div class="col" style="width: 40%; padding: 0;"> 
-            <input type="text" value="SSHv2" disabled>
-        </div>
-    </div>
-</div>-->
