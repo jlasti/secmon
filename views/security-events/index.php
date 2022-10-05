@@ -273,6 +273,8 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
 <link href="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.css" rel="stylesheet">
 
 <script>
+    $(".container").css("padding-top", "10px");
+    
     // Create sortable chips for security events table
     var $sortableChips = $( "#chipstable" );
     $sortableChips.sortable();
