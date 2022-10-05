@@ -156,7 +156,9 @@ class SecurityEventsPage extends \yii\db\ActiveRecord
                     array_push($replaceDataColumns, $column);
             }
         }
-        array_push($replaceDataColumns, ['class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn', 'template'=>'{view}']);
+        // Previous class 'macgyer\yii2materializecss\widgets\grid\ActionColumn'
+        // but it malfunction add attributes to filter from gridview. 
+        array_push($replaceDataColumns, ['class' => 'yii\grid\ActionColumn', 'template'=>'{view}']);
 
         return $replaceDataColumns;
     }

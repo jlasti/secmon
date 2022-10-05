@@ -3,6 +3,7 @@
 Prerequisite for installing SecMon is OS CentOS7/CentOS Stream 8/Ubuntu 22.04 (tested Linux distribution) with Internet access and with the installed programs [Docker Engine](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/) v2.3.3. The functionality of the Docker Engine can be verified with the command `docker run hello-world`. Docker Compose functionality can be verified with `docker compose version`. If the commands do not run correctly, this problem must be resolved or the installation will not be successful.
 
 ### CentOS 7
+
 ```
 # System Update
 sudo yum clean all
@@ -40,6 +41,7 @@ python3 secmon_manager.py deploy
 ```
 
 ### CentOS 8
+
 ```
 # System Update
 sudo yum clean all
@@ -75,6 +77,7 @@ python3 secmon_manager.py deploy
 ```
 
 ### Ubuntu 22.04
+
 ```
 # System Update
 sudo apt clean all
