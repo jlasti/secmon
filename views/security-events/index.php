@@ -248,6 +248,10 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
 
 <script>
     
+    $(document).ready(function() {
+        addHoverElementOnTableCells();
+    });
+
     // If auto_refresh is set to true, then set interval for content update
     if("<?php echo $securityEventsPage->auto_refresh; ?>")
     {
@@ -340,8 +344,6 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
         var selectedColumns = extractColumnsFromChips()
         $.post("/secmon/web/security-events/update-selected-columns", {value:selectedColumns});
     });
-
-    addHoverElementOnTableCells();
 
     function getRefreshTime(refreshString) {
         if (refreshString == "0") {
