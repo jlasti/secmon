@@ -153,7 +153,7 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
                         ?>
                     </div>
                 </div>
-                <div id="relativeTimeForm" style="display:none; padding-right: 20px">
+                <div id="relativeTimeForm" style="display:none; width:50%; float: lefft; padding-right: 20px;">
                     <select id="relativeTimeFormSelect" name="relativeTime" placeholder="nY/nM/nW/nD/nH/nm/nS" value="<?= $relativeTimeFilter ?>">
                         <option value="10m">10m</option>
                         <option value="30m">30m</option>

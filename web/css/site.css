@@ -434,6 +434,7 @@ button.security-events-page-panel {
 }
 
 .filter-rule p {
+  font-size: 0.7rem;
   margin: 0;
 }
 
@@ -529,8 +530,7 @@ label {
   padding: 0 1px 0 1px;
 }
 
-.security-events-page-panel input.form-check-label {
-  margin-bottom: 5;
-  height: 1.3rem;
+.security-events-page-panel label.form-check-label {
+  font-size: 0.9rem;
   color: black;
 }
