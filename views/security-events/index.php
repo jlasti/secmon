@@ -49,64 +49,6 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
 {
     $absoluteTimeFilter = FilterController::getAbsoluteTimeFilterValue();
 }
-
-// If auto_refresh is set to true, then set interval for content update
-if($securityEventsPage->auto_refresh)
-{
-    $this->registerJs('
-    var refreshString = "' . $securityEventsPage->refresh_time .'" ;
-    
-    function getRefreshTime(refreshString) {
-        if (refreshString == "0") {
-            return 0;
-        }
-        var timeUnit = refreshString.substring(
-        refreshString.length - 1,
-        refreshString.length
-        );
-        var refreshTime = parseInt(
-        refreshString.substring(0, refreshString.length - 1)
-        );
-        if (timeUnit == "S") {
-            return refreshTime;
-        }
-        refreshTime *= 60;
-        if (timeUnit == "m") {
-            return refreshTime;
-        }
-        refreshTime *= 60;
-        if (timeUnit == "H") {
-            return refreshTime;
-        }
-        return refreshTime * 24;
-        if (timeUnit == "D") {
-            return refreshTime;
-        }
-        if (timeUnit == "W") {
-            return refreshTime * 7;
-        }
-        if (timeUnit == "M") {
-            return refreshTime * 30;
-        }
-        if (timeUnit == "Y") {
-            return refreshTime * 365;
-        }
-    }
-
-    setInterval(function() {
-        $.pjax.reload({
-            container:"#pjaxContainer table#eventsContent tbody:last", 
-            fragment:"table#eventsContent tbody:last"})
-            .done(function() {
-                activateEventsRows();
-                $.pjax.reload({
-                    container:"#pjaxContainer #pagination", 
-                    fragment:"#pagination"
-                });
-            });
-        }, getRefreshTime(refreshString)*1000 );
-    ');
-}
 ?>
 
 <div class="security-events-page-panel" style="padding-top: 0;">
@@ -118,7 +60,19 @@ if($securityEventsPage->auto_refresh)
             <?= Html::endForm(); ?>
             <?= Html::a("<i class='material-icons'>add</i>", ['filter/create', 'securityEventsPage' => true], ['class' => 'btn btn-success', 'title' => 'Create new filter']) ?>
             <?= Html::a("<i class='material-icons'>edit</i>", ['filter/update', 'id' => $selectedFilterId, 'securityEventsPage' => true], ['class' => 'btn btn-success', 'title' => 'Edit selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]); ?>
-            <?= Html::a("<i class='material-icons'>delete</i>", ['remove-selected-filter'], ['class' => 'btn btn-danger', 'style' => 'background-color: red;', 'title' => 'Remove selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]) ?>
+            <?= Html::a("<i class='material-icons'>clear</i>", ['remove-selected-filter'], ['class' => 'btn btn-danger', 'style' => 'background-color: orange;', 'title' => 'Clear selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]) ?>
+            <?= Html::a("<i class='material-icons'>delete</i>", ['delete-selected-filter'],
+                [
+                    'class' => 'btn btn-danger',
+                    'style' => 'background-color: red;',
+                    'title' => 'Remove selected filter',
+                    'disabled' => !empty($selectedFilter) ? false : true,
+                    'data' => [
+                        'confirm' => Yii::t('app', 'Selected filter will be permanently deleted. Are you sure you want to delete this filter?'),
+                        'method' => 'post',
+                    ],
+                ])
+            ?>
             <div <?= $selectedFilterId ? 'class="filter-rule"' : ''?>>
                 <p>
                     <?php
@@ -202,7 +156,13 @@ if($securityEventsPage->auto_refresh)
             <?php $form = ActiveForm::begin(['action' =>['update-refresh-time'], 'method' => 'post',]); ?>
                 <?= $form->field($securityEventsPage, 'refresh_time')->textInput(['placeholder' => 'nY/nM/nW/nD/nH/nm/nS']) ?>
                 <div class="form-group">
-                        <?= Html::a("<i class='material-icons'>refresh</i>", ['index'], ['class' => 'btn btn-success', 'title' => 'Refresh page']) ?>
+                        <?= Html::button("<i class='material-icons'>refresh</i>",
+                            [
+                                'class' => 'btn btn-success',
+                                'title' => 'Refresh page',
+                                'onclick' => 'location.reload()'
+                            ])
+                        ?>
                         <?= Html::a($securityEventsPage->auto_refresh ? "<i class='material-icons'>pause</i>" : "<i class='material-icons'>play_arrow</i>",
                             ['start-pause-auto-refresh'],
                             [
@@ -222,7 +182,7 @@ if($securityEventsPage->auto_refresh)
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
                 'filterModel' => $searchModel,
-                'layout' => '{items}<div id="pagination">{pager}</div>',
+                'layout' => '{items}<div id="pagination" onclick="location.reload()">{pager}</div>',
                 'tableOptions' => [
                     'id' => 'eventsContent',
                     'class' => 'responsive-table striped'
@@ -233,7 +193,7 @@ if($securityEventsPage->auto_refresh)
 </div>
 
 <a href="#modalColumsSettings" class="btn-floating waves-effect waves-light btn-small blue"
-    style="position:absolute; top: 30px; right: 40px; display: 'block' ?>" data-toggle="tooltip" data-placement="bottom" title="Columns settings">
+    style="position:absolute; top: 200px; right: 40px; display: 'block' ?>" data-toggle="tooltip" data-placement="bottom" title="Columns settings">
     <i class="material-icons">settings</i>
 </a>
 
@@ -287,6 +247,31 @@ if($securityEventsPage->auto_refresh)
 <link href="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.css" rel="stylesheet">
 
 <script>
+    
+    $(document).ready(function() {
+        addHoverElementOnTableCells();
+    });
+
+    // If auto_refresh is set to true, then set interval for content update
+    if("<?php echo $securityEventsPage->auto_refresh; ?>")
+    {
+        var refreshString = "<?php echo $securityEventsPage->refresh_time; ?>";
+
+        setInterval(function() {
+            $.pjax.reload({
+                container:"#pjaxContainer table#eventsContent", 
+                fragment:"table#eventsContent"})
+                .done(function() {
+                    activateEventsRows();
+                    $.pjax.reload({
+                        container:"#pjaxContainer #pagination", 
+                        fragment:"#pagination"
+                    });
+                    addHoverElementOnTableCells();
+                });
+            }, getRefreshTime(refreshString)*1000 );
+    }
+
     // Check which radio button is checked
     if($('input[name="timeFilterType"]:checked').val() == 'absolute')
         showAbsoluteTimeForm();
@@ -294,11 +279,11 @@ if($securityEventsPage->auto_refresh)
     if($('input[name="timeFilterType"]:checked').val() == 'relative'){
         showRelativeTimeForm();
     }
-        
 
     // Create relative time form editable
     $('#relativeTimeFormSelect').editableSelect();
 
+    // Create sortable chips for security events table
     var $sortableChips = $( "#chipstable" );
     $sortableChips.sortable();
 
@@ -318,7 +303,7 @@ if($securityEventsPage->auto_refresh)
         }
     });
     
-    // Create new column chip based on selected from dropdown list
+    // Create new column chip based on selected chip from dropdown list
     $("#addColumn").on("click", function (event) {
         // Get selected Column value
         var element = document.getElementById("selectColumnDropdown");
@@ -360,6 +345,97 @@ if($securityEventsPage->auto_refresh)
         $.post("/secmon/web/security-events/update-selected-columns", {value:selectedColumns});
     });
 
+    function getRefreshTime(refreshString) {
+        if (refreshString == "0") {
+            return 0;
+        }
+        var timeUnit = refreshString.substring(
+        refreshString.length - 1,
+        refreshString.length
+        );
+        var refreshTime = parseInt(
+        refreshString.substring(0, refreshString.length - 1)
+        );
+        if (timeUnit == "S") {
+            return refreshTime;
+        }
+        refreshTime *= 60;
+        if (timeUnit == "m") {
+            return refreshTime;
+        }
+        refreshTime *= 60;
+        if (timeUnit == "H") {
+            return refreshTime;
+        }
+        return refreshTime * 24;
+        if (timeUnit == "D") {
+            return refreshTime;
+        }
+        if (timeUnit == "W") {
+            return refreshTime * 7;
+        }
+        if (timeUnit == "M") {
+            return refreshTime * 30;
+        }
+        if (timeUnit == "Y") {
+            return refreshTime * 365;
+        }
+    }
+
+    function addHoverElementOnTableCells() {
+        const tableBody = document.getElementsByTagName("tbody")[0];
+        const columnsList = document.querySelectorAll('[data-sort]');
+        const tableRowsLength = tableBody.getElementsByTagName("tr").length;
+        const rawTableCells = tableBody.getElementsByTagName("td");
+        const numberOfCells = rawTableCells.length;
+        var tableCells = [];
+    
+        // Create new array of table cells without cells in last column with detailed view
+        for (let index = 0; index < numberOfCells; index++) {
+            if((index % (columnsList.length + 2) != 0 && index % (columnsList.length + 2) != columnsList.length + 1 )){
+                tableCells.push(rawTableCells[index]); 
+            }
+        }
+
+        for (let index = 0; index < tableCells.length; ++index) {
+            idx = index % columnsList.length;
+            column = columnsList[idx].getAttribute('data-sort').replace('-', '');
+            addHoverElementOnTableCell(tableCells[index], index, column);
+        }
+    }
+
+    function addHoverElementOnTableCell(cell, index, column) {
+        cellContent = cell.textContent;
+
+        $('<div class="table-cell-window">\
+            <p>Add to filter:</p>\
+            <form id="addAttributeToFilterForm-1-' + index + '" action="/secmon/web/security-events/add-attribute-to-filter" method="post">\
+            <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />\
+            <input type="hidden" name="operator" value="AND">\
+            <input type="hidden" name="negation" value=false>\
+            <input type="hidden" name="value" value="' + cellContent + '">\
+            <input type="hidden" name="column" value="' + column + '">\
+            <input type="submit" value="+ AND is ' + cellContent + '">\
+            </form>\
+            <form id="addAttributeToFilterForm-2-' + index + '" action="/secmon/web/security-events/add-attribute-to-filter" method="post">\
+            <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />\
+            <input type="hidden" name="operator" value="AND">\
+            <input type="hidden" name="negation" value=true>\
+            <input type="hidden" name="value" value="' + cellContent + '">\
+            <input type="hidden" name="column" value="' + column + '">\
+            <input type="submit" value="+ AND is NOT ' + cellContent + '">\
+            </form>\
+            <form id="addAttributeToFilterForm-3-' + index + '" action="/secmon/web/security-events/add-attribute-to-filter" method="post">\
+            <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />\
+            <input type="hidden" name="operator" value="OR">\
+            <input type="hidden" name="negation" value=false>\
+            <input type="hidden" name="value" value="' + cellContent + '">\
+            <input type="hidden" name="column" value="' + column + '">\
+            <input type="submit" value="+ OR is ' + cellContent + '">\
+            </form>\
+            </div>').appendTo(cell);
+    }
+
     function extractColumnsFromChips() {
         const chipsTable = document.getElementById("chipstable");
         const elements = chipsTable.getElementsByClassName('chip');
@@ -383,4 +459,20 @@ if($securityEventsPage->auto_refresh)
         $("#absoluteTimeForm").hide();
         $("#relativeTimeForm").show();
     }
+
+    // Validation of input values which should be added to filter
+    $(".table-cell-window form").submit(function(){
+        var form = $(this);
+        var id = '#'+form.attr('id');
+        var $inputs = $(id+' :input');
+        var values = {};
+        $inputs.each(function() {
+            values[this.name] = $(this).val();
+        });
+
+        if(values['value'] === "(not set)" || values['value'].length === 0){
+            Materialize.toast('Selected value "' + values['value'] + '" of column "' + values['column'] + '" can not be added to filter!', 3500);
+            return false;
+        }
+    });
 </script>
