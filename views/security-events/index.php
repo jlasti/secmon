@@ -55,8 +55,8 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
     <div class="row">
         <div class="col" style="width:30%;">
             <label class="active" for="name">Selected Filter</label>
-            <?= Html::beginForm(['apply-selected-filter'],'post'); ?>
-                <?= Html::activeDropDownList($filter, 'name', ArrayHelper::map($filters,'name','name'), ['value' => !empty($selectedFilter) ? $selectedFilter->name : '', 'prompt' => 'None', 'style' => !empty($selectedFilter) ? 'color: black;' : 'color: gray;', 'id' => 'eventFilterSelect', 'onchange' => 'this.form.submit()']); ?>
+            <?= Html::beginForm(['apply-selected-filter'],'post', ['style' => 'padding-right: 20px;']); ?>
+                <?= Html::activeDropDownList($filter, 'name', ArrayHelper::map($filters,'name','name'), ['value' => !empty($selectedFilter) ? $selectedFilter->name : '', 'style' => !empty($selectedFilter) ? 'color: black;' : 'color: gray;', 'id' => 'eventFilterSelect', 'onchange' => 'this.form.submit()']); ?>
             <?= Html::endForm(); ?>
             <?= Html::a("<i class='material-icons'>add</i>", ['filter/create', 'securityEventsPage' => true], ['class' => 'btn btn-success', 'title' => 'Create new filter']) ?>
             <?= Html::a("<i class='material-icons'>edit</i>", ['filter/update', 'id' => $selectedFilterId, 'securityEventsPage' => true], ['class' => 'btn btn-success', 'title' => 'Edit selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]); ?>
@@ -284,8 +284,11 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
         showRelativeTimeForm();
     }
 
-    // Create relative time form editable
+    // Make Relative Time filter select editable
     $('#relativeTimeFormSelect').editableSelect();
+
+    // Make Filter select editable
+    $('#eventFilterSelect').editableSelect();
 
     var $sortable = $( "#eventsContent > thead > tr" );
     $sortable.sortable({
