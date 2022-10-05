@@ -177,7 +177,7 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
     </div>
 </div>
 
-<div class="security-events-index clickable-table">
+<div class="security-events-index clickable-table", id="securityEventsTable">
     <?php Pjax::begin(['id' => 'pjaxContainer']); ?>
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
@@ -247,10 +247,14 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
 <link href="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.css" rel="stylesheet">
 
 <script>
-    
-    $(document).ready(function() {
-        addHoverElementOnTableCells();
-    });
+    // Create sortable chips for security events table
+    var $sortableChips = $( "#chipstable" );
+    $sortableChips.sortable();
+
+    var $sortable = $( "#eventsContent > thead > tr" );
+
+    // Add hover elements on table cells
+    addHoverElementOnTableCells();
 
     // If auto_refresh is set to true, then set interval for content update
     if("<?php echo $securityEventsPage->auto_refresh; ?>")
@@ -282,10 +286,6 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
 
     // Create relative time form editable
     $('#relativeTimeFormSelect').editableSelect();
-
-    // Create sortable chips for security events table
-    var $sortableChips = $( "#chipstable" );
-    $sortableChips.sortable();
 
     var $sortable = $( "#eventsContent > thead > tr" );
     $sortable.sortable({
@@ -344,6 +344,23 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
         var selectedColumns = extractColumnsFromChips()
         $.post("/secmon/web/security-events/update-selected-columns", {value:selectedColumns});
     });
+
+    // Validation of input values which should be added to filter
+    
+    $("#securityEventsTable").on("submit", ".table-cell-window form", (function(){
+        var form = $(this);
+        var id = '#'+form.attr('id');
+        var $inputs = $(id+' :input');
+        var values = {};
+        $inputs.each(function() {
+            values[this.name] = $(this).val();
+        });
+
+        if(values['value'] === "(not set)" || values['value'].length === 0){
+            Materialize.toast('Selected value "' + values['value'] + '" of column "' + values['column'] + '" can not be added to filter!', 3500);
+            return false;
+        }
+    }));
 
     function getRefreshTime(refreshString) {
         if (refreshString == "0") {
@@ -459,20 +476,4 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
         $("#absoluteTimeForm").hide();
         $("#relativeTimeForm").show();
     }
-
-    // Validation of input values which should be added to filter
-    $(".table-cell-window form").submit(function(){
-        var form = $(this);
-        var id = '#'+form.attr('id');
-        var $inputs = $(id+' :input');
-        var values = {};
-        $inputs.each(function() {
-            values[this.name] = $(this).val();
-        });
-
-        if(values['value'] === "(not set)" || values['value'].length === 0){
-            Materialize.toast('Selected value "' + values['value'] + '" of column "' + values['column'] + '" can not be added to filter!', 3500);
-            return false;
-        }
-    });
 </script>
