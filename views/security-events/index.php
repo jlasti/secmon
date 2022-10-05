@@ -31,6 +31,7 @@ $selectedFilter = Filter::findOne(['id' => $selectedFilterId]);
 $timeFilter = Filter::findOne(['id' => $timeFilterId]);
 $filter = new Filter();
 $colsDown = SecurityEvents::getColumnsDropdown();
+
 $columns = explode(",", $securityEventsPage->data_columns);
 
 $relativeTimeFilter = '';
@@ -290,6 +291,9 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
     // Make Filter select editable
     $('#eventFilterSelect').editableSelect();
 
+    // Make select columnn dropdown editable
+    $('#selectColumnDropdown').editableSelect();
+
     var $sortable = $( "#eventsContent > thead > tr" );
     $sortable.sortable({
         stop: function (event, ui) {
@@ -309,12 +313,22 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
     // Create new column chip based on selected chip from dropdown list
     $("#addColumn").on("click", function (event) {
         // Get selected Column value
-        var element = document.getElementById("selectColumnDropdown");
-        var value = element.value;
+        var column = document.getElementById("selectColumnDropdown");
+        var colunmValue = column.value;
+        var objectColumns = <?php echo json_encode($colsDown); ?>;
+        var columnsKeyNames = getColumnsKeyNames();
 
-        if(checkColumnExistence(value)){
+        if(!validateColumnName(colunmValue, objectColumns)){
             Materialize.toast(
-              'Column "' + value + '" already in list!',
+              'Column "' + colunmValue + '" does not exist!',
+              2000
+            );
+            return;
+        }
+
+        if(checkColumnExistence(colunmValue, objectColumns)){
+            Materialize.toast(
+              'Column "' + colunmValue + '" already in list!',
               2000
             );
             return;
@@ -323,10 +337,11 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
         // Create a "div" node for column chip:
         const chipNode = document.createElement("div");
         chipNode.className = "chip ui-sortable-handle";
-        chipNode.setAttribute('value', value);
+        newChipName = Object.keys(objectColumns).find(key => objectColumns[key] === colunmValue);
+        chipNode.setAttribute('value', newChipName);
 
         // Create a text node for column chip:
-        const chipText = document.createTextNode(value);
+        const chipText = document.createTextNode(newChipName);
         
         // Create an "icon" node:
         const icon = document.createElement("i");
@@ -349,7 +364,6 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
     });
 
     // Validation of input values which should be added to filter
-    
     $("#securityEventsTable").on("submit", ".table-cell-window form", (function(){
         var form = $(this);
         var id = '#'+form.attr('id');
@@ -456,6 +470,20 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
             </div>').appendTo(cell);
     }
 
+    function getColumnsKeyNames() {
+        var objectColumns = <?php echo json_encode($colsDown); ?>;
+        return Object.keys(objectColumns);
+    }
+
+    function validateColumnName(selectedColumn, objectColumns) {
+        var columns = Object.values(objectColumns);
+
+        if(columns.includes(selectedColumn))
+            return true;
+        else
+            return false;
+    }
+
     function extractColumnsFromChips() {
         const chipsTable = document.getElementById("chipstable");
         const elements = chipsTable.getElementsByClassName('chip');
@@ -466,8 +494,10 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
     }
 
     function checkColumnExistence(newColumn) {
+        var objectColumns = <?php echo json_encode($colsDown); ?>;
+        var newColumnName = Object.keys(objectColumns).find(key => objectColumns[key] === newColumn);
         var selectedColumns = extractColumnsFromChips();
-        return selectedColumns.includes(newColumn);
+        return selectedColumns.includes(newColumnName);
     }
 
     function showAbsoluteTimeForm() {
