@@ -427,7 +427,7 @@ button.security-events-page-panel {
 }
 
 .filter-rule {
-  margin: 10px 0 5px 0;
+  margin: 5px 0 5px 0;
   padding: 5px 5px 5px 5px;
   border-radius: 5px;
   background-color: #d9d9d9;
@@ -471,7 +471,34 @@ td:hover > .table-cell-window {
 }
 
 .table-cell-window form {
-  font-size: 11;
+  font-size: 0.5em;
   padding: 0 0 5px 0;
   margin: 0;
+}
+
+.security-events-page-panel form,
+label {
+  margin-bottom: 0;
+}
+
+.security-events-page-panel .form-group {
+  margin-bottom: 0;
+}
+
+.security-events-page-panel .help-block,
+.selected-filter-buttons {
+  margin: 0;
+}
+
+.security-events-page-panel input {
+  margin-bottom: 5;
+  height: 1.3rem;
+}
+
+.security-events-page-panel a {
+  /*height: 20px;*/
+  padding: 0 5px 0 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

@@ -52,28 +52,38 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
 }
 ?>
 
-<div class="security-events-page-panel" style="padding-top: 0;">
+<div class="security-events-page-panel">
     <div class="row">
         <div class="col" style="width:30%;">
             <label class="active" for="name">Selected Filter</label>
             <?= Html::beginForm(['apply-selected-filter'],'post', ['style' => 'padding-right: 20px;']); ?>
                 <?= Html::activeDropDownList($filter, 'name', ArrayHelper::map($filters,'name','name'), ['value' => !empty($selectedFilter) ? $selectedFilter->name : '', 'style' => !empty($selectedFilter) ? 'color: black;' : 'color: gray;', 'id' => 'eventFilterSelect', 'onchange' => 'this.form.submit()']); ?>
             <?= Html::endForm(); ?>
-            <?= Html::a("<i class='material-icons'>add</i>", ['filter/create', 'securityEventsPage' => true], ['class' => 'btn btn-success', 'title' => 'Create new filter']) ?>
-            <?= Html::a("<i class='material-icons'>edit</i>", ['filter/update', 'id' => $selectedFilterId, 'securityEventsPage' => true], ['class' => 'btn btn-success', 'title' => 'Edit selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]); ?>
-            <?= Html::a("<i class='material-icons'>clear</i>", ['remove-selected-filter'], ['class' => 'btn btn-danger', 'style' => 'background-color: orange;', 'title' => 'Clear selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]) ?>
-            <?= Html::a("<i class='material-icons'>delete</i>", ['delete-selected-filter'],
-                [
-                    'class' => 'btn btn-danger',
-                    'style' => 'background-color: red;',
-                    'title' => 'Remove selected filter',
-                    'disabled' => !empty($selectedFilter) ? false : true,
-                    'data' => [
-                        'confirm' => Yii::t('app', 'Selected filter will be permanently deleted. Are you sure you want to delete this filter?'),
-                        'method' => 'post',
-                    ],
-                ])
-            ?>
+            <div class="row selected-filter-buttons">
+                <div class="col" style="width:25%;">
+                    <?= Html::a("<i class='material-icons'>add</i>", ['filter/create', 'securityEventsPage' => true], ['class' => 'btn btn-success', 'title' => 'Create new filter']) ?>
+                </div>
+                <div class="col" style="width:25%;">
+                    <?= Html::a("<i class='material-icons'>edit</i>", ['filter/update', 'id' => $selectedFilterId, 'securityEventsPage' => true], ['class' => 'btn btn-success', 'title' => 'Edit selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]); ?>
+                </div>
+                <div class="col" style="width:25%;">
+                    <?= Html::a("<i class='material-icons'>clear</i>", ['remove-selected-filter'], ['class' => 'btn btn-danger', 'style' => 'background-color: orange;', 'title' => 'Clear selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]) ?>
+                </div>
+                <div class="col" style="width:25%;">
+                    <?= Html::a("<i class='material-icons'>delete</i>", ['delete-selected-filter'],
+                        [
+                            'class' => 'btn btn-danger',
+                            'style' => 'background-color: red;',
+                            'title' => 'Remove selected filter',
+                            'disabled' => !empty($selectedFilter) ? false : true,
+                            'data' => [
+                                'confirm' => Yii::t('app', 'Selected filter will be permanently deleted. Are you sure you want to delete this filter?'),
+                                'method' => 'post',
+                            ],
+                        ])
+                    ?>
+                </div>
+            </div>
             <div <?= $selectedFilterId ? 'class="filter-rule"' : ''?>>
                 <p>
                     <?php
@@ -146,17 +156,16 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
                 </div>
 
                 <div class="col" style="width:50%; padding: 0;">
-                    <div class="form-group">
-                        <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time', 'style' => 'float: right; margin-right: 0;']) ?>
-                    </div>
-                 </div>
+                    <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time', 'style' => 'float: right; margin-right: 0;']) ?>
+                </div>
             <?= Html::endForm(); ?>
         </div>
 
         <div class="col">
             <?php $form = ActiveForm::begin(['action' =>['update-refresh-time'], 'method' => 'post',]); ?>
                 <?= $form->field($securityEventsPage, 'refresh_time')->textInput(['placeholder' => 'nY/nM/nW/nD/nH/nm/nS']) ?>
-                <div class="form-group">
+                <div class="row selected-filter-buttons">
+                    <div class="col" style="width:fit-content;">
                         <?= Html::button("<i class='material-icons'>refresh</i>",
                             [
                                 'class' => 'btn btn-success',
@@ -164,19 +173,27 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
                                 'onclick' => 'location.reload()'
                             ])
                         ?>
+                    </div>
+                    <div class="col" style="width:fit-content;">
                         <?= Html::a($securityEventsPage->auto_refresh ? "<i class='material-icons'>pause</i>" : "<i class='material-icons'>play_arrow</i>",
                             ['start-pause-auto-refresh'],
                             [
                                 'class' => 'btn btn-success',
                                 'title' => $securityEventsPage->auto_refresh ? 'Pause auto refresh' : 'Resume auto refresh'
-                            ]
-                        )?>
+                            ])
+                        ?>            
+                    </div>
+                    <div class="col" style="width:fit-content;">
                         <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time']) ?>
+                    </div>
                 </div>
             <?php ActiveForm::end(); ?>
         </div>
     </div>
 </div>
+
+<!-- Create a div where the graph will take place -->
+<div id="my_dataviz"></div>
 
 <div class="security-events-index clickable-table", id="securityEventsTable">
     <?php Pjax::begin(['id' => 'pjaxContainer']); ?>
@@ -186,7 +203,7 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
                 'layout' => '{items}<div id="pagination" onclick="location.reload()">{pager}</div>',
                 'tableOptions' => [
                     'id' => 'eventsContent',
-                    'class' => 'responsive-table striped'
+                    'class' => 'responsive-table striped',
                 ],
                 'columns' => $dataColumns,
             ]); ?>
@@ -243,6 +260,7 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
     </div>    
 </div>
 
+<script src="https://d3js.org/d3.v4.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
 <script src="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.js"></script>
 <link href="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.css" rel="stylesheet">
@@ -509,4 +527,86 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
         $("#absoluteTimeForm").hide();
         $("#relativeTimeForm").show();
     }
+
+
+
+    // set the dimensions and margins of the graph
+    var margin = {top: 10, right: 30, bottom: 30, left: 50},
+        width = 1200 - margin.left - margin.right,
+        height = 150 - margin.top - margin.bottom;
+
+    // append the svg object to the body of the page
+    var svg = d3.select("#my_dataviz")
+    .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform",
+            "translate(" + margin.left + "," + margin.top + ")");
+
+    //Read the data
+    d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/3_TwoNumOrdered_comma.csv",
+
+    // When reading the csv, I must format variables:
+    function(d){
+        return { date : d3.timeParse("%Y-%m-%d")(d.date), value : d.value }
+    },
+
+    // Now I can use this dataset:
+    function(data) {
+
+        // Keep only the 90 first rows
+        data = data.filter(function(d,i){ return i<90})
+
+        // Add X axis --> it is a date format
+        var x = d3.scaleTime()
+        .domain(d3.extent(data, function(d) { return d.date; }))
+        .range([ 0, width ]);
+        svg.append("g")
+        .attr("transform", "translate(0," + (height+5) + ")")
+        .call(d3.axisBottom(x).ticks(5).tickSizeOuter(0));
+
+        // Add Y axis
+        var y = d3.scaleLinear()
+        .domain( d3.extent(data, function(d) { return +d.value; }) )
+        .range([ height, 0 ]);
+        svg.append("g")
+        .attr("transform", "translate(-5,0)")
+        .call(d3.axisLeft(y).tickSizeOuter(0));
+
+        // Add the area
+        svg.append("path")
+        .datum(data)
+        .attr("fill", "#69b3a2")
+        .attr("fill-opacity", .3)
+        .attr("stroke", "none")
+        .attr("d", d3.area()
+            .x(function(d) { return x(d.date) })
+            .y0( height )
+            .y1(function(d) { return y(d.value) })
+            )
+
+        // Add the line
+        svg.append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", "#69b3a2")
+        .attr("stroke-width", 4)
+        .attr("d", d3.line()
+            .x(function(d) { return x(d.date) })
+            .y(function(d) { return y(d.value) })
+            )
+
+        // Add the line
+        svg.selectAll("myCircles")
+        .data(data)
+        .enter()
+        .append("circle")
+            .attr("fill", "red")
+            .attr("stroke", "none")
+            .attr("cx", function(d) { return x(d.date) })
+            .attr("cy", function(d) { return y(d.value) })
+            .attr("r", 3)
+    })
+
 </script>
