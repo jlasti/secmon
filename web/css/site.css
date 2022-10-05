@@ -486,8 +486,14 @@ label {
 }
 
 .security-events-page-panel .help-block,
-.selected-filter-buttons {
+.security-panel-header {
   margin: 0;
+}
+
+.security-events-page-panel span.label {
+  font-size: 1rem;
+  color: #999999;
+  padding: 0 0 0 10px;
 }
 
 .security-events-page-panel input {
@@ -495,10 +501,36 @@ label {
   height: 1.3rem;
 }
 
-.security-events-page-panel a {
-  /*height: 20px;*/
+.security-events-page-panel a,
+.btn {
+  height: 20px;
   padding: 0 5px 0 5px;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.security-events-page-panel a.btn i {
+  font-size: 1.3rem;
+  width: 25px;
+}
+
+.security-events-page-panel a.btn button {
+  font-size: 1.3rem;
+  width: fit-content;
+}
+
+.security-panel-header {
+  padding-right: 10px;
+  margin-bottom: 10px;
+}
+
+.security-panel-header .col {
+  padding: 0 1px 0 1px;
+}
+
+.security-events-page-panel input.form-check-label {
+  margin-bottom: 5;
+  height: 1.3rem;
+  color: black;
 }

@@ -55,22 +55,12 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
 <div class="security-events-page-panel">
     <div class="row">
         <div class="col" style="width:30%;">
-            <label class="active" for="name">Selected Filter</label>
-            <?= Html::beginForm(['apply-selected-filter'],'post', ['style' => 'padding-right: 20px;']); ?>
-                <?= Html::activeDropDownList($filter, 'name', ArrayHelper::map($filters,'name','name'), ['value' => !empty($selectedFilter) ? $selectedFilter->name : '', 'style' => !empty($selectedFilter) ? 'color: black;' : 'color: gray;', 'id' => 'eventFilterSelect', 'onchange' => 'this.form.submit()']); ?>
-            <?= Html::endForm(); ?>
-            <div class="row selected-filter-buttons">
-                <div class="col" style="width:25%;">
-                    <?= Html::a("<i class='material-icons'>add</i>", ['filter/create', 'securityEventsPage' => true], ['class' => 'btn btn-success', 'title' => 'Create new filter']) ?>
+            <div class="row security-panel-header">
+                <div class="col" style="float: left;">
+                    <span class="label">Selected filter:</span>
                 </div>
-                <div class="col" style="width:25%;">
-                    <?= Html::a("<i class='material-icons'>edit</i>", ['filter/update', 'id' => $selectedFilterId, 'securityEventsPage' => true], ['class' => 'btn btn-success', 'title' => 'Edit selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]); ?>
-                </div>
-                <div class="col" style="width:25%;">
-                    <?= Html::a("<i class='material-icons'>clear</i>", ['remove-selected-filter'], ['class' => 'btn btn-danger', 'style' => 'background-color: orange;', 'title' => 'Clear selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]) ?>
-                </div>
-                <div class="col" style="width:25%;">
-                    <?= Html::a("<i class='material-icons'>delete</i>", ['delete-selected-filter'],
+                <div class="col" style="float:right;">
+                    <?= Html::a("<span><i class='material-icons'>delete</i></span>", ['delete-selected-filter'],
                         [
                             'class' => 'btn btn-danger',
                             'style' => 'background-color: red;',
@@ -83,7 +73,19 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
                         ])
                     ?>
                 </div>
+                <div class="col" style="float:right;">
+                    <?= Html::a("<span><i class='material-icons'>clear</i></span>", ['remove-selected-filter'], ['class' => 'btn btn-danger', 'style' => 'background-color: orange;', 'title' => 'Clear selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]) ?>
+                </div>
+                <div class="col" style="float:right;">
+                    <?= Html::a("<span><i class='material-icons'>edit</i></span>", ['filter/update', 'id' => $selectedFilterId, 'securityEventsPage' => true], ['class' => 'btn btn-success', 'title' => 'Edit selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]); ?>
+                </div>
+                <div class="col" style="float:right;">
+                    <?= Html::a("<span><i class='material-icons'>add</i></span>", ['filter/create', 'securityEventsPage' => true], ['class' => 'btn btn-success', 'title' => 'Create new filter']) ?>
+                </div>
             </div>
+            <?= Html::beginForm(['apply-selected-filter'],'post', ['style' => 'padding-right: 20px;']); ?>
+                <?= Html::activeDropDownList($filter, 'name', ArrayHelper::map($filters,'name','name'), ['value' => !empty($selectedFilter) ? $selectedFilter->name : '', 'style' => !empty($selectedFilter) ? 'color: black;' : 'color: gray;', 'id' => 'eventFilterSelect', 'onchange' => 'this.form.submit()']); ?>
+            <?= Html::endForm(); ?>
             <div <?= $selectedFilterId ? 'class="filter-rule"' : ''?>>
                 <p>
                     <?php
@@ -104,8 +106,21 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
         </div>
 
         <div class="col" style="width:40%;">
-            <label class="active" for="name">Time Filter</label>
-            <?= Html::beginForm(['update-time-filter'],'post'); ?>
+            <?= Html::beginForm(['update-time-filter'],'post'); ?>    
+                <div class="row security-panel-header" style="margin-bottom: 5px;">
+                    <div class="col" style="float: left;">
+                        <span class="label">Time filter:</span>
+                    </div>
+                    <div class="col" style="float: right; padding: 0;">
+                        <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time']) ?>
+                    </div>
+                    <div class="col" style="float: right; padding-right: 20px;">
+                        <input class="form-check-input" type="radio" name="timeFilterType" id="inlineRadioAbsolute" value="absolute" onclick="showAbsoluteTimeForm()" <?= $securityEventsPage->time_filter_type == 'absolute' ? 'checked=""' : '' ?> >
+                        <label class="form-check-label" for="inlineRadioAbsolute">Absolute</label>
+                        <input class="form-check-input" type="radio" name="timeFilterType" id="inlineRadioRelative" value="relative" onclick="showRelativeTimeForm()" <?= $securityEventsPage->time_filter_type == 'relative' ? 'checked=""' : '' ?> >
+                        <label class="form-check-label" for="inlineRadioRelative">Relative</label>
+                    </div>
+                </div>
                 <div id="absoluteTimeForm" style="display:none;">
                     <div class="col" style="width:50%; padding-left: 0;">
                         <?php
@@ -147,46 +162,38 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
                         <option value="7D">7D</option>
                     </select>
                 </div>
-                
-                <div class="col" style="width:50%;">
-                    <input class="form-check-input" type="radio" name="timeFilterType" id="inlineRadioAbsolute" value="absolute" onclick="showAbsoluteTimeForm()" <?= $securityEventsPage->time_filter_type == 'absolute' ? 'checked=""' : '' ?> >
-                    <label class="form-check-label" for="inlineRadioAbsolute">Absolute</label>
-                    <input class="form-check-input" type="radio" name="timeFilterType" id="inlineRadioRelative" value="relative" onclick="showRelativeTimeForm()" <?= $securityEventsPage->time_filter_type == 'relative' ? 'checked=""' : '' ?> >
-                    <label class="form-check-label" for="inlineRadioRelative">Relative</label>
-                </div>
-
-                <div class="col" style="width:50%; padding: 0;">
-                    <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time', 'style' => 'float: right; margin-right: 0;']) ?>
-                </div>
             <?= Html::endForm(); ?>
         </div>
 
-        <div class="col">
-            <?php $form = ActiveForm::begin(['action' =>['update-refresh-time'], 'method' => 'post',]); ?>
-                <?= $form->field($securityEventsPage, 'refresh_time')->textInput(['placeholder' => 'nY/nM/nW/nD/nH/nm/nS']) ?>
-                <div class="row selected-filter-buttons">
-                    <div class="col" style="width:fit-content;">
-                        <?= Html::button("<i class='material-icons'>refresh</i>",
-                            [
-                                'class' => 'btn btn-success',
-                                'title' => 'Refresh page',
-                                'onclick' => 'location.reload()'
-                            ])
-                        ?>
-                    </div>
-                    <div class="col" style="width:fit-content;">
-                        <?= Html::a($securityEventsPage->auto_refresh ? "<i class='material-icons'>pause</i>" : "<i class='material-icons'>play_arrow</i>",
-                            ['start-pause-auto-refresh'],
-                            [
-                                'class' => 'btn btn-success',
-                                'title' => $securityEventsPage->auto_refresh ? 'Pause auto refresh' : 'Resume auto refresh'
-                            ])
-                        ?>            
-                    </div>
-                    <div class="col" style="width:fit-content;">
-                        <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time']) ?>
-                    </div>
+        <div class="col" style="width:30%;"">
+            <div class="row security-panel-header">
+                <div class="col" style="float: left;">
+                    <span class="label">Refresh time</span>
                 </div>
+                <div class="col" style="float:right;">
+                    <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time']) ?>
+                </div>
+                <div class="col" style="float:right;">
+                    <?= Html::a($securityEventsPage->auto_refresh ? "<i class='material-icons'>pause</i>" : "<i class='material-icons'>play_arrow</i>",
+                        ['start-pause-auto-refresh'],
+                        [
+                            'class' => 'btn btn-success',
+                            'title' => $securityEventsPage->auto_refresh ? 'Pause auto refresh' : 'Resume auto refresh'
+                        ])
+                    ?>            
+                </div>
+                <div class="col" style="float:right;">
+                    <?= Html::button("<i class='material-icons'>refresh</i>",
+                        [
+                            'class' => 'btn btn-success',
+                            'title' => 'Refresh page',
+                            'onclick' => 'location.reload()'
+                        ])
+                    ?>
+                </div>
+            </div>
+            <?php $form = ActiveForm::begin(['action' =>['update-refresh-time'], 'method' => 'post',]); ?>
+                <?= $form->field($securityEventsPage, 'refresh_time')->textInput(['placeholder' => 'nY/nM/nW/nD/nH/nm/nS'])->label(false) ?>
             <?php ActiveForm::end(); ?>
         </div>
     </div>
