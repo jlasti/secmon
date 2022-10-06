@@ -35,7 +35,9 @@
     "ext-json": "*",
     "geoip2/geoip2": "~2.0",
     "beaten-sect0r/yii2-flatpickr": "*",
-    "kartik-v/yii2-widget-datetimepicker": "*"
+    "kartik-v/yii2-widget-datetimepicker": "*",
+    "practically/yii2-chartjs": "^1.1",
+    "bower-asset/chart-js": "^3.9"
   },
   "require-dev": {
     "codeception/codeception": "*",
