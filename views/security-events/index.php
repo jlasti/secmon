@@ -200,13 +200,18 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
 </div>
 
 <!-- Create a div where the graph will take place -->
-<div id="my_dataviz"></div>
+<!-- <div id="my_dataviz"></div>-->
+
+<a href="#modalColumsSettings" class="btn-floating waves-effect waves-light btn-small blue columns-settings-button"
+    style="position:absolute; right: 60px; margin-bottom: 20px; display: 'block'; ?>" data-toggle="tooltip" data-placement="bottom" title="Columns settings">
+    <i class="material-icons">settings</i>
+</a>
 
 <div class="security-events-index clickable-table", id="securityEventsTable">
     <?php Pjax::begin(['id' => 'pjaxContainer']); ?>
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
-                'filterModel' => $searchModel,
+                //'filterModel' => $searchModel,
                 'layout' => '{items}<div id="pagination" onclick="location.reload()">{pager}</div>',
                 'tableOptions' => [
                     'id' => 'eventsContent',
@@ -216,11 +221,6 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
             ]); ?>
     <?php Pjax::end(); ?>
 </div>
-
-<a href="#modalColumsSettings" class="btn-floating waves-effect waves-light btn-small blue"
-    style="position:absolute; top: 200px; right: 40px; display: 'block' ?>" data-toggle="tooltip" data-placement="bottom" title="Columns settings">
-    <i class="material-icons">settings</i>
-</a>
 
 <!-- Modal Structure -->
 <div class="modal" id="modalColumsSettings">

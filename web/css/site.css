@@ -503,7 +503,7 @@ label {
 }
 
 .security-events-page-panel a,
-.btn {
+.security-events-page-panel .btn {
   height: 20px;
   padding: 0 5px 0 5px;
   display: flex;
@@ -533,4 +533,21 @@ label {
 .security-events-page-panel label.form-check-label {
   font-size: 0.9rem;
   color: black;
+}
+
+a.columns-settings-button {
+  height: 25px;
+  width: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+a.columns-settings-button:link,
+a.columns-settings-button:hover {
+  text-decoration: none;
+}
+
+.columns-settings-button i {
+  font-size: 1rem;
 }
