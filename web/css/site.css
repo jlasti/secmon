@@ -466,13 +466,13 @@ td:hover > .table-cell-window {
 }
 
 .table-cell-window p {
-  font-size: 11;
+  font-size: 0.9rem;
   font-weight: bold;
   margin-bottom: 1px;
 }
 
 .table-cell-window form {
-  font-size: 0.5em;
+  font-size: 0.8rem;
   padding: 0 0 5px 0;
   margin: 0;
 }
