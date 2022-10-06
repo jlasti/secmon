@@ -5,6 +5,7 @@ use yii\widgets\Pjax;
 use yii\widgets\ActiveForm;
 use kartik\cmenu\ContextMenu;
 use kartik\datetime\DateTimePicker;
+use practically\chartjs\Chart;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -18,6 +19,7 @@ use \app\controllers\SecurityEventsController;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\SecurityEventsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $chartDataProvider yii\data\ActiveDataProvider */
 
 $this->params['title'] = 'Security Events';
 $loggedUserId = Yii::$app->user->getId();
@@ -199,8 +201,20 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
     </div>
 </div>
 
-<!-- Create a div where the graph will take place -->
-<!-- <div id="my_dataviz"></div>-->
+<?= Chart::widget([
+    'type' => Chart::TYPE_BAR,
+    'datasets' => [
+        [
+            'query' => SecurityEvents::find()
+                ->select(["date_trunc('minutes', datetime) as date"])
+                ->addselect(["count(*) as data"])
+                ->groupBy('date')
+                ->createCommand(),
+            'labelAttribute' => 'date',
+        ]
+    ]
+]);
+?>
 
 <a href="#modalColumsSettings" class="btn-floating waves-effect waves-light btn-small blue columns-settings-button"
     style="position:absolute; right: 60px; margin-bottom: 20px; display: 'block'; ?>" data-toggle="tooltip" data-placement="bottom" title="Columns settings">
@@ -266,7 +280,7 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
     </div>
     </div>    
 </div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 <script src="https://d3js.org/d3.v4.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
 <script src="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.js"></script>
@@ -536,86 +550,4 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
         $("#absoluteTimeForm").hide();
         $("#relativeTimeForm").show();
     }
-
-
-
-    // set the dimensions and margins of the graph
-    var margin = {top: 10, right: 30, bottom: 30, left: 50},
-        width = 1200 - margin.left - margin.right,
-        height = 150 - margin.top - margin.bottom;
-
-    // append the svg object to the body of the page
-    var svg = d3.select("#my_dataviz")
-    .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform",
-            "translate(" + margin.left + "," + margin.top + ")");
-
-    //Read the data
-    d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/3_TwoNumOrdered_comma.csv",
-
-    // When reading the csv, I must format variables:
-    function(d){
-        return { date : d3.timeParse("%Y-%m-%d")(d.date), value : d.value }
-    },
-
-    // Now I can use this dataset:
-    function(data) {
-
-        // Keep only the 90 first rows
-        data = data.filter(function(d,i){ return i<90})
-
-        // Add X axis --> it is a date format
-        var x = d3.scaleTime()
-        .domain(d3.extent(data, function(d) { return d.date; }))
-        .range([ 0, width ]);
-        svg.append("g")
-        .attr("transform", "translate(0," + (height+5) + ")")
-        .call(d3.axisBottom(x).ticks(5).tickSizeOuter(0));
-
-        // Add Y axis
-        var y = d3.scaleLinear()
-        .domain( d3.extent(data, function(d) { return +d.value; }) )
-        .range([ height, 0 ]);
-        svg.append("g")
-        .attr("transform", "translate(-5,0)")
-        .call(d3.axisLeft(y).tickSizeOuter(0));
-
-        // Add the area
-        svg.append("path")
-        .datum(data)
-        .attr("fill", "#69b3a2")
-        .attr("fill-opacity", .3)
-        .attr("stroke", "none")
-        .attr("d", d3.area()
-            .x(function(d) { return x(d.date) })
-            .y0( height )
-            .y1(function(d) { return y(d.value) })
-            )
-
-        // Add the line
-        svg.append("path")
-        .datum(data)
-        .attr("fill", "none")
-        .attr("stroke", "#69b3a2")
-        .attr("stroke-width", 4)
-        .attr("d", d3.line()
-            .x(function(d) { return x(d.date) })
-            .y(function(d) { return y(d.value) })
-            )
-
-        // Add the line
-        svg.selectAll("myCircles")
-        .data(data)
-        .enter()
-        .append("circle")
-            .attr("fill", "red")
-            .attr("stroke", "none")
-            .attr("cx", function(d) { return x(d.date) })
-            .attr("cy", function(d) { return y(d.value) })
-            .attr("r", 3)
-    })
-
 </script>
