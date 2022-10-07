@@ -478,10 +478,7 @@ td:hover > .table-cell-window {
 }
 
 .security-events-page-panel form,
-label {
-  margin-bottom: 0;
-}
-
+.security-events-page-panel label,
 .security-events-page-panel .form-group {
   margin-bottom: 0;
 }
