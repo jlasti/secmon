@@ -205,41 +205,7 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
 </div>
 
 <?php
-
-// Toto pekne fungovalo, ale nedaju sa pouzit applyfilter, lebo je to yii\db\query a nie activequery
-// a fungovalo to s ColumnChart grafom
-//-------------------------------------
-//$query = new Query;
-/*---------------------------------------
-$query->select('source_address, count(*) as count')
-    ->from('security_events')
-    ->groupBy('source_address');*/
-//---------------------------------------
-$query = new Query;
-
-$query->select(["date_trunc('minutes', datetime) as date"])
-    ->addselect(["count(*) as data"])
-    ->from('security_events')
-    ->groupBy('date')
-    ->createCommand();
-
-echo sjaakp\gcharts\ColumnChart::widget([
-    'height' => '200px',
-    'dataProvider' => new ActiveDataProvider([
-        'query' =>  $query,
-        'pagination' => false,
-    ]),
-    'columns' => [
-        'date:datetime',
-        'data'
-    ],
-    'options' => [
-        'title' => 'Security Events'
-    ],
-]);
-
 $chartData = FilterController::getEventsToBarChart($selectedFilterId, $timeFilterId);
-
 $series = [];
 $series = [['name' => 'Security Events', 'data' => []]];
 
@@ -247,7 +213,6 @@ foreach($chartData as $key => $record)
 {
     //$tmpRecord = ['name' => $record['time'], 'data' => [$record['count']]];
     //$tmpRecord = ['name' => $record['src_ip'], 'data' => [$record['src_ip'], $record['count']]];
-
     $tmpRecord = [$record['time'], $record['count']];
     array_push($series[0]['data'], $tmpRecord);
 }
@@ -368,8 +333,7 @@ echo \onmotion\apexcharts\ApexchartsWidget::widget([
     </div>
     </div>    
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-<script src="https://d3js.org/d3.v4.js"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
 <script src="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.js"></script>
 <link href="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.css" rel="stylesheet">
