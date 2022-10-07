@@ -36,11 +36,7 @@
     "geoip2/geoip2": "~2.0",
     "beaten-sect0r/yii2-flatpickr": "*",
     "kartik-v/yii2-widget-datetimepicker": "*",
-    "practically/yii2-chartjs": "^1.1",
-    "bower-asset/chart-js": "^3.9",
-    "sjaakp/yii2-gcharts": "*",
-    "onmotion/yii2-widget-apexcharts": "*",
-    "miloschuman/yii2-highcharts-widget": "*"
+    "onmotion/yii2-widget-apexcharts": "*"
   },
   "require-dev": {
     "codeception/codeception": "*",
