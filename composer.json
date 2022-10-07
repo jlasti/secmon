@@ -37,7 +37,10 @@
     "beaten-sect0r/yii2-flatpickr": "*",
     "kartik-v/yii2-widget-datetimepicker": "*",
     "practically/yii2-chartjs": "^1.1",
-    "bower-asset/chart-js": "^3.9"
+    "bower-asset/chart-js": "^3.9",
+    "sjaakp/yii2-gcharts": "*",
+    "onmotion/yii2-widget-apexcharts": "*",
+    "miloschuman/yii2-highcharts-widget": "*"
   },
   "require-dev": {
     "codeception/codeception": "*",
