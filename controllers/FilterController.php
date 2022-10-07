@@ -501,6 +501,38 @@ class FilterController extends Controller
         return null;
     }
 
+    public static function getEventsToBarChart($filterId, $timeFilterId)
+    {
+        unset($filteredData);
+
+        $filter = Filter::findOne($filterId);
+        $timeFilter = Filter::findOne($timeFilterId);
+
+        /*$query = SecurityEvents::find()
+            ->select('source_address as src_ip')
+            ->addselect(["count(*)"])
+            ->groupBy('src_ip');*/
+
+        $query = SecurityEvents::find()
+            ->select(["date_trunc('minutes', datetime) as time"])
+            ->addselect(["count(*)"])
+            ->groupBy('time');
+
+        if (!empty($filter)) {
+            $query->applyFilter($filter);
+        }
+
+        if (!empty($timeFilter)) {
+            $query->applyFilter($timeFilter);
+        }
+
+        $filteredData = $query->asArray()->all();
+
+        Yii::$app->cache->flush();
+
+        return $filteredData;
+    }
+
     /**
      * Saves filter model and its rules. Used in update and create
      *
