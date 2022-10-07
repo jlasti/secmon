@@ -5,9 +5,6 @@ use yii\widgets\Pjax;
 use yii\widgets\ActiveForm;
 use kartik\cmenu\ContextMenu;
 use kartik\datetime\DateTimePicker;
-use practically\chartjs\Chart;
-use sjaakp\gcharts\ColumnChart;
-use miloschuman\highcharts\Highcharts;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -226,7 +223,7 @@ $query->select(["date_trunc('minutes', datetime) as date"])
     ->groupBy('date')
     ->createCommand();
 
-echo ColumnChart::widget([
+echo sjaakp\gcharts\ColumnChart::widget([
     'height' => '200px',
     'dataProvider' => new ActiveDataProvider([
         'query' =>  $query,
@@ -239,22 +236,6 @@ echo ColumnChart::widget([
     'options' => [
         'title' => 'Security Events'
     ],
-]);
-
-//2nd function version
-echo Chart::widget([
-    'type' => Chart::TYPE_BAR,
-    'datasets' => [
-        [
-            'query' => SecurityEvents::find()
-                ->select(["date_trunc('hour', datetime) as date"])
-                ->addselect(["count(*) as data"])
-                ->groupBy('date')
-                ->limit(20)
-                ->createCommand(),
-            'labelAttribute' => 'date',
-        ]
-    ]
 ]);
 
 $chartData = FilterController::getEventsToBarChart($selectedFilterId, $timeFilterId);
@@ -321,47 +302,6 @@ echo \onmotion\apexcharts\ApexchartsWidget::widget([
     ],
     'series' => $series,
 ]);
-
-
-//$chartData = FilterController::getEventsToBarChart($selectedFilterId, $timeFilterId);
-    /*[
-    ['name' => 'Jane', 'data' => [1]],
-    ['name' => 'John', 'data' => [5]]
-];*/
-
-/*echo "<pre>";
-print_r ($chartData);
-echo "</pre>";
-
-$data = [];
-
-foreach($chartData as $key => $record)
-{
-    $tmpRecord = ['name' => $record['src_ip'], 'data' => [$record['count']]];
-    //$tmpRecord = ['data' => [$record['src_ip'], $record['count']]];
-    array_push($data, $tmpRecord);
-}
-
-echo "<pre>";
-print_r ($data);
-echo "</pre>";
-
-echo Highcharts::widget([
-    'options' => [
-        'title' => ['text' => 'Security Events'],
-        'chart' => ['type' => 'column'],
-        'yAxis' => [
-          'title' => ['text' => 'Event Count']
-        ],
-        'series' => $data,/*[
-            ['name' => 'Source IP', 'data' => $data],
-        ],*/
-        /*'dataLabels' => [
-            'enable' => true,
-            'rotation' => -90,
-        ],
-    ]
-]);*/
 ?>
 
 <a href="#modalColumsSettings" class="btn-floating waves-effect waves-light btn-small blue columns-settings-button"
