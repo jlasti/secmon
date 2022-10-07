@@ -6,9 +6,15 @@ use yii\widgets\ActiveForm;
 use kartik\cmenu\ContextMenu;
 use kartik\datetime\DateTimePicker;
 use practically\chartjs\Chart;
+use sjaakp\gcharts\ColumnChart;
+use miloschuman\highcharts\Highcharts;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\data\ActiveDataProvider;
+use yii\data\ArrayDataProvider;
+use yii\db\Query;
+use app\components\filter\FilterQuery;
 use app\models\SecurityEventsPage;
 use app\models\Filter;
 use app\models\FilterRule;
@@ -55,7 +61,7 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
 ?>
 
 <div class="security-events-page-panel">
-    <div class="row">
+    <div class="row" style="margin-bottom: 0;">
         <div class="col" style="width:30%;">
             <div class="row security-panel-header">
                 <div class="col" style="float: left;">
@@ -201,19 +207,161 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
     </div>
 </div>
 
-<?= Chart::widget([
+<?php
+
+// Toto pekne fungovalo, ale nedaju sa pouzit applyfilter, lebo je to yii\db\query a nie activequery
+// a fungovalo to s ColumnChart grafom
+//-------------------------------------
+//$query = new Query;
+/*---------------------------------------
+$query->select('source_address, count(*) as count')
+    ->from('security_events')
+    ->groupBy('source_address');*/
+//---------------------------------------
+$query = new Query;
+
+$query->select(["date_trunc('minutes', datetime) as date"])
+    ->addselect(["count(*) as data"])
+    ->from('security_events')
+    ->groupBy('date')
+    ->createCommand();
+
+echo ColumnChart::widget([
+    'height' => '200px',
+    'dataProvider' => new ActiveDataProvider([
+        'query' =>  $query,
+        'pagination' => false,
+    ]),
+    'columns' => [
+        'date:datetime',
+        'data'
+    ],
+    'options' => [
+        'title' => 'Security Events'
+    ],
+]);
+
+//2nd function version
+echo Chart::widget([
     'type' => Chart::TYPE_BAR,
     'datasets' => [
         [
             'query' => SecurityEvents::find()
-                ->select(["date_trunc('minutes', datetime) as date"])
+                ->select(["date_trunc('hour', datetime) as date"])
                 ->addselect(["count(*) as data"])
                 ->groupBy('date')
+                ->limit(20)
                 ->createCommand(),
             'labelAttribute' => 'date',
         ]
     ]
 ]);
+
+$chartData = FilterController::getEventsToBarChart($selectedFilterId, $timeFilterId);
+
+$series = [];
+$series = [['name' => 'Security Events', 'data' => []]];
+
+foreach($chartData as $key => $record)
+{
+    //$tmpRecord = ['name' => $record['time'], 'data' => [$record['count']]];
+    //$tmpRecord = ['name' => $record['src_ip'], 'data' => [$record['src_ip'], $record['count']]];
+
+    $tmpRecord = [$record['time'], $record['count']];
+    array_push($series[0]['data'], $tmpRecord);
+}
+
+/*
+$series = [
+    [
+        'name' => 'Entity 1',
+        'data' => [
+            ['2018-10-01', 4.66],
+            ['2018-10-02', 5.0],
+            ['2018-10-05', 3.88],
+            ['2018-10-08', 3.77],
+            ['2018-10-07', 4.40],
+            ['2018-10-09', 5.0],
+        ],
+    ]
+];*/
+
+echo \onmotion\apexcharts\ApexchartsWidget::widget([
+    'type' => 'bar', // default area
+    'height' => '150', // default 350
+    //'width' => '500', // default 100%
+    'chartOptions' => [
+        'chart' => [
+            'toolbar' => [
+                'show' => true,
+                'autoSelected' => 'zoom'
+            ],
+        ],
+        'xaxis' => [
+            'type' => 'datetime',
+            // 'categories' => $categories,
+        ],
+        'plotOptions' => [
+            'bar' => [
+                'horizontal' => false,
+                //'endingShape' => 'rounded'
+            ],
+        ],
+        'dataLabels' => [
+            'enabled' => false
+        ],
+        'stroke' => [
+            'show' => true,
+            'colors' => ['transparent']
+        ],
+        'legend' => [
+            'verticalAlign' => 'bottom',
+            'horizontalAlign' => 'left',
+        ],
+    ],
+    'series' => $series,
+]);
+
+
+//$chartData = FilterController::getEventsToBarChart($selectedFilterId, $timeFilterId);
+    /*[
+    ['name' => 'Jane', 'data' => [1]],
+    ['name' => 'John', 'data' => [5]]
+];*/
+
+/*echo "<pre>";
+print_r ($chartData);
+echo "</pre>";
+
+$data = [];
+
+foreach($chartData as $key => $record)
+{
+    $tmpRecord = ['name' => $record['src_ip'], 'data' => [$record['count']]];
+    //$tmpRecord = ['data' => [$record['src_ip'], $record['count']]];
+    array_push($data, $tmpRecord);
+}
+
+echo "<pre>";
+print_r ($data);
+echo "</pre>";
+
+echo Highcharts::widget([
+    'options' => [
+        'title' => ['text' => 'Security Events'],
+        'chart' => ['type' => 'column'],
+        'yAxis' => [
+          'title' => ['text' => 'Event Count']
+        ],
+        'series' => $data,/*[
+            ['name' => 'Source IP', 'data' => $data],
+        ],*/
+        /*'dataLabels' => [
+            'enable' => true,
+            'rotation' => -90,
+        ],
+    ]
+]);*/
 ?>
 
 <a href="#modalColumsSettings" class="btn-floating waves-effect waves-light btn-small blue columns-settings-button"
@@ -288,7 +436,7 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
 
 <script>
     $(".container").css("padding-top", "10px");
-    
+
     // Create sortable chips for security events table
     var $sortableChips = $( "#chipstable" );
     $sortableChips.sortable();
