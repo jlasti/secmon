@@ -238,22 +238,33 @@ $series = [
         <?= \onmotion\apexcharts\ApexchartsWidget::widget([
             'type' => 'bar', // default area
             'height' => '150', // default 350
-            //'width' => '500', // default 100%
             'chartOptions' => [
                 'chart' => [
                     'toolbar' => [
                         'show' => true,
                         'autoSelected' => 'zoom'
                     ],
-                ],
+                ],  
                 'xaxis' => [
                     'type' => 'datetime',
-                    // 'categories' => $categories,
+                    'thickAmount' => 2,
+                    'labels' => [
+                        'format' => 'd/M HH:MM:ss',
+                    ]
+                ],
+                'yaxis' => [
+                    'type' => 'numeric',
+                    'min' => 0,
+                    'seriesName' => 'Events Count',
+                ],
+                'tooltip' => [
+                    'x' => [
+                      'format' => 'MMM dd hh:mm:ss'
+                    ]
                 ],
                 'plotOptions' => [
                     'bar' => [
                         'horizontal' => false,
-                        //'endingShape' => 'rounded'
                     ],
                 ],
                 'dataLabels' => [
