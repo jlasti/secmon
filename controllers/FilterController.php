@@ -508,11 +508,6 @@ class FilterController extends Controller
         $filter = Filter::findOne($filterId);
         $timeFilter = Filter::findOne($timeFilterId);
 
-        /*$query = SecurityEvents::find()
-            ->select('source_address as src_ip')
-            ->addselect(["count(*)"])
-            ->groupBy('src_ip');*/
-
         $query = SecurityEvents::find()
             ->select(["date_trunc('minutes', datetime) as time"])
             ->addselect(["count(*)"])
