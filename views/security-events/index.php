@@ -172,32 +172,32 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
 
         <div class="col" style="width:30%;"">
             <div class="row security-panel-header">
-                <div class="col" style="float: left;">
-                    <span class="label">Refresh time</span>
+                <?php $form = ActiveForm::begin(['action' =>['update-refresh-time'], 'method' => 'post',]); ?>
+                    <div class="col" style="float: left;">
+                        <span class="label">Refresh time</span>
+                    </div>
+                    <div class="col" style="float:right;">
+                        <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time']) ?>
+                    </div>
+                    <div class="col" style="float:right;">
+                        <?= Html::a($securityEventsPage->auto_refresh ? "<i class='material-icons'>pause</i>" : "<i class='material-icons'>play_arrow</i>",
+                            ['start-pause-auto-refresh'],
+                            [
+                                'class' => 'btn btn-success',
+                                'title' => $securityEventsPage->auto_refresh ? 'Pause auto refresh' : 'Resume auto refresh'
+                            ])
+                        ?>            
+                    </div>
+                    <div class="col" style="float:right;">
+                        <?= Html::button("<i class='material-icons'>refresh</i>",
+                            [
+                                'class' => 'btn btn-success',
+                                'title' => 'Refresh page',
+                                'onclick' => 'location.reload()'
+                            ])
+                        ?>
+                    </div>
                 </div>
-                <div class="col" style="float:right;">
-                    <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time']) ?>
-                </div>
-                <div class="col" style="float:right;">
-                    <?= Html::a($securityEventsPage->auto_refresh ? "<i class='material-icons'>pause</i>" : "<i class='material-icons'>play_arrow</i>",
-                        ['start-pause-auto-refresh'],
-                        [
-                            'class' => 'btn btn-success',
-                            'title' => $securityEventsPage->auto_refresh ? 'Pause auto refresh' : 'Resume auto refresh'
-                        ])
-                    ?>            
-                </div>
-                <div class="col" style="float:right;">
-                    <?= Html::button("<i class='material-icons'>refresh</i>",
-                        [
-                            'class' => 'btn btn-success',
-                            'title' => 'Refresh page',
-                            'onclick' => 'location.reload()'
-                        ])
-                    ?>
-                </div>
-            </div>
-            <?php $form = ActiveForm::begin(['action' =>['update-refresh-time'], 'method' => 'post',]); ?>
                 <?= $form->field($securityEventsPage, 'refresh_time')->textInput(['placeholder' => 'nY/nM/nW/nD/nH/nm/nS'])->label(false) ?>
             <?php ActiveForm::end(); ?>
         </div>
@@ -231,46 +231,51 @@ $series = [
         ],
     ]
 ];*/
-
-echo \onmotion\apexcharts\ApexchartsWidget::widget([
-    'type' => 'bar', // default area
-    'height' => '150', // default 350
-    //'width' => '500', // default 100%
-    'chartOptions' => [
-        'chart' => [
-            'toolbar' => [
-                'show' => true,
-                'autoSelected' => 'zoom'
-            ],
-        ],
-        'xaxis' => [
-            'type' => 'datetime',
-            // 'categories' => $categories,
-        ],
-        'plotOptions' => [
-            'bar' => [
-                'horizontal' => false,
-                //'endingShape' => 'rounded'
-            ],
-        ],
-        'dataLabels' => [
-            'enabled' => false
-        ],
-        'stroke' => [
-            'show' => true,
-            'colors' => ['transparent']
-        ],
-        'legend' => [
-            'verticalAlign' => 'bottom',
-            'horizontalAlign' => 'left',
-        ],
-    ],
-    'series' => $series,
-]);
 ?>
 
+<div class="security-events-index", id="securityEventsBarChart">
+    <?php Pjax::begin(['id' => 'pjaxBarChartContainer']); ?>
+        <?= \onmotion\apexcharts\ApexchartsWidget::widget([
+            'type' => 'bar', // default area
+            'height' => '150', // default 350
+            //'width' => '500', // default 100%
+            'chartOptions' => [
+                'chart' => [
+                    'toolbar' => [
+                        'show' => true,
+                        'autoSelected' => 'zoom'
+                    ],
+                ],
+                'xaxis' => [
+                    'type' => 'datetime',
+                    // 'categories' => $categories,
+                ],
+                'plotOptions' => [
+                    'bar' => [
+                        'horizontal' => false,
+                        //'endingShape' => 'rounded'
+                    ],
+                ],
+                'dataLabels' => [
+                    'enabled' => false
+                ],
+                'stroke' => [
+                    'show' => true,
+                    'colors' => ['transparent']
+                ],
+                'legend' => [
+                    'verticalAlign' => 'bottom',
+                    'horizontalAlign' => 'left',
+                ],
+            ],
+            'series' => $series,
+        ]);
+        ?>      
+    <?php Pjax::end(); ?>
+</div>
+
 <a href="#modalColumsSettings" class="btn-floating waves-effect waves-light btn-small blue columns-settings-button"
-    style="position:absolute; right: 60px; margin-bottom: 20px; display: 'block'; ?>" data-toggle="tooltip" data-placement="bottom" title="Columns settings">
+    style="position:absolute; right: 10px; margin-bottom: 20px; display: 'block'; ?>" data-toggle="tooltip" data-placement="bottom" title="Columns settings">
     <i class="material-icons">settings</i>
 </a>
 
@@ -279,7 +284,7 @@ echo \onmotion\apexcharts\ApexchartsWidget::widget([
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
                 //'filterModel' => $searchModel,
-                'layout' => '{items}<div id="pagination" onclick="location.reload()">{pager}</div>',
+                'layout' => '{items}<div id="pagination">{pager}</div>',
                 'tableOptions' => [
                     'id' => 'eventsContent',
                     'class' => 'responsive-table striped',
@@ -341,14 +346,14 @@ echo \onmotion\apexcharts\ApexchartsWidget::widget([
 <script>
     $(".container").css("padding-top", "10px");
 
+    // Add hover elements on table cells
+    addHoverElementOnTableCells();
+
     // Create sortable chips for security events table
     var $sortableChips = $( "#chipstable" );
     $sortableChips.sortable();
 
     var $sortable = $( "#eventsContent > thead > tr" );
-
-    // Add hover elements on table cells
-    addHoverElementOnTableCells();
 
     // If auto_refresh is set to true, then set interval for content update
     if("<?php echo $securityEventsPage->auto_refresh; ?>")
@@ -357,8 +362,8 @@ echo \onmotion\apexcharts\ApexchartsWidget::widget([
 
         setInterval(function() {
             $.pjax.reload({
-                container:"#pjaxContainer table#eventsContent", 
-                fragment:"table#eventsContent"})
+                container:"#pjaxContainer table#eventsContent tbody:last", 
+                fragment:"table#eventsContent tbody:last"})
                 .done(function() {
                     activateEventsRows();
                     $.pjax.reload({
@@ -368,7 +373,12 @@ echo \onmotion\apexcharts\ApexchartsWidget::widget([
                     addHoverElementOnTableCells();
                 });
             }, getRefreshTime(refreshString)*1000 );
+
     }
+
+    $(document).on('pjax:end', function(e) {
+        alert('Pjax has ended!');
+    });
 
     // Check which radio button is checked
     if($('input[name="timeFilterType"]:checked').val() == 'absolute')
@@ -413,16 +423,16 @@ echo \onmotion\apexcharts\ApexchartsWidget::widget([
 
         if(!validateColumnName(colunmValue, objectColumns)){
             Materialize.toast(
-              'Column "' + colunmValue + '" does not exist!',
-              2000
+            'Column "' + colunmValue + '" does not exist!',
+            2000
             );
             return;
         }
 
         if(checkColumnExistence(colunmValue, objectColumns)){
             Materialize.toast(
-              'Column "' + colunmValue + '" already in list!',
-              2000
+            'Column "' + colunmValue + '" already in list!',
+            2000
             );
             return;
         }
@@ -471,6 +481,13 @@ echo \onmotion\apexcharts\ApexchartsWidget::widget([
             return false;
         }
     }));
+
+    // Add Hover Elements on table cells after pagination is used
+    $("#securityEventsTable").on("click", function(){
+        $(document).on('pjax:end', function() {
+            addHoverElementOnTableCells();
+        });
+    });
 
     function getRefreshTime(refreshString) {
         if (refreshString == "0") {
@@ -532,7 +549,7 @@ echo \onmotion\apexcharts\ApexchartsWidget::widget([
     }
 
     function addHoverElementOnTableCell(cell, index, column) {
-        cellContent = cell.textContent;
+        cellContent = cell.firstChild.data;
 
         $('<div class="table-cell-window">\
             <p>Add to filter:</p>\
