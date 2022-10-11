@@ -44,7 +44,7 @@ class SecurityEventsSearch extends SecurityEvents
     {
         $query = SecurityEvents::find();
         $filter = Filter::findOne(['id' => $filterId]);
-        $timeFilterId = Filter::findOne(['id' => $timeFilterId]);
+        $timeFilter = Filter::findOne(['id' => $timeFilterId]);
 
         // add conditions that should always apply here
 
@@ -67,8 +67,8 @@ class SecurityEventsSearch extends SecurityEvents
             $query->applyFilter($filter);
         }
 
-        if (!empty($timeFilterId)) {
-            $query->applyFilter($timeFilterId);
+        if (!empty($timeFilter)) {
+            $query->applyFilter($timeFilter);
         }
 
         // grid filtering conditions
@@ -249,7 +249,6 @@ class SecurityEventsSearch extends SecurityEvents
             ->andFilterWhere(['ilike', 'raw_event', $this->raw_event]);
         
         $query->all();
-
 
         return $dataProvider;
     }

@@ -8,6 +8,10 @@ use kartik\datetime\DateTimePicker;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\data\ActiveDataProvider;
+use yii\data\ArrayDataProvider;
+use yii\db\Query;
+use app\components\filter\FilterQuery;
 use app\models\SecurityEventsPage;
 use app\models\Filter;
 use app\models\FilterRule;
@@ -18,6 +22,7 @@ use \app\controllers\SecurityEventsController;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\SecurityEventsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $chartDataProvider yii\data\ActiveDataProvider */
 
 $this->params['title'] = 'Security Events';
 $loggedUserId = Yii::$app->user->getId();
@@ -52,50 +57,58 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
 }
 ?>
 
-<div class="security-events-page-panel" style="padding-top: 0;">
-    <div class="row">
+<div class="security-events-page-panel">
+    <div class="row" style="margin-bottom: 0;">
         <div class="col" style="width:30%;">
-            <label class="active" for="name">Selected Filter</label>
+            <div class="row security-panel-header">
+                <div class="col" style="float: left;">
+                    <span class="label">Selected filter:</span>
+                </div>
+                <div class="col" style="float:right;">
+                    <?= Html::a("<span><i class='material-icons'>delete</i></span>", ['delete-selected-filter'],
+                        [
+                            'class' => 'btn btn-danger',
+                            'style' => 'background-color: red;',
+                            'title' => 'Remove selected filter',
+                            'disabled' => !empty($selectedFilter) ? false : true,
+                            'data' => [
+                                'confirm' => Yii::t('app', 'Selected filter will be permanently deleted. Are you sure you want to delete this filter?'),
+                                'method' => 'post',
+                            ],
+                        ])
+                    ?>
+                </div>
+                <div class="col" style="float:right;">
+                    <?= Html::a("<span><i class='material-icons'>clear</i></span>", ['remove-selected-filter'], ['class' => 'btn btn-danger', 'style' => 'background-color: orange;', 'title' => 'Clear selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]) ?>
+                </div>
+                <div class="col" style="float:right;">
+                    <?= Html::a("<span><i class='material-icons'>edit</i></span>", ['filter/update', 'id' => $selectedFilterId, 'securityEventsPage' => true], ['class' => 'btn btn-success', 'title' => 'Edit selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]); ?>
+                </div>
+                <div class="col" style="float:right;">
+                    <?= Html::a("<span><i class='material-icons'>add</i></span>", ['filter/create', 'securityEventsPage' => true], ['class' => 'btn btn-success', 'title' => 'Create new filter']) ?>
+                </div>
+            </div>
             <?= Html::beginForm(['apply-selected-filter'],'post', ['style' => 'padding-right: 20px;']); ?>
                 <?= Html::activeDropDownList($filter, 'name', ArrayHelper::map($filters,'name','name'), ['value' => !empty($selectedFilter) ? $selectedFilter->name : '', 'style' => !empty($selectedFilter) ? 'color: black;' : 'color: gray;', 'id' => 'eventFilterSelect', 'onchange' => 'this.form.submit()']); ?>
             <?= Html::endForm(); ?>
-            <?= Html::a("<i class='material-icons'>add</i>", ['filter/create', 'securityEventsPage' => true], ['class' => 'btn btn-success', 'title' => 'Create new filter']) ?>
-            <?= Html::a("<i class='material-icons'>edit</i>", ['filter/update', 'id' => $selectedFilterId, 'securityEventsPage' => true], ['class' => 'btn btn-success', 'title' => 'Edit selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]); ?>
-            <?= Html::a("<i class='material-icons'>clear</i>", ['remove-selected-filter'], ['class' => 'btn btn-danger', 'style' => 'background-color: orange;', 'title' => 'Clear selected filter', 'disabled' => !empty($selectedFilter) ? false : true ]) ?>
-            <?= Html::a("<i class='material-icons'>delete</i>", ['delete-selected-filter'],
-                [
-                    'class' => 'btn btn-danger',
-                    'style' => 'background-color: red;',
-                    'title' => 'Remove selected filter',
-                    'disabled' => !empty($selectedFilter) ? false : true,
-                    'data' => [
-                        'confirm' => Yii::t('app', 'Selected filter will be permanently deleted. Are you sure you want to delete this filter?'),
-                        'method' => 'post',
-                    ],
-                ])
-            ?>
-            <div <?= $selectedFilterId ? 'class="filter-rule"' : ''?>>
-                <p>
-                    <?php
-                        if($selectedFilter)
-                        {
-                            $rules = FilterRule::find()->where(['filter_id' => $selectedFilterId])->orderBy(['position' => SORT_ASC])->all();
-                            foreach($rules as $idx => $rule)
-                            {
-                                if($idx == 0)
-                                    echo $rule->column . " " . $rule->operator . " " . $rule->value . " ";
-                                else
-                                    echo $rule->logic_operator . " " . $rule->column . " " . $rule->operator . " " . $rule->value . " ";
-                            }
-                        }
-                    ?>
-                </p>
-            </div>    
         </div>
 
         <div class="col" style="width:40%;">
-            <label class="active" for="name">Time Filter</label>
-            <?= Html::beginForm(['update-time-filter'],'post'); ?>
+            <?= Html::beginForm(['update-time-filter'],'post'); ?>    
+                <div class="row security-panel-header" style="margin-bottom: 5px;">
+                    <div class="col" style="float: left;">
+                        <span class="label">Time filter:</span>
+                    </div>
+                    <div class="col" style="float: right; padding: 0;">
+                        <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time']) ?>
+                    </div>
+                    <div class="col" style="float: right; padding-right: 20px;">
+                        <input class="form-check-input" type="radio" name="timeFilterType" id="inlineRadioAbsolute" value="absolute" onclick="showAbsoluteTimeForm()" <?= $securityEventsPage->time_filter_type == 'absolute' ? 'checked=""' : '' ?> >
+                        <label class="form-check-label" for="inlineRadioAbsolute">Absolute</label>
+                        <input class="form-check-input" type="radio" name="timeFilterType" id="inlineRadioRelative" value="relative" onclick="showRelativeTimeForm()" <?= $securityEventsPage->time_filter_type == 'relative' ? 'checked=""' : '' ?> >
+                        <label class="form-check-label" for="inlineRadioRelative">Relative</label>
+                    </div>
+                </div>
                 <div id="absoluteTimeForm" style="display:none;">
                     <div class="col" style="width:50%; padding-left: 0;">
                         <?php
@@ -128,7 +141,7 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
                         ?>
                     </div>
                 </div>
-                <div id="relativeTimeForm" style="display:none; padding-right: 20px">
+                <div id="relativeTimeForm" style="display:none; width:50%; float: lefft; padding-right: 20px;">
                     <select id="relativeTimeFormSelect" name="relativeTime" placeholder="nY/nM/nW/nD/nH/nm/nS" value="<?= $relativeTimeFilter ?>">
                         <option value="10m">10m</option>
                         <option value="30m">30m</option>
@@ -137,26 +150,28 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
                         <option value="7D">7D</option>
                     </select>
                 </div>
-                
-                <div class="col" style="width:50%;">
-                    <input class="form-check-input" type="radio" name="timeFilterType" id="inlineRadioAbsolute" value="absolute" onclick="showAbsoluteTimeForm()" <?= $securityEventsPage->time_filter_type == 'absolute' ? 'checked=""' : '' ?> >
-                    <label class="form-check-label" for="inlineRadioAbsolute">Absolute</label>
-                    <input class="form-check-input" type="radio" name="timeFilterType" id="inlineRadioRelative" value="relative" onclick="showRelativeTimeForm()" <?= $securityEventsPage->time_filter_type == 'relative' ? 'checked=""' : '' ?> >
-                    <label class="form-check-label" for="inlineRadioRelative">Relative</label>
-                </div>
-
-                <div class="col" style="width:50%; padding: 0;">
-                    <div class="form-group">
-                        <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time', 'style' => 'float: right; margin-right: 0;']) ?>
-                    </div>
-                 </div>
             <?= Html::endForm(); ?>
         </div>
 
-        <div class="col">
-            <?php $form = ActiveForm::begin(['action' =>['update-refresh-time'], 'method' => 'post',]); ?>
-                <?= $form->field($securityEventsPage, 'refresh_time')->textInput(['placeholder' => 'nY/nM/nW/nD/nH/nm/nS']) ?>
-                <div class="form-group">
+        <div class="col" style="width:30%;"">
+            <div class="row security-panel-header">
+                <?php $form = ActiveForm::begin(['action' =>['update-refresh-time'], 'method' => 'post',]); ?>
+                    <div class="col" style="float: left;">
+                        <span class="label">Refresh time</span>
+                    </div>
+                    <div class="col" style="float:right;">
+                        <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time']) ?>
+                    </div>
+                    <div class="col" style="float:right;">
+                        <?= Html::a($securityEventsPage->auto_refresh ? "<i class='material-icons'>pause</i>" : "<i class='material-icons'>play_arrow</i>",
+                            ['start-pause-auto-refresh'],
+                            [
+                                'class' => 'btn btn-success',
+                                'title' => $securityEventsPage->auto_refresh ? 'Pause auto refresh' : 'Resume auto refresh'
+                            ])
+                        ?>            
+                    </div>
+                    <div class="col" style="float:right;">
                         <?= Html::button("<i class='material-icons'>refresh</i>",
                             [
                                 'class' => 'btn btn-success',
@@ -164,39 +179,117 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
                                 'onclick' => 'location.reload()'
                             ])
                         ?>
-                        <?= Html::a($securityEventsPage->auto_refresh ? "<i class='material-icons'>pause</i>" : "<i class='material-icons'>play_arrow</i>",
-                            ['start-pause-auto-refresh'],
-                            [
-                                'class' => 'btn btn-success',
-                                'title' => $securityEventsPage->auto_refresh ? 'Pause auto refresh' : 'Resume auto refresh'
-                            ]
-                        )?>
-                        <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time']) ?>
+                    </div>
                 </div>
+                <?= $form->field($securityEventsPage, 'refresh_time')->textInput(['placeholder' => 'nY/nM/nW/nD/nH/nm/nS'])->label(false) ?>
             <?php ActiveForm::end(); ?>
         </div>
     </div>
+    <div class="row" style="margin-bottom: 0;">
+        <div class="col" style="width:100%;">
+            <div <?= $selectedFilterId ? 'class="filter-rule"' : ''?>>
+                <p>
+                    <?php
+                        if($selectedFilter)
+                        {
+                            $rules = FilterRule::find()->where(['filter_id' => $selectedFilterId])->orderBy(['position' => SORT_ASC])->all();
+                            foreach($rules as $idx => $rule)
+                            {
+                                if($idx == 0)
+                                    echo $rule->column . " " . $rule->operator . " " . $rule->value . " ";
+                                else
+                                    echo $rule->logic_operator . " " . $rule->column . " " . $rule->operator . " " . $rule->value . " ";
+                            }
+                        }
+                    ?>
+                </p>
+            </div>        
+        </div>
+    </div>
 </div>
+
+<?php
+$chartData = FilterController::getEventsToBarChart($selectedFilterId, $timeFilterId);
+$series = [];
+$series = [['name' => 'Security Events', 'data' => []]];
+
+foreach($chartData as $key => $record)
+{
+    $tmpRecord = [$record['time'], $record['count']];
+    array_push($series[0]['data'], $tmpRecord);
+}
+?>
+
+<div class="security-events-index", id="securityEventsBarChart">
+    <?php Pjax::begin(['id' => 'pjaxBarChartContainer']); ?>
+        <?= \onmotion\apexcharts\ApexchartsWidget::widget([
+            'type' => 'bar', // area, scatter
+            'height' => '150', // default 350
+            'chartOptions' => [
+                'chart' => [
+                    'toolbar' => [
+                        'show' => true,
+                        'autoSelected' => 'zoom'
+                    ],
+                ],  
+                'xaxis' => [
+                    'type' => 'datetime',
+                    'thickAmount' => 2,
+                    'labels' => [
+                        'format' => 'd/M HH:MM:ss',
+                    ]
+                ],
+                'yaxis' => [
+                    'type' => 'numeric',
+                    'min' => 0,
+                    'seriesName' => 'Events Count',
+                ],
+                'tooltip' => [
+                    'x' => [
+                      'format' => 'MMM dd hh:mm:ss'
+                    ]
+                ],
+                'plotOptions' => [
+                    'bar' => [
+                        'horizontal' => false,
+                    ],
+                ],
+                'dataLabels' => [
+                    'enabled' => false
+                ],
+                'stroke' => [
+                    'show' => true,
+                    'colors' => ['transparent']
+                ],
+                'legend' => [
+                    'verticalAlign' => 'bottom',
+                    'horizontalAlign' => 'left',
+                ],
+            ],
+            'series' => $series,
+        ]);
+        ?>      
+    <?php Pjax::end(); ?>
+</div>
+
+<a href="#modalColumsSettings" class="btn-floating waves-effect waves-light btn-small blue columns-settings-button"
+    style="position:absolute; right: 10px; margin-bottom: 20px; display: 'block'; ?>" data-toggle="tooltip" data-placement="bottom" title="Columns settings">
+    <i class="material-icons">settings</i>
+</a>
 
 <div class="security-events-index clickable-table", id="securityEventsTable">
     <?php Pjax::begin(['id' => 'pjaxContainer']); ?>
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
-                'filterModel' => $searchModel,
-                'layout' => '{items}<div id="pagination" onclick="location.reload()">{pager}</div>',
+                'layout' => '{items}<div id="pagination">{pager}</div>',
                 'tableOptions' => [
                     'id' => 'eventsContent',
-                    'class' => 'responsive-table striped'
+                    'class' => 'responsive-table striped',
                 ],
                 'columns' => $dataColumns,
             ]); ?>
     <?php Pjax::end(); ?>
 </div>
-
-<a href="#modalColumsSettings" class="btn-floating waves-effect waves-light btn-small blue"
-    style="position:absolute; top: 200px; right: 40px; display: 'block' ?>" data-toggle="tooltip" data-placement="bottom" title="Columns settings">
-    <i class="material-icons">settings</i>
-</a>
 
 <!-- Modal Structure -->
 <div class="modal" id="modalColumsSettings">
@@ -248,14 +341,16 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
 <link href="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.css" rel="stylesheet">
 
 <script>
+    $(".container").css("padding-top", "10px");
+
+    // Add hover elements on table cells
+    addHoverElementOnTableCells();
+
     // Create sortable chips for security events table
     var $sortableChips = $( "#chipstable" );
     $sortableChips.sortable();
 
     var $sortable = $( "#eventsContent > thead > tr" );
-
-    // Add hover elements on table cells
-    addHoverElementOnTableCells();
 
     // If auto_refresh is set to true, then set interval for content update
     if("<?php echo $securityEventsPage->auto_refresh; ?>")
@@ -264,8 +359,8 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
 
         setInterval(function() {
             $.pjax.reload({
-                container:"#pjaxContainer table#eventsContent", 
-                fragment:"table#eventsContent"})
+                container:"#pjaxContainer table#eventsContent tbody:last", 
+                fragment:"table#eventsContent tbody:last"})
                 .done(function() {
                     activateEventsRows();
                     $.pjax.reload({
@@ -275,7 +370,12 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
                     addHoverElementOnTableCells();
                 });
             }, getRefreshTime(refreshString)*1000 );
+
     }
+
+    $(document).on('pjax:end', function(e) {
+        alert('Pjax has ended!');
+    });
 
     // Check which radio button is checked
     if($('input[name="timeFilterType"]:checked').val() == 'absolute')
@@ -320,16 +420,16 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
 
         if(!validateColumnName(colunmValue, objectColumns)){
             Materialize.toast(
-              'Column "' + colunmValue + '" does not exist!',
-              2000
+            'Column "' + colunmValue + '" does not exist!',
+            2000
             );
             return;
         }
 
         if(checkColumnExistence(colunmValue, objectColumns)){
             Materialize.toast(
-              'Column "' + colunmValue + '" already in list!',
-              2000
+            'Column "' + colunmValue + '" already in list!',
+            2000
             );
             return;
         }
@@ -378,6 +478,13 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
             return false;
         }
     }));
+
+    // Add Hover Elements on table cells after pagination is used
+    $("#securityEventsTable").on("click", function(){
+        $(document).on('pjax:end', function() {
+            addHoverElementOnTableCells();
+        });
+    });
 
     function getRefreshTime(refreshString) {
         if (refreshString == "0") {
@@ -439,7 +546,10 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
     }
 
     function addHoverElementOnTableCell(cell, index, column) {
-        cellContent = cell.textContent;
+        if(cell.firstChild )
+            cellContent = cell.firstChild.data;
+        else
+            cellContent = cell.contentText;
 
         $('<div class="table-cell-window">\
             <p>Add to filter:</p>\
