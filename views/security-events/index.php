@@ -473,7 +473,7 @@ foreach($chartData as $key => $record)
             values[this.name] = $(this).val();
         });
 
-        if(values['value'] === "(not set)" || values['value'].length === 0){
+        if(values['value'] == 'undefined' || values['value'] === "(not set)" || values['value'].length === 0){
             Materialize.toast('Selected value "' + values['value'] + '" of column "' + values['column'] + '" can not be added to filter!', 3500);
             return false;
         }
