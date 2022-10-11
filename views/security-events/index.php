@@ -560,7 +560,10 @@ $series = [
     }
 
     function addHoverElementOnTableCell(cell, index, column) {
-        cellContent = cell.firstChild.data;
+        if(cell.firstChild )
+            cellContent = cell.firstChild.data;
+        else
+            cellContent = cell.contentText;
 
         $('<div class="table-cell-window">\
             <p>Add to filter:</p>\
