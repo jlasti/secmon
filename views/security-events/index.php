@@ -91,23 +91,6 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
             <?= Html::beginForm(['apply-selected-filter'],'post', ['style' => 'padding-right: 20px;']); ?>
                 <?= Html::activeDropDownList($filter, 'name', ArrayHelper::map($filters,'name','name'), ['value' => !empty($selectedFilter) ? $selectedFilter->name : '', 'style' => !empty($selectedFilter) ? 'color: black;' : 'color: gray;', 'id' => 'eventFilterSelect', 'onchange' => 'this.form.submit()']); ?>
             <?= Html::endForm(); ?>
-            <div <?= $selectedFilterId ? 'class="filter-rule"' : ''?>>
-                <p>
-                    <?php
-                        if($selectedFilter)
-                        {
-                            $rules = FilterRule::find()->where(['filter_id' => $selectedFilterId])->orderBy(['position' => SORT_ASC])->all();
-                            foreach($rules as $idx => $rule)
-                            {
-                                if($idx == 0)
-                                    echo $rule->column . " " . $rule->operator . " " . $rule->value . " ";
-                                else
-                                    echo $rule->logic_operator . " " . $rule->column . " " . $rule->operator . " " . $rule->value . " ";
-                            }
-                        }
-                    ?>
-                </p>
-            </div>    
         </div>
 
         <div class="col" style="width:40%;">
@@ -202,6 +185,27 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
             <?php ActiveForm::end(); ?>
         </div>
     </div>
+    <div class="row" style="margin-bottom: 0;">
+        <div class="col" style="width:100%;">
+            <div <?= $selectedFilterId ? 'class="filter-rule"' : ''?>>
+                <p>
+                    <?php
+                        if($selectedFilter)
+                        {
+                            $rules = FilterRule::find()->where(['filter_id' => $selectedFilterId])->orderBy(['position' => SORT_ASC])->all();
+                            foreach($rules as $idx => $rule)
+                            {
+                                if($idx == 0)
+                                    echo $rule->column . " " . $rule->operator . " " . $rule->value . " ";
+                                else
+                                    echo $rule->logic_operator . " " . $rule->column . " " . $rule->operator . " " . $rule->value . " ";
+                            }
+                        }
+                    ?>
+                </p>
+            </div>        
+        </div>
+    </div>
 </div>
 
 <?php
@@ -211,32 +215,15 @@ $series = [['name' => 'Security Events', 'data' => []]];
 
 foreach($chartData as $key => $record)
 {
-    //$tmpRecord = ['name' => $record['time'], 'data' => [$record['count']]];
-    //$tmpRecord = ['name' => $record['src_ip'], 'data' => [$record['src_ip'], $record['count']]];
     $tmpRecord = [$record['time'], $record['count']];
     array_push($series[0]['data'], $tmpRecord);
 }
-
-/*
-$series = [
-    [
-        'name' => 'Entity 1',
-        'data' => [
-            ['2018-10-01', 4.66],
-            ['2018-10-02', 5.0],
-            ['2018-10-05', 3.88],
-            ['2018-10-08', 3.77],
-            ['2018-10-07', 4.40],
-            ['2018-10-09', 5.0],
-        ],
-    ]
-];*/
 ?>
 
 <div class="security-events-index", id="securityEventsBarChart">
     <?php Pjax::begin(['id' => 'pjaxBarChartContainer']); ?>
         <?= \onmotion\apexcharts\ApexchartsWidget::widget([
-            'type' => 'bar', // default area
+            'type' => 'bar', // area, scatter
             'height' => '150', // default 350
             'chartOptions' => [
                 'chart' => [
@@ -294,7 +281,6 @@ $series = [
     <?php Pjax::begin(['id' => 'pjaxContainer']); ?>
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
-                //'filterModel' => $searchModel,
                 'layout' => '{items}<div id="pagination">{pager}</div>',
                 'tableOptions' => [
                     'id' => 'eventsContent',
