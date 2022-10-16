@@ -36,7 +36,6 @@ $selectedFilter = Filter::findOne(['id' => $selectedFilterId]);
 $timeFilter = Filter::findOne(['id' => $timeFilterId]);
 $filter = new Filter();
 $colsDown = SecurityEvents::getColumnsDropdown();
-
 $columns = explode(",", $securityEventsPage->data_columns);
 
 $relativeTimeFilter = '';
@@ -163,12 +162,13 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
                         <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time']) ?>
                     </div>
                     <div class="col" style="float:right;">
-                        <?= Html::a($securityEventsPage->auto_refresh ? "<i class='material-icons'>pause</i>" : "<i class='material-icons'>play_arrow</i>",
+                        <a id="pauseAutoRefreshButton" class="btn btn-success" value="pause"><i class='material-icons'>pause</i></a>
+                        <?= 'ahoj'/*Html::a($securityEventsPage->auto_refresh ? "<i class='material-icons'>pause</i>" : "<i class='material-icons'>play_arrow</i>",
                             ['start-pause-auto-refresh'],
                             [
                                 'class' => 'btn btn-success',
                                 'title' => $securityEventsPage->auto_refresh ? 'Pause auto refresh' : 'Resume auto refresh'
-                            ])
+                            ])*/
                         ?>            
                     </div>
                     <div class="col" style="float:right;">
@@ -352,12 +352,14 @@ foreach($chartData as $key => $record)
 
     var $sortable = $( "#eventsContent > thead > tr" );
 
-    // If auto_refresh is set to true, then set interval for content update
-    if("<?php echo $securityEventsPage->auto_refresh; ?>")
-    {
-        var refreshString = "<?php echo $securityEventsPage->refresh_time; ?>";
+    var intervalId;
+    var refreshString = "<?php echo $securityEventsPage->refresh_time; ?>";
+    startInterval(getRefreshTime(refreshString)*1000);
 
-        setInterval(function() {
+    // store in a function so we can call it again
+    function startInterval(_interval) {
+        // Store the id of the interval so we can clear it later
+        intervalId = setInterval(function() {
             $.pjax.reload({
                 container:"#pjaxContainer table#eventsContent tbody:last", 
                 fragment:"table#eventsContent tbody:last"})
@@ -367,15 +369,54 @@ foreach($chartData as $key => $record)
                         container:"#pjaxContainer #pagination", 
                         fragment:"#pagination"
                     });
+                    $.pjax.reload({container: "#pjaxBarChartContainer", async:true});
                     addHoverElementOnTableCells();
                 });
-            }, getRefreshTime(refreshString)*1000 );
-
+        }, _interval);
     }
 
-    $(document).on('pjax:end', function(e) {
-        alert('Pjax has ended!');
-    });
+    $('#pauseAutoRefreshButton').on('click', function() {
+        
+        var autorefresh = $('#pauseAutoRefreshButton').attr('value');
+        console.log(autorefresh);
+        if(autorefresh == 'pause')
+        {
+            console.log('pausujem');
+            clearInterval(intervalId);
+            $('#pauseAutoRefreshButton i').text("play_arrow");
+            $('#pauseAutoRefreshButton').attr('value', 'play');
+        }  
+        else
+        {
+            console.log('spustam');
+            startInterval(getRefreshTime(refreshString)*1000);
+            $('#pauseAutoRefreshButton i').text("pause");
+            $('#pauseAutoRefreshButton').attr('value', 'pause');
+        }
+    })
+
+    // If auto_refresh is set to true, then set interval for content update
+    if("<?php echo $securityEventsPage->auto_refresh; ?>")
+    {
+        var refreshString = "<?php echo $securityEventsPage->refresh_time; ?>";
+
+        //startInterval(getRefreshTime(refreshString)*1000);
+
+        /*setInterval(function() {
+            $.pjax.reload({
+                container:"#pjaxContainer table#eventsContent tbody:last", 
+                fragment:"table#eventsContent tbody:last"})
+                .done(function() {
+                    activateEventsRows();
+                    $.pjax.reload({
+                        container:"#pjaxContainer #pagination", 
+                        fragment:"#pagination"
+                    });
+                    $.pjax.reload({container: "#pjaxBarChartContainer", async:true});
+                    addHoverElementOnTableCells();
+                });
+            }, getRefreshTime(refreshString)*1000 );*/
+    }
 
     // Check which radio button is checked
     if($('input[name="timeFilterType"]:checked').val() == 'absolute')
