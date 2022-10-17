@@ -163,7 +163,7 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
                     </div>
                     <div class="col" style="float:right;">
                         <a id="pauseAutoRefreshButton" class="btn btn-success" value="pause"><i class='material-icons'>pause</i></a>
-                        <?= 'ahoj'/*Html::a($securityEventsPage->auto_refresh ? "<i class='material-icons'>pause</i>" : "<i class='material-icons'>play_arrow</i>",
+                        <?php /*Html::a($securityEventsPage->auto_refresh ? "<i class='material-icons'>pause</i>" : "<i class='material-icons'>play_arrow</i>",
                             ['start-pause-auto-refresh'],
                             [
                                 'class' => 'btn btn-success',
@@ -220,7 +220,7 @@ foreach($chartData as $key => $record)
 }
 ?>
 
-<div class="security-events-index", id="securityEventsBarChart">
+<div class="security-events-index", id="securityEventsBarChart" style="height: 160px;">
     <?php Pjax::begin(['id' => 'pjaxBarChartContainer']); ?>
         <?= \onmotion\apexcharts\ApexchartsWidget::widget([
             'type' => 'bar', // area, scatter
