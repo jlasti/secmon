@@ -162,7 +162,14 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
                         <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time']) ?>
                     </div>
                     <div class="col" style="float:right;">
-                        <a id="pauseAutoRefreshButton" class="btn btn-success" value="pause"><i class='material-icons'>pause</i></a>
+                        <?= Html::button("<i class='material-icons'>pause</i>",
+                            [
+                                'class' => 'btn btn-success',
+                                'id' => 'pauseAutoRefreshButton',
+                                'value' => 'pause',
+                                'title' => 'Pause auto refresh'
+                            ])
+                        ?>
                         <?php /*Html::a($securityEventsPage->auto_refresh ? "<i class='material-icons'>pause</i>" : "<i class='material-icons'>play_arrow</i>",
                             ['start-pause-auto-refresh'],
                             [
@@ -231,6 +238,9 @@ foreach($chartData as $key => $record)
                         'show' => true,
                         'autoSelected' => 'zoom'
                     ],
+                    /*'animations' => [
+                        'enabled' => false,
+                    ]*/
                 ],  
                 'xaxis' => [
                     'type' => 'datetime',
@@ -385,6 +395,7 @@ foreach($chartData as $key => $record)
             clearInterval(intervalId);
             $('#pauseAutoRefreshButton i').text("play_arrow");
             $('#pauseAutoRefreshButton').attr('value', 'play');
+            $('#pauseAutoRefreshButton').attr('title', 'Resume auto refresh');
         }  
         else
         {
@@ -392,6 +403,7 @@ foreach($chartData as $key => $record)
             startInterval(getRefreshTime(refreshString)*1000);
             $('#pauseAutoRefreshButton i').text("pause");
             $('#pauseAutoRefreshButton').attr('value', 'pause');
+            $('#pauseAutoRefreshButton').attr('title', 'Pause auto refresh');
         }
     })
 
