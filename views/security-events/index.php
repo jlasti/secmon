@@ -28,7 +28,7 @@ $this->params['title'] = 'Security Events';
 $loggedUserId = Yii::$app->user->getId();
 $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $loggedUserId]);
 $rawDataColumns = explode(",", $securityEventsPage->data_columns);
-$dataColumns = SecurityEventsPage::replaceColumns($rawDataColumns, $searchModel);
+$dataColumns = SecurityEventsController::replaceColumns($rawDataColumns, $searchModel);
 $filters = FilterController::getFiltersOfUser($loggedUserId);
 $selectedFilterId = SecurityEventsPage::findOne(['user_id' => $loggedUserId])->getAttribute('filter_id');
 $timeFilterId = SecurityEventsPage::findOne(['user_id' => $loggedUserId])->getAttribute('time_filter_id');
