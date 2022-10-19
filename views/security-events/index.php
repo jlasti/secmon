@@ -162,21 +162,14 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
                         <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time']) ?>
                     </div>
                     <div class="col" style="float:right;">
-                        <?= Html::button("<i class='material-icons'>pause</i>",
+                        <?= Html::button("<i class='material-icons'>play_arrow</i>",
                             [
                                 'class' => 'btn btn-success',
-                                'id' => 'pauseAutoRefreshButton',
-                                'value' => 'pause',
-                                'title' => 'Pause auto refresh'
+                                'id' => 'autoRefreshButton',
+                                'value' => 'start',
+                                'title' => 'Start auto refresh'
                             ])
-                        ?>
-                        <?php /*Html::a($securityEventsPage->auto_refresh ? "<i class='material-icons'>pause</i>" : "<i class='material-icons'>play_arrow</i>",
-                            ['start-pause-auto-refresh'],
-                            [
-                                'class' => 'btn btn-success',
-                                'title' => $securityEventsPage->auto_refresh ? 'Pause auto refresh' : 'Resume auto refresh'
-                            ])*/
-                        ?>            
+                        ?>          
                     </div>
                     <div class="col" style="float:right;">
                         <?= Html::button("<i class='material-icons'>refresh</i>",
@@ -364,11 +357,11 @@ foreach($chartData as $key => $record)
 
     var intervalId;
     var refreshString = "<?php echo $securityEventsPage->refresh_time; ?>";
-    startInterval(getRefreshTime(refreshString)*1000);
+    //startInterval(getRefreshTime(refreshString)*1000);
 
-    // store in a function so we can call it again
-    function startInterval(_interval) {
-        // Store the id of the interval so we can clear it later
+    // Start refresh interval
+    function startInterval(interval) {
+        // Store the ID of the interval to variable so we can clear it later
         intervalId = setInterval(function() {
             $.pjax.reload({
                 container:"#pjaxContainer table#eventsContent tbody:last", 
@@ -382,53 +375,27 @@ foreach($chartData as $key => $record)
                     $.pjax.reload({container: "#pjaxBarChartContainer", async:true});
                     addHoverElementOnTableCells();
                 });
-        }, _interval);
+        }, interval);
     }
 
-    $('#pauseAutoRefreshButton').on('click', function() {
-        
-        var autorefresh = $('#pauseAutoRefreshButton').attr('value');
-        console.log(autorefresh);
-        if(autorefresh == 'pause')
+    // Handle Pause/Resume auto refresh button
+    $('#autoRefreshButton').on('click', function() {
+        var autorefresh = $('#autoRefreshButton').attr('value');
+        if(autorefresh == 'stop')
         {
-            console.log('pausujem');
             clearInterval(intervalId);
-            $('#pauseAutoRefreshButton i').text("play_arrow");
-            $('#pauseAutoRefreshButton').attr('value', 'play');
-            $('#pauseAutoRefreshButton').attr('title', 'Resume auto refresh');
+            $('#autoRefreshButton i').text("play_arrow");
+            $('#autoRefreshButton').attr('value', 'start');
+            $('#autoRefreshButton').attr('title', 'Start auto refresh');
         }  
         else
         {
-            console.log('spustam');
             startInterval(getRefreshTime(refreshString)*1000);
-            $('#pauseAutoRefreshButton i').text("pause");
-            $('#pauseAutoRefreshButton').attr('value', 'pause');
-            $('#pauseAutoRefreshButton').attr('title', 'Pause auto refresh');
+            $('#autoRefreshButton i').text("pause");
+            $('#autoRefreshButton').attr('value', 'stop');
+            $('#autoRefreshButton').attr('title', 'Stop auto refresh');
         }
     })
-
-    // If auto_refresh is set to true, then set interval for content update
-    if("<?php echo $securityEventsPage->auto_refresh; ?>")
-    {
-        var refreshString = "<?php echo $securityEventsPage->refresh_time; ?>";
-
-        //startInterval(getRefreshTime(refreshString)*1000);
-
-        /*setInterval(function() {
-            $.pjax.reload({
-                container:"#pjaxContainer table#eventsContent tbody:last", 
-                fragment:"table#eventsContent tbody:last"})
-                .done(function() {
-                    activateEventsRows();
-                    $.pjax.reload({
-                        container:"#pjaxContainer #pagination", 
-                        fragment:"#pagination"
-                    });
-                    $.pjax.reload({container: "#pjaxBarChartContainer", async:true});
-                    addHoverElementOnTableCells();
-                });
-            }, getRefreshTime(refreshString)*1000 );*/
-    }
 
     // Check which radio button is checked
     if($('input[name="timeFilterType"]:checked').val() == 'absolute')
