@@ -13,7 +13,6 @@ use yii\helpers\ArrayHelper;
  * @property int|null $filter_id
  * @property int|null $time_filter_id
  * @property string|null $time_filter_type
- * @property bool|null $auto_refresh
  * @property string|null $refresh_time
  * @property string|null $data_columns
  *
@@ -38,8 +37,6 @@ class SecurityEventsPage extends \yii\db\ActiveRecord
         return [
             [['user_id', 'filter_id', 'time_filter_id'], 'default', 'value' => null],
             [['user_id', 'filter_id', 'time_filter_id'], 'integer'],
-            [['auto_refresh'], 'default', 'value' => true],
-            [['auto_refresh'], 'boolean'],
             [['time_filter_type'], 'default', 'value' => 'absolute'],
             [['time_filter_type', 'refresh_time'], 'string'],
             [['refresh_time'], 'match', 'pattern' => '/^\d{1,5}[YMWDHmS]{1}$/',
@@ -61,7 +58,6 @@ class SecurityEventsPage extends \yii\db\ActiveRecord
             'filter_id' => 'Filter ID',
             'time_filter_id' => 'Time Filter ID',
             'time_filter_type' => 'Time Filter Type',
-            'auto_refresh' => 'Auto Refresh',
             'refresh_time' => 'Refresh Time',
             'data_columns' => 'Data Columns',
         ];
