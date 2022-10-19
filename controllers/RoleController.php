@@ -101,7 +101,8 @@ class RoleController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        if($id != 100)
+            $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
     }
