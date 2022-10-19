@@ -28,7 +28,7 @@ $this->params['title'] = 'Security Events';
 $loggedUserId = Yii::$app->user->getId();
 $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $loggedUserId]);
 $rawDataColumns = explode(",", $securityEventsPage->data_columns);
-$dataColumns = SecurityEventsPage::replaceColumns($rawDataColumns, $searchModel);
+$dataColumns = SecurityEventsController::replaceColumns($rawDataColumns, $searchModel);
 $filters = FilterController::getFiltersOfUser($loggedUserId);
 $selectedFilterId = SecurityEventsPage::findOne(['user_id' => $loggedUserId])->getAttribute('filter_id');
 $timeFilterId = SecurityEventsPage::findOne(['user_id' => $loggedUserId])->getAttribute('time_filter_id');
@@ -36,7 +36,6 @@ $selectedFilter = Filter::findOne(['id' => $selectedFilterId]);
 $timeFilter = Filter::findOne(['id' => $timeFilterId]);
 $filter = new Filter();
 $colsDown = SecurityEvents::getColumnsDropdown();
-
 $columns = explode(",", $securityEventsPage->data_columns);
 
 $relativeTimeFilter = '';
@@ -163,13 +162,14 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
                         <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time']) ?>
                     </div>
                     <div class="col" style="float:right;">
-                        <?= Html::a($securityEventsPage->auto_refresh ? "<i class='material-icons'>pause</i>" : "<i class='material-icons'>play_arrow</i>",
-                            ['start-pause-auto-refresh'],
+                        <?= Html::button("<i class='material-icons'>play_arrow</i>",
                             [
                                 'class' => 'btn btn-success',
-                                'title' => $securityEventsPage->auto_refresh ? 'Pause auto refresh' : 'Resume auto refresh'
+                                'id' => 'autoRefreshButton',
+                                'value' => 'start',
+                                'title' => 'Start auto refresh'
                             ])
-                        ?>            
+                        ?>          
                     </div>
                     <div class="col" style="float:right;">
                         <?= Html::button("<i class='material-icons'>refresh</i>",
@@ -220,7 +220,7 @@ foreach($chartData as $key => $record)
 }
 ?>
 
-<div class="security-events-index", id="securityEventsBarChart">
+<div class="security-events-index", id="securityEventsBarChart" style="height: 160px;">
     <?php Pjax::begin(['id' => 'pjaxBarChartContainer']); ?>
         <?= \onmotion\apexcharts\ApexchartsWidget::widget([
             'type' => 'bar', // area, scatter
@@ -231,6 +231,9 @@ foreach($chartData as $key => $record)
                         'show' => true,
                         'autoSelected' => 'zoom'
                     ],
+                    /*'animations' => [
+                        'enabled' => false,
+                    ]*/
                 ],  
                 'xaxis' => [
                     'type' => 'datetime',
@@ -352,12 +355,14 @@ foreach($chartData as $key => $record)
 
     var $sortable = $( "#eventsContent > thead > tr" );
 
-    // If auto_refresh is set to true, then set interval for content update
-    if("<?php echo $securityEventsPage->auto_refresh; ?>")
-    {
-        var refreshString = "<?php echo $securityEventsPage->refresh_time; ?>";
+    var intervalId;
+    var refreshString = "<?php echo $securityEventsPage->refresh_time; ?>";
+    //startInterval(getRefreshTime(refreshString)*1000);
 
-        setInterval(function() {
+    // Start refresh interval
+    function startInterval(interval) {
+        // Store the ID of the interval to variable so we can clear it later
+        intervalId = setInterval(function() {
             $.pjax.reload({
                 container:"#pjaxContainer table#eventsContent tbody:last", 
                 fragment:"table#eventsContent tbody:last"})
@@ -367,15 +372,30 @@ foreach($chartData as $key => $record)
                         container:"#pjaxContainer #pagination", 
                         fragment:"#pagination"
                     });
+                    $.pjax.reload({container: "#pjaxBarChartContainer", async:true});
                     addHoverElementOnTableCells();
                 });
-            }, getRefreshTime(refreshString)*1000 );
-
+        }, interval);
     }
 
-    $(document).on('pjax:end', function(e) {
-        alert('Pjax has ended!');
-    });
+    // Handle Pause/Resume auto refresh button
+    $('#autoRefreshButton').on('click', function() {
+        var autorefresh = $('#autoRefreshButton').attr('value');
+        if(autorefresh == 'stop')
+        {
+            clearInterval(intervalId);
+            $('#autoRefreshButton i').text("play_arrow");
+            $('#autoRefreshButton').attr('value', 'start');
+            $('#autoRefreshButton').attr('title', 'Start auto refresh');
+        }  
+        else
+        {
+            startInterval(getRefreshTime(refreshString)*1000);
+            $('#autoRefreshButton i').text("pause");
+            $('#autoRefreshButton').attr('value', 'stop');
+            $('#autoRefreshButton').attr('title', 'Stop auto refresh');
+        }
+    })
 
     // Check which radio button is checked
     if($('input[name="timeFilterType"]:checked').val() == 'absolute')

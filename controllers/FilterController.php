@@ -511,7 +511,8 @@ class FilterController extends Controller
         $query = SecurityEvents::find()
             ->select(["date_trunc('hours', datetime) as time"])
             ->addselect(["count(*)"])
-            ->groupBy('time');
+            ->groupBy('time')
+            ->limit(1000000);
 
         if (!empty($filter)) {
             $query->applyFilter($filter);
