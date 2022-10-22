@@ -37,7 +37,7 @@ class CorrelatorController extends Controller{
 		$aggregator_config_file = escapeshellarg("/var/www/html/secmon/config/aggregator_config.ini");
 		$last_line = `tail -n 1 $aggregator_config_file`;
 		$parts = explode(":", $last_line);
-		$portIn = trim($parts[1]);
+		$port = trim($parts[1]);
 
 		$corrOutputStream = $this->openPipe($corrOutputFile);
 		$corrInputStream = $this->openPipe($corrInputFile);
@@ -52,7 +52,7 @@ class CorrelatorController extends Controller{
 
 		$zmq = new ZMQContext();
 		$recSocket = $zmq->getSocket(ZMQ::SOCKET_PULL);  
-		$recSocket->bind("tcp://*:" . $portIn);
+		$recSocket->bind("tcp://*:" . $port);
 
 		date_default_timezone_set("Europe/Bratislava");
 	  echo "[" . date("Y-m-d H:i:s") . "] Worker correlator started!" . PHP_EOL;

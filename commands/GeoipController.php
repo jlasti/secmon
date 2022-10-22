@@ -34,7 +34,7 @@ class GeoipController extends Controller{
 
                 if(strpos($line, "Geoip:") !== FALSE){
 					$parts = explode(":", $line);
-					$portOut = trim($parts[1]);
+					$port = trim($parts[1]);
                     $module_loaded = true;
 				}
 			}
@@ -43,7 +43,6 @@ class GeoipController extends Controller{
 		}
 
         fclose($temp_config);
-        $portIn = $portOut - 1;			#calculate input port
 		$temp_config = escapeshellarg("/var/www/html/secmon/config/aggregator_config.ini");
 		$last_line = `tail -n 1 $temp_config`; 		#get last line of temp file
 
@@ -51,16 +50,16 @@ class GeoipController extends Controller{
 			$save_to_db = 1;
 		}
 
-        if (!is_numeric($portIn) || !is_numeric($portOut)) {
+        if (!is_numeric($port)) {
 		    throw new Exception('One of ports is not a numeric value');
         }
         
         $zmq = new ZMQContext();
 		$recSocket = $zmq->getSocket(ZMQ::SOCKET_PULL);  
-		$recSocket->bind("tcp://*:" . $portIn);
+		$recSocket->bind("tcp://*:" . $port);
 
 		$sendSocket = $zmq->getSocket(ZMQ::SOCKET_PUSH);
-        $sendSocket->connect("tcp://secmon_" . $next_module . ":" . $portOut);
+        $sendSocket->connect("tcp://secmon_" . $next_module . ":" . $port);
 
         date_default_timezone_set("Europe/Bratislava");
         echo "[" . date("Y-m-d H:i:s") . "] Geoip module started!" . PHP_EOL;

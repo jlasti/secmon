@@ -31,7 +31,7 @@ class NetworkController extends Controller{
 
 				if(strpos($line, "Network_model:") !== FALSE){
 					$parts = explode(":", $line);
-					$portOut = trim($parts[1]);
+					$port = trim($parts[1]);
 					$module_loaded = true;
 				}
 			}
@@ -65,7 +65,6 @@ class NetworkController extends Controller{
 
 		fclose($aggregator_config_file);
 		fclose($middleware_config_file);
-        $portIn = $portOut - 1;			#calculate output port
 		$aggregator_config_file = escapeshellarg("/var/www/html/secmon/config/aggregator_config.ini");
 		$last_line = `tail -n 1 $aggregator_config_file`; 		#get last line of temp file
 
@@ -73,16 +72,16 @@ class NetworkController extends Controller{
 			$save_to_db = 1;
 		}
 
-		if (!is_numeric($portIn) || !is_numeric($portOut)) {
+		if (!is_numeric($port)) {
 			throw new Exception('One of ports is not a numeric value');
 		}
         
 		$zmq = new ZMQContext();
 		$recSocket = $zmq->getSocket(ZMQ::SOCKET_PULL);  
-		$recSocket->bind("tcp://*:" . $portIn);
+		$recSocket->bind("tcp://*:" . $port);
 
 		$sendSocket = $zmq->getSocket(ZMQ::SOCKET_PUSH);
-		$sendSocket->connect("tcp://secmon_" . $next_module . ":" . $portOut);
+		$sendSocket->connect("tcp://secmon_" . $next_module . ":" . $port);
 		
 		date_default_timezone_set("Europe/Bratislava");
 		echo "[" . date("Y-m-d H:i:s") . "] Network model module started!" . PHP_EOL;
