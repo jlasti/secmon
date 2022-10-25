@@ -24,7 +24,7 @@ sudo firewall-cmd --permanent --add-port=514/tcp
 sudo firewall-cmd --reload
 
 # Download SecMon repository
-git clone -b dockerized-secmon https://github.com/jlasti/secmon_backend.git secmon
+git clone -b dockerized-secmon https://github.com/jlasti/secmon.git secmon
 
 # Start preconfig script
 cd secmon
@@ -60,7 +60,7 @@ sudo firewall-cmd --permanent --add-port=514/tcp
 sudo firewall-cmd --reload
 
 #Download SecMon repository
-git clone -b dockerized-secmon https://github.com/jlasti/secmon_backend.git secmon
+git clone -b dockerized-secmon https://github.com/jlasti/secmon.git secmon
 
 # Start preconfig script
 cd secmon
@@ -103,7 +103,7 @@ sudo ufw allow 443/tcp
 sudo ufw allow 514/tcp
 
 # Download SecMon repository
-git clone -b dockerized-secmon https://github.com/jlasti/secmon_backend.git secmon
+git clone -b dockerized-secmon https://github.com/jlasti/secmon.git secmon
 
 #Start preconfig script
 cd secmon
@@ -112,7 +112,7 @@ cd secmon
 # Start deploying process
 python3 secmon_manager.py deploy
 
-# Crete password for database user 'secmon' during installation
+# Create password for database user 'secmon' during installation
 
 # Default login credentials user:secmon, password:password
 # Change password after first login!!!
