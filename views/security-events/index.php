@@ -18,6 +18,7 @@ use app\models\FilterRule;
 use \app\models\SecurityEvents;
 use \app\controllers\FilterController;
 use \app\controllers\SecurityEventsController;
+use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\SecurityEventsSearch */
@@ -231,9 +232,16 @@ foreach($chartData as $key => $record)
                         'show' => true,
                         'autoSelected' => 'zoom'
                     ],
-                    /*'animations' => [
+                    'events' => [
+                        'zoomed' => new JsExpression('function (chartContext, { xaxis }) {
+                            var from = moment.unix(xaxis.min/1000).format("YYYY-MM-DD HH:mm");
+                            var to = moment.unix(xaxis.max/1000).format("YYYY-MM-DD HH:mm");
+                            updateAbsoluteTimeFilter(from, to);
+                        }'),
+                    ],
+                    'animations' => [
                         'enabled' => false,
-                    ]*/
+                    ]
                 ],  
                 'xaxis' => [
                     'type' => 'datetime',
@@ -341,6 +349,7 @@ foreach($chartData as $key => $record)
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
 <script src="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 <link href="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.css" rel="stylesheet">
 
 <script>
@@ -638,5 +647,24 @@ foreach($chartData as $key => $record)
     function showRelativeTimeForm() {
         $("#absoluteTimeForm").hide();
         $("#relativeTimeForm").show();
+    }
+
+    function updateAbsoluteTimeFilter(from, to){
+        $.ajax({
+            url: "update-time-filter",
+            method: "POST",
+            data:
+            {
+                _crsf: $('meta[name="csrf-token"]').attr('content'),
+                timeFilterType: 'absolute',
+                absoluteTimeFrom: from,
+                absoluteTimeTo: to,
+                relativeTime: ''
+            },
+            success: function (result) {
+                console.log(result);                             
+            },
+            datatype: "json"
+        });
     }
 </script>
