@@ -100,7 +100,7 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
                         <span class="label">Time filter:</span>
                     </div>
                     <div class="col" style="float: right; padding: 0;">
-                        <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time']) ?>
+                        <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update time filter']) ?>
                     </div>
                     <div class="col" style="float: right; padding-right: 20px;">
                         <input class="form-check-input" type="radio" name="timeFilterType" id="inlineRadioAbsolute" value="absolute" onclick="showAbsoluteTimeForm()" <?= $securityEventsPage->time_filter_type == 'absolute' ? 'checked=""' : '' ?> >
