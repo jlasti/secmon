@@ -661,10 +661,13 @@ foreach($chartData as $key => $record)
                 absoluteTimeTo: to,
                 relativeTime: ''
             },
-            success: function (result) {
-                console.log(result);                             
-            },
             datatype: "json"
+        })
+        .done(function(msg) {
+                $("#result").html(msg);
+        })
+        .fail(function(jqXHR, textStatus) {
+            $("#result").html("Request failed: " + textStatus);
         });
     }
 </script>
