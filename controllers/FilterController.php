@@ -509,10 +509,11 @@ class FilterController extends Controller
         $timeFilter = Filter::findOne($timeFilterId);
 
         $query = SecurityEvents::find()
-            ->select(["date_trunc('minutes', datetime) as time"])
+            ->select(["date_trunc('hours', datetime) as time"])
             ->addselect(["count(*)"])
             ->groupBy('time')
-            ->limit(1000000);
+            ->orderBy(['time' => SORT_DESC])
+            ->limit(500);
 
         if (!empty($filter)) {
             $query->applyFilter($filter);
