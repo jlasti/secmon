@@ -22,9 +22,9 @@ def print_help():
     print("\"remove\" - to remove all SecMon containers with database")
     print("\"help\" - to list all available parameters\n")
 
-#run specific enrichment module with port
-def run_enrichment_module(name, port):
-    command = f'docker run -d --restart unless-stopped --name secmon_{name} --network secmon_app-network --expose {port} -v ${{PWD}}:/var/www/html/secmon secmon_{name}'
+#run specific enrichment module
+def run_enrichment_module(name):
+    command = f'docker run -d --restart unless-stopped --name secmon_{name} --network secmon_app-network -v ${{PWD}}:/var/www/html/secmon secmon_{name}'
     if os.system(command) == 0:
         os.system(f'echo -e "\r\033[1A\033[0KCreating secmon_{name} ... {GREEN}done{NORMAL}"')
     else:
@@ -56,13 +56,9 @@ def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules
     print(YELLOW,'\nCreating SecMon enrichment modules:',NORMAL)
     for module in enabled_enrichment_modules:
         if index_containing_substring(contents, module):
-            port = int(re.findall('[0-9]+', contents[index_containing_substring(contents, module)])[0]) - 1
-            run_enrichment_module(module, port)
+            run_enrichment_module(module)
 
-    #calculatiog port for correlator
-    port = int(re.findall('[0-9]+', contents[len(contents)-1])[0])
-    run_enrichment_module('correlator', port)
-    
+    run_enrichment_module('correlator')
     config_file.close
 
 #method for stopping running containers
@@ -202,7 +198,7 @@ if(not validate(config)):
     sys.exit()
 
 #write data to temp file for system services
-port = 5557
+port = 9000
 aggregator_conf_file = open("./config/aggregator_config.ini", "w+")
 aggregator_conf_file.write("Log_input: %s\nName: %s\n" % (config.get('DEVICE', 'log_input'), config.get('DEVICE', 'name')))
 
@@ -211,27 +207,24 @@ aggregator_conf_file.write("Cor_input_NP: %s\nCor_output_NP: %s\n" % (config.get
 
 #write 0MQ port for aggregator
 aggregator_conf_file.write("Aggregator: %d\n" % port)
-port += 1
+
 #write 0MQ port for normalizer
 aggregator_conf_file.write("Normalizer: %d\n" % port)
-port += 1
 
 if config.get('ENRICHMENT', 'geoip').lower() == "true":
     #write 0MQ port for geoip
     aggregator_conf_file.write("Geoip: %d\n" % port)
-    port += 1
     enabled_enrichment_modules.append('geoip')
 
 if config.get('ENRICHMENT', 'network_model').lower() == "true":
     #write 0MQ port for network_model
     aggregator_conf_file.write("Network_model: %d\n" % port)
-    port += 1
     enabled_enrichment_modules.append('network_model')
 
 # if config.get('ENRICHMENT', 'rep_ip').lower() == "true":
 #     #write 0MQ port for rep_ip
 #     aggregator_conf_file.write("Rep_ip: %d\n" % port)
-#     port += 1
+#     enabled_enrichment_modules.append('rep_ip')
 
 aggregator_conf_file.close()
 
@@ -253,12 +246,9 @@ if sys.argv[1] == "deploy":
 
         for module in enabled_enrichment_modules:
             if index_containing_substring(contents, module):
-                port = int(re.findall('[0-9]+', contents[index_containing_substring(contents, module)])[0]) - 1
-                run_enrichment_module(module, port)
-
-        #calculation port for correlator
-        port = int(re.findall('[0-9]+', contents[len(contents)-1])[0])
-        run_enrichment_module('correlator', port)
+                run_enrichment_module(module)
+        
+        run_enrichment_module('correlator')
         config_file.close
 
         os.system('docker logs secmon_db 2>&1 | grep -q "listening on IPv4 address \\"0.0.0.0\\", port 5432" && echo "Database is ready to receive connections" || echo "Database is not ready to receive connections..."')

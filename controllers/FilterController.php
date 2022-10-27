@@ -512,7 +512,8 @@ class FilterController extends Controller
             ->select(["date_trunc('hours', datetime) as time"])
             ->addselect(["count(*)"])
             ->groupBy('time')
-            ->limit(1000000);
+            ->orderBy(['time' => SORT_DESC])
+            ->limit(500);
 
         if (!empty($filter)) {
             $query->applyFilter($filter);

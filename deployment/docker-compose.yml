@@ -47,8 +47,6 @@ services:
     image: secmon_normalizer
     container_name: secmon_normalizer
     restart: unless-stopped
-    expose: 
-      - 5557
     volumes:
       - .:/var/www/html/secmon
       - /var/log/secmon:/var/log/secmon

@@ -47,7 +47,7 @@ class NormalizerController extends Controller{
 
 				if(strpos($line, "Normalizer:") !== FALSE){
 					$parts = explode(":", $line);
-					$portOut = trim($parts[1]);
+					$port = trim($parts[1]);
 					$module_loaded = true;	
 				}
 			}
@@ -55,7 +55,6 @@ class NormalizerController extends Controller{
 			throw new Exception('Not all arguments were specified');
 		}
 		fclose($aggregator_config_file);
-		$portIn = $portOut - 1;			#calculate output port
 		$aggregator_config_file = escapeshellarg("/var/www/html/secmon/config/aggregator_config.ini");
 		$last_line = `tail -n 1 $aggregator_config_file`; 		#get last line of temp file
 
@@ -71,8 +70,8 @@ class NormalizerController extends Controller{
 			throw new Exception('Log path is not directory');
 		}
 
-		if (!is_numeric($portIn) || !is_numeric($portOut)) {
-			throw new Exception('One of ports is not a numeric value' . $portIn . strlen($portIn));
+		if (!is_numeric($port)) {
+			throw new Exception('One of ports is not a numeric value' . $port . strlen($port));
 		}
 
 
@@ -90,10 +89,10 @@ class NormalizerController extends Controller{
 
 		$zmq = new ZMQContext();
 		$recSocket = $zmq->getSocket(ZMQ::SOCKET_PULL);  
-		$recSocket->bind("tcp://*:" . $portIn);
+		$recSocket->bind("tcp://*:" . $port);
 		
 		$sendSocket = $zmq->getSocket(ZMQ::SOCKET_PUSH);
-		$sendSocket->connect("tcp://secmon_" . $next_module . ":" . $portOut);
+		$sendSocket->connect("tcp://secmon_" . $next_module . ":" . $port);
 
 		date_default_timezone_set("Europe/Bratislava");
 		echo "[" . date("Y-m-d H:i:s") . "] Worker normalizer started!" . PHP_EOL;

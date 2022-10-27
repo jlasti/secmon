@@ -18,6 +18,7 @@ use app\models\FilterRule;
 use \app\models\SecurityEvents;
 use \app\controllers\FilterController;
 use \app\controllers\SecurityEventsController;
+use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\SecurityEventsSearch */
@@ -99,7 +100,7 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
                         <span class="label">Time filter:</span>
                     </div>
                     <div class="col" style="float: right; padding: 0;">
-                        <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update page refresh time']) ?>
+                        <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-success', 'title' => 'Update time filter']) ?>
                     </div>
                     <div class="col" style="float: right; padding-right: 20px;">
                         <input class="form-check-input" type="radio" name="timeFilterType" id="inlineRadioAbsolute" value="absolute" onclick="showAbsoluteTimeForm()" <?= $securityEventsPage->time_filter_type == 'absolute' ? 'checked=""' : '' ?> >
@@ -231,9 +232,16 @@ foreach($chartData as $key => $record)
                         'show' => true,
                         'autoSelected' => 'zoom'
                     ],
-                    /*'animations' => [
+                    'events' => [
+                        'zoomed' => new JsExpression('function (chartContext, { xaxis }) {
+                            var from = moment.unix(xaxis.min/1000).format("YYYY-MM-DD HH:mm");
+                            var to = moment.unix(xaxis.max/1000).format("YYYY-MM-DD HH:mm");
+                            updateAbsoluteTimeFilter(from, to);
+                        }'),
+                    ],
+                    'animations' => [
                         'enabled' => false,
-                    ]*/
+                    ]
                 ],  
                 'xaxis' => [
                     'type' => 'datetime',
@@ -341,6 +349,7 @@ foreach($chartData as $key => $record)
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
 <script src="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 <link href="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.css" rel="stylesheet">
 
 <script>
@@ -638,5 +647,27 @@ foreach($chartData as $key => $record)
     function showRelativeTimeForm() {
         $("#absoluteTimeForm").hide();
         $("#relativeTimeForm").show();
+    }
+
+    function updateAbsoluteTimeFilter(from, to){
+        $.ajax({
+            url: "update-time-filter",
+            method: "POST",
+            data:
+            {
+                _crsf: $('meta[name="csrf-token"]').attr('content'),
+                timeFilterType: 'absolute',
+                absoluteTimeFrom: from,
+                absoluteTimeTo: to,
+                relativeTime: ''
+            },
+            datatype: "json"
+        })
+        .done(function(msg) {
+                $("#result").html(msg);
+        })
+        .fail(function(jqXHR, textStatus) {
+            $("#result").html("Request failed: " + textStatus);
+        });
     }
 </script>
