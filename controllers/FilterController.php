@@ -505,11 +505,48 @@ class FilterController extends Controller
     {
         unset($filteredData);
 
+        $userId = Yii::$app->user->getId();
+        $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
         $filter = Filter::findOne($filterId);
         $timeFilter = Filter::findOne($timeFilterId);
 
+        $timeUnit = 'hour';
+
+        if($securityEventsPage->time_filter_type == 'absolute')
+        {
+            $filterRuleFrom = FilterRule::findOne(['filter_id' => $timeFilterId, 'operator' => '>=']);
+            $filterRuleTo = FilterRule::findOne(['filter_id' => $timeFilterId, 'operator' => '<=']);
+            
+            if(!empty($filterRuleFrom) && empty($filterRuleTo))
+            {
+                $firstEventTime= SecurityEvents::find()->orderBy(['id' => SORT_DESC])->one()->getAttribute('datetime');
+                $actualTime = time();
+                print $firstEventTime;
+                print $actualTime . ' - ' . strtotime($firstEventTime) . ' = ';
+                echo ($actualTime - strtotime($firstEventTime))/10;
+                //$firstEventTime= SecurityEvents::find()->orderBy(['id' => SORT_ASC])->one()->getAttribute('datetime');
+                
+            }
+            elseif(empty($filterRuleFrom) && !empty($filterRuleTo))
+            {
+
+            }
+            else
+            {
+                //$firstSecurityEvent = SecurityEvents::findOne();
+            }
+
+        }
+        else{
+            $relativeFilterRule = FilterRule::findOne(['filter_id' => $timeFilterId, 'operator' => 'Last']);
+            $timeInterval = FilterController::convertRelativeTime($relativeFilterRule->value);
+            $timeUnit = FilterController::getTimeUnit($timeInterval);
+            print $timeInterval . " ";
+            print $timeUnit;
+        }
+
         $query = SecurityEvents::find()
-            ->select(["date_trunc('hours', datetime) as time"])
+            ->select(["date_trunc('" . $timeUnit . "', datetime) as time"])
             ->addselect(["count(*)"])
             ->groupBy('time')
             ->orderBy(['time' => SORT_DESC])
@@ -528,6 +565,78 @@ class FilterController extends Controller
         Yii::$app->cache->flush();
 
         return $filteredData;
+    }
+
+    // Convert Relative Time string to seconds
+    public static function convertRelativeTime($relativeTime)
+    {
+        $timeUnit = substr($relativeTime, strlen($relativeTime)-1, strlen($relativeTime));
+        $refreshTime = (int)(substr($relativeTime, 0, strlen($relativeTime)-1));
+        
+        if ($timeUnit == "S") {
+            return $refreshTime;
+        }
+        $refreshTime *= 60;
+        if ($timeUnit == "m") {
+            return $refreshTime;
+        }
+        $refreshTime *= 60;
+        if ($timeUnit == "H") {
+            return $refreshTime;
+        }
+        $refreshTime *= 24;
+        if ($timeUnit == "D") {
+            return $refreshTime;
+        }
+        if ($timeUnit == "W") {
+            return $refreshTime * 7;
+        }
+        if ($timeUnit == "M") {
+            return $refreshTime * 30;
+        }
+        if ($timeUnit == "Y") {
+            return $refreshTime * 365;
+        }
+    }
+
+    // Get Time Unit which will be used as parameter to function data_trunc in group by SQL query
+    public static function getTimeUnit($timeInterval)
+    {
+        $lowerLimit = 0;
+        $higherLimit = 300;
+
+        if($timeInterval >= $lowerLimit && $timeInterval < $higherLimit)
+            return 'second';
+        $lowerLimit = $higherLimit;
+        $higherLimit *= 60;
+
+        if($timeInterval >= $lowerLimit && $timeInterval < $higherLimit)
+            return 'minute';
+        $lowerLimit = $higherLimit;
+        $higherLimit *= 60;
+
+        if($timeInterval >= $lowerLimit && $timeInterval < $higherLimit)
+            return 'hour';
+        $lowerLimit = $higherLimit;
+        $higherLimit *= 24;
+
+        if($timeInterval >= $lowerLimit && $timeInterval < $higherLimit)
+            return 'day';
+        $lowerLimit = $higherLimit;
+        $higherLimit *= 7;
+
+        if($timeInterval >= $lowerLimit && $timeInterval < $higherLimit)
+            return 'week';
+        $lowerLimit = $higherLimit;
+        $higherLimit *= 4;
+
+        if($timeInterval >= $lowerLimit && $timeInterval < $higherLimit)
+            return 'month';
+        $lowerLimit = $higherLimit;
+        $higherLimit *= 12;
+        
+        if($timeInterval >= $lowerLimit && $timeInterval < $higherLimit)
+            return 'year';
     }
 
     /**
