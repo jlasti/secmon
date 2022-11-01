@@ -510,8 +510,6 @@ class FilterController extends Controller
         $filter = Filter::findOne($filterId);
         $timeFilter = Filter::findOne($timeFilterId);
 
-        $timeUnit = 'hour';
-
         if($securityEventsPage->time_filter_type == 'absolute')
         {
             $filterRuleFrom = FilterRule::findOne(['filter_id' => $timeFilterId, 'operator' => '>=']);
@@ -519,23 +517,29 @@ class FilterController extends Controller
             
             if(!empty($filterRuleFrom) && empty($filterRuleTo))
             {
-                $firstEventTime= SecurityEvents::find()->orderBy(['id' => SORT_DESC])->one()->getAttribute('datetime');
-                $actualTime = time();
-                print $firstEventTime;
-                print $actualTime . ' - ' . strtotime($firstEventTime) . ' = ';
-                echo ($actualTime - strtotime($firstEventTime))/10;
-                //$firstEventTime= SecurityEvents::find()->orderBy(['id' => SORT_ASC])->one()->getAttribute('datetime');
-                
+                $intervalFrom = $filterRuleFrom->value;
+                $intervalTo = SecurityEvents::find()->orderBy(['id' => SORT_DESC])->one()->getAttribute('datetime');//time();
             }
             elseif(empty($filterRuleFrom) && !empty($filterRuleTo))
             {
-
+                $intervalFrom = SecurityEvents::find()->orderBy(['id' => SORT_ASC])->one()->getAttribute('datetime');
+                $intervalTo = $filterRuleTo->value;
+            }
+            elseif(!empty($filterRuleFrom) && !empty($filterRuleTo))
+            {
+                $intervalFrom = $filterRuleFrom->value;
+                $intervalTo = $filterRuleTo->value;
             }
             else
             {
-                //$firstSecurityEvent = SecurityEvents::findOne();
+                $intervalFrom = SecurityEvents::find()->orderBy(['id' => SORT_ASC])->one()->getAttribute('datetime');
+                $intervalTo = SecurityEvents::find()->orderBy(['id' => SORT_DESC])->one()->getAttribute('datetime');
             }
 
+            $timeInterval = strtotime($intervalTo) - strtotime($intervalFrom);
+            $timeUnit = FilterController::getTimeUnit($timeInterval);
+            print " " . $timeInterval . " ";
+            print $timeUnit;
         }
         else{
             $relativeFilterRule = FilterRule::findOne(['filter_id' => $timeFilterId, 'operator' => 'Last']);
@@ -603,40 +607,37 @@ class FilterController extends Controller
     public static function getTimeUnit($timeInterval)
     {
         $lowerLimit = 0;
-        $higherLimit = 300;
+        $higherLimit = 60;
 
-        if($timeInterval >= $lowerLimit && $timeInterval < $higherLimit)
+        if($timeInterval > $lowerLimit && $timeInterval <= $higherLimit)
             return 'second';
         $lowerLimit = $higherLimit;
         $higherLimit *= 60;
 
-        if($timeInterval >= $lowerLimit && $timeInterval < $higherLimit)
+        if($timeInterval > $lowerLimit && $timeInterval <= $higherLimit)
             return 'minute';
-        $lowerLimit = $higherLimit;
-        $higherLimit *= 60;
-
-        if($timeInterval >= $lowerLimit && $timeInterval < $higherLimit)
-            return 'hour';
         $lowerLimit = $higherLimit;
         $higherLimit *= 24;
 
-        if($timeInterval >= $lowerLimit && $timeInterval < $higherLimit)
+        if($timeInterval > $lowerLimit && $timeInterval <= $higherLimit)
+            return 'hour';
+        $lowerLimit = $higherLimit;
+        $higherLimit *= 30;
+
+        if($timeInterval > $lowerLimit && $timeInterval <= $higherLimit)
             return 'day';
         $lowerLimit = $higherLimit;
-        $higherLimit *= 7;
+        //$higherLimit = 60*60*24*30*12;
 
-        if($timeInterval >= $lowerLimit && $timeInterval < $higherLimit)
-            return 'week';
-        $lowerLimit = $higherLimit;
-        $higherLimit *= 4;
-
-        if($timeInterval >= $lowerLimit && $timeInterval < $higherLimit)
+        if($timeInterval > $lowerLimit)
             return 'month';
-        $lowerLimit = $higherLimit;
-        $higherLimit *= 12;
+        /*$lowerLimit = $higherLimit;
+        $higherLimit = 60*60*24*30*12;
         
-        if($timeInterval >= $lowerLimit && $timeInterval < $higherLimit)
-            return 'year';
+        if($timeInterval > $lowerLimit && $timeInterval < $higherLimit)
+            return 'year';*/
+        
+        return 'hour';
     }
 
     /**
