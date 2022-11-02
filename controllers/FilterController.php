@@ -505,15 +505,58 @@ class FilterController extends Controller
     {
         unset($filteredData);
 
+        $userId = Yii::$app->user->getId();
+        $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
         $filter = Filter::findOne($filterId);
         $timeFilter = Filter::findOne($timeFilterId);
+        $eventsCount = SecurityEvents::find()->count();
+
+        if($securityEventsPage->time_filter_type == 'absolute' && $eventsCount > 1)
+        {
+            $filterRuleFrom = FilterRule::findOne(['filter_id' => $timeFilterId, 'operator' => '>=']);
+            $filterRuleTo = FilterRule::findOne(['filter_id' => $timeFilterId, 'operator' => '<=']);
+           
+            if(!empty($filterRuleFrom) && empty($filterRuleTo))
+            {
+                $intervalFrom = $filterRuleFrom->value;
+                $intervalTo = SecurityEvents::find()->orderBy(['id' => SORT_DESC])->one()->getAttribute('datetime');
+            }
+            elseif(empty($filterRuleFrom) && !empty($filterRuleTo))
+            {
+                $intervalFrom = SecurityEvents::find()->orderBy(['id' => SORT_ASC])->one()->getAttribute('datetime');
+                $intervalTo = $filterRuleTo->value;
+            }
+            elseif(!empty($filterRuleFrom) && !empty($filterRuleTo))
+            {
+                $intervalFrom = $filterRuleFrom->value;
+                $intervalTo = $filterRuleTo->value;
+            }
+            else
+            {
+                $intervalFrom = SecurityEvents::find()->orderBy(['id' => SORT_ASC])->one()->getAttribute('datetime');
+                $intervalTo = SecurityEvents::find()->orderBy(['id' => SORT_DESC])->one()->getAttribute('datetime');
+            }
+            
+            $timeInterval = strtotime($intervalTo) - strtotime($intervalFrom);
+            $timeUnit = FilterController::getTimeUnit($timeInterval);
+        }
+        elseif($securityEventsPage->time_filter_type == 'relative' && $eventsCount > 1)
+        {
+            $relativeFilterRule = FilterRule::findOne(['filter_id' => $timeFilterId, 'operator' => 'Last']);
+            $timeInterval = FilterController::convertRelativeTime($relativeFilterRule->value);
+            $timeUnit = FilterController::getTimeUnit($timeInterval);
+        }
+        else
+        {
+            $timeUnit = 'second';
+        }
 
         $query = SecurityEvents::find()
-            ->select(["date_trunc('hours', datetime) as time"])
+            ->select(["date_trunc('" . $timeUnit . "', datetime) as time"])
             ->addselect(["count(*)"])
             ->groupBy('time')
             ->orderBy(['time' => SORT_DESC])
-            ->limit(500);
+            ->limit(600);
 
         if (!empty($filter)) {
             $query->applyFilter($filter);
@@ -528,6 +571,68 @@ class FilterController extends Controller
         Yii::$app->cache->flush();
 
         return $filteredData;
+    }
+
+    // Convert Relative Time string to seconds
+    public static function convertRelativeTime($relativeTime)
+    {
+        $timeUnit = substr($relativeTime, strlen($relativeTime)-1, strlen($relativeTime));
+        $refreshTime = (int)(substr($relativeTime, 0, strlen($relativeTime)-1));
+        
+        if ($timeUnit == "S") {
+            return $refreshTime;
+        }
+        $refreshTime *= 60;
+        if ($timeUnit == "m") {
+            return $refreshTime;
+        }
+        $refreshTime *= 60;
+        if ($timeUnit == "H") {
+            return $refreshTime;
+        }
+        $refreshTime *= 24;
+        if ($timeUnit == "D") {
+            return $refreshTime;
+        }
+        if ($timeUnit == "W") {
+            return $refreshTime * 7;
+        }
+        if ($timeUnit == "M") {
+            return $refreshTime * 30;
+        }
+        if ($timeUnit == "Y") {
+            return $refreshTime * 365;
+        }
+    }
+
+    // Get Time Unit which will be used as parameter to function data_trunc in group by SQL query
+    public static function getTimeUnit($timeInterval)
+    {
+        $lowerLimit = 0;
+        $higherLimit = 600;
+
+        if($timeInterval > $lowerLimit && $timeInterval <= $higherLimit)
+            return 'second';
+        $lowerLimit = $higherLimit;
+        $higherLimit *= 60;
+
+        if($timeInterval > $lowerLimit && $timeInterval <= $higherLimit)
+            return 'minute';
+        $lowerLimit = $higherLimit;
+        $higherLimit *= 24;
+
+        if($timeInterval > $lowerLimit && $timeInterval <= $higherLimit)
+            return 'hour';
+        $lowerLimit = $higherLimit;
+        $higherLimit = 60*60*24*365;
+
+        if($timeInterval > $lowerLimit && $timeInterval <= $higherLimit)
+            return 'day';
+
+        if($timeInterval > $higherLimit)
+            return 'month';
+        
+        return 'hour';
     }
 
     /**
