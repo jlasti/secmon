@@ -515,15 +515,27 @@ class FilterController extends Controller
         {
             $filterRuleFrom = FilterRule::findOne(['filter_id' => $timeFilterId, 'operator' => '>=']);
             $filterRuleTo = FilterRule::findOne(['filter_id' => $timeFilterId, 'operator' => '<=']);
-           
+
             if(!empty($filterRuleFrom) && empty($filterRuleTo))
             {
                 $intervalFrom = $filterRuleFrom->value;
-                $intervalTo = SecurityEvents::find()->orderBy(['id' => SORT_DESC])->one()->getAttribute('datetime');
+                $intervalToQuery = (new \yii\db\Query())
+                        ->select(['datetime'])
+                        ->from('security_events')
+                        ->orderby(['datetime' => SORT_DESC])
+                        ->limit(1)
+                        ->one();
+                $intervalTo = $intervalToQuery["datetime"];
             }
             elseif(empty($filterRuleFrom) && !empty($filterRuleTo))
             {
-                $intervalFrom = SecurityEvents::find()->orderBy(['id' => SORT_ASC])->one()->getAttribute('datetime');
+                $intervalFromQuery = (new \yii\db\Query())
+                        ->select(['datetime'])
+                        ->from('security_events')
+                        ->orderby(['datetime' => SORT_ASC])
+                        ->limit(1)
+                        ->one();
+                $intervalFrom = $intervalFromQuery["datetime"];
                 $intervalTo = $filterRuleTo->value;
             }
             elseif(!empty($filterRuleFrom) && !empty($filterRuleTo))
@@ -533,10 +545,22 @@ class FilterController extends Controller
             }
             else
             {
-                $intervalFrom = SecurityEvents::find()->orderBy(['id' => SORT_ASC])->one()->getAttribute('datetime');
-                $intervalTo = SecurityEvents::find()->orderBy(['id' => SORT_DESC])->one()->getAttribute('datetime');
+                $intervalFromQuery = (new \yii\db\Query())
+                        ->select(['datetime'])
+                        ->from('security_events')
+                        ->orderby(['datetime' => SORT_ASC])
+                        ->limit(1)
+                        ->one();
+                $intervalToQuery = (new \yii\db\Query())
+                        ->select(['datetime'])
+                        ->from('security_events')
+                        ->orderby(['datetime' => SORT_DESC])
+                        ->limit(1)
+                        ->one();
+                $intervalFrom = $intervalFromQuery["datetime"];
+                $intervalTo = $intervalToQuery["datetime"];
             }
-            
+
             $timeInterval = strtotime($intervalTo) - strtotime($intervalFrom);
             $timeUnit = FilterController::getTimeUnit($timeInterval);
         }
