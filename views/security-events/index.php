@@ -366,7 +366,6 @@ foreach($chartData as $key => $record)
 
     var intervalId;
     var refreshString = "<?php echo $securityEventsPage->refresh_time; ?>";
-    //startInterval(getRefreshTime(refreshString)*1000);
 
     // Start refresh interval
     function startInterval(interval) {

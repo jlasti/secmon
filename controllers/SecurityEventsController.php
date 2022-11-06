@@ -209,7 +209,7 @@ class SecurityEventsController extends Controller
         $userId = Yii::$app->user->getId();
         $model = new SecurityEventsPage();
 
-        if($model->load(Yii::$app->request->post()) && $model->validate())
+        if($model->load(Yii::$app->request->post()) && $model->refresh_time && $model->validate())
         {
             $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
             $securityEventsPage->refresh_time = $model->refresh_time;
