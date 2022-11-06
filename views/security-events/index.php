@@ -224,13 +224,16 @@ foreach($chartData as $key => $record)
 <div class="security-events-index", id="securityEventsBarChart" style="height: 160px;">
     <?php Pjax::begin(['id' => 'pjaxBarChartContainer']); ?>
         <?= \onmotion\apexcharts\ApexchartsWidget::widget([
-            'type' => 'bar', // area, scatter
-            'height' => '150', // default 350
+            'type' => 'bar',
+            'height' => '150',
             'chartOptions' => [
                 'chart' => [
                     'toolbar' => [
                         'show' => true,
-                        'autoSelected' => 'zoom'
+                        'autoSelected' => 'zoom',
+                        'tools' => [
+                            'pan' => false
+                        ]
                     ],
                     'events' => [
                         'zoomed' => new JsExpression('function (chartContext, { xaxis }) {
@@ -245,7 +248,6 @@ foreach($chartData as $key => $record)
                 ],  
                 'xaxis' => [
                     'type' => 'datetime',
-                    'thickAmount' => 2,
                     'labels' => [
                         'format' => 'd/M HH:MM:ss',
                     ]

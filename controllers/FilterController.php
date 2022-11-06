@@ -579,7 +579,7 @@ class FilterController extends Controller
             ->select(["date_trunc('" . $timeUnit . "', datetime) as time"])
             ->addselect(["count(*)"])
             ->groupBy('time')
-            ->orderBy(['time' => SORT_DESC])
+            ->orderBy(['time' => SORT_ASC])
             ->limit(600);
 
         if (!empty($filter)) {
