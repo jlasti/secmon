@@ -248,7 +248,6 @@ foreach($chartData as $key => $record)
                 ],  
                 'xaxis' => [
                     'type' => 'datetime',
-                    'thickAmount' => 2,
                     'labels' => [
                         'format' => 'd/M HH:MM:ss',
                     ]
