@@ -212,12 +212,18 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
 <?php
 $chartData = FilterController::getEventsToBarChart($selectedFilterId, $timeFilterId);
 $series = [];
-$series = [['name' => 'Security Events', 'data' => []]];
+
+for ($i = 1; $i <= 10; $i++) {
+    $series[$i-1] = [
+        'name' => 'CEF Severity ' . $i,
+        'data' => []
+    ];
+}
 
 foreach($chartData as $key => $record)
 {
     $tmpRecord = [$record['time'], $record['count']];
-    array_push($series[0]['data'], $tmpRecord);
+    array_push($series[$record['cef_severity']-1]['data'], $tmpRecord);
 }
 ?>
 
@@ -227,6 +233,7 @@ foreach($chartData as $key => $record)
             'type' => 'bar',
             'height' => '150',
             'chartOptions' => [
+                'colors' => ['#00DBFF', '#00DBFF', '#00FF00', '#00FF00', '#FFFF00', '#FFFF00', '#CC5500', '#CC5500', '#FF0000', '#FF0000'],
                 'chart' => [
                     'toolbar' => [
                         'show' => true,
@@ -235,6 +242,7 @@ foreach($chartData as $key => $record)
                             'pan' => false
                         ]
                     ],
+                    'stacked'=>true,
                     'events' => [
                         'zoomed' => new JsExpression('function (chartContext, { xaxis }) {
                             var from = moment.unix(xaxis.min/1000).format("YYYY-MM-DD HH:mm");

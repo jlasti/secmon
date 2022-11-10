@@ -52,7 +52,7 @@ $this->params['dst_device'] = NetworkModel::getNetworkDevice($model->destination
 
 <ul class="collapsible">
     <li>
-      <div class="collapsible-header light-blue accent-4" style="font-size:20px; color: white;"><i class="material-icons">network_wifi</i>Source Device Information: <?= $model->source_address?>:<?= $model->source_port ?></div>
+      <div class="collapsible-header light-blue accent-4" style="font-size:20px; color: white;"><i class="material-icons">network_wifi</i>Source Information: <?= $model->source_address?>:<?= $model->source_port ?></div>
       <div class="collapsible-body">
         <?= DetailView::widget([
           'model' => $model,
@@ -115,7 +115,7 @@ $this->params['dst_device'] = NetworkModel::getNetworkDevice($model->destination
 
   <ul class="collapsible">
     <li>
-      <div class="collapsible-header light-blue accent-4" style="font-size:20px; color: white;"><i class="material-icons">network_wifi</i>Destination Device Information: <?= $model->destination_address?>:<?= $model->destination_port?></div>
+      <div class="collapsible-header light-blue accent-4" style="font-size:20px; color: white;"><i class="material-icons">network_wifi</i>Destination Information: <?= $model->destination_address?>:<?= $model->destination_port?></div>
       <div class="collapsible-body">
         <?= DetailView::widget([
           'model' => $model,
