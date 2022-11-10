@@ -577,9 +577,10 @@ class FilterController extends Controller
 
         $query = SecurityEvents::find()
             ->select(["date_trunc('" . $timeUnit . "', datetime) as time"])
+            ->addselect(["cef_severity"])
             ->addselect(["count(*)"])
-            ->groupBy('time')
-            ->orderBy(['time' => SORT_ASC])
+            ->groupBy(['time', 'cef_severity'])
+            ->orderBy(['time' => SORT_ASC, 'cef_severity' => SORT_ASC])
             ->limit(600);
 
         if (!empty($filter)) {
