@@ -212,7 +212,10 @@ class SecurityEventsController extends Controller
         if($model->load(Yii::$app->request->post()) && $model->refresh_time && $model->validate())
         {
             $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
-            $securityEventsPage->refresh_time = $model->refresh_time;
+            if($this->checkMinRefreshTimeValue($model->refresh_time))
+                $securityEventsPage->refresh_time = $model->refresh_time;
+            else
+                $securityEventsPage->refresh_time = '10S';
             if(!empty($securityEventsPage))
                 $securityEventsPage->save();
         }
@@ -498,6 +501,16 @@ class SecurityEventsController extends Controller
             }
         }
         return $this->redirect(['index']);
+    }
+
+    public function checkMinRefreshTimeValue($refreshTime)
+    {
+        $timeUnit = substr($refreshTime, strlen($refreshTime)-1, strlen($refreshTime));
+        $refreshTime = (int)(substr($refreshTime, 0, strlen($refreshTime)-1));
+
+        if ($timeUnit == "S" && $refreshTime < 10)
+            return false;
+        return true;
     }
 
     public static function replaceColumns($rawDataColumns, $searchModel)
