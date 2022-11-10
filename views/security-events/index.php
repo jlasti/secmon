@@ -227,11 +227,11 @@ foreach($chartData as $key => $record)
 }
 ?>
 
-<div class="security-events-index", id="securityEventsBarChart" style="height: 160px;">
+<div class="security-events-index", id="securityEventsBarChart" style="height: 180px;">
     <?php Pjax::begin(['id' => 'pjaxBarChartContainer']); ?>
         <?= \onmotion\apexcharts\ApexchartsWidget::widget([
             'type' => 'bar',
-            'height' => '150',
+            'height' => '175',
             'chartOptions' => [
                 'colors' => ['#00DBFF', '#00DBFF', '#00FF00', '#00FF00', '#FFFF00', '#FFFF00', '#CC5500', '#CC5500', '#FF0000', '#FF0000'],
                 'chart' => [
