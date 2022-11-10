@@ -580,7 +580,7 @@ class FilterController extends Controller
             ->addselect(["cef_severity"])
             ->addselect(["count(*)"])
             ->groupBy(['time', 'cef_severity'])
-            ->orderBy(['time' => SORT_ASC, 'cef_severity' => SORT_ASC])
+            ->orderBy(['time' => SORT_ASC])
             ->limit(600);
 
         if (!empty($filter)) {
