@@ -548,3 +548,7 @@ a.columns-settings-button:hover {
 .columns-settings-button i {
   font-size: 1rem;
 }
+
+.security-events-view table.detail-view th {
+  white-space: nowrap;
+}
