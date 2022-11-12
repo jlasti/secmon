@@ -546,7 +546,7 @@ foreach($chartData as $key => $record)
         if (timeUnit == "H") {
             return refreshTime;
         }
-        return refreshTime * 24;
+        refreshTime *= 24;
         if (timeUnit == "D") {
             return refreshTime;
         }
@@ -660,7 +660,7 @@ foreach($chartData as $key => $record)
 
     function updateAbsoluteTimeFilter(from, to){
         $.ajax({
-            url: "update-time-filter",
+            url: "/secmon/web/security-events/update-time-filter",
             method: "POST",
             data:
             {
