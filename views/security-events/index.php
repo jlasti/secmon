@@ -227,7 +227,7 @@ foreach($chartData as $key => $record)
 }
 ?>
 
-<div class="security-events-index", id="securityEventsBarChart" style="height: 180px;">
+<div class="security-events-index" id="securityEventsBarChart" style="height: 180px;">
     <?php Pjax::begin(['id' => 'pjaxBarChartContainer']); ?>
         <?= \onmotion\apexcharts\ApexchartsWidget::widget([
             'type' => 'bar',
@@ -298,7 +298,7 @@ foreach($chartData as $key => $record)
     <i class="material-icons">settings</i>
 </a>
 
-<div class="security-events-index clickable-table", id="securityEventsTable">
+<div class="security-events-index clickable-table" id="securityEventsTable">
     <?php Pjax::begin(['id' => 'pjaxContainer']); ?>
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
@@ -382,17 +382,19 @@ foreach($chartData as $key => $record)
         // Store the ID of the interval to variable so we can clear it later
         intervalId = setInterval(function() {
             $.pjax.reload({
-                container:"#pjaxContainer table#eventsContent tbody:last", 
-                fragment:"table#eventsContent tbody:last"})
-                .done(function() {
-                    activateEventsRows();
-                    $.pjax.reload({
-                        container:"#pjaxContainer #pagination", 
-                        fragment:"#pagination"
-                    });
-                    $.pjax.reload({container: "#pjaxBarChartContainer", async:true});
+                container: "#pjaxBarChartContainer"
+            }).done(function() {
+                $.pjax.reload({
+                    container:"#pjaxContainer table#eventsContent tbody:last", 
+                    fragment:"table#eventsContent tbody:last"
+                }).done(function() {
                     addHoverElementOnTableCells();
+                    $.pjax.reload({
+                        container:"#pjaxContainer #pagination ul.pagination", 
+                        fragment:"#pagination ul.pagination"
+                    });
                 });
+            });
         }, interval);
     }
 
