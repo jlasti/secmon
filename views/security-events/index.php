@@ -381,19 +381,21 @@ foreach($chartData as $key => $record)
         // Store the ID of the interval to variable so we can clear it later
         intervalId = setInterval(function() {
             $.pjax.reload({
-                container: "#pjaxBarChartContainer"
-            }).done(function() {
-                $.pjax.reload({
-                    container:"#pjaxContainer table#eventsContent tbody:last", 
-                    fragment:"table#eventsContent tbody:last"
-                }).done(function() {
-                    addHoverElementOnTableCells();
-                    $.pjax.reload({
-                        container:"#pjaxContainer #pagination", 
-                        fragment:"#pagination"
-                    });
-                });
+                container: "#pjaxBarChartContainer",
+                async:false
             });
+            $.pjax.reload({
+                container:"#pjaxContainer table#eventsContent tbody:last", 
+                fragment:"table#eventsContent tbody:last",
+                async:false
+            });
+            $.pjax.reload({
+                container:"#pjaxContainer #pagination", 
+                fragment:"#pagination",
+                async:false
+            });
+
+            addHoverElementOnTableCells();
         }, interval);
     }
 
