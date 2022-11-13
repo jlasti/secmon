@@ -283,8 +283,7 @@ foreach($chartData as $key => $record)
                     'colors' => ['transparent']
                 ],
                 'legend' => [
-                    'verticalAlign' => 'bottom',
-                    'horizontalAlign' => 'left',
+                    'show' => false
                 ],
             ],
             'series' => $series,
