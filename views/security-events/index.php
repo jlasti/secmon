@@ -390,8 +390,8 @@ foreach($chartData as $key => $record)
                 }).done(function() {
                     addHoverElementOnTableCells();
                     $.pjax.reload({
-                        container:"#pjaxContainer #pagination ul.pagination", 
-                        fragment:"#pagination ul.pagination"
+                        container:"#pjaxContainer #pagination", 
+                        fragment:"#pagination"
                     });
                 });
             });
