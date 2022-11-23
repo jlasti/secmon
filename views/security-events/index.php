@@ -301,7 +301,7 @@ foreach($chartData as $key => $record)
     <?php Pjax::begin(['id' => 'pjaxContainer']); ?>
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
-                'layout' => '{items}<div id="pagination">{pager}</div>',
+                'layout' => '{items}<div id="pagination"><div class="row"><div class="col" style="width:75%;">{pager}</div><div class="col" style="width:25%;">{summary}</div></div></div>',
                 'tableOptions' => [
                     'id' => 'eventsContent',
                     'class' => 'responsive-table striped',
