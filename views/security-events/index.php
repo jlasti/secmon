@@ -1,6 +1,6 @@
 <?php
 
-use macgyer\yii2materializecss\widgets\grid\GridView;
+use yii\grid\GridView;
 use yii\widgets\Pjax;
 use yii\widgets\ActiveForm;
 use kartik\cmenu\ContextMenu;
@@ -300,6 +300,11 @@ foreach($chartData as $key => $record)
 <div class="security-events-index clickable-table" id="securityEventsTable">
     <?php Pjax::begin(['id' => 'pjaxContainer']); ?>
             <?= GridView::widget([
+                'pager' => [
+                    'firstPageLabel' => 'First',
+                    'lastPageLabel' => 'Last',
+                    'maxButtonCount' => 7,
+                ],
                 'dataProvider' => $dataProvider,
                 'layout' => '{items}<div id="pagination"><div class="row"><div class="col" style="width:75%;">{pager}</div><div class="col" style="width:25%;">{summary}</div></div></div>',
                 'tableOptions' => [
