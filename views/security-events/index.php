@@ -257,7 +257,7 @@ foreach($chartData as $key => $record)
                 'xaxis' => [
                     'type' => 'datetime',
                     'labels' => [
-                        'format' => 'd/M HH:MM:ss',
+                        'format' => 'd/M hh:mm:ss',
                     ]
                 ],
                 'yaxis' => [
