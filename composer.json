@@ -24,7 +24,7 @@
     "yiisoft/yii2-bootstrap": "*",
     "yiisoft/yii2-swiftmailer": "*",
     "frostealth/yii2-presenter": "@stable",
-    "macgyer/yii2-materializecss": "*",
+    "macgyer/yii2-materializecss": "1.3.0",
     "bower-asset/materialize": "0.98.0",
     "php-ds/php-ds": "^1.2",
     "2amigos/yii2-grid-view-library": "~1.0",
