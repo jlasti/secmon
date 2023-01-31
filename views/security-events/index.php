@@ -154,8 +154,8 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
         </div>
 
         <div class="col" style="width:30%;"">
-            <div class="row security-panel-header">
-                <?php $form = ActiveForm::begin(['action' =>['update-refresh-time'], 'method' => 'post',]); ?>
+            <?php $form = ActiveForm::begin(['action' =>['update-refresh-time'], 'method' => 'post',]); ?>
+                <div class="row security-panel-header">
                     <div class="col" style="float: left;">
                         <span class="label">Refresh time</span>
                     </div>
@@ -181,7 +181,7 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
                             ])
                         ?>
                     </div>
-                </div>
+                    </div>
                 <?= $form->field($securityEventsPage, 'refresh_time')->textInput(['placeholder' => 'nY/nM/nW/nD/nH/nm/nS'])->label(false) ?>
             <?php ActiveForm::end(); ?>
         </div>
@@ -314,6 +314,14 @@ foreach($chartData as $key => $record)
                 'columns' => $dataColumns,
             ]); ?>
     <?php Pjax::end(); ?>
+
+    <select class="form-select form-select-sm" id="numberOfRecords" onchange="updateNumberOfRecords();">
+        <option value="10" <?= $securityEventsPage->number_of_records == 10 ? 'selected' : ''?> >10</option>
+        <option value="25" <?= $securityEventsPage->number_of_records == 25 ? 'selected' : ''?> >25</option>
+        <option value="50" <?= $securityEventsPage->number_of_records == 50 ? 'selected' : ''?> >50</option>
+        <option value="100" <?= $securityEventsPage->number_of_records == 100 ? 'selected' : ''?> >100</option>
+    </select>
+            
 </div>
 
 <!-- Modal Structure -->
@@ -677,6 +685,27 @@ foreach($chartData as $key => $record)
                 absoluteTimeFrom: from,
                 absoluteTimeTo: to,
                 relativeTime: ''
+            },
+            datatype: "json"
+        })
+        .done(function(msg) {
+                $("#result").html(msg);
+        })
+        .fail(function(jqXHR, textStatus) {
+            $("#result").html("Request failed: " + textStatus);
+        });
+    }
+
+    function updateNumberOfRecords(){
+        var e = document.getElementById("numberOfRecords");
+        var value = e.value;
+        $.ajax({
+            url: "/secmon/web/security-events/update-number-of-records",
+            method: "POST",
+            data:
+            {
+                _crsf: $('meta[name="csrf-token"]').attr('content'),
+                numberOfRecords: value
             },
             datatype: "json"
         })
