@@ -72,9 +72,10 @@ class SecurityEventsController extends Controller
 
         $filterId = $securityEventsPage->filter_id;
         $timeFilterId = $securityEventsPage->time_filter_id;
+        $numberOfRecords = $securityEventsPage->number_of_records;
 
         $searchModel = new SecurityEventsSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams, $filterId, $timeFilterId);
+        $dataProvider = $searchModel->search($this->request->queryParams, $filterId, $timeFilterId, $numberOfRecords);
         $dataProvider->sort->defaultOrder = ['id' => SORT_DESC];
 
         return $this->render('index', [
@@ -418,6 +419,23 @@ class SecurityEventsController extends Controller
                 $securityEventsPage->update();
 
             }
+        }
+        return $this->redirect(['index']);
+    }
+
+    public function actionUpdateNumberOfRecords()
+    {
+        $userId = Yii::$app->user->getId();
+        $securityEventsPage = SecurityEventsPage::findOne(['user_id' => $userId]);
+        $allowedValues = [10,25,50,100];
+        
+        if(Yii::$app->request->post() && $securityEventsPage) {
+            $numberOfRecords = Yii::$app->request->post('numberOfRecords');
+            if(in_array($numberOfRecords, $allowedValues))
+                $securityEventsPage->number_of_records = $numberOfRecords;
+            else
+                $securityEventsPage->number_of_records = '10';
+            $securityEventsPage->update();
         }
         return $this->redirect(['index']);
     }
