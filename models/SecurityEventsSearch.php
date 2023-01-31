@@ -41,7 +41,7 @@ class SecurityEventsSearch extends SecurityEvents
      *
      * @return ActiveDataProvider
      */
-    public function search($params, $filterId, $timeFilterId)
+    public function search($params, $filterId, $timeFilterId, $numberOfRecords)
     {
         $query = SecurityEvents::find();
         $filter = Filter::findOne(['id' => $filterId]);
@@ -52,7 +52,7 @@ class SecurityEventsSearch extends SecurityEvents
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pageSize' => 10,
+                'pageSize' => $numberOfRecords,
             ],
         ]);
 
