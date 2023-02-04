@@ -306,7 +306,20 @@ foreach($chartData as $key => $record)
                     'maxButtonCount' => 7,
                 ],
                 'dataProvider' => $dataProvider,
-                'layout' => '{items}<div id="pagination"><div class="row"><div class="col" style="width:75%;">{pager}</div><div class="col" style="width:25%;">{summary}</div></div></div>',
+                'layout' => '
+                    {items}
+                    <div id="pagination">
+                        <div class="row">
+                            <div class="col" style="float: left;">
+                                {pager}
+                            </div>
+                            <div class="col" id="numberOfRecordsSelect" style="width: 5%; float: left;">
+                            </div>
+                            <div class="col" style="width:20%; float: right;">
+                                {summary}
+                            </div>
+                        </div>
+                    </div>',
                 'tableOptions' => [
                     'id' => 'eventsContent',
                     'class' => 'responsive-table striped',
@@ -314,14 +327,6 @@ foreach($chartData as $key => $record)
                 'columns' => $dataColumns,
             ]); ?>
     <?php Pjax::end(); ?>
-
-    <select class="form-select form-select-sm" id="numberOfRecords" onchange="updateNumberOfRecords();">
-        <option value="10" <?= $securityEventsPage->number_of_records == 10 ? 'selected' : ''?> >10</option>
-        <option value="25" <?= $securityEventsPage->number_of_records == 25 ? 'selected' : ''?> >25</option>
-        <option value="50" <?= $securityEventsPage->number_of_records == 50 ? 'selected' : ''?> >50</option>
-        <option value="100" <?= $securityEventsPage->number_of_records == 100 ? 'selected' : ''?> >100</option>
-    </select>
-            
 </div>
 
 <!-- Modal Structure -->
@@ -379,6 +384,9 @@ foreach($chartData as $key => $record)
 
     // Add hover elements on table cells
     addHoverElementOnTableCells();
+
+    // Add NumberOfRecordsSelect
+    addNumberOfRecordsElement();
 
     // Create sortable chips for security events table
     var $sortableChips = $( "#chipstable" );
@@ -672,6 +680,17 @@ foreach($chartData as $key => $record)
     function showRelativeTimeForm() {
         $("#absoluteTimeForm").hide();
         $("#relativeTimeForm").show();
+    }
+
+    function addNumberOfRecordsElement()
+    {
+        var e = document.getElementById("numberOfRecordsSelect");
+        $('<select class="form-select form-select-sm" id="numberOfRecords" onchange="updateNumberOfRecords();">\
+		<option value="10" <?= $securityEventsPage->number_of_records == 10 ? "selected" : ""?> >10</option>\
+		<option value="25" <?= $securityEventsPage->number_of_records == 25 ? "selected" : ""?> >25</option>\
+		<option value="50" <?= $securityEventsPage->number_of_records == 50 ? "selected" : ""?> >50</option>\
+		<option value="100" <?= $securityEventsPage->number_of_records == 100 ? "selected" : ""?> >100</option>\
+	    </select>').appendTo(e);
     }
 
     function updateAbsoluteTimeFilter(from, to){
