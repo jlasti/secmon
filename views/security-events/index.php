@@ -292,12 +292,21 @@ foreach($chartData as $key => $record)
     <?php Pjax::end(); ?>
 </div>
 
+<div class="col" style="position:absolute; right: 45px; display: 'block'; width: 30px">
+    <select class="form-select form-select-sm" style="text-align: center;" id="numberOfRecords" onchange="updateNumberOfRecords();">
+    <option value="10" <?= $securityEventsPage->number_of_records == 10 ? "selected" : ""?> >10</option>
+    <option value="25" <?= $securityEventsPage->number_of_records == 25 ? "selected" : ""?> >25</option>
+    <option value="50" <?= $securityEventsPage->number_of_records == 50 ? "selected" : ""?> >50</option>
+    <option value="100" <?= $securityEventsPage->number_of_records == 100 ? "selected" : ""?> >100</option>
+    </select>
+</div>
+
 <a href="#modalColumsSettings" class="btn-floating waves-effect waves-light btn-small blue columns-settings-button"
-    style="position:absolute; right: 10px; margin-bottom: 20px; display: 'block'; ?>" data-toggle="tooltip" data-placement="bottom" title="Columns settings">
+    style="position:absolute; right: 10px; margin-top: 10px; display: 'block';" data-toggle="tooltip" data-placement="bottom" title="Columns settings">
     <i class="material-icons">settings</i>
 </a>
 
-<div class="security-events-index clickable-table" id="securityEventsTable">
+<div class="security-events-index clickable-table" style="margin-top: 17px;" id="securityEventsTable">
     <?php Pjax::begin(['id' => 'pjaxContainer']); ?>
             <?= GridView::widget([
                 'pager' => [
@@ -312,8 +321,6 @@ foreach($chartData as $key => $record)
                         <div class="row">
                             <div class="col" style="float: left;">
                                 {pager}
-                            </div>
-                            <div class="col" id="numberOfRecordsSelect" style="width: 5%; float: left;">
                             </div>
                             <div class="col" style="width:20%; float: right;">
                                 {summary}
@@ -384,9 +391,6 @@ foreach($chartData as $key => $record)
 
     // Add hover elements on table cells
     addHoverElementOnTableCells();
-
-    // Add NumberOfRecordsSelect
-    addNumberOfRecordsElement();
 
     // Create sortable chips for security events table
     var $sortableChips = $( "#chipstable" );
@@ -680,17 +684,6 @@ foreach($chartData as $key => $record)
     function showRelativeTimeForm() {
         $("#absoluteTimeForm").hide();
         $("#relativeTimeForm").show();
-    }
-
-    function addNumberOfRecordsElement()
-    {
-        var e = document.getElementById("numberOfRecordsSelect");
-        $('<select class="form-select form-select-sm" id="numberOfRecords" onchange="updateNumberOfRecords();">\
-		<option value="10" <?= $securityEventsPage->number_of_records == 10 ? "selected" : ""?> >10</option>\
-		<option value="25" <?= $securityEventsPage->number_of_records == 25 ? "selected" : ""?> >25</option>\
-		<option value="50" <?= $securityEventsPage->number_of_records == 50 ? "selected" : ""?> >50</option>\
-		<option value="100" <?= $securityEventsPage->number_of_records == 100 ? "selected" : ""?> >100</option>\
-	    </select>').appendTo(e);
     }
 
     function updateAbsoluteTimeFilter(from, to){
