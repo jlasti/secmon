@@ -37,7 +37,7 @@ python3 secmon_manager.py deploy
 
 # Default login credentials user:secmon, password:password
 # Change password after first login!!!
-<IP_address_host_machine>:8080/secmon/web
+<host_machine_IP_address>:8080/secmon/web
 ```
 
 ### CentOS 8
@@ -73,7 +73,7 @@ python3 secmon_manager.py deploy
 
 # Default login credentials user:secmon, password:password
 # Change password after first login!!!
-<IP_address_host_machine>:8080/secmon/web
+<host_machine_IP_address>:8080/secmon/web
 ```
 
 ### Ubuntu 22.04
@@ -116,5 +116,5 @@ python3 secmon_manager.py deploy
 
 # Default login credentials user:secmon, password:password
 # Change password after first login!!!
-<IP_address_host_machine>:8080/secmon/web
+<host_machine_IP_address>:8080/secmon/web
 ```
