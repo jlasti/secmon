@@ -1,13 +1,17 @@
 
+
 # SecMon User Guide
 ## Architecture
 
- - **Aggregator**
- - **Normalizer**
- - **Correlator**
- - **Enrichment Modules**
- - **Geo IP**
-- **Network Model**
+ - **Aggregator** -
+ - **Normalizer** -
+ - **Enrichment modules** -
+   - **Geo IP** -
+   - **Network model** -
+ - **Correlator** -
+ - **Database** -
+ - **Database retention service** -
+ - **SecMon app** -
 
 ## How to Install
 
@@ -149,11 +153,9 @@ python3 secmon_manager.py restart
 # Deploy SecMon system on a host machine
 python3 secmon_manager.py deploy
 ```
-
-## Managing Enrichment Modules
-
-### Turn off enrichment module
-In file `./config/secmon_config.ini` change value from ’true’ to ’false’ for a particular enrichment module
+## Configuration
+#### Turn on/off enrichment module
+Set value `true` /`false` in the file `./config/secmon_config.ini` for a particular enrichment module which you want to turn on/off:
 ```
 [ENRICHMENT]
 geoip = true
@@ -163,9 +165,8 @@ Save your changes and restart the SecMon system with the command:
 ```
 python3 secmon_manager.py restart
 ```
-
-### Turn on enrichment module
-In file `./config/secmon_config.ini` change value from ’false’ to ’true’ for a particular enrichment module
+####  Turn on enrichment module
+Change value from 'false' to 'true' in the file `./config/secmon_config.ini` for a particular enrichment module which you want to turn on: 
 ```
 [ENRICHMENT]
 geoip = false
@@ -175,7 +176,7 @@ Save your changes and restart the SecMon system with the command:
 ```
 python3 secmon_manager.py restart
 ```
-## Rsyslog client config
+### Rsyslog client config
 To redirect logs from client machine to the SecMon add the following line at the end of the `/etc/rsyslog.conf` file , where `192.168.1.100` is the IP address of the remote server (SecMon), you will be writing your logs to:
 ```
 *.* @192.168.1.100:514
@@ -185,5 +186,46 @@ Save your changes and restart the rsyslog service on the client with the command
  sudo systemctl restart rsyslog
  ```
 
-## Debug
+## Development
+### Directory structure
+Yii framework
+https://yii2-framework.readthedocs.io/en/latest/
+https://www.yiiframework.com/doc/guide/2.0/en
+
+### Docker commands
+Run command inside container:
+- `docker exec <container_name> <command>`
+- `docker exec -it secmon_app ls`
+
+Run bash inside container:
+- `docker exec -it <container_name> bash`
+- `docker exec -it secmon_app bash`
+
+Run composer update/install:
+- `docker exec secmon_app composer update`
+- `docker exec secmon_app composer install`
+
+[Database migrations:](https://www.yiiframework.com/doc/guide/2.0/en/db-migrations)
+- `docker exec -it secmon_app <command>`
+
+Run migration:
+- `docker exec -it secmon_app ./yii migrate`
+
+Refreshing migration:
+- `docker exec -it secmon_app ./yii migrate/fresh`
+
+Create new migration:
+- `docker exec -it secmon_app ./yii migrate/create <name>`
+- `docker exec -it secmon_app ./yii migrate/create security_events_table`
+
+Run psql:
+- `docker exec -it secmon_db psql -U secmon`
+
+### Create own Enrichment modules
+TODO
+
+### Create own Rules
+To create own normalization/correlation rules. TODO
+
+### Debug
 SecMon logs are located in file `/var/log/docker/secmon.log`
