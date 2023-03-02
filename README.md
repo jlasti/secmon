@@ -1,17 +1,6 @@
 
 
 # SecMon User Guide
-## Architecture
-
- - **Aggregator** -
- - **Normalizer** -
- - **Enrichment modules** -
-   - **Geo IP** -
-   - **Network model** -
- - **Correlator** -
- - **Database** -
- - **Database retention service** -
- - **SecMon app** -
 
 ## How to Install
 
@@ -176,7 +165,7 @@ Save your changes and restart the SecMon system with the command:
 ```
 python3 secmon_manager.py restart
 ```
-### Rsyslog client config
+### Rsyslog client configuration
 To redirect logs from client machine to the SecMon add the following line at the end of the `/etc/rsyslog.conf` file , where `192.168.1.100` is the IP address of the remote server (SecMon), you will be writing your logs to:
 ```
 *.* @192.168.1.100:514
@@ -187,21 +176,27 @@ Save your changes and restart the rsyslog service on the client with the command
  ```
 
 ## Development
+SecMon UI is written in php Yii2 framework. More information about this framework can be found [here](https://yii2-framework.readthedocs.io/en/latest/) or [here](https://www.yiiframework.com/doc/guide/2.0/en) ;)
+
 ### Directory structure
-Yii framework
-https://yii2-framework.readthedocs.io/en/latest/
-https://www.yiiframework.com/doc/guide/2.0/en
+SecMon root directory contains a few important directories:
+- Commands - contains main scripts for SecMon services which are run in docker containers
+-	Config - contains SecMon config files after deployment
+-	Deployment - contains necessary files for SecMon deployment (config_files, Dockerfiles, docker-compose.yml and GeoIP database)
+  - config_files - contains different configuration files 
+  - Dockerfiles - contains custom Dockerfiles for creating SecMon docker images
+-	Rules - contains normalization and correlation rules
 
 ### Docker commands
 Run command inside container:
 - `docker exec <container_name> <command>`
 - `docker exec -it secmon_app ls`
 
-Run bash inside container:
+Run `bash` inside container:
 - `docker exec -it <container_name> bash`
 - `docker exec -it secmon_app bash`
 
-Run composer update/install:
+Run `composer update`/`install`:
 - `docker exec secmon_app composer update`
 - `docker exec secmon_app composer install`
 
@@ -218,14 +213,25 @@ Create new migration:
 - `docker exec -it secmon_app ./yii migrate/create <name>`
 - `docker exec -it secmon_app ./yii migrate/create security_events_table`
 
-Run psql:
+Run `psql`:
 - `docker exec -it secmon_db psql -U secmon`
+
+### System Update
+
+#### Local changes:
+- Changes in database: `docker exec -it secmon_app ./yii migrate`
+- Changes in `./commands` directory/New enrichment module/New normalization or correlation rules?: `python3 secmon_manager.py restart`
+
+#### Remote changes:
+- `git pull`
+- Changes in database: `docker exec -it secmon_app ./yii migrate`
+- Changes in `./commands` directory/New enrichment module/New normalization or correlation rules: `python3 secmon_manager.py restart`
 
 ### Create own Enrichment modules
 TODO
 
 ### Create own Rules
-To create own normalization/correlation rules. TODO
+TODO
 
 ### Debug
 SecMon logs are located in file `/var/log/docker/secmon.log`
