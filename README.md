@@ -125,7 +125,7 @@ python3 secmon_manager.py deploy
 
 ## How to Use
 ### SecMon Manager
-SecMon manager (*secmon_manager.py*) is a python script  located in root directory of SecMon repository. It is used for managing SecMon system which consists from docker containers.
+SecMon manager (*secmon_manager.py*) is a python script  located in root directory of SecMon repository. It is used for managing SecMon services as docker containers.
 ```
 # Show list of all available parameters
 python3 secmon_manager.py help
@@ -154,23 +154,12 @@ Save your changes and restart the SecMon system with the command:
 ```
 python3 secmon_manager.py restart
 ```
-####  Turn on enrichment module
-Change value from 'false' to 'true' in the file `./config/secmon_config.ini` for a particular enrichment module which you want to turn on: 
-```
-[ENRICHMENT]
-geoip = false
-network_model = false
-```
-Save your changes and restart the SecMon system with the command:
-```
-python3 secmon_manager.py restart
-```
 ### Rsyslog client configuration
-To redirect logs from client machine to the SecMon add the following line at the end of the `/etc/rsyslog.conf` file , where `192.168.1.100` is the IP address of the remote server (SecMon), you will be writing your logs to:
+To redirect logs from client machine to the SecMon add the following line at the end of the `/etc/rsyslog.conf` file, where `192.168.1.100` is the IP address of the remote server (SecMon), you will be writing your logs to:
 ```
 *.* @192.168.1.100:514
 ```
-Save your changes and restart the rsyslog service on the client with the command:
+Save your changes and restart the `rsyslog` service on the client with the command:
  ```
  sudo systemctl restart rsyslog
  ```
@@ -182,9 +171,9 @@ SecMon UI is written in php Yii2 framework. More information about this framewor
 SecMon root directory contains a few important directories:
 - Commands - contains main scripts for SecMon services which are run in docker containers
 -	Config - contains SecMon config files after deployment
--	Deployment - contains necessary files for SecMon deployment (config_files, Dockerfiles, docker-compose.yml and GeoIP database)
+-	Deployment - contains necessary files for SecMon deployment (configuration files, Dockerfiles, docker-compose.yml and GeoIP database)
   - config_files - contains different configuration files 
-  - Dockerfiles - contains custom Dockerfiles for creating SecMon docker images
+  - Dockerfiles - contains custom Dockerfiles for creating docker images of SecMon services
 -	Rules - contains normalization and correlation rules
 
 ### Docker commands
