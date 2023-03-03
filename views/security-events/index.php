@@ -357,7 +357,7 @@ foreach($chartData as $key => $record)
                     <label class="active" for="name">Add Column</label>
                     <select class="form-select" id="selectColumnDropdown" aria-label="Default select example">
                     <?php foreach ($colsDown as $key => $value) : ?>
-                        <option value="<?= $key ?>"><?= $value ?></option>
+                        <option value="<?= $value ?>"><?= $value ?></option>
                     <?php endforeach; ?>
                     </select>
                 </div>
@@ -481,6 +481,7 @@ foreach($chartData as $key => $record)
         // Get selected Column value
         var column = document.getElementById("selectColumnDropdown");
         var colunmValue = column.value;
+        console.log(colunmValue);
         var objectColumns = <?php echo json_encode($colsDown); ?>;
         var columnsKeyNames = getColumnsKeyNames();
 
