@@ -481,7 +481,6 @@ foreach($chartData as $key => $record)
         // Get selected Column value
         var column = document.getElementById("selectColumnDropdown");
         var colunmValue = column.value;
-        console.log(colunmValue);
         var objectColumns = <?php echo json_encode($colsDown); ?>;
         var columnsKeyNames = getColumnsKeyNames();
 
