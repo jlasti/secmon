@@ -154,8 +154,8 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
         </div>
 
         <div class="col" style="width:30%;"">
-            <div class="row security-panel-header">
-                <?php $form = ActiveForm::begin(['action' =>['update-refresh-time'], 'method' => 'post',]); ?>
+            <?php $form = ActiveForm::begin(['action' =>['update-refresh-time'], 'method' => 'post',]); ?>
+                <div class="row security-panel-header">
                     <div class="col" style="float: left;">
                         <span class="label">Refresh time</span>
                     </div>
@@ -181,7 +181,7 @@ if($securityEventsPage->time_filter_type == 'absolute' && $securityEventsPage->t
                             ])
                         ?>
                     </div>
-                </div>
+                    </div>
                 <?= $form->field($securityEventsPage, 'refresh_time')->textInput(['placeholder' => 'nY/nM/nW/nD/nH/nm/nS'])->label(false) ?>
             <?php ActiveForm::end(); ?>
         </div>
@@ -292,12 +292,21 @@ foreach($chartData as $key => $record)
     <?php Pjax::end(); ?>
 </div>
 
+<div class="col" style="position:absolute; right: 45px; display: 'block'; width: 30px">
+    <select class="form-select form-select-sm" style="text-align: center;" id="numberOfRecords" onchange="updateNumberOfRecords();">
+    <option value="10" <?= $securityEventsPage->number_of_records == 10 ? "selected" : ""?> >10</option>
+    <option value="25" <?= $securityEventsPage->number_of_records == 25 ? "selected" : ""?> >25</option>
+    <option value="50" <?= $securityEventsPage->number_of_records == 50 ? "selected" : ""?> >50</option>
+    <option value="100" <?= $securityEventsPage->number_of_records == 100 ? "selected" : ""?> >100</option>
+    </select>
+</div>
+
 <a href="#modalColumsSettings" class="btn-floating waves-effect waves-light btn-small blue columns-settings-button"
-    style="position:absolute; right: 10px; margin-bottom: 20px; display: 'block'; ?>" data-toggle="tooltip" data-placement="bottom" title="Columns settings">
+    style="position:absolute; right: 10px; margin-top: 10px; display: 'block';" data-toggle="tooltip" data-placement="bottom" title="Columns settings">
     <i class="material-icons">settings</i>
 </a>
 
-<div class="security-events-index clickable-table" id="securityEventsTable">
+<div class="security-events-index clickable-table" style="margin-top: 17px;" id="securityEventsTable">
     <?php Pjax::begin(['id' => 'pjaxContainer']); ?>
             <?= GridView::widget([
                 'pager' => [
@@ -306,7 +315,18 @@ foreach($chartData as $key => $record)
                     'maxButtonCount' => 7,
                 ],
                 'dataProvider' => $dataProvider,
-                'layout' => '{items}<div id="pagination"><div class="row"><div class="col" style="width:75%;">{pager}</div><div class="col" style="width:25%;">{summary}</div></div></div>',
+                'layout' => '
+                    {items}
+                    <div id="pagination">
+                        <div class="row">
+                            <div class="col" style="float: left;">
+                                {pager}
+                            </div>
+                            <div class="col" style="width:20%; float: right;">
+                                {summary}
+                            </div>
+                        </div>
+                    </div>',
                 'tableOptions' => [
                     'id' => 'eventsContent',
                     'class' => 'responsive-table striped',
@@ -677,6 +697,27 @@ foreach($chartData as $key => $record)
                 absoluteTimeFrom: from,
                 absoluteTimeTo: to,
                 relativeTime: ''
+            },
+            datatype: "json"
+        })
+        .done(function(msg) {
+                $("#result").html(msg);
+        })
+        .fail(function(jqXHR, textStatus) {
+            $("#result").html("Request failed: " + textStatus);
+        });
+    }
+
+    function updateNumberOfRecords(){
+        var e = document.getElementById("numberOfRecords");
+        var value = e.value;
+        $.ajax({
+            url: "/secmon/web/security-events/update-number-of-records",
+            method: "POST",
+            data:
+            {
+                _crsf: $('meta[name="csrf-token"]').attr('content'),
+                numberOfRecords: value
             },
             datatype: "json"
         })

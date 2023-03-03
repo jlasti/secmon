@@ -13,7 +13,9 @@ use Yii;
  * @property int|null $time_filter_id
  * @property string|null $time_filter_type
  * @property string|null $refresh_time
+ * @property int|null number_of_records
  * @property string|null $data_columns
+ * 
  *
  * @property Filter $filter
  * @property Users $user
@@ -34,8 +36,9 @@ class SecurityEventsPage extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['number_of_records'], 'default', 'value' => 10],
             [['user_id', 'filter_id', 'time_filter_id'], 'default', 'value' => null],
-            [['user_id', 'filter_id', 'time_filter_id'], 'integer'],
+            [['user_id', 'filter_id', 'time_filter_id', 'number_of_records'], 'integer'],
             [['time_filter_type'], 'default', 'value' => 'absolute'],
             [['time_filter_type', 'refresh_time'], 'string'],
             [['refresh_time'], 'match', 'pattern' => '/^\d{1,5}[YMWDHmS]{1}$/',
@@ -58,6 +61,7 @@ class SecurityEventsPage extends \yii\db\ActiveRecord
             'time_filter_id' => 'Time Filter ID',
             'time_filter_type' => 'Time Filter Type',
             'refresh_time' => 'Refresh Time',
+            'number_of_records' => 'Number of Records',
             'data_columns' => 'Data Columns',
         ];
     }

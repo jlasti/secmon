@@ -36,7 +36,7 @@
     "geoip2/geoip2": "~2.0",
     "beaten-sect0r/yii2-flatpickr": "*",
     "kartik-v/yii2-widget-datetimepicker": "*",
-    "onmotion/yii2-widget-apexcharts": "*"
+    "onmotion/yii2-widget-apexcharts": "1.0.7"
   },
   "require-dev": {
     "codeception/codeception": "*",
