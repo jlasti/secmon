@@ -209,13 +209,13 @@ Run `psql`:
 
 #### Local changes:
 - Changes in database: `docker exec -it secmon_app ./yii migrate`
-- Changes in `composer.json` file?: `docker exec -it secmon_app composer update`
-- Changes in `./commands` directory/New enrichment module/New normalization or correlation rules?: `python3 secmon_manager.py restart`
+- Changes in `composer.json` file: `docker exec -it secmon_app composer update`
+- Changes in `./commands` directory/New enrichment module/New normalization or correlation rules: `python3 secmon_manager.py restart`
 
 #### Remote changes:
 - `git pull`
 - Changes in database: `docker exec -it secmon_app ./yii migrate`
-- Changes in `composer.json` file?: `docker exec -it secmon_app composer update`
+- Changes in `composer.json` file: `docker exec -it secmon_app composer update`
 - Changes in `./commands` directory/New enrichment module/New normalization or correlation rules: `python3 secmon_manager.py restart`
 
 ### Create own Enrichment modules
