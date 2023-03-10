@@ -6,6 +6,8 @@
 
 Prerequisite for installing SecMon system is OS CentOS7/CentOS Stream 8/Ubuntu 22.04 (tested Linux distribution) with user ***secmon*** (under which we will deploy SecMon system), internet access and installed programs [Docker Engine](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/) v2.3.3. The functionality of the Docker Engine can be verified with the command `docker run hello-world`. Docker Compose functionality can be verified with `docker compose version`. If the commands do not run correctly, this problem must be resolved or the installation will not be successful.
 
+---
+
 ### CentOS 7
 
 ```
@@ -46,6 +48,8 @@ python3 secmon_manager.py deploy
 
 After successful installation configure logs forwarding on clients using [rsyslog service](https://github.com/Miropanak/dockerized_secmon/edit/master/README.md#how-to-configure-clients-for-logs-forwarding).
 
+---
+
 ### CentOS 8
 
 ```
@@ -83,6 +87,8 @@ python3 secmon_manager.py deploy
 ```
 
 After successful installation configure logs forwarding on clients using [rsyslog service](https://github.com/Miropanak/dockerized_secmon/edit/master/README.md#how-to-configure-clients-for-logs-forwarding).
+
+---
 
 ### Ubuntu 22.04
 
@@ -128,6 +134,8 @@ python3 secmon_manager.py deploy
 ```
 
 After successful installation configure logs forwarding on clients using [rsyslog service](https://github.com/Miropanak/dockerized_secmon/edit/master/README.md#how-to-configure-clients-for-logs-forwarding).
+
+---
 
 ### How to configure clients for logs forwarding
 To redirect logs from client machine to the SecMon add the following line at the end of the `/etc/rsyslog.conf` file, where `192.168.1.100` is the IP address of the remote server (SecMon), you will be writing your logs to:
