@@ -44,6 +44,8 @@ python3 secmon_manager.py deploy
 <host_machine_IP_address>:8080/secmon/web
 ```
 
+After successful installation configure logs forwarding on clients using [rsyslog service](https://github.com/Miropanak/dockerized_secmon/edit/master/README.md#how-to-configure-clients-for-logs-forwarding).
+
 ### CentOS 8
 
 ```
@@ -79,6 +81,8 @@ python3 secmon_manager.py deploy
 # Change password after first login!!!
 <host_machine_IP_address>:8080/secmon/web
 ```
+
+After successful installation configure logs forwarding on clients using [rsyslog service](https://github.com/Miropanak/dockerized_secmon/edit/master/README.md#how-to-configure-clients-for-logs-forwarding).
 
 ### Ubuntu 22.04
 
@@ -123,6 +127,18 @@ python3 secmon_manager.py deploy
 <host_machine_IP_address>:8080/secmon/web
 ```
 
+After successful installation configure logs forwarding on clients using [rsyslog service](https://github.com/Miropanak/dockerized_secmon/edit/master/README.md#how-to-configure-clients-for-logs-forwarding).
+
+### How to configure clients for logs forwarding
+To redirect logs from client machine to the SecMon add the following line at the end of the `/etc/rsyslog.conf` file, where `192.168.1.100` is the IP address of the remote server (SecMon), you will be writing your logs to:
+```
+*.* @192.168.1.100:514
+```
+Save your changes and restart the `rsyslog` service on the client with the command:
+```
+sudo systemctl restart rsyslog
+```
+
 ## How to Use
 ### SecMon Manager
 SecMon manager (*secmon_manager.py*) is a python script  located in root directory of SecMon repository. It is used for managing SecMon services as docker containers.
@@ -154,15 +170,6 @@ Save your changes and restart the SecMon system with the command:
 ```
 python3 secmon_manager.py restart
 ```
-### Rsyslog client configuration
-To redirect logs from client machine to the SecMon add the following line at the end of the `/etc/rsyslog.conf` file, where `192.168.1.100` is the IP address of the remote server (SecMon), you will be writing your logs to:
-```
-*.* @192.168.1.100:514
-```
-Save your changes and restart the `rsyslog` service on the client with the command:
- ```
- sudo systemctl restart rsyslog
- ```
 
 ## Development
 SecMon UI is written in php Yii2 framework. More information about this framework can be found [here](https://yii2-framework.readthedocs.io/en/latest/) or [here](https://www.yiiframework.com/doc/guide/2.0/en) ;)
@@ -217,12 +224,6 @@ Run `psql`:
 - Changes in database: `docker exec -it secmon_app ./yii migrate`
 - Changes in `composer.json` file: `docker exec -it secmon_app composer update`
 - Changes in `./commands` directory/New enrichment module/New normalization or correlation rules: `python3 secmon_manager.py restart`
-
-### Create own Enrichment modules
-TODO
-
-### Create own Rules
-TODO
 
 ### Debug
 SecMon logs are located in file `/var/log/docker/secmon.log`
