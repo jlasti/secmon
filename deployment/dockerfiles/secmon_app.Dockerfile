@@ -24,5 +24,12 @@ WORKDIR /var/www/html/secmon
 
 # Copy apache config
 COPY deployment/config_files/000-default.conf /etc/apache2/sites-available/
+COPY deployment/config_files/default-ssl.conf /etc/apache2/sites-available/
 
+# Copy SSL certificates
+COPY deployment/certificates/* /etc/ssl/
 
+RUN a2ensite default-ssl
+RUN service apache2 reload
+RUN a2enmod ssl
+RUN service apache2 reload

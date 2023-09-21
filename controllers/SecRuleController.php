@@ -36,13 +36,17 @@ class SecRuleController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new SecRuleSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            $searchModel = new SecRuleSearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]);
+        }
     }
 
     /**
@@ -52,9 +56,13 @@ class SecRuleController extends Controller
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            return $this->render('view', [
+                'model' => $this->findModel($id),
+            ]);
+        }
     }
 
     /**
@@ -64,22 +72,26 @@ class SecRuleController extends Controller
      */
     public function actionCreate()
     {
-        $model = new SecRule();
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            $model = new SecRule();
 
-        if($model->load(Yii::$app->request->post()))
-        {
-			$model->secConfigFile = UploadedFile::getInstance($model, 'secConfigFile');
+            if($model->load(Yii::$app->request->post()))
+            {
+                $model->secConfigFile = UploadedFile::getInstance($model, 'secConfigFile');
 
-			if($model->upload())
-			{
-				return $this->redirect(['view', 'id' => $model->id]);
-			}
+                if($model->upload())
+                {
+                    return $this->redirect(['view', 'id' => $model->id]);
+                }
+            }
+
+            $model->state = true;
+            return $this->render('create', [
+                'model' => $model,
+            ]);
         }
-
-        $model->state = true;
-		return $this->render('create', [
-			'model' => $model,
-		]);
     }
 
     /**
@@ -90,19 +102,23 @@ class SecRuleController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
-        if ($model->load(Yii::$app->request->post())) {
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            $model = $this->findModel($id);
+            if ($model->load(Yii::$app->request->post())) {
 
-            $model->changeRepository();
+                $model->changeRepository();
 
-            if($model->save())
+                if($model->save())
 
-                return $this->redirect(['view', 'id' => $model->id]);
+                    return $this->redirect(['view', 'id' => $model->id]);
 
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+            } else {
+                return $this->render('update', [
+                    'model' => $model,
+                ]);
+            }
         }
     }
 
@@ -114,14 +130,18 @@ class SecRuleController extends Controller
      */
     public function actionDelete($id)
     {
-        $model = $this->findModel($id);
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            $model = $this->findModel($id);
             if (file_exists($model->link)) {
                 unlink($model->link);
             }
             $model->delete();
             exec("sudo systemctl restart secmon-correlator.service");
 
-        return $this->redirect(['index']);
+            return $this->redirect(['index']);
+        }
     }
 
     /**
@@ -133,10 +153,14 @@ class SecRuleController extends Controller
      */
     protected function findModel($id)
     {
-        if (($model = SecRule::findOne($id)) !== null) {
-            return $model;
-        } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            if (($model = SecRule::findOne($id)) !== null) {
+                return $model;
+            } else {
+                throw new NotFoundHttpException('The requested page does not exist.');
+            }
         }
     }
 }

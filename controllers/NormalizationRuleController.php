@@ -38,12 +38,16 @@ class NormalizationRuleController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new NormalizationRuleSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            $searchModel = new NormalizationRuleSearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]);
+        }
     }
     /**
      * Displays a single NormalizationRule model.
@@ -52,9 +56,13 @@ class NormalizationRuleController extends Controller
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            return $this->render('view', [
+                'model' => $this->findModel($id),
+            ]);
+        }
     }
     /**
      * Creates a new NormalizationRule model.
@@ -63,20 +71,24 @@ class NormalizationRuleController extends Controller
      */
     public function actionCreate()
     {
-        $model = new NormalizationRule();
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            $model = new NormalizationRule();
 
-        if($model->load(Yii::$app->request->post()))
-        {
-            $model->normalizationRuleFile = UploadedFile::getInstance($model, 'normalizationRuleFile');
-            if($model->upload()){
+            if($model->load(Yii::$app->request->post()))
+            {
+                $model->normalizationRuleFile = UploadedFile::getInstance($model, 'normalizationRuleFile');
+                if($model->upload()){
 
-                return $this->redirect(['view', 'id' => $model->id]);
+                    return $this->redirect(['view', 'id' => $model->id]);
+                }
             }
+            $model->state = true;
+            return $this->render('create', [
+                'model' => $model,
+            ]);
         }
-        $model->state = true;
-        return $this->render('create', [
-            'model' => $model,
-        ]);
     }
     /**
      * Updates an existing NormalizationRule model.
@@ -86,19 +98,23 @@ class NormalizationRuleController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
-        if ($model->load(Yii::$app->request->post())) {
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            $model = $this->findModel($id);
+            if ($model->load(Yii::$app->request->post())) {
 
-            $model->changeRepository();
+                $model->changeRepository();
 
-            if($model->save())
+                if($model->save())
 
-                return $this->redirect(['view', 'id' => $model->id]);
+                    return $this->redirect(['view', 'id' => $model->id]);
 
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+            } else {
+                return $this->render('update', [
+                    'model' => $model,
+                ]);
+            }
         }
     }
     /**
@@ -109,13 +125,17 @@ class NormalizationRuleController extends Controller
      */
     public function actionDelete($id)
     {
-        $model = $this->findModel($id);
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            $model = $this->findModel($id);
             if (file_exists($model->link)) {
                 unlink($model->link);
                 $model->delete();
                 exec("sudo systemctl restart secmon-normalizer.service");
             }
-        return $this->redirect(['index']);
+            return $this->redirect(['index']);
+        }
     }
     /**
      * Finds the NormalizationRule model based on its primary key value.
@@ -126,10 +146,14 @@ class NormalizationRuleController extends Controller
      */
     protected function findModel($id)
     {
-        if (($model = NormalizationRule::findOne($id)) !== null) {
-            return $model;
-        } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            if (($model = NormalizationRule::findOne($id)) !== null) {
+                return $model;
+            } else {
+                throw new NotFoundHttpException('The requested page does not exist.');
+            }
         }
     }
 }
