@@ -30,6 +30,5 @@ COPY deployment/config_files/default-ssl.conf /etc/apache2/sites-available/
 COPY deployment/certificates/* /etc/ssl/
 
 RUN a2ensite default-ssl
-RUN service apache2 reload
 RUN a2enmod ssl
-RUN service apache2 reload
+RUN service apache2 restart
