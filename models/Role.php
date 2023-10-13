@@ -50,6 +50,7 @@ class Role extends \yii\db\ActiveRecord implements Linkable
     {
         return [
             [['name', 'slug'], 'string', 'max' => 255],
+            [['name'], 'match', 'pattern' => '/^[a-zA-Z0-9_-]*$/']
         ];
     }
 

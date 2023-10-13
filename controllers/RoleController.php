@@ -35,13 +35,17 @@ class RoleController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new RoleSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            $searchModel = new RoleSearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]);
+        }
     }
 
     /**
@@ -51,9 +55,13 @@ class RoleController extends Controller
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            return $this->render('view', [
+                'model' => $this->findModel($id),
+            ]);
+        }
     }
 
     /**
@@ -63,14 +71,18 @@ class RoleController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Role();
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            $model = new Role();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            } else {
+                return $this->render('create', [
+                    'model' => $model,
+                ]);
+            }
         }
     }
 
@@ -82,14 +94,18 @@ class RoleController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            } else {
+                return $this->render('update', [
+                    'model' => $model,
+                ]);
+            }
         }
     }
 
@@ -101,10 +117,14 @@ class RoleController extends Controller
      */
     public function actionDelete($id)
     {
-        if($id != 100)
-            $this->findModel($id)->delete();
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            if($id != 100)
+                $this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+            return $this->redirect(['index']);
+        }
     }
 
     /**
@@ -116,10 +136,14 @@ class RoleController extends Controller
      */
     protected function findModel($id)
     {
-        if (($model = Role::findOne($id)) !== null) {
-            return $model;
-        } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            if (($model = Role::findOne($id)) !== null) {
+                return $model;
+            } else {
+                throw new NotFoundHttpException('The requested page does not exist.');
+            }
         }
     }
 }

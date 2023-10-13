@@ -36,41 +36,45 @@ class ViewController extends Controller
      */
     public function actionIndex()
     {
-        $userId = Yii::$app->user->getId();
-        $activeViewId = null;
-        $views = View::findAll(['user_id' => $userId]);
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            $userId = Yii::$app->user->getId();
+            $activeViewId = null;
+            $views = View::findAll(['user_id' => $userId]);
 
-        // No view was created, create default
-        if (count($views) == 0) {
-            $view = new View();
-            $view->name = 'Default';
-            $view->user_id = $userId;
-            $view->active = 1;
-            $view->refresh_time = '10S';
-            $view->save();
-            array_push($views,$view);
-        }
-       
-        foreach ($views as $temp)
-        {
-            if ($temp->getAttribute('active') == 1)
-            {
-                $activeViewId = $temp->getAttribute('id');
+            // No view was created, create default
+            if (count($views) == 0) {
+                $view = new View();
+                $view->name = 'Default';
+                $view->user_id = $userId;
+                $view->active = 1;
+                $view->refresh_time = '10S';
+                $view->save();
+                array_push($views,$view);
             }
-        }
 
-        // no active view was found, select default view returned by reset
-        if (!isset($activeViewId) && !empty($views))
-        {
-            $defaultView = reset($views);
-            $defaultView->active = 1;
-            $defaultView->save();
-        }
+            foreach ($views as $temp)
+            {
+                if ($temp->getAttribute('active') == 1)
+                {
+                    $activeViewId = $temp->getAttribute('id');
+                }
+            }
 
-        return $this->render('index', [
-            'views' => $views,
-            'activeViewId' => $activeViewId
-        ]);
+            // no active view was found, select default view returned by reset
+            if (!isset($activeViewId) && !empty($views))
+            {
+                $defaultView = reset($views);
+                $defaultView->active = 1;
+                $defaultView->save();
+            }
+
+            return $this->render('index', [
+                'views' => $views,
+                'activeViewId' => $activeViewId
+            ]);
+        }
     }
 
     /**
@@ -81,9 +85,13 @@ class ViewController extends Controller
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            return $this->render('view', [
+                'model' => $this->findModel($id),
+            ]);
+        }
     }
 
     /**
@@ -94,26 +102,30 @@ class ViewController extends Controller
      */
     public function actionCreate()
     {
-        $model = new View();
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            $model = new View();
 
-        // setting currently active view to false
-        $userId = Yii::$app->user->getId();
-        $views = View::findAll(['user_id' => $userId]);
-        foreach ($views as $view)
-        {
-            if ($view->getAttribute('active') == 1)
+            // setting currently active view to false
+            $userId = Yii::$app->user->getId();
+            $views = View::findAll(['user_id' => $userId]);
+            foreach ($views as $view)
             {
-                $view->active = 0;
-                $view->save();
+                if ($view->getAttribute('active') == 1)
+                {
+                    $view->active = 0;
+                    $view->save();
+                }
             }
-        }
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                return $this->redirect(['index']);
+            } else {
+                return $this->render('create', [
+                    'model' => $model,
+                ]);
+            }
         }
     }
 
@@ -126,14 +138,18 @@ class ViewController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                return $this->redirect(['index']);
+            } else {
+                return $this->render('update', [
+                    'model' => $model,
+                ]);
+            }
         }
     }
 
@@ -146,9 +162,13 @@ class ViewController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            $this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+            return $this->redirect(['index']);
+        }
     }
 
     /**
@@ -159,74 +179,94 @@ class ViewController extends Controller
      */
     public function actionChangeView($viewId)
     {
-        $userId = Yii::$app->user->getId();
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            $userId = Yii::$app->user->getId();
 
-        // requested view does not exist
-        $view = View::findOne(['user_id' => $userId, 'id' => $viewId]);
-        if (empty($view))
-        {
-            throw new NotFoundHttpException('The requested page does not exist.');
+            // requested view does not exist
+            $view = View::findOne(['user_id' => $userId, 'id' => $viewId]);
+            if (empty($view))
+            {
+                throw new NotFoundHttpException('The requested page does not exist.');
+            }
+
+            $components = $this->getComponentsOfView($viewId);
+            $activeViewId = View::findOne(['user_id' => $userId, 'active' => 1])->getAttribute('id');
+
+            $this->changeActiveAttributeOfView($viewId, 1);
+
+            if ($activeViewId != $viewId) $this->changeActiveAttributeOfView($activeViewId, 0);
+
+            return Json::encode($components);
         }
-
-        $components = $this->getComponentsOfView($viewId);
-        $activeViewId = View::findOne(['user_id' => $userId, 'active' => 1])->getAttribute('id');
-
-        $this->changeActiveAttributeOfView($viewId, 1);
-
-        if ($activeViewId != $viewId) $this->changeActiveAttributeOfView($activeViewId, 0);
-
-        return Json::encode($components);
     }
 
     public function actionCreateComponent($viewId, $config, $order)
     {
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
-        $component = new View\Component();
-        $component->view_id = $viewId;
-        $component->config = $config;
-        $component->order = $order;
+            $component = new View\Component();
+            $component->view_id = $viewId;
+            $component->config = $config;
+            $component->order = $order;
 
-        if($component->save())
-        {
-            return [
-                'html' => \app\widgets\ComponentWidget::widget(['data' => compact('component')]),
-                'id' => $component->id,
-            ];
-         }
+            if($component->save())
+            {
+                return [
+                    'html' => \app\widgets\ComponentWidget::widget(['data' => compact('component')]),
+                    'id' => $component->id,
+                ];
+            }
 
-         return false;
+            return false;
+        }
     }
 
     public function actionUpdateComponent($componentId, $config)
     {
-        $component = View\Component::findOne($componentId);
-        $component->config = $config;
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            $component = View\Component::findOne($componentId);
+            $component->config = $config;
 
-        return !empty($component) ? ($component->update() ? $component->id : null) : null;
+            return !empty($component) ? ($component->update() ? $component->id : null) : null;
+        }
     }
 
     public function actionDeleteComponent($componentId)
     {
-        $component = View\Component::findOne($componentId);
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            $component = View\Component::findOne($componentId);
 
-        return !empty($component) ? ($component->delete() ? true : null) : null;
+            return !empty($component) ? ($component->delete() ? true : null) : null;
+        }
     }
 
     public function actionGetRefreshTimes()
     {
-        $userId = Yii::$app->user->getId();
-        $views = View::findAll(['user_id' => $userId]);
-        $refresh_times = array();
-        foreach($views as $view) {
-            if($view->refresh_time != null && $view->refresh_time != "") {
-                $refresh_times[$view->id] = $view->refresh_time;
-            } else {
-                $refresh_times[$view->id] = '0';
-            }
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            $userId = Yii::$app->user->getId();
+            $views = View::findAll(['user_id' => $userId]);
+            $refresh_times = array();
+            foreach($views as $view) {
+                if($view->refresh_time != null && $view->refresh_time != "") {
+                    $refresh_times[$view->id] = $view->refresh_time;
+                } else {
+                    $refresh_times[$view->id] = '0';
+                }
 
+            }
+            return Json::encode($refresh_times);
         }
-        return Json::encode($refresh_times);
     }
 
     /*
@@ -234,25 +274,29 @@ class ViewController extends Controller
      */ 
     public function actionUpdateOrderOfComponents($viewId, $componentOrder)
     {
-        $loggedUserId = Yii::$app->user->getId();
-        $componentOrder = Json::decode($componentOrder);
-        $view = View::findOne(['id' => $viewId]);;
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            $loggedUserId = Yii::$app->user->getId();
+            $componentOrder = Json::decode($componentOrder);
+            $view = View::findOne(['id' => $viewId]);;
 
-        // if view not exist or not belong to logged user
-        if ( empty($view) || $view->user_id != $loggedUserId ) return null;
+            // if view not exist or not belong to logged user
+            if ( empty($view) || $view->user_id != $loggedUserId ) return null;
 
-        foreach ( $componentOrder as $value )
-        {
-            $component =  View\Component::findOne(['id' => $value['id'], 'view_id' => $viewId]);
-
-            if ( !empty($component) )
+            foreach ( $componentOrder as $value )
             {
-                $component->order = $value['order'];
-                $component->update();
-            }
-        }
+                $component =  View\Component::findOne(['id' => $value['id'], 'view_id' => $viewId]);
 
-        return true;
+                if ( !empty($component) )
+                {
+                    $component->order = $value['order'];
+                    $component->update();
+                }
+            }
+
+            return true;
+        }
     }
 
     /**
@@ -265,18 +309,26 @@ class ViewController extends Controller
      */
     protected function findModel($id)
     {
-        if (($model = View::findOne($id)) !== null) {
-            return $model;
-        } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            if (($model = View::findOne($id)) !== null) {
+                return $model;
+            } else {
+                throw new NotFoundHttpException('The requested page does not exist.');
+            }
         }
     }
 
     protected function getComponentsOfView($viewId)
     {
-        $components = View\Component::findAll(['view_id' => $viewId]);
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            $components = View\Component::findAll(['view_id' => $viewId]);
 
-        return $components;
+            return $components;
+        }
     }
 
     /**
@@ -288,10 +340,14 @@ class ViewController extends Controller
      */
     protected function changeActiveAttributeOfView($viewId, $active)
     {
-        $view = View::findOne($viewId);
-        $view->active = $active;
-        $view->update();
+        if (Yii::$app->user->isGuest) { // user not logged in
+            return $this->goHome();
+        } else { // user logged in
+            $view = View::findOne($viewId);
+            $view->active = $active;
+            $view->update();
 
-        return $viewId;
+            return $viewId;
+        }
     }
 }
