@@ -4,7 +4,7 @@
 
 ## How to Install
 
-Prerequisite for installing SecMon system is OS CentOS7/CentOS Stream 8/Ubuntu 22.04 (tested Linux distribution) with user ***secmon*** (under which we will deploy SecMon system), internet access and installed programs [Docker Engine](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/) v2.3.3. The functionality of the Docker Engine can be verified with the command `docker run hello-world`. Docker Compose functionality can be verified with `docker compose version`. If the commands do not run correctly, this problem must be resolved or the installation will not be successful.
+Prerequisite for installing SecMon system is OS CentOS7/CentOS Stream 8/Rocky Linux 9/Ubuntu 22.04 (tested Linux distribution) with user ***secmon*** (under which we will deploy SecMon system), internet access and installed programs [Docker Engine](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/) v2.3.3. The functionality of the Docker Engine can be verified with the command `docker run hello-world`. Docker Compose functionality can be verified with `docker compose version`. If the commands do not run correctly, this problem must be resolved or the installation will not be successful.
 
 ---
 
@@ -25,12 +25,12 @@ sudo pip3.6 install -U configparser
 
 # Setting up firewall
 sudo firewall-cmd --permanent --add-port=8080/tcp
-sudo firewall-cmd --permanent --add-port=443/tcp
+sudo firewall-cmd --permanent --add-port=8443/tcp
 sudo firewall-cmd --permanent --add-port=514/tcp
 sudo firewall-cmd --reload
 
 # Download SecMon repository
-git clone -b dockerized-secmon https://github.com/jlasti/secmon.git secmon
+git clone https://github.com/jlasti/secmon.git secmon
 
 # Start preconfig script
 cd secmon
@@ -39,11 +39,11 @@ cd secmon
 # Start deploying process
 python3 secmon_manager.py deploy
 
-# Crete password for database user 'secmon' during installation
+# Create password for database user 'secmon' during installation
 
 # Default login credentials user:secmon, password:password
 # Change password after first login!!!
-<host_machine_IP_address>:8080/secmon/web
+https://<host_machine_IP_address>:8443/secmon/web
 ```
 
 After successful installation configure logs forwarding on clients using [rsyslog service](https://github.com/Miropanak/dockerized_secmon/edit/master/README.md#how-to-configure-clients-for-logs-forwarding).
@@ -65,12 +65,12 @@ sudo pip3.6 install -U configparser
 
 # Setting up firewall
 sudo firewall-cmd --permanent --add-port=8080/tcp
-sudo firewall-cmd --permanent --add-port=443/tcp
+sudo firewall-cmd --permanent --add-port=8443/tcp
 sudo firewall-cmd --permanent --add-port=514/tcp
 sudo firewall-cmd --reload
 
 #Download SecMon repository
-git clone -b dockerized-secmon https://github.com/jlasti/secmon.git secmon
+git clone https://github.com/jlasti/secmon.git secmon
 
 # Start preconfig script
 cd secmon
@@ -79,11 +79,52 @@ cd secmon
 # Start deploying process
 python3 secmon_manager.py deploy
 
-# Crete password for database user 'secmon' during installation
+# Create password for database user 'secmon' during installation
 
 # Default login credentials user:secmon, password:password
 # Change password after first login!!!
-<host_machine_IP_address>:8080/secmon/web
+https://<host_machine_IP_address>:8080/secmon/web
+```
+
+After successful installation configure logs forwarding on clients using [rsyslog service](https://github.com/Miropanak/dockerized_secmon/edit/master/README.md#how-to-configure-clients-for-logs-forwarding).
+
+---
+
+### Rocky 9
+
+```
+# System Update
+sudo yum clean all
+sudo yum -y update
+
+# Install git, firewall & rsyslog
+sudo yum install -y git firewalld rsyslog
+
+# Install python packages
+sudo yum install python3-pip
+sudo pip install -U configparser
+
+# Setting up firewall
+sudo firewall-cmd --permanent --add-port=8080/tcp
+sudo firewall-cmd --permanent --add-port=8443/tcp
+sudo firewall-cmd --permanent --add-port=514/tcp
+sudo firewall-cmd --reload
+
+#Download SecMon repository
+git clone https://github.com/jlasti/secmon.git secmon
+
+# Start preconfig script
+cd secmon
+./secmon_preconfig.sh
+
+# Start deploying process
+python3 secmon_manager.py deploy
+
+# Create password for database user 'secmon' during installation
+
+# Default login credentials user:secmon, password:password
+# Change password after first login!!!
+https://<host_machine_IP_address>:8080/secmon/web
 ```
 
 After successful installation configure logs forwarding on clients using [rsyslog service](https://github.com/Miropanak/dockerized_secmon/edit/master/README.md#how-to-configure-clients-for-logs-forwarding).
@@ -113,11 +154,11 @@ sudo make altinstall
 
 # Setting up firewall
 sudo ufw allow 8080/tcp
-sudo ufw allow 443/tcp
+sudo ufw allow 8443/tcp
 sudo ufw allow 514/tcp
 
 # Download SecMon repository
-git clone -b dockerized-secmon https://github.com/jlasti/secmon.git secmon
+git clone https://github.com/jlasti/secmon.git secmon
 
 #Start preconfig script
 cd secmon
@@ -130,17 +171,17 @@ python3 secmon_manager.py deploy
 
 # Default login credentials user:secmon, password:password
 # Change password after first login!!!
-<host_machine_IP_address>:8080/secmon/web
+https://<host_machine_IP_address>:8443/secmon/web
 ```
 
 After successful installation configure logs forwarding on clients using [rsyslog service](https://github.com/Miropanak/dockerized_secmon/edit/master/README.md#how-to-configure-clients-for-logs-forwarding).
 
 ---
 
-### How to configure clients for logs forwarding
-To redirect logs from client machine to the SecMon add the following line at the end of the `/etc/rsyslog.conf` file, where `192.168.1.100` is the IP address of the remote server (SecMon), you will be writing your logs to:
+## How to configure clients for logs forwarding
+To redirect logs from client machine to the SecMon add the following line at the end of the `/etc/rsyslog.conf` file, where `<secmon_machine_IP_address>` is the IP address of the remote server (SecMon), you will be writing your logs to:
 ```
-*.* @192.168.1.100:514
+*.* @@<secmon_machine_IP_address>:514
 ```
 Save your changes and restart the `rsyslog` service on the client with the command:
 ```
