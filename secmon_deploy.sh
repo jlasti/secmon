@@ -25,7 +25,7 @@ echo -e "${GREEN}Done${NORMAL}"
 # Password creation
 echo Create password for database user \'secmon\'
 while true; do
-	read -s -p -r "Enter Password: " password1
+	read -s -p "Enter Password: " password1
 	echo
 	
 	if [ "${password1,,}" = "password" ];
@@ -36,7 +36,7 @@ while true; do
 		then echo -e "${RED}Entered password is shorten than 8 characters, try again...${NORMAL}"; continue;
 	fi
 	
-	read -s -p -r "Re-enter Password: " password2
+	read -s -p "Re-enter Password: " password2
 	echo
 
 	if [ "${password1}" != "$password2" ]
