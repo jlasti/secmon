@@ -1,5 +1,6 @@
 # phpstorm project files
 .idea
+.vscode
 
 # netbeans project files
 nbproject
@@ -27,6 +28,8 @@ phpunit.phar
 # local phpunit config
 /phpunit.xml
 
+# SecMon project related
+/deployment/certificates
 /runtime
 /config/db.php
 /secdb/config.ini
