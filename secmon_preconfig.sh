@@ -53,9 +53,10 @@ echo -e "Generating self-signed certificate (PEM encoding)"
 openssl x509 -signkey ./deployment/certificates/server.key -in ./deployment/certificates/server.csr -req -days 365 -out ./deployment/certificates/server.pem
 echo -e "${GREEN}Done${NORMAL}"
 
-# remove directory not writable by web process error
-# chgrp www-data ./web/assets
-# chmod 777 ./web/assets/
+# remove directory not writable by web process error and add secmon group
+chgrp www-data ./web/assets
+chmod 777 ./web/assets/
+groupadd secmon
 
 # Copy config files from /deployment
 echo -e "${YELLOW}Copying config files${NORMAL}"
