@@ -236,8 +236,9 @@ if sys.argv[1] == "remove":
 if sys.argv[1] == "deploy":
     create_temp_config()
 
-    answer = input("Deploying SecMon will remove all existing SecMon containers and existing SecMon database. This process also includes setting up different \
-                    config files and creating new SecMon containers.\nDo you want to still deploy SecMon? [y/N] ")
+    answer = input("Deploying SecMon will remove all existing SecMon containers and existing SecMon database.\n"
+                   "This process also includes setting up different config files and creating new SecMon containers.\n"
+                   "Do you want to still deploy SecMon? [y/N] ")
     if answer == "N":
         sys.exit()
     elif answer == "y":
