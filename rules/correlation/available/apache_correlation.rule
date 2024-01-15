@@ -1,0 +1,37 @@
+#############################
+#   SQL Injection  Attack   #
+#############################
+type=Single
+ptype=RegExp
+continue=EndMatch
+pattern=^( *\d+):([A-Za-z0-9: ]*) (\S+) (\S+)\|Apache\|httpd\|access\|(?P<status_code>\d+)\|HTTP Request\|(?P<severity>\d+)\| app=(\S+) src=(?P<remote_ip>([0-9.]*)) requestMethod=(?P<request_method>.*?) request=(?i)(?P<request_url>([^,\n ]*)(((((%20|\+|\s|\(|%2A%2A|\/|\\|;|%3B|\'|%27|)(select|union|insert|update|delete|replace| truncate|null|count|drop))([^,\n ]*))|((\')|(\%27)|(\\)|(#)|(\%23))|((\%27)|(\'))(\s|\+|\%20)*((\%6F)|o|(\%4F))((\%72)|r|(\%52)))([^,\n ]*))) requestClientApplication=(?P<user_agent>.*?) rawEvent=(?P<rawEvent>.*?).$
+desc=Suspicious URL request - possible XSS attack from IP $+{remote_ip}
+action=write /var/www/html/secmon/__secInput $2 $3 CEF:0|Apache|HTTP Request|0|13|SQLi pattern detected - Possible SQL Injection attack|9|att=sql_injection src=$+{remote_ip} requestMethod=$+{request_method} request=$+{request_url} requestClientApplication=$+{user_agent} rawEvent=$+{rawEvent}
+
+##################################
+#  Directory Traversal Attack    #
+##################################
+type=Single
+ptype=RegExp
+continue=EndMatch
+pattern=^( *\d+):([A-Za-z0-9: ]*) (\S+) (\S+)\|Apache\|httpd\|access\|(?P<status_code>\d+)\|HTTP Request\|(?P<severity>.*?)\| app=(\S+) src=(?P<remote_ip>.*?) requestMethod=(?P<request_method>.*?) request=(?i)(?P<request_url>([^,\n ]*)((\.|%2e|%252e|%c0ae|%c0%2e|0x2e|%%32%65|%c0%ae|%25c0%25ae|%e0%40%ae|%uff0e|;|\?)(\.|%2e|%252e|%c0ae|%c0%2e|0x2e|%%32%65|%c0%ae|%25c0%25ae|%e0%40%ae|%uff0e|;|\?)((\/)|%2f|%252f|\\|%5c|%255c|0x2f|0x5c|%%35%63|%%32%66|%c0%af|%c0%5c|%c1%9c|%25c1%259c|%25c0%25af|%e0%80%af|%c0%80%5c|%u2215|%u2216|%uEFC8|%uf025))([^,\n ]*)) requestClientApplication=(?P<user_agent>.*?) rawEvent=(?P<rawEvent>.*?).$
+desc=Possible direcotory traversal attack from IP $+{remote_ip}
+action=write /var/www/html/secmon/__secInput $2 $3 CEF:0|Apache|HTTP Request|0|16|Traversal pattern detected - Possible directory traversal attack|6|att=directory_traversal src=$+{remote_ip} requestMethod=$+{request_method} request=$+{request_url} requestClientApplication=$+{user_agent} rawEvent=$+{rawEvent}
+
+###################################
+#  Directory Enumeration Attack  #
+###################################
+type=Suppress
+ptype=RegExp
+pattern=^( *\d+):([A-Za-z0-9: ]*) (\S+) (\S+)\|Apache\|httpd\|access\|(?P<status_code>4\d+)\|HTTP Request\|(?<severity>.*?)\| app=(\S+) src=(?<remote_ip>.*?) requestMethod=(?<request_method>.*?) request=(?<request_url>.*?) requestClientApplication=(.*) rawEvent=(.*)
+context=SUPPRESS_IP_$+{remote_ip}
+
+type=SingleWithThreshold
+ptype=RegExp
+continue=EndMatch
+pattern=^( *\d+):([A-Za-z0-9: ]*) (\S+) (\S+)\|Apache\|httpd\|access\|(?P<status_code>4\d+)\|HTTP Request\|(?<severity>.*?)\| app=(\S+) src=(?<remote_ip>.*?) requestMethod=(?<request_method>.*?) request=(?<request_url>.*?) requestClientApplication=(?P<user_agent>.*?) rawEvent=(?P<rawEvent>.*?).$
+desc=HTTP error response sent to host with IP $+{remote_ip}
+action=write /var/www/html/secmon/__secInput $2 $3 CEF:0|Apache|HTTP Request|0|16|Too many 4xx status code detected - Possible directory enumeration attack|6|att=directory_enumeration src=$+{remote_ip} requestClientApplication=$+{user_agent} rawEvent=$+{rawEvent}; \
+	create SUPPRESS_IP_$+{remote_ip} 60
+window=10
+thresh=5

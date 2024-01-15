@@ -1,0 +1,111 @@
+##############################################
+# Author = Matus Mikulas
+# Type = Correlator rule for SSH dictionary attacks with parent events funcionality and configuration
+# Log1 = this rule is evaluated only when SEC is started, using SEC internal events funcionality
+# Log2 = 21456:Mar 11 16:07:35 localhost sshd[16476]: Failed password for admin from 192.168.100.100 port 56330 ssh2
+# Log3 = 21456:Mar 11 16:07:35 localhost sshd[16476]: Failed password for admin from 192.168.100.100 port 56330 ssh2
+# SEC variables used =  %sshBruteForce_timeout - context lifetime can't read perl variables, so this SEC variable with same name is used
+#                       %o - just help variable used for return value from 'lcall' actions, where returned vaule is not used
+#                       %sshBruteForceParentIds - used for store list of parent events, which will be written in new correlated event
+#
+# Perl variables used = $sshBruteForce_timeout - time of SSH_BRUTE_FORCE_$+{ip}_$+{duser} context lifetime
+#                       $sshBruteForce_thresh - number of events, needed to get matched in $sshBruteForce_window to generate correlated event
+#                       $sshBruteForce_window - time window, whitin  $sshBruteForce_thresh events, need to be matched
+#                       %sshBruteForceRule - hash of hashes fro storing matched events with their id and time of match
+# Description1 = Initialize configurable variables
+# Description2 = Match event
+#                add matched data in hash of hashes
+#                compare time of all elements of hash of hashes, if time is bigger than $sshBruteForce_window, then element is removed
+# Description3 = Match event and compare if context SSH_BRUTE_FORCE_$+{ip}_$+{duser} exists or if number of elements for matched 'ip' and 'user' is equal to 3
+#                Returns list of all ids in %sshBruteForceParentIds SEC viariable
+#                Write log in CEF format with parent ids in pipe for middleware
+#                Create context SSH_BRUTE_FORCE_$+{ip}_$+{duser} for %sshBruteForce_timeout time
+# Description4 = Commented rule is used for debug printout of hash of hashes content
+##############################################
+
+
+type=Single
+ptype=RegExp
+pattern=SEC_STARTUP
+context=SEC_INTERNAL_EVENT
+desc=Initialization of array for parent ids and size of this array
+action=	lcall %sshBruteForce_timeout ->(sub{\	
+		$sshBruteForce_timeout = 30;\
+		$sshBruteForce_thresh = 3;\		
+		$sshBruteForce_window = 30;\
+		%sshBruteForceRule = ();\
+		return $sshBruteForce_timeout;\
+	})
+
+type=Single
+ptype=RegExp
+pattern=(\d+):\w{3} [\s\d]\d [\d:]+ (\S+).*Wrong password.*src=([\d.]+).*dpt=(\d+).*duser=(\S+)
+varmap=id=1; host=2; ip=3; dpt=4; duser=5;
+continue=TakeNext
+desc=Possible brute force attack (ssh) user $+{duser} from $+{ip}
+action=lcall %o $+{id} $+{ip} $+{duser} ->(sub{\
+		my($id) = $_[0];\
+		my($ip) = $_[1];\
+		my($user) = $_[2];\
+		my($event) = $ip . $user;\
+		$sshBruteForceRule{$event}{$id} = time();\
+		return $sshBruteForceRule{$event}{$id};\
+	});\
+	lcall %o ->(sub{\
+		my($time) = time();\
+            for $event_combination (keys %sshBruteForceRule){\
+                for $event_occurence (keys %{$sshBruteForceRule{$event_combination}}){\
+                    if($time - $sshBruteForceRule{$event_combination}{$event_occurence} > $sshBruteForce_window){\
+                        delete $sshBruteForceRule{$event_combination}{$event_occurence};\
+                    }\
+                }\
+            }\
+            return 1;\
+	});	
+
+type=Single
+ptype=RegExp
+pattern=(\d+):\w{3} [\s\d]\d [\d:]+ (\S+).*Wrong password.*src=([\d.]+).*dpt=(\d+).*duser=(\S+)
+varmap=id=1; host=2; ip=3; dpt=4; duser=5
+context=!SSH_BRUTE_FORCE_$+{ip}_$+{duser} && $+{ip} $+{duser} -> (sub{\
+		my($event_combination) = $_[0] . $_[1];\
+		my($size) = scalar(keys %{$sshBruteForceRule{$event_combination}});\
+		return($size == $sshBruteForce_thresh);\
+	})
+continue=TakeNext
+desc=If there are N events from same $event_combination actions are processed
+action=lcall %sshBruteForceParentIds $+{ip} $+{duser} -> (sub{\
+		my($output);\
+		my($event_combination) = $_[0] . $_[1];\
+		for $event_occurence (keys %{$sshBruteForceRule{$event_combination}}){\
+			$output .= "$event_occurence;";\ 
+		}\
+		$output =~ s/;$//;\
+		$sshBruteForceRule{$event_combination} = ();\
+		return $output;\
+	});\
+	write /var/www/html/secmon/__secInput $+{host} CEF:0|SECMON|sshd|ver|0|Possible SSH brute-force {$+{duser}@$+{ip}}|0|src=$+{ip} dpt=$+{dpt} duser=$+{duser} cs1Label=parentEvents cs1=%sshBruteForceParentIds;\
+	create SSH_BRUTE_FORCE_$+{ip}_$+{duser} %sshBruteForce_timeout (\
+		lcall %o $+{ip} $+{duser} ->(sub{\
+			my($event_combination) = $_[0] . $_[1];\
+			$sshBruteForceRule{$event_combination} = ();\
+			return 1;\
+		});)
+
+
+#type=Single
+#ptype=RegExp
+#pattern=(\d+):\w{3} [\s\d]\d [\d:]+ (\S+).*Wrong password.*src=([\d.]+).*dpt=(\d+).*duser=(\S+)
+#varmap=id=1; host=2; ip=3; dpt=4; duser=5
+#desc=$0
+#action=lcall %o $+{id} $+{ip} $+{duser} -> (sub{\
+#		my($output);\
+#		for $event_combination (keys %sshBruteForceRule){\
+#			$output .= "$event_combination, ";\
+#			for $event_occurence (keys %{$sshBruteForceRule{$event_combination}}){\
+#				$output .="$event_occurence = $sshBruteForceRule{$event_combination}{$event_occurence}, ";\
+#			}\
+#			$output .= "\n";\
+#		}\
+#		return $output;\
+#	}); write - %o	
