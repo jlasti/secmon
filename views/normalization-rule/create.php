@@ -3,7 +3,7 @@
 /* @var $this yii\web\View */
 /* @var $model app\models\NormalizationRule */
 
-$this->params['title'] = 'Create Normalization Rule';
+$this->params['title'] = 'Add Normalization Rule';
 ?>
 
 <div class="normalization-rule-create">

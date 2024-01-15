@@ -1,7 +1,6 @@
 <?php
 
 use macgyer\yii2materializecss\widgets\form\ActiveForm;
-use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\NormalizationRule */
@@ -10,33 +9,49 @@ use yii\helpers\Html;
 $this->params['title'] = 'Update Normalization Rule: ' . $model->name;
 
 ?>
-<div class="normalization-rule-update">
 
-    <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
+<div class="normalization-rule-form">
 
-    <div class="row">
-        <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+    <?php $form = ActiveForm::begin(); ?>
+
+    <div>
+        <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
     </div>
 
-    <div class="row">
-        <?= $form->field($model, 'type')->textInput(['maxlength' => true]) ?>
+    <div style='margin-bottom: 50px;'>
+        <label>Rule state</label>
+        <div style="margin-left: 5px;">
+            <?= $form->field($model, 'active')->checkbox() ?>
+        </div>
     </div>
 
-    <div class="row">
-        <?= $form->field($model, 'state')->checkbox() ?>
-    </div>
+    <label>Set normalization rule file path</label>
 
     <div class="row">
-        <?= $form->field($model, 'description')->textarea() ?>
+        <div class="file-field input-field" style="margin-left: 10px;">
+            <div class="btn blue">
+                <span>Set file path</span>
+                <?= $form->field($model, 'normalizationRuleFile')->fileInput()->label(false) ?>
+            </div>
+            <div class="file-path-wrapper">
+                <input class="file-path validate" type="text" placeholder="Provide path to normalization rule">
+            </div>
+            <?php if ($model->normalizationRuleFile): ?>
+                <span class="text-muted">Current File: <a href="<?= $model->normalizationRuleFile ?>" target="_blank">
+                        <?= basename($model->normalizationRuleFile) ?>
+                    </a></span>
+            <?php endif; ?>
+        </div>
     </div>
 
     <div class="row"></div>
 
-    <div class="row">
-        <div class="form-group">
-            <?=Html::submitButton('Update', ['class' => 'waves-effect waves-light btn'])?>
-        </div>
+    <div class='row' style='margin-left: 0px;'>
+        <div class='form-input'>
+            <button type="submit" class="btn btn-primary">Update</button>
+            <a href="." class="btn btn-primary grey" >Close</a>
+        </div> 
     </div>
-
+    
     <?php ActiveForm::end(); ?>
 </div>

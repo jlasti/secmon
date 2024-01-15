@@ -1,0 +1,9 @@
+{
+    "file": "\/var\/www\/secmon\/rules\/normalization\/available\/user_management.rule",
+    "name": "Puke3",
+    "id": 1,
+    "active": true,
+    "created_at": "2022-04-23T18:25:43.511Z",
+    "modified_at": "2024-01-15T22:00:40.595707Z",
+    "normalizationRuleFile": "\/var\/www\/secmon\/rules\/normalization\/available\/user_management.rule"
+}
