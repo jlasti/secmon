@@ -53,10 +53,18 @@ echo -e "Generating self-signed certificate (PEM encoding)"
 openssl x509 -signkey ./deployment/certificates/server.key -in ./deployment/certificates/server.csr -req -days 365 -out ./deployment/certificates/server.pem
 echo -e "${GREEN}Done${NORMAL}"
 
-# remove directory not writable by web process error and add secmon group
-chgrp www-data ./web/assets
-chmod 777 ./web/assets/
+# Add required groups
+echo -e "${YELLOW}Creating groups${NORMAL}"
+group_name=$(getent group 33 | cut -d ':' -f 1)
+if [[ "$group_name" != "www-data" ]]; then
+    groupdel "$group_name"
+    groupadd -g 33 www-data
+fi
 groupadd secmon
+# chgrp www-data ./web/assets
+chgrp www-data .
+chmod 777 ./web/assets/
+echo -e "${GREEN}Done${NORMAL}"
 
 # Copy config files from /deployment
 echo -e "${YELLOW}Copying config files${NORMAL}"
