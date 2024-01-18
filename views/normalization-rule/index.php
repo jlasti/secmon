@@ -8,9 +8,9 @@ $this->params['title'] = 'Normalization Rules';
 
 <div class="normalization-rule-index">
 
-    <!-- <div class="main-actions centered-horizontal">
-        <?= Html::a("<i class='material-icons'>add</i>" . Yii::t('app', 'Create Normalization Rule'), ['create'], ['class' => 'btn-floating waves-effect waves-light btn-large red']) ?>
-    </div> -->
+    <div class="main-actions centered-horizontal">
+        <?= Html::a(Yii::t('app', 'Import new rule'), ['create'], ['class' => 'btn', 'style' => 'border-radius: 10px']) ?>
+    </div>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -63,9 +63,5 @@ $this->params['title'] = 'Normalization Rules';
             ],
         ],
     ]); ?>
-
-    <div class='center' style="margin-top: 20px;">
-        <?= Html::a('Add normalization rule', ['create'], ['class' => 'btn']) ?>
-    </div>
 
 </div>

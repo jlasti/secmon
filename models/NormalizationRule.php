@@ -11,6 +11,7 @@ class NormalizationRule extends Model
     public $size;
     public $modified_at;
     public $ruleFileName;
+    public $content;
     
     /**
      * {@inheritdoc}
@@ -20,6 +21,7 @@ class NormalizationRule extends Model
         return [
             [['active', 'ruleFileName'], 'required'],
             ['name', 'string','max'=> 50],
+            ['content', 'string'],
             ['active', 'boolean'],
             ['created_at', 'safe'],
         ];

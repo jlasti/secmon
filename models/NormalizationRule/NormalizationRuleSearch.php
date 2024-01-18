@@ -135,6 +135,9 @@ class NormalizationRuleSearch
         $normalizationRule->modified_at = date('d.m.Y H:i:s', $lastModifiedTime);
         $normalizationRule->active = NormalizationRuleSearch::isRuleActive(basename($ruleFile));
 
+        // Load the content of the file.
+        $normalizationRule->content = file_get_contents($ruleFile);
+
         return $normalizationRule;
     }
 

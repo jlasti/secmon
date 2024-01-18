@@ -8,7 +8,6 @@ use app\models\NormalizationRule;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii\web\UploadedFile;
 
 /**
  * NormalizationRuleController implements the CRUD actions for NormalizationRule model.

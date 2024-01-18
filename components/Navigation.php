@@ -17,14 +17,14 @@ class Navigation extends \yii\base\Component
 				'url' => ['/security-events'],
 				'visible' => true,
 				'active' => 'security-events',
-				'icon' => 'event'
+				'icon' => 'lock'
 	    ],
 			[
 				'label' => 'Clustered Events',
 				'url' => ['/events-clustered-runs'],
 				'visible' => true,
 				'active' => 'events-clustered-runs',
-				'icon' => 'event'
+				'icon' => 'timeline'
 			],
 			[
 				'label' => 'Dashboard', 
