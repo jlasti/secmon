@@ -38,12 +38,12 @@ class NormalizationRuleController extends Controller
      */
     public function actionIndex()
     {
-        if (Yii::$app->user->isGuest) { 
+        if (Yii::$app->user->isGuest) {
             // User not logged in
             return $this->goHome();
-        } else { 
+        } else {
             // User logged in
-            $dataProvider = NormalizationRuleSearch::getRules();
+            $dataProvider = NormalizationRuleSearch::getAllRules();
             return $this->render('index', [
                 'dataProvider' => $dataProvider,
             ]);
@@ -52,17 +52,17 @@ class NormalizationRuleController extends Controller
 
     /**
      * Displays a single NormalizationRule model.
-     * @param string $name
+     * @param string $ruleFileName
      * @return mixed
      */
-    public function actionView($name)
+    public function actionView($ruleFileName)
     {
-        if (Yii::$app->user->isGuest) { 
+        if (Yii::$app->user->isGuest) {
             // User not logged in
             return $this->goHome();
-        } else { 
+        } else {
             // User logged in
-            $model = $this->findModel($name);
+            $model = $this->findModel($ruleFileName);
             return $this->render('view', [
                 'model' => $model,
             ]);
@@ -77,10 +77,10 @@ class NormalizationRuleController extends Controller
     public function actionCreate()
     {
         // TODO: rework
-        if (Yii::$app->user->isGuest) { 
+        if (Yii::$app->user->isGuest) {
             // User not logged in
             return $this->goHome();
-        } else { 
+        } else {
             // User is logged in
             $model = new NormalizationRule();
             if ($model->load(Yii::$app->request->post())) {
@@ -97,26 +97,29 @@ class NormalizationRuleController extends Controller
     /**
      * Updates an existing NormalizationRule.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param string $name
+     * @param string $ruleFileName
      * @return mixed
      */
-    public function actionUpdate($name)
+    public function actionUpdate($ruleFileName)
     {
-        if (Yii::$app->user->isGuest) { 
+        if (Yii::$app->user->isGuest) {
             // User not logged in
             return $this->goHome();
-        } else { 
+        } else {
             // User logged in
-            $model = $this->findModel($name);
+            $model = $this->findModel($ruleFileName);
             if (!$model) {
+                // NormalizationRule model not found.
                 return $this->redirect(['index']);
             }
             if (Yii::$app->request->post()) {
+                // POST
                 $model->load(Yii::$app->request->post());
                 if (NormalizationRuleSearch::updateRule($model)) {
-                    return $this->redirect(['view', 'name' => $model->name]);
+                    return $this->redirect(['view', 'ruleFileName' => $model->ruleFileName]);
                 }
             } else {
+                // GET
                 return $this->render('update', [
                     'model' => $model,
                 ]);
@@ -148,18 +151,18 @@ class NormalizationRuleController extends Controller
     /**
      * Finds the NormalizationRule model based on unique name.
      * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param string $name
+     * @param string $ruleFileName
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($name)
+    protected function findModel($ruleFileName)
     {
-        if (Yii::$app->user->isGuest) { 
+        if (Yii::$app->user->isGuest) {
             // User not logged in
             return $this->goHome();
-        } else { 
+        } else {
             // User logged in
-            $model = NormalizationRuleSearch::getRuleByName($name);
+            $model = NormalizationRuleSearch::getRuleByFileName($ruleFileName);
             if (!is_null($model)) {
                 return $model;
             } else {

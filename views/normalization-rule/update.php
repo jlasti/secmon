@@ -15,32 +15,13 @@ $this->params['title'] = 'Update Normalization Rule: ' . $model->name;
     <?php $form = ActiveForm::begin(); ?>
 
     <div>
-        <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
+        <?= $form->field($model, 'name')->textInput(['maxlength' => 50]) ?>
     </div>
 
     <div style='margin-bottom: 50px;'>
         <label>Rule state</label>
         <div style="margin-left: 5px;">
             <?= $form->field($model, 'active')->checkbox() ?>
-        </div>
-    </div>
-
-    <label>Set normalization rule file path</label>
-
-    <div class="row">
-        <div class="file-field input-field" style="margin-left: 10px;">
-            <div class="btn blue">
-                <span>Set file path</span>
-                <?= $form->field($model, 'normalizationRuleFile')->fileInput()->label(false) ?>
-            </div>
-            <div class="file-path-wrapper">
-                <input class="file-path validate" type="text" placeholder="Provide path to normalization rule">
-            </div>
-            <?php if ($model->normalizationRuleFile): ?>
-                <span class="text-muted">Current File: <a href="<?= $model->normalizationRuleFile ?>" target="_blank">
-                        <?= basename($model->normalizationRuleFile) ?>
-                    </a></span>
-            <?php endif; ?>
         </div>
     </div>
 

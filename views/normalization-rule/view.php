@@ -13,10 +13,10 @@ $this->params['title'] = 'Normalization Rule: ' . $model->name;
 <div class="normalization-rule-view">
 
     <div class="main-actions centered-horizontal">
-        <?= Html::a("<i class='material-icons'>edit</i>" . Yii::t('app', 'Update'), ['update', 'name' => $model->name], ['class' => 'btn-floating waves-effect waves-light btn-large blue']) ?>
+        <?= Html::a("<i class='material-icons'>edit</i>" . Yii::t('app', 'Update'), ['update', 'ruleFileName' => $model->ruleFileName], ['class' => 'btn-floating waves-effect waves-light btn-large blue']) ?>
         <?= Html::a(
             "<i class='material-icons'>delete</i>" . Yii::t('app', 'Delete'),
-            ['delete', 'id' => $model->id],
+            ['delete', 'ruleFileName' => $model->ruleFileName],
             [
                 'class' => 'btn-floating waves-effect waves-light btn-large red',
                 'data' => [
@@ -35,14 +35,9 @@ $this->params['title'] = 'Normalization Rule: ' . $model->name;
                 'label' => 'Rule name',
             ],
             [
-                'attribute' => 'normalizationRuleFile',
-                'label' => 'Normalization rule file path',
+                'attribute' => 'ruleFileName',
+                'label' => 'Rule file name',
             ],
-            [
-                'attribute' => 'uiFileName',
-                'label' => 'UI File name',
-            ],
-            'id',
             [
                 'attribute' => 'active',
                 'label' => 'Status',
@@ -56,25 +51,18 @@ $this->params['title'] = 'Normalization Rule: ' . $model->name;
             },
             ],
             [
-                'attribute' => 'created_at',
-                'label' => 'Created at',
-                'value' => function ($model) {
-                return $model->getPrettyDateTime('created_at');
-            },
-            ],
-            [
                 'attribute' => 'modified_at',
                 'label' => 'Last modified',
-                'value' => function ($model) {
-                return $model->getPrettyDateTime('modified_at');
-            },
+            ],
+            [
+                'attribute' => 'size',
+                'label' => 'Size (B)',
             ],
         ],
-    ])
-        ?>
+    ]) ?>
 
     <div class='center'>
-        <a href="." class="btn btn-primary grey" >Close</a>
+        <a href="." class="btn btn-primary grey">Close</a>
     </div>
 
 </div>

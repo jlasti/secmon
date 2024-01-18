@@ -6,12 +6,17 @@ GREEN='\033[0;32m'
 NORMAL='\033[0m'
 
 # Check log file and restart Rsyslog
-FILE=/var/log/docker/secmon.log
-if sudo test -f "$FILE"; then
-  TIMESTAMP=$(date +%Y%m%d)
-  sudo mv $FILE /var/log/docker/secmon.log.old-"$TIMESTAMP" || { echo -e "${RED}Renaming old /var/log/docker/secmon.log failed!${NORMAL}" ; exit 1; }
-  sudo systemctl restart rsyslog.service || { echo -e "${RED}Restarting rsyslog service failed${NORMAL}" ; exit 1; }
-fi
+#FILE=/var/log/docker/secmon.log
+#if sudo test -f "$FILE"; then
+#  TIMESTAMP=$(date +%Y%m%d)
+#  sudo mv $FILE /var/log/docker/secmon.log.old-"$TIMESTAMP" || { echo -e "${RED}Renaming old /var/log/docker/secmon.log failed!${NORMAL}" ; exit 1; }
+#  sudo systemctl restart rsyslog.service || { echo -e "${RED}Restarting rsyslog service failed${NORMAL}" ; exit 1; }
+#fi
+
+# Set 777 permissions so container secmon_app can write to directories
+chgrp www-data .
+chmod 777 ./web/assets/
+chmod -R 777 ./rules/*
 
 # Copy configuration files
 echo -e "Copying configuration files"

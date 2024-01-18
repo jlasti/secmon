@@ -61,9 +61,6 @@ if [[ "$group_name" != "www-data" ]]; then
     groupadd -g 33 www-data
 fi
 groupadd secmon
-# chgrp www-data ./web/assets
-chgrp www-data .
-chmod 777 ./web/assets/
 echo -e "${GREEN}Done${NORMAL}"
 
 # Copy config files from /deployment

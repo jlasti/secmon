@@ -19,16 +19,18 @@ RUN alias python="/usr/bin/python3.9"
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
 WORKDIR /var/www/html/secmon
 
-# Copy apache config
+# Copy apache config files
 COPY deployment/config_files/000-default.conf /etc/apache2/sites-available/
 COPY deployment/config_files/default-ssl.conf /etc/apache2/sites-available/
 
 # Copy SSL certificates
 COPY deployment/certificates/* /etc/ssl/
 
+# Enable SSL
 RUN a2ensite default-ssl
 RUN a2enmod ssl
+
+# Restart Apache
 RUN service apache2 restart

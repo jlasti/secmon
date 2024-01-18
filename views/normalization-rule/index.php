@@ -21,10 +21,9 @@ $this->params['title'] = 'Normalization Rules';
                 'label' => 'Rule name',
             ],
             [
-                'attribute' => 'normalizationRuleFile',
+                'attribute' => 'ruleFileName',
                 'label' => 'Normalization rule file path',
             ],
-            'id',
             [
                 'attribute' => 'active',
                 'label' => 'Status',
@@ -38,33 +37,26 @@ $this->params['title'] = 'Normalization Rules';
                     },
             ],
             [
-                'attribute' => 'created_at',
-                'label' => 'Created at',
-                'value' => function ($model) {
-                        return $model->getPrettyDateTime('created_at');
-                    },
-            ],
-            [
                 'attribute' => 'modified_at',
                 'label' => 'Last modified',
-                'value' => function ($model) {
-                    return $model->getPrettyDateTime('modified_at');
-                },
+            ],
+            [
+                'attribute' => 'size',
+                'label' => 'Size (B)',
             ],
             [
                 'class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn',
                 'urlCreator' => function ($action, $model, $key, $index) {
                         if ($action === 'view') {
-                            $url = ['view', 'name' => $model->name];
+                            $url = ['view', 'ruleFileName' => $model->ruleFileName];
                             return $url;
                         }
                         if ($action === 'update') {
-                            $url = ['update', 'name' => $model->name];
-                            ;
+                            $url = ['update', 'ruleFileName' => $model->ruleFileName];
                             return $url;
                         }
                         if ($action === 'delete') {
-                            $url = ['delete', 'name' => $model->name];
+                            $url = ['delete', 'ruleFileName' => $model->ruleFileName];
                             return $url;
                         }
                     }
