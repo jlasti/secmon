@@ -75,7 +75,7 @@ class NormalizationRuleController extends Controller
      */
     public function actionCreate()
     {
-        // TODO: rework
+        // TODO: enable import rule from URL
         if (Yii::$app->user->isGuest) {
             // User not logged in
             return $this->goHome();
@@ -129,21 +129,19 @@ class NormalizationRuleController extends Controller
     /**
      * Deletes an existing NormalizationRule model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
+     * @param string $ruleFileName
      * @return mixed
      */
-    public function actionDelete($id)
+    public function actionDelete($ruleFileName)
     {
-        if (Yii::$app->user->isGuest) { // user not logged in
+        if (Yii::$app->user->isGuest) {
+            // User not logged in
             return $this->goHome();
-        } else { // user logged in
-            $model = $this->findModel($id);
-            if (file_exists($model->link)) {
-                unlink($model->link);
-                $model->delete();
-                exec("sudo systemctl restart secmon-normalizer.service");
+        } else {
+            // User logged in
+            if (NormalizationRuleSearch::deleteRule($ruleFileName)) {
+                return $this->redirect(['index']);
             }
-            return $this->redirect(['index']);
         }
     }
 

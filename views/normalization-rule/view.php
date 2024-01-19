@@ -6,14 +6,14 @@ use macgyer\yii2materializecss\widgets\data\DetailView;
 /* @var $this yii\web\View */
 /* @var $model app\models\NormalizationRule */
 
-$this->params['title'] = 'Normalization Rule: ' . $model->name;
+$this->params['title'] = 'Normalization Rule: ' . $model->ruleFileName;
 
 ?>
 
 <div class="normalization-rule-view">
 
     <div class="main-actions centered-horizontal">
-        <?= Html::a("<i class='material-icons'>edit</i>" . Yii::t('app', 'Update'), ['update', 'ruleFileName' => $model->ruleFileName], ['class' => 'btn-floating waves-effect waves-light btn-large blue']) ?>
+<!--         <?= Html::a("<i class='material-icons'>edit</i>" . Yii::t('app', 'Update'), ['update', 'ruleFileName' => $model->ruleFileName], ['class' => 'btn-floating waves-effect waves-light btn-large blue']) ?>
         <?= Html::a(
             "<i class='material-icons'>delete</i>" . Yii::t('app', 'Delete'),
             ['delete', 'ruleFileName' => $model->ruleFileName],
@@ -24,7 +24,9 @@ $this->params['title'] = 'Normalization Rule: ' . $model->name;
                     'method' => 'post',
                 ],
             ]
-        ) ?>
+        ) ?> -->
+        <a href="." class="btn grey darken-2" style="border-radius: 10px">Close</a>
+    </div>
     </div>
 
     <?= DetailView::widget([
@@ -60,9 +62,5 @@ $this->params['title'] = 'Normalization Rule: ' . $model->name;
             ],
         ],
     ]) ?>
-
-    <div class='center'>
-        <a href="." class="btn btn-primary grey">Close</a>
-    </div>
 
 </div>

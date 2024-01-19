@@ -37,9 +37,10 @@ phpunit.phar
 /config/anomaly_config.ini
 /config/secmon_config.ini
 /config/aggregator_config.ini
+/rules/normalization/ui
+/rules/correlation/ui
 docker-compose.yml
 composer.lock
-lastdepoy.txt
 output/
 
 # pycache is not needed

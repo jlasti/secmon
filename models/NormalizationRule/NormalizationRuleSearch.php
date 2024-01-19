@@ -16,6 +16,7 @@ class NormalizationRuleSearch
     const AVAILABLE_RULES_PATH = '@app/rules/normalization/available';
     const ACTIVE_RULES_PATH = '@app/rules/normalization/active';
     const RULE_METADATA_PATH = '@app/rules/normalization/ui';
+    const BIN_PATH = '@app/rules/normalization/.bin';
 
     /**
      * Returns data provider filled with all available NormalizationRule models.
@@ -85,26 +86,20 @@ class NormalizationRuleSearch
         if (is_null($ruleMetaFile)) {
             // Metadata files does not exists.
             file_put_contents($metaFilePath, json_encode(['name' => $model->name])); // Add 'name' key with value set from WebUI.
-
-            if ($model->active == 1 && NormalizationRuleSearch::isRuleActive($ruleFileName) == 0) {
-                // Rule status change to 'active'.
-                NormalizationRuleSearch::activateRule($ruleFileName);
-            } else if ($model->active == 0 && NormalizationRuleSearch::isRuleActive($ruleFileName) == 1) {
-                // Rule status change to 'available'.
-                NormalizationRuleSearch::deactivateRule($ruleFileName);
-            }
         } else {
             // Metadata file exists, update key 'name'.
             $ruleMetaFile['name'] = $model->name;
             file_put_contents($metaFilePath, json_encode($ruleMetaFile));
-            if ($model->active == 1 && NormalizationRuleSearch::isRuleActive($ruleFileName) == 0) {
-                // Rule status change to 'active'.
-                NormalizationRuleSearch::activateRule($ruleFileName);
-            } else if ($model->active == 0 && NormalizationRuleSearch::isRuleActive($ruleFileName) == 1) {
-                // Rule status change to 'available'.
-                NormalizationRuleSearch::deactivateRule($ruleFileName);
-            }
+
         }
+        if ($model->active == 1 && NormalizationRuleSearch::isRuleActive($ruleFileName) == 0) {
+            // Rule status change to 'active'.
+            NormalizationRuleSearch::activateRule($ruleFileName);
+        } else if ($model->active == 0 && NormalizationRuleSearch::isRuleActive($ruleFileName) == 1) {
+            // Rule status change to 'available'.
+            NormalizationRuleSearch::deactivateRule($ruleFileName);
+        }
+        file_put_contents(Yii::getAlias(NormalizationRuleSearch::AVAILABLE_RULES_PATH) . '/' . $ruleFileName, $model->content);
         return true; // true, if update was successful.
     }
 
@@ -139,6 +134,19 @@ class NormalizationRuleSearch
         $normalizationRule->content = file_get_contents($ruleFile);
 
         return $normalizationRule;
+    }
+
+    public static function deleteRule($ruleFileName)
+    {
+        $fromPath = Yii::getAlias(NormalizationRuleSearch::AVAILABLE_RULES_PATH) . '/' . $ruleFileName;
+        $toPath = Yii::getAlias(NormalizationRuleSearch::BIN_PATH) . '/' . $ruleFileName;
+        $metadataPath = Yii::getAlias(NormalizationRuleSearch::RULE_METADATA_PATH) . '/' . $ruleFileName;
+        if(NormalizationRuleSearch::isRuleActive($ruleFileName)){
+            NormalizationRuleSearch::deactivateRule($ruleFileName);
+        }
+        rename($fromPath, $toPath);
+        unlink($metadataPath);
+        return true;
     }
 
     // Created hardlink from available .rule directory to active rules directory.

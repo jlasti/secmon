@@ -577,12 +577,3 @@ a.columns-settings-button:hover {
   text-align: right;
   margin: 5px 0 5px 0;
 }
-
-.normalization-rule-form {
-  margin: 0 auto;
-  width: 1000px;
-  text-align: left;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
