@@ -29,15 +29,15 @@ phpunit.phar
 /phpunit.xml
 
 # SecMon project related
+docker-compose.yml
 /config/.lock
 /config/db.php
 /config/anomaly_config.ini
 /config/secmon_config.ini
 /config/aggregator_config.ini
-docker-compose.yml
 /deployment/certificates
-/runtime
 /rules
+/runtime
 composer.lock
 output/
 
