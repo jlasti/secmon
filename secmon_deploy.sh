@@ -5,27 +5,20 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NORMAL='\033[0m'
 
+# Execute preconfig.sh, if never executed
+if [[ ! -f /config/.lock ]]; then
+	bash ./secmon_preconfig.sh
+else
+	echo "Preconfiguration already executed. Skipping step."
+fi
+
 # Check log file and restart Rsyslog
-#FILE=/var/log/docker/secmon.log
-#if sudo test -f "$FILE"; then
-#  TIMESTAMP=$(date +%Y%m%d)
-#  sudo mv $FILE /var/log/docker/secmon.log.old-"$TIMESTAMP" || { echo -e "${RED}Renaming old /var/log/docker/secmon.log failed!${NORMAL}" ; exit 1; }
-#  sudo systemctl restart rsyslog.service || { echo -e "${RED}Restarting rsyslog service failed${NORMAL}" ; exit 1; }
-#fi
-
-# Set 777 permissions so container secmon_app can write to directories
-chgrp www-data .
-chmod 777 ./web/assets/
-chmod -R 777 ./rules/*
-
-# Copy configuration files
-echo -e "Copying configuration files"
-cp deployment/config_files/db.php config/ \
-&& cp deployment/config_files/anomaly_config.ini config/ \
-&& cp deployment/config_files/secmon_config.ini config/ \
-&& cp deployment/docker-compose.yml . \
-|| { echo -e "${RED}Copying configuration files failed!${NORMAL}" ; exit 1; }
-echo -e "${GREEN}Done${NORMAL}"
+FILE=/var/log/docker/secmon.log
+if test -f "$FILE"; then
+	TIMESTAMP=$(date +%Y%m%d)
+	mv $FILE /var/log/docker/secmon.log.old-"$TIMESTAMP" || { echo -e "${RED}Renaming old /var/log/docker/secmon.log failed!${NORMAL}" ; exit 1; }
+	systemctl restart rsyslog.service || { echo -e "${RED}Restarting rsyslog service failed${NORMAL}" ; exit 1; }
+fi
 
 # Password creation
 echo Create password for database user \'secmon\'
@@ -51,14 +44,26 @@ while true; do
 done
 echo -e "${GREEN}Password successfully created${NORMAL}"
 
+# Copy configuration file templates
+echo -e "Copying configuration file templates"
+cp deployment/config_templates/db.php config/ \
+&& cp deployment/config_templates/anomaly_config.ini config/ \
+&& cp deployment/config_templates/secmon_config.ini config/ \
+&& cp deployment/config_templates/docker-compose.yml . \
+|| { echo -e "${RED}Copying configuration file templates failed!${NORMAL}" ; exit 1; }
+echo -e "${GREEN}Done${NORMAL}"
+
 # Update placeholder password in configuration files
+echo -e "Updating passwords in configuration files"
 sed -i "s/<password>/$password1/g" config/db.php \
 && sed -i "s/<password>/$password1/g" config/anomaly_config.ini \
 && sed -i "s/<password>/$password1/g" config/secmon_config.ini \
 && sed -i "s/<password>/$password1/g" docker-compose.yml \
-|| { echo "${RED}Updating password in configuration files failed${NORMAL}" ; exit 1; }
+|| { echo "${RED}Updating passwords in configuration file templates failed${NORMAL}" ; exit 1; }
+echo -e "${GREEN}Done${NORMAL}"
 
 # Docker setup
+echo -e "Building docker images"
 docker pull php:7.4-fpm || { echo "${RED}Pulling docker image failed${NORMAL}" ; exit 1; }
 docker build -t secmon_base -f deployment/dockerfiles/secmon_base.Dockerfile ./ \
 && docker build -t secmon_geoip -f deployment/dockerfiles/secmon_geoip.Dockerfile ./deployment \

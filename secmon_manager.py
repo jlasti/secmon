@@ -289,4 +289,19 @@ if sys.argv[1] == "restart":
     restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules)
     sys.exit()
 
+# Manualy run secmon configuration
+if sys.argv[1] == "config":
+    if os.system('./secmon_preconfig.sh') != 0:
+        print(RED,'\nError occured during secmon_preconfig.sh execution, SecMon configuration process was unsuccessful.',NORMAL)
+    sys.exit()
+
+# Manualy update rules for repository configured in secmon_config.ini
+if sys.argv[1] == "get-rules":
+    print(YELLOW,'\nStarting download of default SecMon rules:',NORMAL)
+    if os.system('./commands/rules_downloader.py') != 0:
+        print(RED,'Error occured during rules download, retreival of rules from repository was unsuccessful.',NORMAL)
+        sys.exit()
+    print(GREEN,'Download successful',NORMAL)
+    sys.exit()
+
 print_help()

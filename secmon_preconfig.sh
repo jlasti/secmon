@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# ------------------------------------------------ #
+#           SecMon configuration script
+#   Automatically executed once before deployment
+# ------------------------------------------------ #
+
 # Set up colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -23,11 +28,36 @@ for dependency in "${dependencies[@]}"; do
 done
 echo -e "${GREEN}Done${NORMAL}"
 
-# Create and set permissions for log directory
+# Add required groups
+echo -e "${YELLOW}Creating groups${NORMAL}"
+group_name=$(getent group 33 | cut -d ':' -f 1)
+if [[ "$group_name" != "www-data" ]]; then
+    groupdel "$group_name"
+    groupadd -g 33 www-data
+fi
+groupadd secmon
+echo -e "${GREEN}Done${NORMAL}"
+
+# Create and set permissions for directories
 echo -e "${YELLOW}Creating log directory${NORMAL}"
 mkdir -p /var/log/secmon || { echo -e "${RED}Creating directory /var/log/secmon failed${NORMAL}" ; exit 1; }
 chmod 600 /var/log/secmon || { echo -e "${RED}Changing access mode of the directory /var/log/secmon failed${NORMAL}" ; exit 1; }
+
+mkdir -p ./rules/normalization/.bin || { echo -e "${RED}Creating directory rules/normalization/.bin failed${NORMAL}" ; exit 1; }
+mkdir -p ./rules/normalization/active || { echo -e "${RED}Creating directory rules/normalization/active failed${NORMAL}" ; exit 1; }
+mkdir -p ./rules/normalization/available || { echo -e "${RED}Creating directory rules/normalization/available failed${NORMAL}" ; exit 1; }
+mkdir -p ./rules/normalization/ui || { echo -e "${RED}Creating directory rules/normalization/ui failed${NORMAL}" ; exit 1; }
+
+mkdir -p ./rules/correlation/.bin || { echo -e "${RED}Creating directory rules/correlation/.bin failed${NORMAL}" ; exit 1; }
+mkdir -p ./rules/correlation/active || { echo -e "${RED}Creating directory rules/correlation/active failed${NORMAL}" ; exit 1; }
+mkdir -p ./rules/correlation/available || { echo -e "${RED}Creating directory rules/correlation/available failed${NORMAL}" ; exit 1; }
+mkdir -p ./rules/correlation/ui || { echo -e "${RED}Creating directory rules/correlation/ui failed${NORMAL}" ; exit 1; }
+chmod -R 777 ./rules/* || { echo -e "${RED}Changing access mode of the directory ./rules/* failed${NORMAL}" ; exit 1; }
 echo -e "${GREEN}Done${NORMAL}"
+
+# Set 777 permissions so container secmon_app can write to directories
+chgrp www-data .
+chmod 777 ./web/assets/
 
 # Generate SSL certificates
 COUNTRY="SK"
@@ -53,33 +83,31 @@ echo -e "Generating self-signed certificate (PEM encoding)"
 openssl x509 -signkey ./deployment/certificates/server.key -in ./deployment/certificates/server.csr -req -days 365 -out ./deployment/certificates/server.pem
 echo -e "${GREEN}Done${NORMAL}"
 
-# Add required groups
-echo -e "${YELLOW}Creating groups${NORMAL}"
-group_name=$(getent group 33 | cut -d ':' -f 1)
-if [[ "$group_name" != "www-data" ]]; then
-    groupdel "$group_name"
-    groupadd -g 33 www-data
-fi
-groupadd secmon
-echo -e "${GREEN}Done${NORMAL}"
-
 # Copy config files from /deployment
 echo -e "${YELLOW}Copying config files${NORMAL}"
 cp deployment/config_files/secmon.conf /etc/rsyslog.d/ \
 && cp deployment/config_files/docker.conf /etc/rsyslog.d/ \
 && cp deployment/config_files/secmon_logrotate /etc/logrotate.d/ \
-&& cp deployment/config_files/db.php config/ \
-&& cp deployment/config_files/anomaly_config.ini config/ \
-&& cp deployment/config_files/secmon_config.ini config/ \
-&& cp deployment/docker-compose.yml . \
 || { echo -e "${RED}Copying config files failed${NORMAL}" ; exit 1; }
+echo -e "${GREEN}Done${NORMAL}"
+
+# Download rules from configured repository
+echo -e "${YELLOW}Starting download of SecMon rules${NORMAL}"
+python3 ./commands/rules_downloader.py \
+|| { echo -e "${RED}Download of SecMon rules failed${NORMAL}" ; exit 1; }
+echo -e "${GREEN}Done${NORMAL}"
+
+# Create lock file as a sign config was run.
+echo -e "${YELLOW}Creating lock file${NORMAL}"
+touch ./config/.lock
+chmod 700 ./config/.lock
 echo -e "${GREEN}Done${NORMAL}"
 
 # Restart services
 echo -e "${YELLOW}Restarting services${NORMAL}"
 systemctl restart rsyslog.service || { echo -e "${RED}Restarting rsyslog service failed${NORMAL}" ; exit 1; }
 systemctl daemon-reload || { echo -e "${RED}Reloading docker daemon failed${NORMAL}" ; exit 1; }
-# sudo systemctl restart docker || { echo -e "${RED}Restarting docker service failed${NORMAL}" ; exit 1; }
+systemctl restart docker || { echo -e "${RED}Restarting docker service failed${NORMAL}" ; exit 1; }
 echo -e "${GREEN}Done${NORMAL}"
 
-echo -e "${MAGENTA}Secmon preconfiguration is complete, to deploy SecMon run command \"python3 secmon_manager.py deploy\"${NORMAL}"
+echo -e "${MAGENTA}Secmon preconfiguration is complete.${NORMAL}"
