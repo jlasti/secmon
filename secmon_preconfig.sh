@@ -52,12 +52,18 @@ mkdir -p ./rules/correlation/.bin || { echo -e "${RED}Creating directory rules/c
 mkdir -p ./rules/correlation/active || { echo -e "${RED}Creating directory rules/correlation/active failed${NORMAL}" ; exit 1; }
 mkdir -p ./rules/correlation/available || { echo -e "${RED}Creating directory rules/correlation/available failed${NORMAL}" ; exit 1; }
 mkdir -p ./rules/correlation/ui || { echo -e "${RED}Creating directory rules/correlation/ui failed${NORMAL}" ; exit 1; }
-chmod -R 777 ./rules/* || { echo -e "${RED}Changing access mode of the directory ./rules/* failed${NORMAL}" ; exit 1; }
+echo -e "${GREEN}Done${NORMAL}"
+
+# Download rules from configured repository
+echo -e "${YELLOW}Starting download of SecMon rules${NORMAL}"
+python3 ./commands/rules_downloader.py \
+|| { echo -e "${RED}Download of SecMon rules failed${NORMAL}" ; exit 1; }
 echo -e "${GREEN}Done${NORMAL}"
 
 # Set 777 permissions so container secmon_app can write to directories
 chgrp www-data .
 chmod 777 ./web/assets/
+chmod -R 777 ./rules/* || { echo -e "${RED}Changing access mode of the directory ./rules/* failed${NORMAL}" ; exit 1; }
 
 # Generate SSL certificates
 COUNTRY="SK"
@@ -91,10 +97,13 @@ cp deployment/config_files/secmon.conf /etc/rsyslog.d/ \
 || { echo -e "${RED}Copying config files failed${NORMAL}" ; exit 1; }
 echo -e "${GREEN}Done${NORMAL}"
 
-# Download rules from configured repository
-echo -e "${YELLOW}Starting download of SecMon rules${NORMAL}"
-python3 ./commands/rules_downloader.py \
-|| { echo -e "${RED}Download of SecMon rules failed${NORMAL}" ; exit 1; }
+# Copy configuration file templates
+echo -e "Copying configuration file templates"
+cp deployment/config_templates/db.php config/ \
+&& cp deployment/config_templates/anomaly_config.ini config/ \
+&& cp deployment/config_templates/secmon_config.ini config/ \
+&& cp deployment/config_templates/docker-compose.yml . \
+|| { echo -e "${RED}Copying configuration file templates failed!${NORMAL}" ; exit 1; }
 echo -e "${GREEN}Done${NORMAL}"
 
 # Create lock file as a sign config was run.

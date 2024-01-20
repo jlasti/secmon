@@ -234,6 +234,11 @@ if sys.argv[1] == "remove":
     sys.exit()
 
 if sys.argv[1] == "deploy":
+    if not os.path.isfile('/config/.lock'):
+        os.system('bash ./secmon_preconfig.sh')
+    else:
+        print("Preconfiguration already executed. Skipping step.")
+
     create_temp_config()
 
     answer = input("Deploying SecMon will remove all existing SecMon containers and existing SecMon database.\n"

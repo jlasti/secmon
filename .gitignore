@@ -29,7 +29,6 @@ phpunit.phar
 /phpunit.xml
 
 # SecMon project related
-docker-compose.yml
 /config/.lock
 /config/db.php
 /config/anomaly_config.ini
