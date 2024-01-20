@@ -14,7 +14,7 @@ $this->params['title'] = 'Update Normalization Rule: ' . $model->ruleFileName;
     <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
     <div class="main-actions centered-horizontal">
-        <button type="submit" class="btn red darken-4" style="border-radius: 10px">Update</button>
+        <button type="submit" class="btn red" style="border-radius: 10px">Update</button>
         <a href="." class="btn grey darken-2" style="border-radius: 10px">Close</a>
     </div>
 

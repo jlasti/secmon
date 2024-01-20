@@ -2,12 +2,13 @@
 
 namespace app\controllers;
 
-use app\models\NormalizationRule\NormalizationRuleSearch;
 use Yii;
-use app\models\NormalizationRule;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\ServerErrorHttpException;
 use yii\filters\VerbFilter;
+use app\models\NormalizationRule;
+use app\services\NormalizationRuleService;
 
 /**
  * NormalizationRuleController implements the CRUD actions for NormalizationRule model.
@@ -42,7 +43,7 @@ class NormalizationRuleController extends Controller
             return $this->goHome();
         } else {
             // User logged in
-            $dataProvider = NormalizationRuleSearch::getAllRules();
+            $dataProvider = NormalizationRuleService::getAllRules();
             return $this->render('index', [
                 'dataProvider' => $dataProvider,
             ]);
@@ -114,7 +115,7 @@ class NormalizationRuleController extends Controller
             if (Yii::$app->request->post()) {
                 // POST
                 $model->load(Yii::$app->request->post());
-                if (NormalizationRuleSearch::updateRule($model)) {
+                if (NormalizationRuleService::updateRule($model)) {
                     return $this->redirect(['view', 'ruleFileName' => $model->ruleFileName]);
                 }
             } else {
@@ -139,8 +140,30 @@ class NormalizationRuleController extends Controller
             return $this->goHome();
         } else {
             // User logged in
-            if (NormalizationRuleSearch::deleteRule($ruleFileName)) {
+            if (NormalizationRuleService::deleteRule($ruleFileName)) {
                 return $this->redirect(['index']);
+            }
+        }
+    }
+
+    /**
+     * Executes update of default rules.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @param string $ruleFileName
+     * @return mixed
+     */
+    public function actionRulesUpdate()
+    {
+        if (Yii::$app->user->isGuest) {
+            // User not logged in
+            return $this->goHome();
+        } else {
+            if (NormalizationRuleService::deleteAllRules() == 1){
+                $pythonScriptPath = Yii::getAlias("@app/commands/rules_downloader.py");
+                shell_exec("python3 $pythonScriptPath web");
+                return $this->redirect(['index']);
+            } else {
+                throw new ServerErrorHttpException('Rules update error.');
             }
         }
     }
@@ -159,7 +182,7 @@ class NormalizationRuleController extends Controller
             return $this->goHome();
         } else {
             // User logged in
-            $model = NormalizationRuleSearch::getRuleByFileName($ruleFileName);
+            $model = NormalizationRuleService::getRuleByFileName($ruleFileName);
             if (!is_null($model)) {
                 return $model;
             } else {

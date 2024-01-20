@@ -4,14 +4,15 @@
 import configparser
 import sys
 import os
-import fileinput # TODO: Remove not used
-import re
 import time
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NORMAL='\033[0m'
+
+SECMON_MAIN_CONF = './config/secmon_config.ini'
+SECMON_AGGREGATOR_CONF = './config/aggregator_config.ini'
 
 # FIXME: upraviť 'docker compose down', prerobit aby correlation modul bol startovany ako enrichment module (teraz start hardcoded)
 
@@ -49,7 +50,7 @@ def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules
     stop_secmon_containers(all_enrichment_modules)
     remove_secmon_containers(all_enrichment_modules)
     
-    config_file = open("./config/aggregator_config.ini", "r")
+    config_file = open(SECMON_AGGREGATOR_CONF, "r")
     contents = config_file.readlines()
 
     print(YELLOW,'\nRestarting SecMon modules:',NORMAL)
@@ -109,7 +110,7 @@ def log_input_device_name_validation(name, input_data, index):
 def create_temp_config():
     # Read configuration file
     config = configparser.ConfigParser()
-    config.read('./config/secmon_config.ini')
+    config.read(SECMON_MAIN_CONF)
 
     # Validate secmon_config.ini
     if(not validate(config)):
@@ -117,7 +118,7 @@ def create_temp_config():
 
     # Write data to temp config for system services
     port = 9000
-    aggregator_conf_file = open("./config/aggregator_config.ini", "w+")
+    aggregator_conf_file = open(SECMON_AGGREGATOR_CONF, "w+")
 
     aggregator_conf_file.write("Log_input: %s\nName: %s\n" % (config.get('DEVICE', 'log_input'), config.get('DEVICE', 'name')))
     aggregator_conf_file.write("Nor_input_NP: %s\nNor_output_NP: %s\n" % (config.get('NORMALIZATION', 'input_NP'), config.get('NORMALIZATION', 'output_NP')))
@@ -259,7 +260,7 @@ if sys.argv[1] == "deploy":
             sys.exit()
         
         # Create and start core modules + selected enrichment modules
-        config_file = open("./config/aggregator_config.ini", "r")
+        config_file = open(SECMON_AGGREGATOR_CONF, "r")
         contents = config_file.readlines()
         os.system('docker compose -p secmon up -d')
         for module in enabled_enrichment_modules:
@@ -303,9 +304,10 @@ if sys.argv[1] == "config":
 # Manualy update rules for repository configured in secmon_config.ini
 if sys.argv[1] == "get-rules":
     print(YELLOW,'\nStarting download of default SecMon rules:',NORMAL)
-    if os.system('./commands/rules_downloader.py') != 0:
+    if os.system(f'./commands/rules_downloader.py os') != 0:
         print(RED,'Error occured during rules download, retreival of rules from repository was unsuccessful.',NORMAL)
         sys.exit()
+    os.system('chmod -R 777 ./rules/*')
     print(GREEN,'Download successful',NORMAL)
     sys.exit()
 

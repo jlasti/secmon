@@ -3,18 +3,27 @@
 
 import configparser
 import os
+import sys
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-NORMAL='\033[0m'
+enviroment = sys.argv[1] # supported values: web, os
 
-config = configparser.ConfigParser()
-config.read('./config/secmon_config.ini')
+if enviroment == "os":
+    # Execute this if rules update called in deployment, configuration...
+    config = configparser.ConfigParser()
+    config.read('./config/secmon_config.ini')
+    repo_url = config.get('RULES_REPOSITORY', 'url')
 
-repo_url = config.get('RULES_REPOSITORY', 'url')
+    os.system(f'git clone {repo_url} ../.git/temp/rules_repository')
+    os.system(f'mv ../.git/temp/rules_repository/normalization/* ./rules/normalization/available/')
+    os.system(f'mv ../.git/temp/rules_repository/correlation/* ./rules/correlation/available/')
+    os.system(f'rm -rf ../.git/temp/rules_repository')
+elif enviroment == 'web':
+    # Execute this if rules update called from web
+    config = configparser.ConfigParser()
+    config.read('/var/www/html/secmon/config/secmon_config.ini')
+    repo_url = config.get('RULES_REPOSITORY', 'url')
 
-os.system(f'git clone {repo_url} ../.git/temp/rules_repository')
-os.system('mv ../.git/temp/rules_repository/normalization/* ./rules/normalization/available/')
-os.system('mv ../.git/temp/rules_repository/correlation/* ./rules/correlation/available/')
-os.system('rm -rf ../.git/temp/rules_repository')
+    os.system(f'git clone {repo_url} ./assets/temp/rules_repository')
+    os.system(f'mv ./assets/temp/rules_repository/normalization/* /var/www/html/secmon/rules/normalization/available/')
+    os.system(f'mv ./assets/temp/rules_repository/correlation/* /var/www/html/secmon/rules/correlation/available/')
+    os.system(f'rm -rf ./assets/temp')

@@ -9,7 +9,8 @@ $this->params['title'] = 'Normalization Rules';
 <div class="normalization-rule-index">
 
     <div class="main-actions centered-horizontal">
-        <?= Html::a(Yii::t('app', 'Import new rule'), ['create'], ['class' => 'btn', 'style' => 'border-radius: 10px']) ?>
+        <?= Html::a(Yii::t('app', 'Import new rule'), ['create'], ['class' => 'btn red', 'style' => 'border-radius: 10px']) ?>
+        <?= Html::a(Yii::t('app', 'Update rules'), ['rules-update'], ['class' => 'btn', 'style' => 'border-radius: 10px']) ?>
     </div>
 
     <?= GridView::widget([

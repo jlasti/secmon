@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models\NormalizationRule;
+namespace app\services;
 
 use Yii;
 use app\models\NormalizationRule;
@@ -8,9 +8,9 @@ use yii\data\ArrayDataProvider;
 use yii\helpers\FileHelper;
 
 /**
- * NormalizationRuleSearch represents the model behind the search form about `app\models\NormalizationRule`.
+ * NormalizationRuleService is responsible for managing normalization rules.
  */
-class NormalizationRuleSearch
+class NormalizationRuleService
 {
     const PAGE_SIZE = 10;
     const AVAILABLE_RULES_PATH = '@app/rules/normalization/available';
@@ -27,20 +27,20 @@ class NormalizationRuleSearch
     public static function getAllRules()
     {
         // Get the list of all available normalization rule files.
-        $ruleFiles = FileHelper::findFiles(Yii::getAlias(NormalizationRuleSearch::AVAILABLE_RULES_PATH), [
+        $ruleFiles = FileHelper::findFiles(Yii::getAlias(NormalizationRuleService::AVAILABLE_RULES_PATH), [
             'only' => ['*.rule'],
         ]);
 
         $ruleModels = [];
         foreach ($ruleFiles as $ruleFile) {
-            $ruleModels[] = NormalizationRuleSearch::createRuleModel($ruleFile);
+            $ruleModels[] = NormalizationRuleService::createRuleModel($ruleFile);
         }
 
         // Create and return array data provider with the loaded data. 
         $dataProvider = new ArrayDataProvider([
             'allModels' => $ruleModels,
             'pagination' => [
-                'pageSize' => NormalizationRuleSearch::PAGE_SIZE,
+                'pageSize' => NormalizationRuleService::PAGE_SIZE,
             ],
         ]);
         return $dataProvider;
@@ -62,14 +62,14 @@ class NormalizationRuleSearch
         foreach ($ruleFiles as $ruleFile) {
             if (basename($ruleFile) === $rulefileName) {
                 // Find one available rule by matching file name.
-                return NormalizationRuleSearch::createRuleModel($ruleFile);
+                return NormalizationRuleService::createRuleModel($ruleFile);
             }
         }
         return null;
     }
 
     /**
-     * Updates NormalizationRule and metadata file.
+     * Updates NormalizationRule file and metadata file.
      *
      * @param NormalizationRule $model
      * @return boolean
@@ -78,8 +78,8 @@ class NormalizationRuleSearch
     {
         $ruleFileName = $model->ruleFileName;
         $metaFileName = pathinfo($ruleFileName, PATHINFO_FILENAME) . ".ui.json"; // Metadata file name (ex. apache.ui.json)
-        $ruleMetaFile = NormalizationRuleSearch::findMetaFileByRuleName($ruleFileName); // Return json data from metadata file
-        $metaFilePath = Yii::getAlias(NormalizationRuleSearch::RULE_METADATA_PATH) . '/' . $metaFileName; // Full path to metadata file
+        $ruleMetaFile = NormalizationRuleService::findMetaFileByRuleName($ruleFileName); // Return json data from metadata file
+        $metaFilePath = Yii::getAlias(NormalizationRuleService::RULE_METADATA_PATH) . '/' . $metaFileName; // Full path to metadata file
 
         // file_put_contents('/var/www/html/secmon/error.log', $model->toArray());
 
@@ -92,14 +92,14 @@ class NormalizationRuleSearch
             file_put_contents($metaFilePath, json_encode($ruleMetaFile));
 
         }
-        if ($model->active == 1 && NormalizationRuleSearch::isRuleActive($ruleFileName) == 0) {
+        if ($model->active == 1 && NormalizationRuleService::isRuleActive($ruleFileName) == 0) {
             // Rule status change to 'active'.
-            NormalizationRuleSearch::activateRule($ruleFileName);
-        } else if ($model->active == 0 && NormalizationRuleSearch::isRuleActive($ruleFileName) == 1) {
+            NormalizationRuleService::activateRule($ruleFileName);
+        } else if ($model->active == 0 && NormalizationRuleService::isRuleActive($ruleFileName) == 1) {
             // Rule status change to 'available'.
-            NormalizationRuleSearch::deactivateRule($ruleFileName);
+            NormalizationRuleService::deactivateRule($ruleFileName);
         }
-        file_put_contents(Yii::getAlias(NormalizationRuleSearch::AVAILABLE_RULES_PATH) . '/' . $ruleFileName, $model->content);
+        file_put_contents(Yii::getAlias(NormalizationRuleService::AVAILABLE_RULES_PATH) . '/' . $ruleFileName, $model->content);
         return true; // true, if update was successful.
     }
 
@@ -119,7 +119,7 @@ class NormalizationRuleSearch
         $lastModifiedTime = $statInfo['mtime'];
 
         // If metadata file exists, read attributes from it to NormalizationRule model.
-        $ruleMetaFile = NormalizationRuleSearch::findMetaFileByRuleName(basename($ruleFile));
+        $ruleMetaFile = NormalizationRuleService::findMetaFileByRuleName(basename($ruleFile));
         if (!is_null($ruleMetaFile)) {
             $normalizationRule->name = $ruleMetaFile['name'];
         }
@@ -128,7 +128,7 @@ class NormalizationRuleSearch
         $normalizationRule->ruleFileName = basename($ruleFile);
         $normalizationRule->size = $fileSize;
         $normalizationRule->modified_at = date('d.m.Y H:i:s', $lastModifiedTime);
-        $normalizationRule->active = NormalizationRuleSearch::isRuleActive(basename($ruleFile));
+        $normalizationRule->active = NormalizationRuleService::isRuleActive(basename($ruleFile));
 
         // Load the content of the file.
         $normalizationRule->content = file_get_contents($ruleFile);
@@ -136,38 +136,61 @@ class NormalizationRuleSearch
         return $normalizationRule;
     }
 
+    /**
+     * Deletes NormalizationRule file from active and available folders.
+     *
+     * @param string $ruleFileName
+     * @return boolean
+     */
     public static function deleteRule($ruleFileName)
     {
-        $fromPath = Yii::getAlias(NormalizationRuleSearch::AVAILABLE_RULES_PATH) . '/' . $ruleFileName;
-        $toPath = Yii::getAlias(NormalizationRuleSearch::BIN_PATH) . '/' . $ruleFileName;
-        $metadataPath = Yii::getAlias(NormalizationRuleSearch::RULE_METADATA_PATH) . '/' . $ruleFileName;
-        if(NormalizationRuleSearch::isRuleActive($ruleFileName)){
-            NormalizationRuleSearch::deactivateRule($ruleFileName);
+        $fromPath = Yii::getAlias(NormalizationRuleService::AVAILABLE_RULES_PATH) . '/' . $ruleFileName;
+        $toPath = Yii::getAlias(NormalizationRuleService::BIN_PATH) . '/' . $ruleFileName;
+        $metadataPath = Yii::getAlias(NormalizationRuleService::RULE_METADATA_PATH) . '/' . $ruleFileName;
+        if(NormalizationRuleService::isRuleActive($ruleFileName)){
+            NormalizationRuleService::deactivateRule($ruleFileName);
         }
         rename($fromPath, $toPath);
         unlink($metadataPath);
         return true;
     }
 
+    public static function deleteAllRules()
+    {
+        $active = FileHelper::findFiles(Yii::getAlias(NormalizationRuleService::ACTIVE_RULES_PATH), [
+            'only' => ['*.rule'],
+        ]);
+        $available = FileHelper::findFiles(Yii::getAlias(NormalizationRuleService::AVAILABLE_RULES_PATH), [
+            'only' => ['*.rule'],
+        ]);
+        foreach ($active as $file) {
+            unlink($file);
+        }
+        foreach ($available as $file) {
+            unlink($file);
+        }
+        return true;
+    }
+
     // Created hardlink from available .rule directory to active rules directory.
     private static function activateRule($ruleFileName)
     {
-        $targetPath = Yii::getAlias(NormalizationRuleSearch::ACTIVE_RULES_PATH) . '/' . $ruleFileName;
-        $fromPath = Yii::getAlias(NormalizationRuleSearch::AVAILABLE_RULES_PATH) . '/' . $ruleFileName;
+        $targetPath = Yii::getAlias(NormalizationRuleService::ACTIVE_RULES_PATH) . '/' . $ruleFileName;
+        $fromPath = Yii::getAlias(NormalizationRuleService::AVAILABLE_RULES_PATH) . '/' . $ruleFileName;
         return link($fromPath, $targetPath);
     }
 
     // Removes file(hardlink) from directory 'active'.
     private static function deactivateRule($ruleFileName)
     {
-        $targetPath = Yii::getAlias(NormalizationRuleSearch::ACTIVE_RULES_PATH) . '/' . $ruleFileName;
+        $targetPath = Yii::getAlias(NormalizationRuleService::ACTIVE_RULES_PATH) . '/' . $ruleFileName;
         return unlink($targetPath);
     }
 
     // Return metadata json data, if found by metadata rule file name. Null if not found.
     private static function findMetaFileByRuleName($ruleFileName)
     {
-        $metaFiles = FileHelper::findFiles(Yii::getAlias(NormalizationRuleSearch::RULE_METADATA_PATH), [
+        $metaFiles = FileHelper::findFiles(Yii::getAlias(NormalizationRuleService::RULE_METADATA_PATH), [
             'only' => ['*ui.json'],
         ]);
 
@@ -183,7 +206,7 @@ class NormalizationRuleSearch
     // Return true, if .rule file is present in 'active' directory (checks by rule file name)
     private static function isRuleActive($ruleFileName)
     {
-        $activeFile = Yii::getAlias(NormalizationRuleSearch::ACTIVE_RULES_PATH) . '/' . $ruleFileName;
+        $activeFile = Yii::getAlias(NormalizationRuleService::ACTIVE_RULES_PATH) . '/' . $ruleFileName;
         return file_exists($activeFile);
     }
 
