@@ -29,6 +29,7 @@ phpunit.phar
 /phpunit.xml
 
 # SecMon project related
+docker-compose.yml
 /config/.lock
 /config/db.php
 /config/anomaly_config.ini
@@ -43,5 +44,5 @@ output/
 # pycache is not needed
 __pycache__/
 
-#error logs
+# error logs
 error.log
