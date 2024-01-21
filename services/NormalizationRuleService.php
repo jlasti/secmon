@@ -147,7 +147,7 @@ class NormalizationRuleService
         $fromPath = Yii::getAlias(NormalizationRuleService::AVAILABLE_RULES_PATH) . '/' . $ruleFileName;
         $toPath = Yii::getAlias(NormalizationRuleService::BIN_PATH) . '/' . $ruleFileName;
         $metadataPath = Yii::getAlias(NormalizationRuleService::RULE_METADATA_PATH) . '/' . $ruleFileName;
-        if(NormalizationRuleService::isRuleActive($ruleFileName)){
+        if (NormalizationRuleService::isRuleActive($ruleFileName)) {
             NormalizationRuleService::deactivateRule($ruleFileName);
         }
         rename($fromPath, $toPath);
@@ -155,6 +155,11 @@ class NormalizationRuleService
         return true;
     }
 
+    /**
+     * Deletes all NormalizationRule files from active and available folders.
+     *
+     * @return array Returns array of full path to previously active rules.
+     */
     public static function deleteAllRules()
     {
         $active = FileHelper::findFiles(Yii::getAlias(NormalizationRuleService::ACTIVE_RULES_PATH), [
@@ -169,7 +174,31 @@ class NormalizationRuleService
         foreach ($available as $file) {
             unlink($file);
         }
-        return true;
+        return $active;
+    }
+
+    /**
+     * Reactivates NormalizationRules from previously active rules provided in @param.
+     *
+     * @param array $activeRules
+     * @return int Returns 1 if reactivation was successful.
+     */
+    public static function reactiveRules($activeRules)
+    {
+        $available = FileHelper::findFiles(Yii::getAlias(NormalizationRuleService::AVAILABLE_RULES_PATH), [
+            'only' => ['*.rule'],
+        ]);
+        $availableBNames = array();
+        foreach ($available as $FPactive) { // Convert full path to base name
+            $availableBNames[] = basename($FPactive);
+        }
+        foreach ($activeRules as $rule) {
+            $ruleBName = basename($rule);
+            if (in_array($ruleBName, $availableBNames, true)) { // Ensure previously active rule was not deleted in new update.
+                NormalizationRuleService::activateRule($ruleBName);
+            }
+        }
+        return 1;
     }
 
     // Created hardlink from available .rule directory to active rules directory.

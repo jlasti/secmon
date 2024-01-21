@@ -158,13 +158,11 @@ class NormalizationRuleController extends Controller
             // User not logged in
             return $this->goHome();
         } else {
-            if (NormalizationRuleService::deleteAllRules() == 1){
-                $pythonScriptPath = Yii::getAlias("@app/commands/rules_downloader.py");
-                shell_exec("python3 $pythonScriptPath web");
-                return $this->redirect(['index']);
-            } else {
-                throw new ServerErrorHttpException('Rules update error.');
-            }
+            $activeRulesPath = NormalizationRuleService::deleteAllRules();
+            $pythonScriptPath = Yii::getAlias("@app/commands/rules_downloader.py");
+            shell_exec("python3 $pythonScriptPath web");
+            NormalizationRuleService::reactiveRules($activeRulesPath);
+            return $this->redirect(['index']);
         }
     }
 
