@@ -70,13 +70,12 @@ class NormalizationRuleController extends Controller
     }
 
     /**
-     * Creates a new NormalizationRule model.
+     * Imports new rule file from URL using cURL.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        // TODO: enable import rule from URL
         if (Yii::$app->user->isGuest) {
             // User not logged in
             return $this->goHome();
@@ -84,10 +83,12 @@ class NormalizationRuleController extends Controller
             // User is logged in
             $model = new NormalizationRule();
             if ($model->load(Yii::$app->request->post())) {
-                // Handle creation of UI file
-                /* return $this->redirect(['view', 'id' => $model->id]); */
+                $ruleFileName = NormalizationRuleService::importNewRule($model); // znasilnenie modelu NormalizationRule na ulozenie URL
+                return $this->redirect([
+                    'view',
+                    'ruleFileName' => $ruleFileName
+                ]);
             }
-            $model->active = true;
             return $this->render('create', [
                 'model' => $model,
             ]);
@@ -116,7 +117,10 @@ class NormalizationRuleController extends Controller
                 // POST
                 $model->load(Yii::$app->request->post());
                 if (NormalizationRuleService::updateRule($model)) {
-                    return $this->redirect(['view', 'ruleFileName' => $model->ruleFileName]);
+                    return $this->redirect([
+                        'view',
+                        'ruleFileName' => $model->ruleFileName
+                    ]);
                 }
             } else {
                 // GET
@@ -158,7 +162,7 @@ class NormalizationRuleController extends Controller
             // User not logged in
             return $this->goHome();
         } else {
-            $activeRulesPath = NormalizationRuleService::deleteAllRules();
+            $activeRulesPath = NormalizationRuleService::deleteActiveRules();
             $pythonScriptPath = Yii::getAlias("@app/commands/rules_downloader.py");
             shell_exec("python3 $pythonScriptPath web");
             NormalizationRuleService::reactiveRules($activeRulesPath);

@@ -21,23 +21,27 @@ $this->params['title'] = 'Update Normalization Rule: ' . $model->ruleFileName;
 
     <div class="row" style="margin-bottom: -10px;">
         <div style="margin-bottom: -10px;">
-            <label>Custom rule name</label>
+            <label style="font-size: larger;">Custom rule name</label>
         </div>
-        <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+        <div style='margin-top: -20px;'>
+            <?= $form->field($model, 'name')->textInput(['maxlength' => true])->label(false) ?>
+        </div>
     </div>
 
     <div class="row" style="margin-bottom: 5px;">
         <div style="margin-bottom: -10px;">
-            <label>Rule status</label>
+            <label style="font-size: larger;">Rule state</label>
         </div>
-        <?= $form->field($model, 'active')->checkbox() ?>
+        <div style='margin-left: 10px;'>
+            <?= $form->field($model, 'active')->checkbox() ?>
+        </div>
     </div>
 
     <div class="row"></div>
 
     <div style="margin-left: -10px;">
-        <label>Edit rule</label>
-        <div style='border: 1px solid grey; padding: 0 5px'>
+        <label style="font-size: larger;">Edit rule</label>
+        <div style='border: 1px solid grey; padding: 0 5px; font-family: consolas;'>
             <?= $form->field($model, 'content')->textarea(['showCharacterCounter' => true])->label(false) ?>
         </div>
     </div>

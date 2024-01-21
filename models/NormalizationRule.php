@@ -20,7 +20,7 @@ class NormalizationRule extends Model
     {
         return [
             [['active', 'ruleFileName'], 'required'],
-            ['name', 'string','max'=> 50],
+            ['name', 'string', 'max'=> 60],
             ['content', 'string'],
             ['active', 'boolean'],
             ['created_at', 'safe'],

@@ -13,20 +13,7 @@ $this->params['title'] = 'Normalization Rule: ' . $model->ruleFileName;
 <div class="normalization-rule-view">
 
     <div class="main-actions centered-horizontal">
-<!--         <?= Html::a("<i class='material-icons'>edit</i>" . Yii::t('app', 'Update'), ['update', 'ruleFileName' => $model->ruleFileName], ['class' => 'btn-floating waves-effect waves-light btn-large blue']) ?>
-        <?= Html::a(
-            "<i class='material-icons'>delete</i>" . Yii::t('app', 'Delete'),
-            ['delete', 'ruleFileName' => $model->ruleFileName],
-            [
-                'class' => 'btn-floating waves-effect waves-light btn-large red',
-                'data' => [
-                    'confirm' => Yii::t('app', 'Are you sure you want to delete this item?'),
-                    'method' => 'post',
-                ],
-            ]
-        ) ?> -->
         <a href="." class="btn grey darken-2" style="border-radius: 10px">Close</a>
-    </div>
     </div>
 
     <?= DetailView::widget([
@@ -34,7 +21,7 @@ $this->params['title'] = 'Normalization Rule: ' . $model->ruleFileName;
         'attributes' => [
             [
                 'attribute' => 'name',
-                'label' => 'Rule name',
+                'label' => 'Custom rule name',
             ],
             [
                 'attribute' => 'ruleFileName',
@@ -42,15 +29,15 @@ $this->params['title'] = 'Normalization Rule: ' . $model->ruleFileName;
             ],
             [
                 'attribute' => 'active',
-                'label' => 'Status',
+                'label' => 'State',
                 'format' => 'html',
                 'value' => function ($model) {
-                if ($model->active == 1) {
-                    return '<span style="color: #11ff00;">ACTIVE</span>';
-                } else {
-                    return '<span style="color: red">INACTIVE</span>';
-                }
-            },
+                    if ($model->active == 1) {
+                        return '<span style="font-weight: bold; color: #00c853;">ACTIVE</span>';
+                    } else {
+                        return '<span style="color: #2196f3">INACTIVE</span>';
+                    }
+                },
             ],
             [
                 'attribute' => 'modified_at',

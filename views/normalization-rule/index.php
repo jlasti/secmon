@@ -19,23 +19,23 @@ $this->params['title'] = 'Normalization Rules';
             ['class' => 'yii\grid\SerialColumn'],
             [
                 'attribute' => 'name',
-                'label' => 'Rule name',
+                'label' => 'Custom rule name',
             ],
             [
                 'attribute' => 'ruleFileName',
-                'label' => 'Normalization rule file path',
+                'label' => 'Rule file name',
             ],
             [
                 'attribute' => 'active',
-                'label' => 'Status',
+                'label' => 'State',
                 'format' => 'html',
                 'value' => function ($model) {
-                        if ($model->active == 1) {
-                            return '<span style="color: #11ff00;">ACTIVE</span>';
-                        } else {
-                            return '<span style="color: red">INACTIVE</span>';
-                        }
-                    },
+                    if ($model->active == 1) {
+                        return '<span style="font-weight: bold; color: #00c853;">ACTIVE</span>';
+                    } else {
+                        return '<span style="color: #2196f3">INACTIVE</span>';
+                    }
+                },
             ],
             [
                 'attribute' => 'modified_at',

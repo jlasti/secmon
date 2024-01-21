@@ -19,6 +19,48 @@ class NormalizationRuleService
     const BIN_PATH = '@app/rules/normalization/.bin';
 
     /**
+     * Safely imports new rule using cURL.
+     *
+     * @param array $params
+     * @return mixed false if import was not successful. $newRuleFileName if successful
+     */
+    public static function importNewRule($model)
+    {
+        $active = $model->active;
+        $url = $model->content;
+
+        # Validate url
+        if (!filter_var($url, FILTER_VALIDATE_URL))
+            return false;
+
+        # Check if safe file name
+        if (is_null($model->name)) {
+            $newRuleFileName = basename($url);
+        } else {
+            $newRuleFileName = $model->name;
+        }
+        if (!NormalizationRuleService::isValidFileName($newRuleFileName))
+            return false;
+
+        $newRuleFilePath = Yii::getAlias(NormalizationRuleService::AVAILABLE_RULES_PATH) . '/' . $newRuleFileName;
+
+        $curl = curl_init($url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+        $response = curl_exec($curl);
+        curl_close($curl);
+
+        if (!$response)
+            return false;
+
+        file_put_contents($newRuleFilePath, $response);
+        if ($active == 1)
+            NormalizationRuleService::activateRule($newRuleFileName);
+
+        return $newRuleFileName;
+    }
+
+    /**
      * Returns data provider filled with all available NormalizationRule models.
      *
      * @param array $params
@@ -40,8 +82,8 @@ class NormalizationRuleService
         $dataProvider = new ArrayDataProvider([
             'allModels' => $ruleModels,
             'pagination' => [
-                'pageSize' => NormalizationRuleService::PAGE_SIZE,
-            ],
+                    'pageSize' => NormalizationRuleService::PAGE_SIZE,
+                ],
         ]);
         return $dataProvider;
     }
@@ -151,27 +193,23 @@ class NormalizationRuleService
             NormalizationRuleService::deactivateRule($ruleFileName);
         }
         rename($fromPath, $toPath);
-        unlink($metadataPath);
+        if (file_exists($metadataPath)) {
+            unlink($metadataPath);
+        }
         return true;
     }
 
     /**
-     * Deletes all NormalizationRule files from active and available folders.
+     * Deletes all active NormalizationRule files from active folders.
      *
      * @return array Returns array of full path to previously active rules.
      */
-    public static function deleteAllRules()
+    public static function deleteActiveRules()
     {
         $active = FileHelper::findFiles(Yii::getAlias(NormalizationRuleService::ACTIVE_RULES_PATH), [
             'only' => ['*.rule'],
         ]);
-        $available = FileHelper::findFiles(Yii::getAlias(NormalizationRuleService::AVAILABLE_RULES_PATH), [
-            'only' => ['*.rule'],
-        ]);
         foreach ($active as $file) {
-            unlink($file);
-        }
-        foreach ($available as $file) {
             unlink($file);
         }
         return $active;
@@ -237,6 +275,17 @@ class NormalizationRuleService
     {
         $activeFile = Yii::getAlias(NormalizationRuleService::ACTIVE_RULES_PATH) . '/' . $ruleFileName;
         return file_exists($activeFile);
+    }
+
+    // Check for safe file name using regex
+    private static function isValidFileName($input)
+    {
+        $pattern = '/^[a-zA-Z0-9.\-_]+$/';
+
+        if (preg_match($pattern, $input)) {
+            return true;
+        }
+        return false;
     }
 
 }
