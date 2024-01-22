@@ -5,8 +5,8 @@ use macgyer\yii2materializecss\widgets\form\ActiveForm;
 
 ?>
 
-<div class="normalization-rule-form">
-    
+<div class="sec-rule-form">
+
     <?php $form = ActiveForm::begin(); ?>
 
     <div class="main-actions centered-horizontal">

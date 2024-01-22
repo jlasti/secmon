@@ -3,10 +3,11 @@
 use yii\helpers\Html;
 use macgyer\yii2materializecss\widgets\grid\GridView;
 
-$this->params['title'] = 'Normalization Rules';
+$this->params['title'] = 'Correlation Rules';
 ?>
 
-<div class="normalization-rule-index">
+<div class="sec-rule-index">
+    
     <div class="main-actions centered-horizontal">
         <?= Html::a(Yii::t('app', 'Import new rule'), ['create'], ['class' => 'btn red', 'style' => 'border-radius: 10px']) ?>
         <?= Html::a(Yii::t('app', 'Update rules'), ['rules-update'], ['class' => 'btn', 'style' => 'border-radius: 10px']) ?>
@@ -29,12 +30,12 @@ $this->params['title'] = 'Normalization Rules';
                 'label' => 'State',
                 'format' => 'html',
                 'value' => function ($model) {
-                    if ($model->active == 1) {
-                        return '<span style="font-weight: bold; color: #00c853;">ACTIVE</span>';
-                    } else {
-                        return '<span style="color: #2196f3">INACTIVE</span>';
-                    }
-                },
+                        if ($model->active == 1) {
+                            return '<span style="font-weight: bold; color: #00c853;">ACTIVE</span>';
+                        } else {
+                            return '<span style="color: #2196f3">INACTIVE</span>';
+                        }
+                    },
             ],
             [
                 'attribute' => 'modified_at',

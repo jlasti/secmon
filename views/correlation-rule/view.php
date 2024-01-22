@@ -1,13 +1,15 @@
 <?php
 
+use yii\helpers\Html;
 use macgyer\yii2materializecss\widgets\data\DetailView;
 
+/* @var $this yii\web\View */
+/* @var $model app\models\SecRule */
 
-$this->params['title'] = 'Normalization Rule: ' . $model->ruleFileName;
+$this->params['title'] = 'Correlation Rule: ' . $model->name;
 ?>
+<div class="sec-rule-view">
 
-<div class="normalization-rule-view">
-    
     <div class="main-actions centered-horizontal">
         <a href="." class="btn grey darken-2" style="border-radius: 10px">Close</a>
     </div>
@@ -28,12 +30,12 @@ $this->params['title'] = 'Normalization Rule: ' . $model->ruleFileName;
                 'label' => 'State',
                 'format' => 'html',
                 'value' => function ($model) {
-                    if ($model->active == 1) {
-                        return '<span style="font-weight: bold; color: #00c853;">ACTIVE</span>';
-                    } else {
-                        return '<span style="color: #2196f3">INACTIVE</span>';
-                    }
-                },
+                        if ($model->active == 1) {
+                            return '<span style="font-weight: bold; color: #00c853;">ACTIVE</span>';
+                        } else {
+                            return '<span style="color: #2196f3">INACTIVE</span>';
+                        }
+                    },
             ],
             [
                 'attribute' => 'modified_at',

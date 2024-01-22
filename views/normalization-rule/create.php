@@ -1,8 +1,5 @@
 <?php
 
-/* @var $this yii\web\View */
-/* @var $model app\models\NormalizationRule */
-
 $this->params['title'] = 'Add Normalization Rule';
 ?>
 
@@ -11,4 +8,5 @@ $this->params['title'] = 'Add Normalization Rule';
     <?= $this->render('_form', [
         'model' => $model,
     ]) ?>
+    
 </div>

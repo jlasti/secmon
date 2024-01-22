@@ -89,7 +89,7 @@ echo -e "Generating self-signed certificate (PEM encoding)"
 openssl x509 -signkey ./deployment/certificates/server.key -in ./deployment/certificates/server.csr -req -days 365 -out ./deployment/certificates/server.pem
 echo -e "${GREEN}Done${NORMAL}"
 
-# Copy config files from /deployment
+# Copy config files from /deployment - system related
 echo -e "${YELLOW}Copying config files${NORMAL}"
 cp deployment/config_files/secmon.conf /etc/rsyslog.d/ \
 && cp deployment/config_files/docker.conf /etc/rsyslog.d/ \
@@ -97,7 +97,7 @@ cp deployment/config_files/secmon.conf /etc/rsyslog.d/ \
 || { echo -e "${RED}Copying config files failed${NORMAL}" ; exit 1; }
 echo -e "${GREEN}Done${NORMAL}"
 
-# Copy configuration file templates
+# Copy configuration file templates - secmon related
 echo -e "Copying configuration file templates"
 cp deployment/config_templates/db.php config/ \
 && cp deployment/config_templates/anomaly_config.ini config/ \
@@ -106,7 +106,7 @@ cp deployment/config_templates/db.php config/ \
 || { echo -e "${RED}Copying configuration file templates failed!${NORMAL}" ; exit 1; }
 echo -e "${GREEN}Done${NORMAL}"
 
-# Create lock file as a sign config was run.
+# Create lock file as a sign a config was run.
 echo -e "${YELLOW}Creating lock file${NORMAL}"
 touch ./config/.lock
 chmod 700 ./config/.lock
@@ -119,4 +119,4 @@ systemctl daemon-reload || { echo -e "${RED}Reloading docker daemon failed${NORM
 systemctl restart docker || { echo -e "${RED}Restarting docker service failed${NORMAL}" ; exit 1; }
 echo -e "${GREEN}Done${NORMAL}"
 
-echo -e "${MAGENTA}Secmon preconfiguration is complete.${NORMAL}"
+echo -e "${MAGENTA}SecMon configuration is complete.${NORMAL}"

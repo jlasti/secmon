@@ -49,9 +49,9 @@ class Navigation extends \yii\base\Component
 				],
 				[
 					'label' => 'Correlation Rules',
-					'url' => ['/sec-rule'],
+					'url' => ['/correlation-rule'],
 					'visible' => Yii::$app->user->identity->can('create_users'),
-					'active' => 'sec-rule',
+					'active' => 'correlation-rule',
 					'icon' => 'receipt'
 				],
 				[

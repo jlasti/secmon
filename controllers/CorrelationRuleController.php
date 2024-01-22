@@ -8,20 +8,20 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\models\Rules\Rule;
-use app\models\Rules\NormalizationParams;
+use app\models\Rules\CorrelationParams;
 use app\services\RulesService;
 
 /**
- * NormalizationRuleController implements the CRUD actions for NormalizationRule model.
+ * CorrelationRuleController implements the CRUD actions for Rule model.
  */
 
-class NormalizationRuleController extends Controller
+class CorrelationRuleController extends Controller
 {
     private $rulesService;
     
     public function __construct($id, $module, $config = [])
     {
-        $normalizationParams = new NormalizationParams();
+        $normalizationParams = new CorrelationParams();
         $this->rulesService = new RulesService($normalizationParams);
         parent::__construct($id, $module, $config);
     }
@@ -42,7 +42,7 @@ class NormalizationRuleController extends Controller
     }
 
     /**
-     * Lists all NormalizationRule models.
+     * Lists all Rule models.
      * @return mixed
      */
     public function actionIndex()
@@ -60,7 +60,7 @@ class NormalizationRuleController extends Controller
     }
 
     /**
-     * Displays a single NormalizationRule model.
+     * Displays a single CorrelationRule model.
      * @param string $ruleFileName
      * @return mixed
      */
@@ -92,7 +92,7 @@ class NormalizationRuleController extends Controller
             // User is logged in
             $model = new Rule();
             if ($model->load(Yii::$app->request->post())) {
-                $ruleFileName = $this->rulesService->importNewRule($model); // znasilnenie modelu NormalizationRule na ulozenie URL
+                $ruleFileName = $this->rulesService->importNewRule($model); // znasilnenie modelu Rule na ulozenie URL
                 return $this->redirect([
                     'view',
                     'ruleFileName' => $ruleFileName
@@ -105,7 +105,7 @@ class NormalizationRuleController extends Controller
     }
 
     /**
-     * Updates an existing NormalizationRule.
+     * Updates an existing Rule.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param string $ruleFileName
      * @return mixed
@@ -119,7 +119,7 @@ class NormalizationRuleController extends Controller
             // User logged in
             $model = $this->findModel($ruleFileName);
             if (!$model) {
-                // NormalizationRule model not found.
+                // Rule model not found.
                 return $this->redirect(['index']);
             }
             if (Yii::$app->request->post()) {
@@ -141,7 +141,7 @@ class NormalizationRuleController extends Controller
     }
 
     /**
-     * Deletes an existing NormalizationRule model.
+     * Deletes an existing Rule model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param string $ruleFileName
      * @return mixed
@@ -180,7 +180,7 @@ class NormalizationRuleController extends Controller
     }
 
     /**
-     * Finds the NormalizationRule model based on unique name.
+     * Finds the Rule model based on unique name.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param string $ruleFileName
      * @return mixed
