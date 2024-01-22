@@ -20,6 +20,8 @@ check_dependency() {
     command -v $1 >/dev/null 2>&1 || { echo -e "${RED}Package $1 is not installed${NORMAL}"; exit 1; }
 }
 
+echo -e "${MAGENTA}Starting SecMon configuration.${NORMAL}"
+
 # Check required packages
 echo -e "${YELLOW}Checking for required dependencies${NORMAL}"
 for dependency in "${dependencies[@]}"; do
@@ -54,9 +56,9 @@ mkdir -p ./rules/correlation/available || { echo -e "${RED}Creating directory ru
 mkdir -p ./rules/correlation/ui || { echo -e "${RED}Creating directory rules/correlation/ui failed${NORMAL}" ; exit 1; }
 echo -e "${GREEN}Done${NORMAL}"
 
-# Download rules from configured repository
+# Download rules from repository configured in secmon_config.ini
 echo -e "${YELLOW}Starting download of SecMon rules${NORMAL}"
-python3 ./commands/rules_downloader.py \
+python3 ./commands/rules_downloader.py os \
 || { echo -e "${RED}Download of SecMon rules failed${NORMAL}" ; exit 1; }
 echo -e "${GREEN}Done${NORMAL}"
 

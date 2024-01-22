@@ -23,7 +23,9 @@ def print_help():
     print("\"restart\" - to restart stopped/running SecMon containers")
     print("\"stop\" - to stop running SecMon containers")
     print("\"remove\" - to remove all SecMon containers with database")
-    print("\"help\" - to list all available parameters\n")
+    print("\"help\" - to list all available parameters")
+    print("\"config\" - to run initial SecMon configuration")
+    print("\"get-rules\" - to manually update default rules\n")
 
 # Run specific enrichment module
 def run_enrichment_module(name):
@@ -235,10 +237,10 @@ if sys.argv[1] == "remove":
     sys.exit()
 
 if sys.argv[1] == "deploy":
-    if not os.path.isfile('/config/.lock'):
+    if not os.path.isfile('./config/.lock'):
         os.system('bash ./secmon_preconfig.sh')
     else:
-        print("Preconfiguration already executed. Skipping step.")
+        print("Initial configuration already executed. Skipping step.")
 
     create_temp_config()
 
