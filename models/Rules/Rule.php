@@ -7,7 +7,7 @@ use yii\base\Model;
 
 /**
  * 
- * Class representing rule
+ * Class representing .rule file.
  *
  * @param string $name  Custom name of rule.
  * @param string $active  State of rule (e.g ACTIVE/INACTIVE)

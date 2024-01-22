@@ -8,11 +8,13 @@ use yii\helpers\FileHelper;
 use app\models\Rules\Rule;
 
 /**
- * RulesService is responsible for managing normalization rules.
+ * RulesService is responsible for managing correlation or normalization rules directly in file system.
+ * $parameters representes model with constants(parameters). 
+ * @see NormalizationParams or CorrelationParams
  */
 class RulesService
 {
-    const PAGE_SIZE = 15;
+    const PAGE_SIZE = 15; // Size of page on 'index'
     private $parameters;
 
     function __construct($params)
@@ -23,8 +25,8 @@ class RulesService
     /**
      * Safely imports new rule using cURL.
      *
-     * @param array $params
-     * @return mixed false if import was not successful. $newRuleFileName if successful
+     * @param Rule $model
+     * @return mixed false if import was not successful. $newRuleFileName if successful.
      */
     public function importNewRule($model)
     {
@@ -63,13 +65,13 @@ class RulesService
     }
 
     /**
-     * Returns data provider filled with all available NormalizationRule models.
+     * Returns data provider filled with all available Rule models.
      *
      * @return ArrayDataProvider
      */
     public function getAllRules()
     {
-        // Get the list of all available normalization rule files.
+        // Get the list of all available rule files.
         $ruleFiles = FileHelper::findFiles(Yii::getAlias($this->parameters::AVAILABLE_RULES_PATH), [
             'only' => ['*.rule'],
         ]);
@@ -79,7 +81,7 @@ class RulesService
             $ruleModels[] = RulesService::createRuleModel($ruleFile);
         }
 
-        // Create and return array data provider with the loaded data. 
+        // Create and return array data provider with the loaded rule models. 
         $dataProvider = new ArrayDataProvider([
             'allModels' => $ruleModels,
             'pagination' => [
@@ -90,14 +92,14 @@ class RulesService
     }
 
     /**
-     * Return one NormalizationRule model by rule file name.
+     * Return one Rule model by rule file name.
      *
      * @param string $rulefileName
      * @return mixed
      */
     public function getRuleByFileName($rulefileName)
     {
-        // Get the list of all available normalization rule files.
+        // Get the list of all available rule files.
         $ruleFiles = FileHelper::findFiles(Yii::getAlias($this->parameters::AVAILABLE_RULES_PATH), [
             'only' => ['*.rule'],
         ]);
@@ -112,7 +114,7 @@ class RulesService
     }
 
     /**
-     * Updates NormalizationRule file and metadata file.
+     * Updates Rule file and metadata file. Using updated model from view.
      *
      * @param Rule $model
      * @return boolean
@@ -121,24 +123,24 @@ class RulesService
     {
         $ruleFileName = $model->ruleFileName;
         $metaFileName = pathinfo($ruleFileName, PATHINFO_FILENAME) . ".ui.json"; // Metadata file name (ex. apache.ui.json)
-        $ruleMetaFile = RulesService::findMetaFileByRuleName($ruleFileName); // Return json data from metadata file
+        $metaFileData = RulesService::findMetaFileByRuleName($ruleFileName); // Return json data from metadata file
         $metaFilePath = Yii::getAlias($this->parameters::RULE_METADATA_PATH) . '/' . $metaFileName; // Full path to metadata file
 
         // file_put_contents('/var/www/html/secmon/error.log', $model->toArray());
 
-        if (is_null($ruleMetaFile)) {
+        if (is_null($metaFileData)) {
             // Metadata files does not exists.
-            file_put_contents($metaFilePath, json_encode(['name' => $model->name])); // Add 'name' key with value set from WebUI.
+            file_put_contents($metaFilePath, json_encode(['name' => $model->name])); // Add 'name' key with value from model.
         } else {
             // Metadata file exists, update key 'name'.
-            $ruleMetaFile['name'] = $model->name;
-            file_put_contents($metaFilePath, json_encode($ruleMetaFile));
+            $metaFileData['name'] = $model->name;
+            file_put_contents($metaFilePath, json_encode($metaFileData));
         }
         if ($model->active == 1 && RulesService::isRuleActive($ruleFileName) == 0) {
-            // Rule status change to 'active'.
+            // Rule status changed to 'active'.
             RulesService::activateRule($ruleFileName);
         } else if ($model->active == 0 && RulesService::isRuleActive($ruleFileName) == 1) {
-            // Rule status change to 'available'.
+            // Rule status changed to 'available'.
             RulesService::deactivateRule($ruleFileName);
         }
         file_put_contents(Yii::getAlias($this->parameters::AVAILABLE_RULES_PATH) . '/' . $ruleFileName, $model->content);
@@ -146,44 +148,44 @@ class RulesService
     }
 
     /**
-     * Crates NormalizationRule model from ruleFile.
+     * Crates Rule model from rule file.
      *
      * @param string $ruleFile
      * @return Rule
      */
     private function createRuleModel($ruleFile)
     {
-        $normalizationRule = new Rule();
+        $rule = new Rule();
 
-        // Extract information about file to NormalizationRule model.
+        // Extract information about file to Rule model.
         $statInfo = stat($ruleFile);
         // $fileSize = round($statInfo['size'] / 1024, 0); // convertion to KB.
         $lastModifiedTime = $statInfo['mtime'];
         $lastAccessTime = $statInfo['atime'];
-        $normalizationRule->size = $statInfo['size'];
-        $normalizationRule->gid = $statInfo['gid'];
-        $normalizationRule->uid = $statInfo['uid'];
+        $rule->size = $statInfo['size'];
+        $rule->gid = $statInfo['gid'];
+        $rule->uid = $statInfo['uid'];
 
-        // If metadata file exists, read attributes from it to NormalizationRule model.
+        // If metadata file exists, read attributes from it to Rule model.
         $ruleMetaFile = RulesService::findMetaFileByRuleName(basename($ruleFile));
         if (!is_null($ruleMetaFile)) {
-            $normalizationRule->name = $ruleMetaFile['name'];
+            $rule->name = $ruleMetaFile['name'];
         }
 
-        // Set properties of NormalizationRule model.
-        $normalizationRule->ruleFileName = basename($ruleFile);
-        $normalizationRule->modified_at = date('d.m.Y H:i:s', $lastModifiedTime);
-        $normalizationRule->accessed_at = date('d.m.Y H:i:s', $lastAccessTime);
-        $normalizationRule->active = RulesService::isRuleActive(basename($ruleFile));
+        // Set properties of Rule model.
+        $rule->ruleFileName = basename($ruleFile);
+        $rule->modified_at = date('d.m.Y H:i:s', $lastModifiedTime);
+        $rule->accessed_at = date('d.m.Y H:i:s', $lastAccessTime);
+        $rule->active = RulesService::isRuleActive(basename($ruleFile));
 
         // Load the content of the file.
-        $normalizationRule->content = file_get_contents($ruleFile);
+        $rule->content = file_get_contents($ruleFile);
 
-        return $normalizationRule;
+        return $rule;
     }
 
     /**
-     * Deletes NormalizationRule file from active and available folders.
+     * Deletes Rule file from active and available folders.
      *
      * @param string $ruleFileName
      * @return boolean
@@ -204,7 +206,7 @@ class RulesService
     }
 
     /**
-     * Deletes all active NormalizationRule files from active folders.
+     * Deletes all active Rule files from active folders.
      *
      * @return array Returns array of full path to previously active rules.
      */
@@ -220,7 +222,7 @@ class RulesService
     }
 
     /**
-     * Reactivates NormalizationRules from previously active rules provided in @param.
+     * Reactivates Rules from previously active rules provided in @param.
      *
      * @param array $activeRules
      * @return int Returns 1 if reactivation was successful.
@@ -258,7 +260,7 @@ class RulesService
         return unlink($targetPath);
     }
 
-    // Return metadata json data, if found by metadata rule file name. Null if not found.
+    // Return metadata .json data, if found by metadata rule file name. Null if not found.
     private function findMetaFileByRuleName($ruleFileName)
     {
         $metaFiles = FileHelper::findFiles(Yii::getAlias($this->parameters::RULE_METADATA_PATH), [

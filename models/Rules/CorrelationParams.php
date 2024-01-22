@@ -5,7 +5,7 @@ namespace app\models\Rules;
 
 /**
  * 
- * Class storing constants for RulesService.
+ *  Class storing constants for working with Correlation rules.
  *
  * @param $AVAILABLE_RULES_PATH  Path to available folder
  * @param $ACTIVE_RULES_PATH  Path to active rules folder
