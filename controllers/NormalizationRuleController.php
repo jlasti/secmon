@@ -173,7 +173,7 @@ class NormalizationRuleController extends Controller
         } else {
             $activeRulesPath = $this->rulesService->deleteActiveRules();
             $pythonScriptPath = Yii::getAlias("@app/commands/rules_downloader.py");
-            shell_exec("python3 $pythonScriptPath web");
+            shell_exec("python3 $pythonScriptPath web n");
             $this->rulesService->reactiveRules($activeRulesPath);
             return $this->redirect(['index']);
         }

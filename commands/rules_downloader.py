@@ -18,12 +18,15 @@ if enviroment == "os":
     os.system(f'mv ../.git/temp/rules_repository/correlation/* ./rules/correlation/available/')
     os.system(f'rm -rf ../.git/temp/rules_repository')
 elif enviroment == 'web':
+    rules = sys.argv[2] # supported values: c, n
     # Execute this if rules update called from web
     config = configparser.ConfigParser()
     config.read('/var/www/html/secmon/config/secmon_config.ini')
     repo_url = config.get('RULES_REPOSITORY', 'url')
 
     os.system(f'git clone {repo_url} ./assets/temp/rules_repository')
-    os.system(f'mv ./assets/temp/rules_repository/normalization/* /var/www/html/secmon/rules/normalization/available/')
-    os.system(f'mv ./assets/temp/rules_repository/correlation/* /var/www/html/secmon/rules/correlation/available/')
+    if rules == 'c':
+        os.system(f'mv ./assets/temp/rules_repository/correlation/* /var/www/html/secmon/rules/correlation/available/')
+    elif rules == 'n':
+        os.system(f'mv ./assets/temp/rules_repository/normalization/* /var/www/html/secmon/rules/normalization/available/')
     os.system(f'rm -rf ./assets/temp')
