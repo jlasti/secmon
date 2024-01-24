@@ -10,6 +10,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NORMAL='\033[0m'
+MAGENTA='\033[0;35m'
 
 SECMON_MAIN_CONF = './config/secmon_config.ini'
 SECMON_AGGREGATOR_CONF = './config/aggregator_config.ini'
@@ -27,47 +28,46 @@ def print_help():
     print("\"config\" - to run initial SecMon configuration")
     print("\"get-rules\" - to manually update default rules\n")
 
+# Return all enabled enrichment modules in "secmon_config.ini"
+def get_enabled_enr_modules():
+    config = configparser.ConfigParser()
+    config.read(SECMON_MAIN_CONF)
+    
+    enabled_enrichment_modules = []
+    for module in all_enrichment_modules:
+        if config.get('ENRICHMENT', module) == 'true':
+            enabled_enrichment_modules.append(module)
+    
+    return enabled_enrichment_modules
+
 # Run specific enrichment module
-def run_enrichment_module(name):
-    command = f'docker run -d --restart unless-stopped --name secmon_{name} --network secmon_app-network -v ${{PWD}}:/var/www/html/secmon secmon_{name}'
-    if os.system(command) == 0:
-        os.system(f'echo -e "\r\033[1A\033[0KCreating secmon_{name} ... {GREEN}done{NORMAL}"')
-    else:
-        os.system(f'echo -e "\r\033[1A\033[0KCreating secmon_{name} ... {RED}failed{NORMAL}"')
+def create_enrichment_modules():
+    print(YELLOW,'\nCreating secmon enrichment modules:',NORMAL)
+
+    enabled_enrichment_modules = get_enabled_enr_modules()
+    for module in enabled_enrichment_modules:
+        command = f'docker run -d --restart unless-stopped --name secmon_{module} --network secmon_app-network \
+                    -v ${{PWD}}:/var/www/html/secmon secmon_{module}'
+        if os.system(command) == 0:
+            os.system(f'echo -e "\r\033[1A\033[0KCreating secmon_{module} ... {GREEN}done{NORMAL}"')
+        else:
+            os.system(f'echo -e "\r\033[1A\033[0KCreating secmon_{module} ... {RED}failed{NORMAL}"')
 
 # Method for starting stopped containers
-def start_secmon_containers(all_enrichment_modules):
+def start_secmon_containers():
     print(YELLOW,'\nStarting secmon modules:',NORMAL)
-    os.system('docker compose start')
 
-    for module in all_enrichment_modules:
+    enabled_enrichment_modules = get_enabled_enr_modules()
+    for module in enabled_enrichment_modules:
         if os.system(f'docker container inspect secmon_{module} > /dev/null 2>&1') == 0:
             if os.system(f'docker start secmon_{module}') == 0:
                 os.system(f'echo -e "\r\033[1A\033[0KStarting secmon_{module} ... {GREEN}done{NORMAL}"')
             else:
                 os.system(f'echo -e "\r\033[1A\033[0KStarting secmon_{module} ... {RED}failed{NORMAL}"')
-
-# Method for restarting running/stopped containers
-def restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules):
-    stop_secmon_containers(all_enrichment_modules)
-    remove_secmon_containers(all_enrichment_modules)
-    
-    config_file = open(SECMON_AGGREGATOR_CONF, "r")
-    contents = config_file.readlines()
-
-    print(YELLOW,'\nRestarting SecMon modules:',NORMAL)
     os.system('docker compose start')
 
-    print(YELLOW,'\nCreating SecMon enrichment modules:',NORMAL)
-    for module in enabled_enrichment_modules:
-        if index_containing_substring(contents, module):
-            run_enrichment_module(module)
-
-    run_enrichment_module('correlator')
-    config_file.close
-
 # Method for stopping running containers
-def stop_secmon_containers(all_enrichment_modules):
+def stop_secmon_containers():
     print(YELLOW,'\nStopping secmon modules:',NORMAL)
 
     for module in all_enrichment_modules:
@@ -79,21 +79,16 @@ def stop_secmon_containers(all_enrichment_modules):
     os.system('docker compose stop')
 
 # Method for removing stopped containers
-def remove_secmon_containers(all_enrichment_modules):
+def remove_secmon_containers():
     print(YELLOW,'\nRemoving secmon modules:',NORMAL)
+
     for module in all_enrichment_modules:
         if os.system(f'docker container inspect secmon_{module} > /dev/null 2>&1') == 0:
             if os.system(f'docker rm secmon_{module}') == 0:
                 os.system(f'echo -e "\r\033[1A\033[0KRemoving secmon_{module} ... {GREEN}done{NORMAL}"')
             else:
                 os.system(f'echo -e "\r\033[1A\033[0KRemoving secmon_{module} ... {RED}failed{NORMAL}"')
-
-# Method taken from https://stackoverflow.com/questions/2170900/get-first-list-index-containing-sub-string
-def index_containing_substring(the_list, substring):
-    for i, s in enumerate(the_list):
-        if substring.lower() in s.lower():
-              return i
-    return -1
+    os.system('docker compose down')
   
 def path_validation(path, input_data):
     return (path in input_data)
@@ -132,20 +127,19 @@ def create_temp_config():
     # Write 0MQ port for normalizer
     aggregator_conf_file.write("Normalizer: %d\n" % port)
 
-    # Write 0MQ port for geoip
+    # Write 0MQ port for geoip and 
     if config.get('ENRICHMENT', 'geoip').lower() == "true":
         aggregator_conf_file.write("Geoip: %d\n" % port)
-        enabled_enrichment_modules.append('geoip')
 
     # Write 0MQ port for network_model
     if config.get('ENRICHMENT', 'network_model').lower() == "true":
         aggregator_conf_file.write("Network_model: %d\n" % port)
-        enabled_enrichment_modules.append('network_model')
+
+    # !!! ADD HERE ANY NEW ENRICHMENT MODULE 0MQ port CONFIG !!!
 
     # if config.get('ENRICHMENT', 'rep_ip').lower() == "true":
     #     #write 0MQ port for rep_ip
     #     aggregator_conf_file.write("Rep_ip: %d\n" % port)
-    #     enabled_enrichment_modules.append('rep_ip')
 
     aggregator_conf_file.close()
 
@@ -217,84 +211,30 @@ if len(sys.argv) < 2 or sys.argv[1] == "help":
     sys.exit()
 
 all_enrichment_modules = ['geoip', 'network_model', 'correlator']
-enabled_enrichment_modules = []
 
 # Start stopped containers
 if sys.argv[1] == "start":
-    start_secmon_containers(all_enrichment_modules)
+    start_secmon_containers()
     sys.exit()
 
 # Stop running containers
 if sys.argv[1] == "stop":
-    stop_secmon_containers(all_enrichment_modules)
+    stop_secmon_containers()
     sys.exit()
 
 # Stop and remove all secmon containers
 if sys.argv[1] == "remove":
-    stop_secmon_containers(all_enrichment_modules)
-    remove_secmon_containers(all_enrichment_modules)
+    stop_secmon_containers()
+    remove_secmon_containers()
     os.system('docker compose down')
     sys.exit()
 
-if sys.argv[1] == "deploy":
-    if not os.path.isfile('./config/.lock'):
-        os.system('bash ./secmon_preconfig.sh')
-    else:
-        print("Initial configuration already executed. Skipping step.")
-
-    create_temp_config()
-
-    answer = input("Deploying SecMon will remove all existing SecMon containers and existing SecMon database.\n"
-                   "This process also includes setting up different config files and creating new SecMon containers.\n"
-                   "Do you want to still deploy SecMon? [y/N] ")
-    if answer == "N":
-        sys.exit()
-    elif answer == "y":
-        # Stop and remove enrichment modules
-        stop_secmon_containers(all_enrichment_modules)
-        remove_secmon_containers(all_enrichment_modules)
-        # Stop and remove core modules
-        os.system('docker compose down')
-
-        # Auto execute 'secmon_deploy.sh'
-        if os.system('./secmon_deploy.sh') != 0:
-            print(RED,'\nError occured during script secmon_deploy.sh execution, SecMon deploying process was unsuccessful.',NORMAL)
-            sys.exit()
-        
-        # Create and start core modules + selected enrichment modules
-        config_file = open(SECMON_AGGREGATOR_CONF, "r")
-        contents = config_file.readlines()
-        os.system('docker compose -p secmon up -d')
-        for module in enabled_enrichment_modules:
-            if index_containing_substring(contents, module):
-                run_enrichment_module(module)
-        run_enrichment_module('correlator')
-        config_file.close
-
-        # Check the status of the database and wait until it is ready to receive connections
-        os.system('docker logs secmon_db 2>&1 | grep -q "listening on IPv4 address \\"0.0.0.0\\", port 5432" && echo "Database is ready to receive connections" || echo "Database is not ready to receive connections..."')
-        time.sleep(1)
-        while os.system('docker logs secmon_db 2>&1 | grep -q "listening on IPv4 address \\"0.0.0.0\\", port 5432"') != 0:
-            print('Waiting for database to be ready to receive connections...')
-            time.sleep(5)
-        os.system('docker exec -it secmon_app ./yii migrate --interactive=0') # Run database migration
-        os.system('docker exec -it secmon_app chgrp -R www-data .') # Ensure the web-app files are accesible to web server
-        
-        # Initialize admin user 
-        os.system(f'echo -n "Initializing SecMon admin user ... {GREEN}"')
-        os.system('curl 127.0.0.1:8080/secmon/web/user/init')
-        
-        print(NORMAL)
-        restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules)
-        sys.exit()
-    else:
-        sys.exit()
-
 # Restart running containers
 if sys.argv[1] == "restart":
+    print(YELLOW,'\nRestarting SecMon modules:',NORMAL)
     create_temp_config()
-
-    restart_secmon_containers(all_enrichment_modules, enabled_enrichment_modules)
+    stop_secmon_containers()
+    start_secmon_containers()
     sys.exit()
 
 # Manualy run secmon configuration
@@ -312,5 +252,50 @@ if sys.argv[1] == "get-rules":
     os.system('chmod -R 777 ./rules/*')
     print(GREEN,'Download successful',NORMAL)
     sys.exit()
+
+if sys.argv[1] == "deploy":
+    if not os.path.isfile('./config/.lock'):
+        os.system('bash ./secmon_preconfig.sh')
+    else:
+        print(YELLOW,"Initial configuration already executed. Skipping step.",NORMAL)
+
+    create_temp_config()
+
+    answer = input("Deploying SecMon will remove all existing SecMon containers and existing SecMon database.\n"
+                   "This process also includes setting up different config files and creating new SecMon containers.\n"
+                   "Do you want to still deploy SecMon? [y/N] ")
+    if answer == "N":
+        sys.exit()
+    elif answer == "y":
+        # Stop and remove enrichment modules
+        stop_secmon_containers()
+        remove_secmon_containers()
+
+        # Auto execute 'secmon_deploy.sh'
+        if os.system('./secmon_deploy.sh') != 0:
+            print(RED,'\nError occured during script secmon_deploy.sh execution, SecMon deploying process was unsuccessful.',NORMAL)
+            sys.exit()
+
+        os.system('docker compose -p secmon up -d')
+        create_enrichment_modules()
+
+        # Check the status of the database and wait until it is ready to receive connections
+        os.system('docker logs secmon_db 2>&1 | grep -q "listening on IPv4 address \\"0.0.0.0\\", port 5432" && echo "Database is ready to receive connections" || echo "Database is not ready to receive connections..."')
+        time.sleep(1)
+        while os.system('docker logs secmon_db 2>&1 | grep -q "listening on IPv4 address \\"0.0.0.0\\", port 5432"') != 0:
+            print('Waiting for database to be ready to receive connections...')
+            time.sleep(5)
+        os.system('docker exec -it secmon_app ./yii migrate --interactive=0') # Run database migration
+        os.system('docker exec -it secmon_app chgrp -R www-data .') # Ensure the web-app files are accesible to web server
+        
+        # Initialize admin user 
+        # TODO: what this ? why needed ? what do ?
+        os.system(f'echo -n "Initializing SecMon admin user ... {GREEN}"')
+        os.system('curl 127.0.0.1:8080/secmon/web/user/init')
+        
+        print(MAGENTA,"Deployment successful.",NORMAL)
+        sys.exit()
+    else:
+        sys.exit()
 
 print_help()
