@@ -40,6 +40,7 @@ docker-compose.yml
 /runtime
 composer.lock
 output/
+/pids
 
 # pycache is not needed
 __pycache__/

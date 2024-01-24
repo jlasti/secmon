@@ -14,4 +14,8 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # Set working directory
 WORKDIR /var/www/html/secmon
 
-ENTRYPOINT ["sh", "-c", "sec --conf=/var/www/html/secmon/rules/normalization/active/*.rule --input=/var/log/secmon/__secOutput --bufsize=1 --detach && ./yii normalizer"]
+ENTRYPOINT ["sh", "-c", "sec \
+                --conf=/var/www/html/secmon/rules/normalization/active/*.rule \
+                --input=/var/log/secmon/__secOutput \
+                --pid=/var/www/html/secmon/pids/normalizer.pid \
+                --bufsize=1 --detach && ./yii normalizer"]

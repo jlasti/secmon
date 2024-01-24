@@ -56,6 +56,9 @@ mkdir -p ./rules/correlation/available || { echo -e "${RED}Creating directory ru
 mkdir -p ./rules/correlation/ui || { echo -e "${RED}Creating directory rules/correlation/ui failed${NORMAL}" ; exit 1; }
 echo -e "${GREEN}Done${NORMAL}"
 
+# Craete pids directory
+mkdir -p ./pids
+
 # Download rules from repository configured in secmon_config.ini
 echo -e "${YELLOW}Starting download of SecMon rules${NORMAL}"
 python3 ./commands/rules_downloader.py os \

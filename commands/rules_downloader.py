@@ -7,6 +7,12 @@ import sys
 
 enviroment = sys.argv[1] # supported values: web, os
 
+# Read PID from file
+def read_file(file_path):
+    with open(file_path, 'r') as file:
+        pid = int(file.read().strip())
+        return pid
+
 if enviroment == "os":
     # Execute this if rules update called in deployment, configuration...
     config = configparser.ConfigParser()
@@ -17,6 +23,8 @@ if enviroment == "os":
     os.system(f'mv ../.git/temp/rules_repository/normalization/* ./rules/normalization/available/')
     os.system(f'mv ../.git/temp/rules_repository/correlation/* ./rules/correlation/available/')
     os.system(f'rm -rf ../.git/temp/rules_repository')
+    os.system('chmod -R 777 ./rules/')
+
 elif enviroment == 'web':
     rules = sys.argv[2] # supported values: c, n
     # Execute this if rules update called from web

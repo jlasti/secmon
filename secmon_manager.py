@@ -264,9 +264,9 @@ if sys.argv[1] == "deploy":
     answer = input("Deploying SecMon will remove all existing SecMon containers and existing SecMon database.\n"
                    "This process also includes setting up different config files and creating new SecMon containers.\n"
                    "Do you want to still deploy SecMon? [y/N] ")
-    if answer == "N":
+    if answer.lower() == "n":
         sys.exit()
-    elif answer == "y":
+    elif answer.lower() == "y":
         # Stop and remove enrichment modules
         stop_secmon_containers()
         remove_secmon_containers()
@@ -293,7 +293,7 @@ if sys.argv[1] == "deploy":
         os.system(f'echo -n "Initializing SecMon admin user ... {GREEN}"')
         os.system('curl 127.0.0.1:8080/secmon/web/user/init')
         
-        print(MAGENTA,"Deployment successful.",NORMAL)
+        print(MAGENTA,"\nDeployment successful. SecMon is now live.",NORMAL)
         sys.exit()
     else:
         sys.exit()
