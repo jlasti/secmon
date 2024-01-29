@@ -292,7 +292,7 @@ if sys.argv[1] == "deploy":
         remove_secmon_containers()
 
         # Auto execute 'secmon_deploy.sh'
-        if os.system('sudo bash./secmon_deploy.sh') != 0:
+        if os.system('sudo bash ./secmon_deploy.sh') != 0:
             print(RED, '\nError occurred during script secmon_deploy.sh execution, SecMon deploying process was unsuccessful.', NORMAL)
             sys.exit()
 
