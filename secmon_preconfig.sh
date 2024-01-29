@@ -59,17 +59,6 @@ echo -e "${GREEN}Done${NORMAL}"
 # Craete pids directory
 mkdir -p ./pids
 
-# Download rules from repository configured in secmon_config.ini
-echo -e "${YELLOW}Starting download of SecMon rules${NORMAL}"
-python3 ./commands/rules_downloader.py os \
-|| { echo -e "${RED}Download of SecMon rules failed${NORMAL}" ; exit 1; }
-echo -e "${GREEN}Done${NORMAL}"
-
-# Set 777 permissions so container secmon_app can write to directories
-chgrp www-data .
-chmod 777 ./web/assets/
-chmod -R 777 ./rules/* || { echo -e "${RED}Changing access mode of the directory ./rules/* failed${NORMAL}" ; exit 1; }
-
 # Generate SSL certificates
 COUNTRY="SK"
 STATE="Slovakia"
@@ -110,6 +99,17 @@ cp deployment/config_templates/db.php config/ \
 && cp deployment/config_templates/docker-compose.yml . \
 || { echo -e "${RED}Copying configuration file templates failed!${NORMAL}" ; exit 1; }
 echo -e "${GREEN}Done${NORMAL}"
+
+# Download rules from repository configured in secmon_config.ini
+echo -e "${YELLOW}Starting download of SecMon rules${NORMAL}"
+python3 ./commands/rules_downloader.py os \
+|| { echo -e "${RED}Download of SecMon rules failed${NORMAL}" ; exit 1; }
+echo -e "${GREEN}Done${NORMAL}"
+
+# Set 777 permissions so container secmon_app can write to directories
+chgrp www-data .
+chmod 777 ./web/assets/
+chmod -R 777 ./rules/* || { echo -e "${RED}Changing access mode of the directory ./rules/* failed${NORMAL}" ; exit 1; }
 
 # Create lock file as a sign a config was run.
 echo -e "${YELLOW}Creating lock file${NORMAL}"
