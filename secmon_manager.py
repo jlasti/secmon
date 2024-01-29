@@ -275,7 +275,9 @@ if sys.argv[1] == "get-rules":
 
 if sys.argv[1] == "deploy":
     if not os.path.isfile('./config/.lock'):
-        os.system('sudo bash ./secmon_preconfig.sh')
+        if os.system('sudo bash ./secmon_preconfig.sh') != 0:
+            print(RED, '\nError occurred during SecMon configuration, SecMon configuration process was unsuccessful.', NORMAL)
+            sys.exit()
     else:
         print(YELLOW, "Initial configuration already executed. Skipping step.", NORMAL)
 

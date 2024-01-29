@@ -17,7 +17,7 @@ use app\models\Rules\Rule;
 class RuleController extends Controller
 {
     public $rulesService;
-    
+
     public function __construct($id, $module, $config = [])
     {
         parent::__construct($id, $module, $config);
@@ -169,9 +169,7 @@ class RuleController extends Controller
             return $this->goHome();
         } else {
             $activeRulesPath = $this->rulesService->deleteActiveRules();
-            $pythonScriptPath = Yii::getAlias("@app/commands/rules_downloader.py");
-            shell_exec("python3 $pythonScriptPath web c");
-            $this->rulesService->reactiveRules($activeRulesPath);
+            $this->rulesService->updateStandardRules($activeRulesPath);
             return $this->redirect(['index']);
         }
     }

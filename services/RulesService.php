@@ -222,12 +222,26 @@ class RulesService
     }
 
     /**
+     * Updates standard rules and calls rules reactivation method.
+     *
+     * @param array $activeRules
+     * @return int Returns 1 if update was successful.
+     */
+    public function updateStandardRules($activeRules)
+    {
+        $pythonScriptPath = Yii::getAlias("@app/commands/rules_downloader.py");
+        $name = $this->parameters::RULES_TYPE;
+        shell_exec("python3 $pythonScriptPath web $name");
+        return $this->reactiveRules($activeRules);
+    }
+
+    /**
      * Reactivates Rules from previously active rules provided in @param.
      *
      * @param array $activeRules
      * @return int Returns 1 if reactivation was successful.
      */
-    public function reactiveRules($activeRules)
+    private function reactiveRules($activeRules)
     {
         $available = FileHelper::findFiles(Yii::getAlias($this->parameters::AVAILABLE_RULES_PATH), [
             'only' => ['*.rule'],

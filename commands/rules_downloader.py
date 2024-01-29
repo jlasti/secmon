@@ -33,8 +33,8 @@ elif enviroment == 'web':
     repo_url = config.get('RULES_REPOSITORY', 'url')
 
     os.system(f'git clone {repo_url} ./assets/temp/rules_repository')
-    if rules == 'c':
+    if rules == 'correlation':
         os.system(f'mv ./assets/temp/rules_repository/correlation/* /var/www/html/secmon/rules/correlation/available/')
-    elif rules == 'n':
+    elif rules == 'normalization':
         os.system(f'mv ./assets/temp/rules_repository/normalization/* /var/www/html/secmon/rules/normalization/available/')
     os.system(f'rm -rf ./assets/temp')

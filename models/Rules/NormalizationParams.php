@@ -4,7 +4,6 @@ namespace app\models\Rules;
 
 
 /**
- * 
  * Class storing constants for working with Normalization rules.
  *
  * @param $AVAILABLE_RULES_PATH  Path to available folder
@@ -14,6 +13,7 @@ namespace app\models\Rules;
  */
 class NormalizationParams
 {
+    const RULES_TYPE = "normalization";
     const AVAILABLE_RULES_PATH = '@app/rules/normalization/available';
     const ACTIVE_RULES_PATH = '@app/rules/normalization/active';
     const RULE_METADATA_PATH = '@app/rules/normalization/ui';

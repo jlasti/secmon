@@ -13,7 +13,7 @@ NORMAL='\033[0m'
 MAGENTA='\033[0;35m'
 
 # List of dependencies
-dependencies=("git" "firewalld" "openssl" "systemctl" "python3")
+dependencies=("git" "firewalld" "openssl" "systemctl" "python3" "docker")
 
 # Function to check if a dependency is installed
 check_dependency() {
