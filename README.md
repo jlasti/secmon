@@ -37,7 +37,7 @@ cd secmon
 ./secmon_preconfig.sh
 
 # Start deploying process
-python3 secmon_manager.py deploy
+sudo python3 secmon_manager.py deploy
 
 # Create password for database user 'secmon' during installation
 
@@ -77,7 +77,7 @@ cd secmon
 ./secmon_preconfig.sh
 
 # Start deploying process
-python3 secmon_manager.py deploy
+sudo python3 secmon_manager.py deploy
 
 # Create password for database user 'secmon' during installation
 
@@ -118,7 +118,7 @@ cd secmon
 ./secmon_preconfig.sh
 
 # Start deploying process
-python3 secmon_manager.py deploy
+sudo python3 secmon_manager.py deploy
 
 # Create password for database user 'secmon' during installation
 
@@ -165,7 +165,7 @@ cd secmon
 ./secmon_preconfig.sh
 
 # Start deploying process
-python3 secmon_manager.py deploy
+sudo python3 secmon_manager.py deploy
 
 # Create password for database user 'secmon' during installation
 
