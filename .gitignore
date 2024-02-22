@@ -42,5 +42,8 @@ output/
 # pycache is not needed
 __pycache__/
 
-#error logs
+# error logs
 error.log
+
+# generated TLS keys and certificates
+/deployment/certificates/
