@@ -16,7 +16,7 @@ use macgyer\yii2materializecss\widgets\form\ActiveForm;
 
     <div class="row" style="margin-bottom: -10px;">
         <div style="margin-bottom: -10px;">
-            <label style="font-size: larger;">URL path</label>
+            <label style="font-size: larger;">Rule URL path</label>
         </div>
         <div style='margin-top: -20px;'>
             <?= $form->field($model, 'content')->textInput(['maxlength' => 150])->label(false) ?>

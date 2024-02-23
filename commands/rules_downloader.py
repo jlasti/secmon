@@ -7,14 +7,8 @@ import sys
 
 enviroment = sys.argv[1] # supported values: web, os
 
-# Read PID from file
-def read_file(file_path):
-    with open(file_path, 'r') as file:
-        pid = int(file.read().strip())
-        return pid
-
 if enviroment == "os":
-    # Execute this if rules update called in deployment, configuration...
+    # Execute this if rules update called in deployment
     config = configparser.ConfigParser()
     config.read('./config/secmon_config.ini')
     repo_url = config.get('RULES_REPOSITORY', 'url')
@@ -26,8 +20,8 @@ if enviroment == "os":
     os.system('chmod -R 777 ./rules/')
 
 elif enviroment == 'web':
-    rules = sys.argv[2] # supported values: c, n
     # Execute this if rules update called from web
+    rules = sys.argv[2] # supported values: correlation, normalization
     config = configparser.ConfigParser()
     config.read('/var/www/html/secmon/config/secmon_config.ini')
     repo_url = config.get('RULES_REPOSITORY', 'url')
