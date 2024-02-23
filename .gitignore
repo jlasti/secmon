@@ -44,3 +44,6 @@ output/
 
 # pycache is not needed
 __pycache__/
+
+# error logs
+error.log

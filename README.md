@@ -38,7 +38,7 @@ git clone https://github.com/jlasti/secmon.git secmon
 
 # Start deployment process with configuration
 cd secmon
-python3 secmon_manager.py deploy
+sudo python3 secmon_manager.py deploy
 
 # Create password for database user 'secmon' during installation
 
@@ -75,7 +75,7 @@ git clone https://github.com/jlasti/secmon.git secmon
 
 # Start deployment process with configuration
 cd secmon
-python3 secmon_manager.py deploy
+sudo python3 secmon_manager.py deploy
 
 # Create password for database user 'secmon' during installation
 
@@ -113,7 +113,7 @@ git clone https://github.com/jlasti/secmon.git secmon
 
 # Start deployment process with configuration
 cd secmon
-python3 secmon_manager.py deploy
+sudo python3 secmon_manager.py deploy
 
 # Create password for database user 'secmon' during installation
 
@@ -157,7 +157,7 @@ git clone https://github.com/jlasti/secmon.git secmon
 
 # Start deployment process with configuration
 cd secmon
-python3 secmon_manager.py deploy
+sudo python3 secmon_manager.py deploy
 
 # Create password for database user 'secmon' during installation
 
