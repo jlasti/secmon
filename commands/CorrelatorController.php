@@ -59,13 +59,14 @@ class CorrelatorController extends Controller
 		echo "[" . date("Y-m-d H:i:s") . "] Worker correlator started!" . PHP_EOL;
 
 		while (true) {
+			$this->checkRestartSec();
 			$msg = $recSocket->recv(ZMQ::MODE_NOBLOCK);
 			if (empty($msq)) {
-				usleep(30000);
+				usleep(100000);
 			}
 
 			if (!empty($msg)) {
-				//echo "Received Message:" . $msg . PHP_EOL;
+				// echo "Received Message:" . $msg . PHP_EOL;
 				fwrite($corrInputStream, $msg);
 				flush();
 			}
@@ -100,6 +101,24 @@ class CorrelatorController extends Controller
 
 		return $stream;
 	}
-}
 
-?>
+	function checkRestartSec()
+	{
+		$reqFilePath = '/var/www/html/secmon/rules/corr_restart.req';
+		$pidFilePath = '/var/www/html/secmon/pids/correlator.pid';
+
+		// Check if the request file exists
+		if (file_exists($reqFilePath)) {
+			// Read the PID from the PID file
+			$pid = file_get_contents($pidFilePath);
+
+			// Validate the PID
+			if ($pid !== false && is_numeric($pid)) {
+				// Execute the kill command and delete .req file
+				unlink($reqFilePath);
+				exec("kill -ABRT $pid");
+				echo "Restarted SEC correlator with PID: $pid" . PHP_EOL;
+			}
+		}
+	}
+}

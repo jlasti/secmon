@@ -18,4 +18,5 @@ class NormalizationParams
     const ACTIVE_RULES_PATH = '@app/rules/normalization/active';
     const RULE_METADATA_PATH = '@app/rules/normalization/ui';
     const BIN_PATH = '@app/rules/normalization/.bin';
+    const RESTART_FILE = '@app/rules/norm_restart.req';
 }

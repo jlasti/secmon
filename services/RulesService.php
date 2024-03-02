@@ -264,6 +264,7 @@ class RulesService
     {
         $targetPath = Yii::getAlias($this->parameters::ACTIVE_RULES_PATH) . '/' . $ruleFileName;
         $fromPath = Yii::getAlias($this->parameters::AVAILABLE_RULES_PATH) . '/' . $ruleFileName;
+        touch(Yii::getAlias($this->parameters::RESTART_FILE)); // create .req file to restart SEC
         return link($fromPath, $targetPath);
     }
 
@@ -271,6 +272,7 @@ class RulesService
     private function deactivateRule($ruleFileName)
     {
         $targetPath = Yii::getAlias($this->parameters::ACTIVE_RULES_PATH) . '/' . $ruleFileName;
+        touch(Yii::getAlias($this->parameters::RESTART_FILE)); // create .req file to restart SEC
         return unlink($targetPath);
     }
 

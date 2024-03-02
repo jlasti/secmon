@@ -13,7 +13,6 @@ require '/var/www/html/secmon/vendor/autoload.php';
 
 class AggregatorController extends Controller
 {
-
     public function actionIndex()
     {
         $aggregator_config_file = $this->openNonBlockingStream("/var/www/html/secmon/config/aggregator_config.ini");
@@ -78,7 +77,7 @@ class AggregatorController extends Controller
                     $endOfFilePos = intval(exec("wc -c '$pathToFile'"));
                     $streamPosition[$file] = $endOfFilePos;
                 }
-                usleep(1000000); // nutne kvoli vytazeniu CPU (1 sekunda)
+                usleep(100000); // nutne kvoli vytazeniu CPU (0.1 sekunda)
                 clearstatcache(false, $logPath . "/" . $file);
                 fseek($stream, $streamPosition[$file]);
                 while (($line = fgets($stream)) != FALSE) {

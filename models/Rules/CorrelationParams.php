@@ -18,4 +18,5 @@ class CorrelationParams
     const ACTIVE_RULES_PATH = '@app/rules/correlation/active';
     const RULE_METADATA_PATH = '@app/rules/correlation/ui';
     const BIN_PATH = '@app/rules/correlation/.bin';
+    const RESTART_FILE = '@app/rules/corr_restart.req';
 }

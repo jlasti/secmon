@@ -9,7 +9,6 @@ use yii\console\Controller;
 use yii\console\Exception;
 use ZMQ;
 use ZMQContext;
-use ZMQSocketException;
 
 require '/var/www/html/secmon/vendor/autoload.php';
 
@@ -21,8 +20,8 @@ class NormalizerController extends Controller
 	{
 
 		$aggregator_config_file = $this->openNonBlockingStream("/var/www/html/secmon/config/aggregator_config.ini");
-		$save_to_db = false;				#boolen value to determine whether to execute save
-		$module_loaded = false;			#variable used for reading line after Normalizer in config file
+		$save_to_db = false;			# boolen value to determine whether to execute save
+		$module_loaded = false;			# variable used for reading line after Normalizer in config file
 		$next_module = "correlator";
 		if ($aggregator_config_file) {
 			while (($line = fgets($aggregator_config_file)) !== false) {
@@ -57,11 +56,11 @@ class NormalizerController extends Controller
 			throw new Exception('Not all arguments were specified');
 		}
 		fclose($aggregator_config_file);
-		
-		$aggregator_config_file = escapeshellarg("/var/www/html/secmon/config/aggregator_config.ini");
-		$last_line = `tail -n 1 $aggregator_config_file`; 		#get last line of temp file
 
-		if (strpos($last_line, "Normalizer:") !== FALSE) {		#if last is normalizer, then ensure saving event to db
+		$aggregator_config_file = escapeshellarg("/var/www/html/secmon/config/aggregator_config.ini");
+		$last_line = `tail -n 1 $aggregator_config_file`; 		# get last line of temp file
+
+		if (strpos($last_line, "Normalizer:") !== FALSE) {		# if last is normalizer, then ensure saving event to db
 			$save_to_db = true;
 		}
 
@@ -99,9 +98,11 @@ class NormalizerController extends Controller
 		echo "[" . date("Y-m-d H:i:s") . "] Worker normalizer started!" . PHP_EOL;
 
 		while (true) {
+			$this->checkRestartSec();
+
 			$msg = $recSocket->recv(ZMQ::MODE_NOBLOCK);
 			if (empty($msq)) {
-				usleep(30000);
+				usleep(100000);
 			}
 
 			if (!empty($msg)) {
@@ -149,5 +150,24 @@ class NormalizerController extends Controller
 
 		return $stream;
 	}
+
+	function checkRestartSec()
+	{
+		$reqFilePath = '/var/www/html/secmon/rules/norm_restart.req';
+		$pidFilePath = '/var/www/html/secmon/pids/normalizer.pid';
+
+		// Check if the request file exists
+		if (file_exists($reqFilePath)) {
+			// Read the PID from the PID file
+			$pid = file_get_contents($pidFilePath);
+
+			// Validate the PID
+			if ($pid !== false && is_numeric($pid)) {
+				// Execute the kill command and delete .req file
+				unlink($reqFilePath);
+				exec("kill -ABRT $pid");
+				echo "Restarted SEC normalizer with PID: $pid" . PHP_EOL;
+			}
+		}
+	}
 }
-?>
