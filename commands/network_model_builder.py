@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
-#requirements:
+# requirements:
 # sudo yum install nmap
 # sudo pip3 install python-libnmap
 

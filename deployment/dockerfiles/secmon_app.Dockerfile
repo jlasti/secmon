@@ -13,14 +13,15 @@ RUN apt-get install -y git zip curl gcc build-essential net-tools apt-utils libp
 # Install python
 RUN apt-get install -y python3 python3-dev python3-pip
 RUN mv /usr/lib/python3.11/EXTERNALLY-MANAGED /usr/lib/python3.11/EXTERNALLY-MANAGED.old
-RUN pip3 install numpy pandas psycopg2 psycopg2-binary minisom dbus-python python-libnmap
-# check if 'psycopg2-binary' or 'psycopg2' is used.
+RUN pip3 install numpy pandas psycopg2-binary minisom python-libnmap
+
 RUN pip3 install -U configparser
 RUN alias python="/usr/bin/python3"
 
 # Cleanup
 RUN apt-get -y autoremove --purge
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN pip3 cache purge
 
 WORKDIR /var/www/html/secmon
 
