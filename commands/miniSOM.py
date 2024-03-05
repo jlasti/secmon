@@ -6,9 +6,9 @@ import pandas
 import psycopg2
 import re
 import numpy as np
+import configparser
 from collections import defaultdict
 from sequence import pad_sequences
-from backports import configparser
 from minisom import MiniSom
 from text import one_hot
 

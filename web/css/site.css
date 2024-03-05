@@ -150,30 +150,38 @@ main > .container {
   color: #f44336;
 }
 
+/* Style for side navigation bar */
+.side-nav {
+  transition: all 0.2s ease;
+}
 .side-nav .userView {
-  padding: 1px 16px 0;
+  padding: 5px 0 0 15px;
   height: 102px;
 }
 .side-nav .userView .email {
-  padding-bottom: 0px;
+  padding-bottom: 5px;
+  font-size: 16px;
+}
+.side-nav .userView .name {
+  font-size: 16px;
 }
 .side-nav > li > a {
   padding: 0 16px;
 }
+.side-nav .userView > a {
+  white-space: nowrap;
+}
+
+/* Style if compact mode is ON */
 body.compact .side-nav {
   width: 56px !important;
 }
 body.compact .side-nav .userView > a {
   visibility: hidden;
 }
-.side-nav .userView > a {
-  white-space: nowrap;
-}
-
 body.compact .side-nav .subheader {
   display: none;
 }
-
 body.compact .side-nav .userView {
   padding: 1px 0;
 }
@@ -182,31 +190,56 @@ body.compact main,
 body.compact footer {
   margin-left: 56px;
 }
-.side-nav {
-  transition: all 0.2s ease;
-}
 
-button.white-text.btn-flat.logout-button {
-  font-weight: bolder;
-  text-transform: none;
-  padding: 0 5px;
-  margin-top: -20px;
+.profile-btn {
   margin-left: -21px;
   width: 218px;
+  background-color: transparent !important;
+  -webkit-transition: background-color 0.2s;
+  -moz-transition: background-color 0.2s;
+  -ms-transition: background-color 0.2s;
+  -o-transition: background-color 0.2s;
+  transition: background-color 0.2s;
+}
+.profile-btn:hover {
+  background-color: rgba(0, 0, 0, 0.1) !important;
+}
+.profile-btn span {
+  margin-top: 10px;
+  margin-left: 25px;
+}
+
+/* Style for logout button */
+button.logout-button {
+  background-color: transparent;
+  border-color: transparent;
+  position: absolute;
+  bottom: 0;
+  transform: translateY(-100%);
+  font-weight: bolder;
+  padding: 0 5px;
+  margin-bottom: 6px;
+  width: 250px;
   text-align: left;
 }
-button.white-text.btn-flat.logout-button:before {
+button.logout-button:before {
   content: "\e879";
   font-family: "Material Icons";
   font-style: normal;
   font-weight: normal;
   float: left;
-  font-size: 24px;
-  margin: 0 16px;
+  font-size: 23px;
+  margin-left: 10px;
+  margin-right: 32px;
 }
-body.compact .side-nav button.white-text.btn-flat.logout-button {
-  padding-left: 22px;
+button.logout-button:hover {
+  background-color: #F94C4C;
 }
+body.compact .side-nav button.logout-button {
+  padding-left: 5px;
+  margin-bottom: -10px;
+}
+
 .compact-button {
   width: 40px;
   height: 40px;
@@ -395,23 +428,6 @@ main .container {
 #modalColumsSettings {
   max-height: 70%;
   top: 5% !important;
-}
-
-.profile-btn {
-  margin-left: -21px;
-  width: 218px;
-  background-color: transparent !important;
-  -webkit-transition: background-color 0.2s;
-  -moz-transition: background-color 0.2s;
-  -ms-transition: background-color 0.2s;
-  -o-transition: background-color 0.2s;
-  transition: background-color 0.2s;
-}
-.profile-btn:hover {
-  background-color: rgba(0, 0, 0, 0.1) !important;
-}
-.profile-btn span {
-  margin-left: 20px;
 }
 
 .security-events-page-panel {

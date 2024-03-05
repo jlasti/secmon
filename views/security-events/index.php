@@ -387,7 +387,7 @@ foreach($chartData as $key => $record)
 <link href="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.css" rel="stylesheet">
 
 <script>
-    $(".container").css("padding-top", "10px");
+    $(".container");
 
     // Add hover elements on table cells
     addHoverElementOnTableCells();

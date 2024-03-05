@@ -3,22 +3,22 @@
 namespace app\controllers;
 
 
-use app\models\Rules\NormalizationParams;
+use app\models\Rules\CorrelationParams;
 use app\services\RulesService;
 
 /**
- * NormalizationRuleController extends RuleController model.
+ * CorrelationRuleController extends RuleController model.
  */
 
-class NormalizationRuleController extends RuleController
+class CorrelationRuleController extends RuleController
 {
     public $rulesService;
-
+    
     public function __construct($id, $module, $config = [])
     {
-        $normalizationParams = new NormalizationParams();
+        $normalizationParams = new CorrelationParams();
         $this->rulesService = new RulesService($normalizationParams);
         parent::__construct($id, $module, $config);
     }
-
+    
 }

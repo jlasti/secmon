@@ -7,7 +7,7 @@ import math
 import numpy as np
 import pandas
 import psycopg2
-from backports import configparser
+import configparser
 
 config = configparser.ConfigParser()
 config.read('/var/www/html/secmon/config/anomaly_config.ini')

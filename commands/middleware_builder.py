@@ -15,8 +15,7 @@
 # mv modules/zmq.so /usr/lib64/php/modules
 # vim /etc/php.d/20-zmq.ini (extension=zmq.so)           => insert this line without brackets
 
-from six.moves import configparser
-import subprocess
+import configparser
 import dbus
 import psycopg2
 import sys
