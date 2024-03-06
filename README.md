@@ -235,14 +235,13 @@ SecMon root directory contains a few important directories:
     - config_files - configuration files for system services
     - config_templates - configuration files which are modified during deployment
     - dockerfiles - custom Dockerfiles for creating docker images of SecMon services
-- **help** - tutorials and how to's
+- **docs** - tutorials and how to's
 - **migrations** - migrations for database 
 - **models** - standard MVC directory
 - **pids** - SEC PIDs in normalizator and correlator
 - **reporting** - SecMon security testing script
 - ~~rules - contains normalization and correlation rules~~ (moved [here](https://github.com/mlomencik/secmon-rules))
 - **services** - standard MVC+S directory
-- **test** - unit test directory
 - **views** - standard MVC directory
 - **web** - root directory of the web application
 - **widgets** - common UI components or functionalities

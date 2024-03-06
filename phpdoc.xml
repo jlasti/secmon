@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<phpdoc>
-    <files>
-        <directory>.</directory>
-        <file>*.php</file>
-        <ignore>vendor/*</ignore>
-    </files>
-</phpdoc>
