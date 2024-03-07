@@ -1,12 +1,8 @@
-
-
 # SecMon User Guide
 
 ## How to Install
 
 Prerequisite for installing SecMon system is OS CentOS7/CentOS Stream 8/Rocky Linux 9/Ubuntu 22.04 (tested Linux distribution) with user ***secmon*** (under which we will deploy SecMon system), internet access and installed programs [Docker Engine](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/) v2.3.3. 
-
-Tutorial: [Docker installation on Rocky Linux 9](./help/docker_installation_RL9.md)
 
 The functionality of the Docker Engine can be verified with the command `docker run hello-world`. Docker Compose functionality can be verified with `docker compose version`. If the commands do not run correctly, this problem must be resolved or the installation will not be successful.
 
@@ -70,7 +66,7 @@ sudo firewall-cmd --permanent --add-port=8443/tcp
 sudo firewall-cmd --permanent --add-port=514/tcp
 sudo firewall-cmd --reload
 
-#Download SecMon repository
+# Download SecMon repository
 git clone https://github.com/jlasti/secmon.git secmon
 
 # Start deployment process with configuration
@@ -121,6 +117,7 @@ sudo python3 secmon_manager.py deploy
 # !!! Change password after first login !!!
 https://<host_machine_IP_address>:8443/secmon/web
 ```
+Installation of Docker on Rocky Linux 9: [installation help](./docs/docker_installation_RL9.md).
 
 After successful installation configure logs forwarding on clients using [rsyslog service](./README.md#how-to-configure-clients-for-logs-forwarding).
 
@@ -170,16 +167,6 @@ After successful installation configure logs forwarding on clients using [rsyslo
 
 ---
 
-## How to configure clients for logs forwarding
-To redirect logs from client machine to the SecMon add the following line at the end of the `/etc/rsyslog.conf` file, where `<secmon_machine_IP_address>` is the IP address of the remote server (SecMon), you will be writing your logs to:
-```bash
-*.* @@<secmon_machine_IP_address>:514
-```
-Save your changes and restart the `rsyslog` service on the client with the command:
-```bash
-sudo systemctl restart rsyslog
-```
-
 ## How to Use
 ### SecMon Manager
 SecMon manager (*secmon_manager.py*) is a python script  located in root directory of SecMon repository. It is used for managing SecMon services as docker containers.
@@ -209,7 +196,7 @@ python3 secmon_manager.py deploy
 python3 secmon_manager.py get-rules
 ```
 ## Configuration
-#### Turn on/off enrichment module
+### Turn on/off enrichment module
 Set value `true` /`false` in the file `./config/secmon_config.ini` for a particular enrichment module which you want to turn on/off:
 ```ini
 [ENRICHMENT]
@@ -220,6 +207,15 @@ network_model = true
 After any changes in configuration or rule states, restart the SecMon system with the command:
 ```bash
 python3 secmon_manager.py restart
+```
+### How to configure clients for logs forwarding
+To redirect logs from client machine to the SecMon add the following line at the end of the `/etc/rsyslog.conf` file, where `<secmon_machine_IP_address>` is the IP address of the remote server (SecMon), you will be writing your logs to:
+```bash
+*.* @@<secmon_machine_IP_address>:514
+```
+Save your changes and restart the `rsyslog` service on the client with the command:
+```bash
+sudo systemctl restart rsyslog
 ```
 
 ## Development
@@ -240,7 +236,7 @@ SecMon root directory contains a few important directories:
 - **models** - standard MVC directory
 - **pids** - SEC PIDs in normalizator and correlator
 - **reporting** - SecMon security testing script
-- ~~rules - contains normalization and correlation rules~~ (moved [here](https://github.com/mlomencik/secmon-rules))
+- ~~rules - contains normalization and correlation rules~~ (moved [here](https://github.com/jlasti/secmon-rules))
 - **services** - standard MVC+S directory
 - **views** - standard MVC directory
 - **web** - root directory of the web application
