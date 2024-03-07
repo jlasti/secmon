@@ -1,13 +1,11 @@
 <?php
 
-use yii\helpers\Html;
 use macgyer\yii2materializecss\widgets\data\DetailView;
 
-/* @var $this yii\web\View */
-/* @var $model app\models\SecRule */
 
-$this->params['title'] = 'Correlation Rule: ' . $model->name;
+$this->params['title'] = 'Correlation Rule: ' . $model->ruleFileName;
 ?>
+
 <div class="sec-rule-view">
 
     <div class="main-actions centered-horizontal">
