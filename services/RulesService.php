@@ -38,7 +38,7 @@ class RulesService
             return false;
 
         # Check if safe file name
-        if (is_null($model->name)) {
+        if (empty($model->name)) {
             $newRuleFileName = basename($url);
         } else {
             $newRuleFileName = $model->name;
@@ -302,7 +302,7 @@ class RulesService
     // Check for safe file name using regex
     private static function isValidFileName($input)
     {
-        $pattern = '/^[a-zA-Z0-9.\-_]+$/';
+        $pattern = '/^[a-zA-Z0-9\-_]+.rule$/';
 
         if (preg_match($pattern, $input)) {
             return true;

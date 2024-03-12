@@ -3,10 +3,10 @@
 use macgyer\yii2materializecss\widgets\form\ActiveForm;
 
 
-$this->params['title'] = 'Update Correlation Rule: ' . $model->name;
+$this->params['title'] = 'Update Correlation Rule: ' . $model->ruleFileName;
 ?>
+
 <div class="sec-rule-update">
-    
     <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
     <div class="main-actions centered-horizontal">
