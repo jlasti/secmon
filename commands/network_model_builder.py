@@ -1,19 +1,15 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
-#requirements:
+# requirements:
 # sudo yum install nmap
 # sudo pip3 install python-libnmap
 
-from six.moves import configparser
-import subprocess
-import dbus
+import configparser
 import psycopg2
 import sys
 import os
-import fileinput
 from libnmap.parser import NmapParser
-
 
 def connect():
     try:

@@ -1,5 +1,6 @@
 # phpstorm project files
 .idea
+.vscode
 
 # netbeans project files
 nbproject
@@ -27,23 +28,22 @@ phpunit.phar
 # local phpunit config
 /phpunit.xml
 
-/runtime
+# SecMon project related
+docker-compose.yml
+/config/.lock
 /config/db.php
-/secdb/config.ini
-/config/config_secdb.ini
 /config/anomaly_config.ini
 /config/secmon_config.ini
 /config/aggregator_config.ini
-docker-compose.yml
+/deployment/certificates
+/rules
+/runtime
 composer.lock
-lastdepoy.txt
 output/
+/pids
 
 # pycache is not needed
 __pycache__/
 
 # error logs
 error.log
-
-# generated TLS keys and certificates
-/deployment/certificates/

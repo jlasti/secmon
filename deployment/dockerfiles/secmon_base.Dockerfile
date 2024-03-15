@@ -1,4 +1,4 @@
-FROM php:7.4-fpm
+FROM php:8.2-fpm
 
 # Update system
 RUN apt-get update
@@ -18,8 +18,7 @@ RUN git clone https://github.com/zeromq/php-zmq.git \
     && rm -fr php-zmq \
     && echo "extension=zmq.so" > /usr/local/etc/php/conf.d/docker-php-ext-zmq.ini
 RUN apt-get remove -y git build-essential
+
+# Cleanup
 RUN apt-get -y autoremove --purge
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
-
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*

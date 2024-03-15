@@ -1,0 +1,23 @@
+/var/log/secmon/*/cron
+/var/log/secmon/*/maillog
+/var/log/secmon/*/messages
+/var/log/secmon/*/secure
+/var/log/secmon/*/spooler
+{
+	weekly
+	rotate 4
+	create
+	dateext
+	missingok
+	notifempty
+}
+
+/var/log/docker/secmon.log
+{
+	daily
+	rotate 14
+	create
+	dateext
+	missingok
+	notifempty
+}

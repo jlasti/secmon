@@ -1,10 +1,16 @@
 <?php
+/**
+ * Yii framework's core file serves as the entry
+ * point for incoming HTTP(s) requests.
+ */
 
-// comment out the following two lines when deployed to production
+// Use either development or production config
+
+// Development
 // defined('YII_DEBUG') or define('YII_DEBUG', true);
 // defined('YII_ENV') or define('YII_ENV', 'dev');
 
-// production
+// Production
 defined('YII_DEBUG') or define('YII_DEBUG', false);
 defined('YII_ENV') or define('YII_ENV', 'prod');
 
