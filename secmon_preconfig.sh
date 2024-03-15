@@ -87,7 +87,7 @@ echo -e "${GREEN}Done${NORMAL}"
 echo -e "${YELLOW}Copying config files${NORMAL}"
 cp deployment/config_files/secmon.conf /etc/rsyslog.d/ \
 && cp deployment/config_files/docker.conf /etc/rsyslog.d/ \
-&& cp deployment/config_files/secmon_logrotate /etc/logrotate.d/ \
+&& cp deployment/config_files/secmon.logrotate /etc/logrotate.d/secmon \
 || { echo -e "${RED}Copying config files failed${NORMAL}" ; exit 1; }
 echo -e "${GREEN}Done${NORMAL}"
 
