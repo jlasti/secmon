@@ -1,17 +1,11 @@
+/var/log/secmon/*/cron
+/var/log/secmon/*/maillog
 /var/log/secmon/*/messages
-{
-	daily
-	rotate 14
-	create
-	dateext
-	missingok
-	notifempty
-}
-
 /var/log/secmon/*/secure
+/var/log/secmon/*/spooler
 {
-	daily
-	rotate 14
+	weekly
+	rotate 4
 	create
 	dateext
 	missingok
