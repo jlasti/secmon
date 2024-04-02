@@ -21,7 +21,7 @@ use yii\base\Model;
  */
 class Rule extends Model
 {
-    public $name;
+    public $description;
     public $active;
     public $size;
     public $uid;
@@ -38,7 +38,7 @@ class Rule extends Model
     {
         return [
             [['active', 'ruleFileName'], 'required'],
-            ['name', 'string', 'max' => 60],
+            ['description', 'string', 'max' => 80],
             ['content', 'string'],
             ['active', 'boolean'],
             [['created_at', 'accessed_at'], 'safe'],

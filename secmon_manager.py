@@ -18,14 +18,14 @@ SECMON_AGGREGATOR_CONF = './config/aggregator_config.ini'
 
 def print_help():
     print("Available parameters are:\n")
+    print("\"help\" - to list all available parameters")
     print("\"deploy\" - to deploy SecMon")
     print("\"start\" - to start stopped SecMon containers")
-    print("\"restart\" - to restart stopped/running SecMon containers")
     print("\"stop\" - to stop running SecMon containers")
-    print("\"remove\" - to remove all SecMon containers with database")
-    print("\"help\" - to list all available parameters")
+    print("\"restart\" - to restart SecMon containers")
+    print("\"remove\" - to remove all SecMon enrichment containers")
     print("\"config\" - to run initial SecMon configuration")
-    print("\"get-rules\" - to manually update default rules\n")
+    print("\"update-rules\" - to manually update default rules\n")
 
 
 # Return all enabled enrichment modules in "secmon_config.ini"
@@ -92,7 +92,6 @@ def remove_secmon_containers():
                 os.system(f'echo -e "\r\033[1A\033[0KRemoving secmon_{module} ... {GREEN}done{NORMAL}"')
             else:
                 os.system(f'echo -e "\r\033[1A\033[0KRemoving secmon_{module} ... {RED}failed{NORMAL}"')
-    os.system('docker compose down')
 
 
 def path_validation(path, input_data):
@@ -252,7 +251,9 @@ if sys.argv[1] == "restart":
     print(YELLOW, '\nRestarting SecMon modules:', NORMAL)
     create_temp_config()
     stop_secmon_containers()
-    start_secmon_containers()
+    remove_secmon_containers()
+    create_enrichment_modules()
+    os.system('docker compose restart')
     sys.exit()
 
 # Manually run secmon configuration
@@ -262,20 +263,20 @@ if sys.argv[1] == "config":
     sys.exit()
 
 # Manually update rules for repository configured in secmon_config.ini
-if sys.argv[1] == "get-rules":
+if sys.argv[1] == "update-rules":
     print(YELLOW, '\nStarting download of default SecMon rules:', NORMAL)
     
     if os.system(f'./commands/rules_downloader.py os') != 0:
         print(RED, 'Error occurred during rules download, retrieval of rules from repository was unsuccessful.', NORMAL)
         sys.exit()
     
-    os.system('chmod -R 777 ./rules/*')
+    os.system('chmod -R 777 ./rules/')
     print(GREEN, 'Download successful', NORMAL)
     sys.exit()
 
 if sys.argv[1] == "deploy":
     if not os.path.isfile('./config/.lock'):
-        if os.system('sudo bash ./secmon_preconfig.sh') != 0:
+        if os.system('sudo bash ./secmon_preconfig.sh') != 0: # set sudo
             print(RED, '\nError occurred during SecMon configuration, SecMon configuration process was unsuccessful.', NORMAL)
             sys.exit()
     else:
@@ -292,9 +293,10 @@ if sys.argv[1] == "deploy":
         # Stop and remove enrichment modules
         stop_secmon_containers()
         remove_secmon_containers()
+        os.system('docker compose down')
 
         # Auto execute 'secmon_deploy.sh'
-        if os.system('sudo bash ./secmon_deploy.sh') != 0:
+        if os.system('sudo bash ./secmon_deploy.sh') != 0: # set sudo
             print(RED, '\nError occurred during script secmon_deploy.sh execution, SecMon deploying process was unsuccessful.', NORMAL)
             sys.exit()
 
@@ -312,7 +314,6 @@ if sys.argv[1] == "deploy":
         os.system('docker exec -it secmon_app chgrp -R www-data .') # Ensure the web-app files are accessible to web server
 
         # Initialize admin user 
-        # TODO: what this ? why needed ? what do ?
         os.system(f'echo -n "Initializing SecMon admin user ... {GREEN}"')
         os.system('curl 127.0.0.1:8080/secmon/web/user/init')
 
