@@ -183,7 +183,7 @@ python3 secmon_manager.py start
 # Restart running/stopped SecMon system
 python3 secmon_manager.py restart
 
-# Remove SecMon containers
+# Remove SecMon enrichment containers
 python3 secmon_manager.py remove
 
 # Manually run configuration script
@@ -193,7 +193,7 @@ python3 secmon_manager.py config
 python3 secmon_manager.py deploy
 
 # Update standard rules set
-python3 secmon_manager.py get-rules
+python3 secmon_manager.py update-rules
 ```
 ## Configuration
 ### Turn on/off enrichment module
