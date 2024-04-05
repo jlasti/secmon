@@ -17,7 +17,7 @@ dependencies=("git" "firewalld" "openssl" "systemctl" "python3" "docker")
 
 # Function to check if a dependency is installed
 check_dependency() {
-    command -v $1 >/dev/null 2>&1 || { echo -e "${RED}Package $1 is not installed${NORMAL}"; exit 1; }
+    command -v "$1" >/dev/null 2>&1 || { echo -e "${RED}Package $1 is not installed${NORMAL}"; exit 1; }
 }
 
 echo -e "${MAGENTA}Starting SecMon configuration.${NORMAL}"
@@ -25,7 +25,7 @@ echo -e "${MAGENTA}Starting SecMon configuration.${NORMAL}"
 # Check required packages
 echo -e "${YELLOW}Checking for required dependencies${NORMAL}"
 for dependency in "${dependencies[@]}"; do
-    check_dependency $dependency
+    check_dependency "$dependency"
     echo "$dependency found"
 done
 echo -e "${GREEN}Done${NORMAL}"
@@ -56,7 +56,7 @@ mkdir -p ./rules/correlation/available || { echo -e "${RED}Creating directory ru
 mkdir -p ./rules/correlation/ui || { echo -e "${RED}Creating directory rules/correlation/ui failed${NORMAL}" ; exit 1; }
 echo -e "${GREEN}Done${NORMAL}"
 
-# Craete pids directory
+# Create pids directory
 mkdir -p ./pids
 
 # Generate SSL certificates
@@ -66,7 +66,7 @@ CITY="Bratislava"
 ORGANIZATION="secmon"
 COMMON_NAME="localhost"
 
-echo -e "${YELLOW}Generating SSL cerificates in './deploment/certificates'${NORMAL}"
+echo -e "${YELLOW}Generating SSL certificates in './deployment/certificates'${NORMAL}"
 if [ ! -d "./deployment/certificates" ]; then
     mkdir "./deployment/certificates"
     echo "Created directory ./deployment/certificates"

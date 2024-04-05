@@ -38,10 +38,10 @@ class RulesService
             return false;
 
         # Check if safe file name
-        if (empty($model->name)) {
+        if (empty($model->description)) {
             $newRuleFileName = basename($url);
         } else {
-            $newRuleFileName = $model->name;
+            $newRuleFileName = $model->description;
         }
         if (!RulesService::isValidFileName($newRuleFileName))
             return false;
@@ -130,10 +130,10 @@ class RulesService
 
         if (is_null($metaFileData)) {
             // Metadata files does not exists.
-            file_put_contents($metaFilePath, json_encode(['name' => $model->name])); // Add 'name' key with value from model.
+            file_put_contents($metaFilePath, json_encode(['description' => $model->description])); // Add 'description' key with value from model.
         } else {
-            // Metadata file exists, update key 'name'.
-            $metaFileData['name'] = $model->name;
+            // Metadata file exists, update key 'description'.
+            $metaFileData['description'] = $model->description;
             file_put_contents($metaFilePath, json_encode($metaFileData));
         }
         if ($model->active == 1 && RulesService::isRuleActive($ruleFileName) == 0) {
@@ -169,7 +169,7 @@ class RulesService
         // If metadata file exists, read attributes from it to Rule model.
         $ruleMetaFile = RulesService::findMetaFileByRuleName(basename($ruleFile));
         if (!is_null($ruleMetaFile)) {
-            $rule->name = $ruleMetaFile['name'];
+            $rule->description = $ruleMetaFile['description'];
         }
 
         // Set properties of Rule model.
