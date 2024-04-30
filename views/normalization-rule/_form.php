@@ -28,7 +28,7 @@ use macgyer\yii2materializecss\widgets\form\ActiveForm;
             <label style="font-size: larger;">Custom rule file name</label>
         </div>
         <div style='margin-top: -20px;'>
-            <?= $form->field($model, 'name')->textInput(['maxlength' => true])->label(false) ?>
+            <?= $form->field($model, 'description')->textInput(['maxlength' => true])->label(false) ?>
         </div>
         <div style="display: flex; align-items: center; margin-top: -12px;">
             <i class='material-icons' style='color: #42a5f5; margin-right: 5px;'>info</i>

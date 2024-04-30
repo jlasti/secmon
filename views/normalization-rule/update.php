@@ -17,10 +17,10 @@ $this->params['title'] = 'Update Normalization Rule: ' . $model->ruleFileName;
 
     <div class="row" style="margin-bottom: -10px;">
         <div style="margin-bottom: -10px;">
-            <label style="font-size: larger;">Custom rule name</label>
+            <label style="font-size: larger;">Description</label>
         </div>
         <div style='margin-top: -20px;'>
-            <?= $form->field($model, 'name')->textInput(['maxlength' => true])->label(false) ?>
+            <?= $form->field($model, 'description')->textInput(['maxlength' => true])->label(false) ?>
         </div>
     </div>
 

@@ -17,12 +17,12 @@ $this->params['title'] = 'Normalization Rules';
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
             [
-                'attribute' => 'name',
-                'label' => 'Custom rule name',
-            ],
-            [
                 'attribute' => 'ruleFileName',
                 'label' => 'Rule file name',
+            ],
+            [
+                'attribute' => 'description',
+                'label' => 'Description',
             ],
             [
                 'attribute' => 'active',
