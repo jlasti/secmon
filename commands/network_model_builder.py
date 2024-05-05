@@ -5,15 +5,15 @@
 # sudo yum install nmap
 # sudo pip3 install python-libnmap
 
-import configparser
 import psycopg2
 import sys
 import os
+import yaml
 from libnmap.parser import NmapParser
 
 def connect():
     try:
-        conn = psycopg2.connect(host=config.get('DATABASE', 'host'),database=config.get('DATABASE', 'database'), user=config.get('DATABASE', 'user'), password=config.get('DATABASE', 'password'))
+        conn = psycopg2.connect(host=config['DATABASE']['host'],database=config['DATABASE']['database'], user=config['DATABASE']['user'], password=config['DATABASE']['password'])
     except:
         print ("I am unable to connect to the database")
     return conn
@@ -139,8 +139,8 @@ if not os.path.isfile(sys.argv[1]):
 p = NmapParser.parse_fromfile(sys.argv[1])
 
 #read configuration file
-config = configparser.ConfigParser()
-config.read('/var/www/html/secmon/config/secmon_config.ini')
+secmon_config_file = open('/var/www/html/secmon/config/secmon_config.yaml')
+config = yaml.safe_load(secmon_config_file)
 
 for host in p.hosts:
     if already_exists(host.address):

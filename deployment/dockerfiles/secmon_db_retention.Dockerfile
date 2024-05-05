@@ -4,6 +4,7 @@ FROM python:3.9-alpine
 RUN pip3 install --upgrade pip
 RUN pip3 install psycopg2-binary
 RUN pip3 install -U configparser
+RUN pip3 install -U pyyaml
 
 # Set working directory
 WORKDIR /home/secmon
