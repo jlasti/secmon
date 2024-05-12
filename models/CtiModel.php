@@ -160,7 +160,7 @@ class CsvService {
 			'format' => Client::FORMAT_JSON
 		]]);
 
-		$filePath = "/var/www/html/secmon/config/ip_rep.csv";
+		$filePath = "/var/www/html/secmon/cti/ip_rep.csv";
 
 		if (file_exists($filePath)) {
 			$csv = file_get_contents($filePath);
@@ -209,7 +209,7 @@ class CsvService {
 		if ($response->isOk) {
 			//print("GOT CSV" . PHP_EOL);
 			$csvData = $response->getContent();
-			file_put_contents('/var/www/html/secmon/config/ip_rep.csv', $csvData);
+			file_put_contents('/var/www/html/secmon/cti/ip_rep.csv', $csvData);
 			$csvData = str_getcsv($csvData, "\n", "", "#");
             return $csvData;
 		}

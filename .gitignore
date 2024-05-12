@@ -35,7 +35,7 @@ docker-compose.yml
 /config/anomaly_config.ini
 /config/secmon_config.yaml
 /config/cti_config.json
-config/ip_rep.csv
+/cti/ip_rep.csv
 /config/aggregator_config.ini
 /deployment/certificates
 /rules
