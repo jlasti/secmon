@@ -110,7 +110,7 @@ echo -e "${GREEN}Done${NORMAL}"
 # Set 777 permissions so container secmon_app can write to directories
 chgrp www-data .
 chmod 777 ./web/assets/
-chmod 777 ./cti/
+chmod 770 ./cti/
 chmod -R 777 ./rules/* || { echo -e "${RED}Changing access mode of the directory ./rules/* failed${NORMAL}" ; exit 1; }
 
 # Create lock file as a sign a config was run.
