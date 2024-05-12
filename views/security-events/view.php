@@ -163,7 +163,7 @@ $this->params['dst_cti_model'] = CtiModel::getCtiInfo($model->destination_cti_id
                   'value' => $this->params["src_cti_model"]['crowdsec']->classification ?? null
                 ],
                 [
-                  "label" => "events",
+                  "label" => "Recorded events",
                   'format' => 'raw',
                   'value' => function(){
                     $tag = null;
@@ -232,7 +232,7 @@ $this->params['dst_cti_model'] = CtiModel::getCtiInfo($model->destination_cti_id
                   }
                 ],
                 [
-                  "label" => "ip_range rep",
+                  "label" => "IP range reputational score",
                   'format' => 'raw',
                   'value' => function(){
                     $tag = null;
@@ -268,7 +268,7 @@ $this->params['dst_cti_model'] = CtiModel::getCtiInfo($model->destination_cti_id
                   }
                 ],
                 [
-                  "label" => "AS name (ID)",
+                  "label" => "AS name (AS number)",
                   'format' => 'raw',
                   'value' => function(){
                     $tag = null;
@@ -424,10 +424,6 @@ $this->params['dst_cti_model'] = CtiModel::getCtiInfo($model->destination_cti_id
                   'value' => $this->params["dst_cti_model"]['ip']
                 ],
                 [
-                  "label" => 'Reputation',
-                  'value' => $this->params["dst_cti_model"]['reputation']
-                ],
-                [
                   "label" => 'FMP',
                   'value' => $this->params["dst_cti_model"]['nerd']->fmp ?? null
                 ],
@@ -488,7 +484,7 @@ $this->params['dst_cti_model'] = CtiModel::getCtiInfo($model->destination_cti_id
                   'value' => $this->params["dst_cti_model"]['crowdsec']->classification ?? null
                 ],
                 [
-                  "label" => "events",
+                  "label" => "Recorded events",
                   'format' => 'raw',
                   'value' => function(){
                     $tag = null;
@@ -557,7 +553,7 @@ $this->params['dst_cti_model'] = CtiModel::getCtiInfo($model->destination_cti_id
                   }
                 ],
                 [
-                  "label" => "ip_range rep",
+                  "label" => "IP range reputational score",
                   'format' => 'raw',
                   'value' => function(){
                     $tag = null;
@@ -593,7 +589,7 @@ $this->params['dst_cti_model'] = CtiModel::getCtiInfo($model->destination_cti_id
                   }
                 ],
                 [
-                  "label" => "AS name (ID)",
+                  "label" => "AS name (AS number)",
                   'format' => 'raw',
                   'value' => function(){
                     $tag = null;

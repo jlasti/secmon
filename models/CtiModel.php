@@ -94,7 +94,7 @@ class CtiModel extends ActiveRecord
         }
 
         $cti_row->reputation = isset($cti_row['nerd']) 
-            ? $cti_row['nerd']['rep'] 
+            ? round($cti_row['nerd']['rep'], 2) 
             : CsvService::getRepFromCsv($cti_row['ip']);
             
         $cti_row->as_name = (object)["nerd" => $cti_row['nerd']['as_name'] ?? null, 'crowd' => $cti_row['crowdsec']['as_name'] ?? null];
