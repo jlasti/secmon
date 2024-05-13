@@ -211,7 +211,6 @@ def get_config():
         for module in secmon_config["ENRICHMENT"]:
             if module["enabled"]:
                 ENABLED_ENRICHMENT_MODULES.append(module)
-            print(module["name"])
             ALL_MODULES.append(module)
         return secmon_config
 

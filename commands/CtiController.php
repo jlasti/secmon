@@ -132,7 +132,7 @@ class CtiController extends Controller
 					//print("PROCESSING SRC\n");
 					$src_cti_id = $this->processIp($srcIp, $whitelist, $connection, $client, $nerd_auth, $crowd_auth, $api_time_validity, $file_time_validity);
 					$msg = str_replace("\n", "", $msg);
-					$msg = $msg . " src_cti_id=" . strval($src_cti_id);
+					$msg = $msg . " src_cti_id=" . strval($src_cti_id) . " ";
 				}
 
 				if ($dstIp != -1) {
@@ -174,7 +174,7 @@ class CtiController extends Controller
 			}
 
 			############# NERD #############
-			if ($main[2] != null) {
+			if (($main[2] ?? null) != null) {
 				//print("Pairing table has NERD table linked\n");
 				$object = $this->selectFromNERDTable($main[2], $connection, $ip, $client, $nerd_auth, $api_time_validity);
 			} else {
@@ -188,7 +188,7 @@ class CtiController extends Controller
 			}
 
 			############# CROWD #############
-			if ($main[1] != null) {
+			if (($main[1] ?? null) != null) {
 				//print("Pairing table has CROWD table linked\n");
 				$object = $this->selectFromCROWDTable($main[1], $connection, $ip, $client, $crowd_auth, $api_time_validity);
 			} else {
