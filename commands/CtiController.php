@@ -134,7 +134,7 @@ class CtiController extends Controller
 					$msg = str_replace("\n", "", $msg);
 					$msg = $msg . " src_cti_id=" . strval($src_cti_id) . " ";
 				}
-
+				
 				if ($dstIp != -1) {
 					//print("PROCESSING DST\n");
 					$dst_cti_id = $this->processIp($dstIp, $whitelist, $connection, $client, $nerd_auth, $crowd_auth, $api_time_validity, $file_time_validity);
@@ -180,7 +180,7 @@ class CtiController extends Controller
 			} else {
 				//print("Pairing table hasn't NERD table linked\n");
 				$object = $this->updateFromNERDapi($ip, $client, $nerd_auth);
-				if ($object != null && $object != -1) {
+				if ($object != null) {
 					$nerd_id = $this->recordToNERDTable($object, $connection);
 					$this->updatePairingTableNERD($connection, $main[0], $nerd_id);
 					$main[2] = $nerd_id;
@@ -194,7 +194,7 @@ class CtiController extends Controller
 			} else {
 				//print("Pairing table hasn't CROWD table linked\n");
 				$object = $this->updateFromCROWDapi($ip, $client, $crowd_auth);
-				if ($object != null && $object != -1) {
+				if ($object != null) {
 					$crowd_id = $this->recordToCROWDTable($object, $connection);
 					$this->updatePairingTableCROWD($connection, $main[0], $crowd_id);
 					$main[1] = $crowd_id;
@@ -306,10 +306,7 @@ class CtiController extends Controller
 			->setUrl('https://nerd.cesnet.cz/nerd/api/v1/ip/' . (string)$ip . '/full')
 			->addHeaders(['Authorization' => $nerd_auth])
 			->send();
-		if ($nerd_response->statusCode == 404) {
-			//print("No NERD record found\n");
-			return -1;
-		} elseif ($nerd_response->statusCode != 200) {
+		if ($nerd_response->statusCode != 200) {
 			//print("NERD API call failed\n");
 			return null;
 		}
@@ -423,13 +420,13 @@ class CtiController extends Controller
 				behavior=$1, classification=$2, score_overall=$3, last_checked_at=$4,
 				as_num=$5, as_name=$6, ip_range_24=$7, 
 				ip_range_24_rep=$8, geo_city=$9, geo_country=$10,
-				reverse_dns=$11, last_seen=$12, first_seen=$13
-				WHERE id = $14',
+				reverse_dns=$11, last_seen=$12, first_seen=$13, false_pos=$14
+				WHERE id = $15',
 			array(
 				$object->behavior, $object->classification, $object->score_overall, $object->crowd_timestamp,
 				$object->crowd_AS_id, $object->crowd_AS_name, $object->crowd_ip_range,
 				$object->crowd_ip_range_rep, $object->crowd_city, $object->crowd_country,
-				$object->crowd_reverse_dns, $object->crowd_last_seen, $object->crowd_first_seen,
+				$object->crowd_reverse_dns, $object->crowd_last_seen, $object->crowd_first_seen, $object->false_pos,
 				$id
 			)
 		);
@@ -448,10 +445,8 @@ class CtiController extends Controller
 			->setUrl('https://cti.api.crowdsec.net/v2/smoke/' . (string)$ip)
 			->addHeaders(['x-api-key' => $crowd_auth])
 			->send();
-		if ($crowd_response->statusCode == 404) {
-			//print("No CROWD record found\n");
-			return -1;
-		} elseif ($crowd_response->statusCode != 200) {
+
+		if ($crowd_response->statusCode != 200) {
 			//print("CROWD API call failed\n");
 			return null;
 		}
@@ -466,7 +461,12 @@ class CtiController extends Controller
 		foreach ($crowd_response->data["classifications"]["classifications"] as $list) {
 			array_push($class, $list["label"]);
 		}
+		$false_pos = array();
+		foreach ($crowd_response->data["classifications"]["false_positives"] as $list) {
+			array_push($false_pos, $list["label"]);
+		}
 		$object->classification = implode(", ", $class);
+		$object->false_pos = implode(", ", $false_pos);
 		$object->score_overall = $crowd_response->data["scores"]["overall"]["total"];
 		$object->crowd_AS_id = $crowd_response->data["as_num"];
 		$object->crowd_AS_name = $crowd_response->data["as_name"];
@@ -491,17 +491,17 @@ class CtiController extends Controller
 			'INSERT INTO cti_crowdsec(behavior, classification, score_overall, last_checked_at,
 				as_num, as_name, ip_range_24, 
 				ip_range_24_rep, geo_city, geo_country,
-				reverse_dns, last_seen, first_seen) 
+				reverse_dns, last_seen, first_seen, false_pos) 
 				VALUES ($1, $2, $3, $4,
 				$5, $6, $7,
 				$8, $9, $10,
-				$11, $12, $13) 
+				$11, $12, $13, $14) 
 				RETURNING id',
 			array(
 				$object->behavior, $object->classification, $object->score_overall, $object->crowd_timestamp,
 				$object->crowd_AS_id, $object->crowd_AS_name, $object->crowd_ip_range,
 				$object->crowd_ip_range_rep, $object->crowd_city, $object->crowd_country,
-				$object->crowd_reverse_dns, $object->crowd_last_seen, $object->crowd_first_seen
+				$object->crowd_reverse_dns, $object->crowd_last_seen, $object->crowd_first_seen, $object->false_pos
 			)
 		);
 		$id = pg_fetch_row($result)[0];

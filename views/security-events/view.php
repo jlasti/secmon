@@ -160,7 +160,21 @@ $this->params['dst_cti_model'] = CtiModel::getCtiInfo($model->destination_cti_id
                 ],
                 [
                   "label" => 'Classification',
-                  'value' => $this->params["src_cti_model"]['crowdsec']->classification ?? null
+                  'format' => 'raw',
+                  'value' => function () {
+                    if ($this->params["src_cti_model"]['crowdsec']?->classification === '' || $this->params["src_cti_model"]['crowdsec']?->classification === null)
+                      return null;
+                    return $this->params["src_cti_model"]['crowdsec']->classification ?? null;
+                  }
+                ],
+                [
+                  "label" => 'False positives',
+                  'format' => 'raw',
+                  'value' => function () {
+                    if ($this->params["src_cti_model"]['crowdsec']?->false_pos === '' || $this->params["src_cti_model"]['crowdsec']?->false_pos === null)
+                      return null;
+                    return $this->params["src_cti_model"]['crowdsec']->false_pos ?? null;
+                  }
                 ],
                 [
                   "label" => "Recorded events",
@@ -239,7 +253,7 @@ $this->params['dst_cti_model'] = CtiModel::getCtiInfo($model->destination_cti_id
                     if($this->params["src_cti_model"]["ip_range_rep"]?->nerd != null){
                       $tag = $tag . Html::tag('div', $this->params["src_cti_model"]["ip_range_rep"]->nerd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[NERD]', ['class' => "vertical-top gray"]) . "<br>";
                     }
-                    if($this->params["src_cti_model"]["ip_range_rep"]?->crowd != null){
+                    if($this->params["src_cti_model"]["ip_range_rep"]?->crowd != null && $this->params["src_cti_model"]["ip_range_rep"]?->crowd !== ' '){
                       $tag = $tag . Html::tag('div', $this->params["src_cti_model"]["ip_range_rep"]->crowd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[Crowdsec]', ['class' => "vertical-top gray"]);
                     }
                     if ($tag){
@@ -464,7 +478,7 @@ $this->params['dst_cti_model'] = CtiModel::getCtiInfo($model->destination_cti_id
                     $reputationNerdDiv = null;
                     if ($reputationNerd !== null) {
                       $reputationNerdDiv = Html::tag('i', $iconNameNerd, ['class' => "material-icons vertical-top " . $colorClassNerd]) ."&nbsp;". Html::tag('div', $reputationNerd, ['class' => "vertical-top"]) . "&nbsp;" . Html::tag('p', '[NERD]', ['class' => "vertical-top gray"]) . "<br>";
-        }
+                    }
                     $scoreCrowdDiv = null;
                     if ($scoreCrowd !== null){
                       $scoreCrowdDiv = Html::tag('i', $iconNameCrowd, ['class' => "material-icons vertical-top " . $colorClassCrowd]) ."&nbsp;". Html::tag('div', $scoreCrowd, ['class' => "vertical-top"]) . "&nbsp;" . Html::tag('p', '[Crowdsec]', ['class' => "vertical-top gray"]);
@@ -481,7 +495,21 @@ $this->params['dst_cti_model'] = CtiModel::getCtiInfo($model->destination_cti_id
                 ],
                 [
                   "label" => 'Classification',
-                  'value' => $this->params["dst_cti_model"]['crowdsec']->classification ?? null
+                  'format' => 'raw',
+                  'value' => function () {
+                    if ($this->params["dst_cti_model"]['crowdsec']?->classification === '' || $this->params["dst_cti_model"]['crowdsec']?->classification === null)
+                      return null;
+                    return $this->params["dst_cti_model"]['crowdsec']->classification ?? null;
+                  }
+                ],
+                [
+                  "label" => 'False positives',
+                  'format' => 'raw',
+                  'value' => function () {
+                    if ($this->params["dst_cti_model"]['crowdsec']?->false_pos === '' || $this->params["dst_cti_model"]['crowdsec']?->false_pos === null)
+                      return null;
+                    return $this->params["dst_cti_model"]['crowdsec']->false_pos ?? null;
+                  }
                 ],
                 [
                   "label" => "Recorded events",
@@ -560,7 +588,7 @@ $this->params['dst_cti_model'] = CtiModel::getCtiInfo($model->destination_cti_id
                     if($this->params["dst_cti_model"]["ip_range_rep"]?->nerd != null){
                       $tag = $tag . Html::tag('div', $this->params["dst_cti_model"]["ip_range_rep"]->nerd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[NERD]', ['class' => "vertical-top gray"]) . "<br>";
                     }
-                    if($this->params["dst_cti_model"]["ip_range_rep"]?->crowd != null){
+                    if($this->params["dst_cti_model"]["ip_range_rep"]?->crowd != null && $this->params["dst_cti_model"]["ip_range_rep"]?->crowd !== ' '){
                       $tag = $tag . Html::tag('div', $this->params["dst_cti_model"]["ip_range_rep"]->crowd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[Crowdsec]', ['class' => "vertical-top gray"]);
                     }
                     if ($tag){
