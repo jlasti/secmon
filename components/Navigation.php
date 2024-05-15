@@ -76,6 +76,13 @@ class Navigation extends \yii\base\Component
 					'active' => 'user',
 					'icon' => 'accessibility'
 				],
+                                [
+					'label' => 'Mitre',
+					'url' => ['/mitre'],
+					'visible' => true,
+					'active' => 'mitre',
+					'icon' => 'perm_identity'
+				],
 				[
 					'label' => 'Roles',
 					'url' => ['/role'],

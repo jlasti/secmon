@@ -222,6 +222,7 @@ for ($i = 1; $i <= 10; $i++) {
 
 foreach($chartData as $key => $record)
 {
+
     $tmpRecord = [$record['time'], $record['count']];
     array_push($series[$record['cef_severity']-1]['data'], $tmpRecord);
 }
