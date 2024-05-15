@@ -156,7 +156,12 @@ $this->params['dst_cti_model'] = CtiModel::getCtiInfo($model->destination_cti_id
                 ],
                 [
                   "label" => 'Blacklists',
-                  'value' => $this->params["src_cti_model"]['nerd']->blacklists ?? null
+                  'format' => 'raw',
+                  'value' => function () {
+                    if ($this->params["src_cti_model"]['nerd']?->blacklists === '' || $this->params["src_cti_model"]['nerd']?->blacklists === null)
+                      return null;
+                    return $this->params["src_cti_model"]['nerd']->blacklists ?? null;
+                  }
                 ],
                 [
                   "label" => 'Classification',
@@ -491,7 +496,12 @@ $this->params['dst_cti_model'] = CtiModel::getCtiInfo($model->destination_cti_id
                 ],
                 [
                   "label" => 'Blacklists',
-                  'value' => $this->params["dst_cti_model"]['nerd']->blacklists ?? null
+                  'format' => 'raw',
+                  'value' => function () {
+                    if ($this->params["dst_cti_model"]['nerd']?->blacklists === '' || $this->params["dst_cti_model"]['nerd']?->blacklists === null)
+                      return null;
+                    return $this->params["dst_cti_model"]['nerd']->blacklists ?? null;
+                  }
                 ],
                 [
                   "label" => 'Classification',
