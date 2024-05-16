@@ -10,6 +10,6 @@ use kartik\cmenu\ContextMenu;
 
 $this->params['title'] = 'Mitre module';
 ?>
-<iframe src='http://192.168.100.132:8085' width='100%' height='90%' style="border:none"></iframe>
+<iframe src='http://localhost:8085' width='100%' height='90%' style="border:none"></iframe>
 
 
