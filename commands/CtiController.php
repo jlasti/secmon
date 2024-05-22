@@ -127,7 +127,7 @@ class CtiController extends Controller
 					$dstIp = substr($msg, $position1 + strlen("dst="), $position3);
 				}
 				$connection = pg_connect("host=" . $host . " dbname=" . $database . " user=" . $user . " password=" . $password);
-
+				
 				if ($srcIp != -1) {
 					//print("PROCESSING SRC\n");
 					$src_cti_id = $this->processIp($srcIp, $whitelist, $connection, $client, $nerd_auth, $crowd_auth, $api_time_validity, $file_time_validity);
@@ -230,12 +230,13 @@ class CtiController extends Controller
 		if ($ip != -1) {
 			//print("IP is defined\n");
 			$result = pg_query_params($connection, 'INSERT INTO cti(ip) VALUES ($1) RETURNING id', array($ip));
-			$id = pg_fetch_row($result)[0];
+			
 			if ($result == false) {
 				//print("Query failed\n");
 				return -1;
 			}
 			//print("Successfuly inserted\n");
+			$id = pg_fetch_row($result)[0];
 			return $id;
 		}
 	}
@@ -291,7 +292,6 @@ class CtiController extends Controller
 				$id
 			)
 		);
-		$id = pg_fetch_row($result)[0];
 		if ($result == false) {
 			//print("Query failed\n");
 		}
@@ -318,9 +318,10 @@ class CtiController extends Controller
 			array_push($bl, $list["name"]);
 		}
 		$object->blacklists = implode(", ", $bl);
+		$object->blacklists = substr($object->blacklists, 0, 254);
 		$object->rep = $nerd_response->data["rep"];
-		$object->nerd_AS_id = $nerd_response->data["asn"][0]["_id"];
-		$object->nerd_AS_name = $nerd_response->data["asn"][0]["name"];
+		$object->nerd_AS_id = $nerd_response->data["asn"][0]["_id"] ?? null;
+		$object->nerd_AS_name = $nerd_response->data["asn"][0]["name"] ?? null;
 		$object->nerd_ip_range = $nerd_response->data["bgppref"]["_id"];
 		$object->nerd_ip_range_rep = $nerd_response->data["bgppref"]["rep"];
 
@@ -329,6 +330,7 @@ class CtiController extends Controller
 			array_push($events_cat, $list["cat"]);
 		}
 		$object->events = implode(", ", array_unique($events_cat));
+		$object->events = substr($object->events, 0, 254);
 		$object->nerd_city = $nerd_response->data["geo"]["city"];
 		$object->nerd_country = $nerd_response->data["geo"]["ctry"];
 		$object->nerd_hostname = $nerd_response->data["hostname"];
@@ -361,11 +363,12 @@ class CtiController extends Controller
 				$object->nerd_hostname, $object->nerd_last_activity, $object->nerd_first_activity
 			)
 		);
-		$id = pg_fetch_row($result)[0];
+		
 		if ($result == false) {
 			//print("Query failed\n");
 			return -1;
 		}
+		$id = pg_fetch_row($result)[0];
 		return $id;
 	}
 
@@ -373,7 +376,7 @@ class CtiController extends Controller
 	{
 		//print("updatePairingTableNERD started\n");
 		$result = pg_query_params($connection, 'UPDATE cti SET fk_nerd_id = $1 WHERE id = $2 RETURNING id', array($nerd_id, $main_id));
-		$id = pg_fetch_row($result)[0];
+
 		if ($result == false) {
 			//print("Query failed\n");
 		}
@@ -430,7 +433,7 @@ class CtiController extends Controller
 				$id
 			)
 		);
-		$id = pg_fetch_row($result)[0];
+		
 		if ($result == false) {
 			//print("Query failed\n");
 		}
@@ -504,11 +507,12 @@ class CtiController extends Controller
 				$object->crowd_reverse_dns, $object->crowd_last_seen, $object->crowd_first_seen, $object->false_pos
 			)
 		);
-		$id = pg_fetch_row($result)[0];
+		
 		if ($result == false) {
 			//print("Query failed\n");
 			return -1;
 		}
+		$id = pg_fetch_row($result)[0];
 		return $id;
 	}
 
@@ -516,7 +520,7 @@ class CtiController extends Controller
 	{
 		//print("updatePairingTableCROWD started\n");
 		$result = pg_query_params($connection, 'UPDATE cti SET fk_crowdsec_id = $1 WHERE id = $2 RETURNING id', array($crowd_id, $main_id));
-		$id = pg_fetch_row($result)[0];
+
 		if ($result == false) {
 			//print("Query failed\n");
 		}
