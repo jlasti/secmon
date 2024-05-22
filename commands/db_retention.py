@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
-import configparser
 import psycopg2
 import os
 import time
 import datetime
+import yaml
 
 def wait_for_db():
     while(is_db_ready() is not True):
@@ -24,7 +24,7 @@ def is_db_ready():
 def connect():
     conn = False
     try:
-        conn = psycopg2.connect(host=config.get('DATABASE', 'host'),database=config.get('DATABASE', 'database'), user=config.get('DATABASE', 'user'), password=config.get('DATABASE', 'password'))
+        conn = psycopg2.connect(host=config['DATABASE']['host'],database=config['DATABASE']['database'], user=config['DATABASE']['user'], password=config['DATABASE']['password'])
     except:
         os.system('echo -e "Connection to the database was unsuccessful"')
         return False
@@ -34,7 +34,7 @@ def size_check(max_db_size):
     os.system('echo -e "Proceeding database size check"')
     connection = connect()
     cursor = connection.cursor()
-    querry = "SELECT pg_size_pretty(pg_database_size(\'" + config.get('DATABASE', 'database') + "\'));"
+    querry = "SELECT pg_size_pretty(pg_database_size(\'" + config['DATABASE']['database'] + "\'));"
     cursor.execute(querry)
     db_size = cursor.fetchone()
     act_size = db_size[0].split()
@@ -61,12 +61,12 @@ def timestamp_check(last_date):
     connection.close()
 
 #read configuration file
-config = configparser.ConfigParser()
-config.read('./config/secmon_config.ini')
+secmon_config_file = open('./config/secmon_config.yaml')
+config = yaml.safe_load(secmon_config_file)
 
-max_db_size = config.get('DATABASE', 'max_size')
-no_of_days = config.get('DATABASE', 'max_days')
-sleep_interval= config.get('DATABASE', 'sleep_interval')
+max_db_size = config['DATABASE']['max_size']
+no_of_days = config['DATABASE']['max_days']
+sleep_interval= config['DATABASE']['sleep_interval']
 
 wait_for_db()
 

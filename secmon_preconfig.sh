@@ -95,12 +95,13 @@ echo -e "${GREEN}Done${NORMAL}"
 echo -e "Copying configuration file templates"
 cp deployment/config_templates/db.php config/ \
 && cp deployment/config_templates/anomaly_config.ini config/ \
-&& cp deployment/config_templates/secmon_config.ini config/ \
+&& cp deployment/config_templates/secmon_config.yaml config/ \
+&& cp deployment/config_templates/cti_config.json config/ \
 && cp deployment/config_templates/docker-compose.yml . \
 || { echo -e "${RED}Copying configuration file templates failed!${NORMAL}" ; exit 1; }
 echo -e "${GREEN}Done${NORMAL}"
 
-# Download rules from repository configured in secmon_config.ini
+# Download rules from repository configured in secmon_config.yaml
 echo -e "${YELLOW}Starting download of SecMon rules${NORMAL}"
 python3 ./commands/rules_downloader.py os \
 || { echo -e "${RED}Download of SecMon rules failed${NORMAL}" ; exit 1; }
@@ -109,6 +110,7 @@ echo -e "${GREEN}Done${NORMAL}"
 # Set 777 permissions so container secmon_app can write to directories
 chgrp www-data .
 chmod 777 ./web/assets/
+chmod 770 ./cti/
 chmod -R 777 ./rules/* || { echo -e "${RED}Changing access mode of the directory ./rules/* failed${NORMAL}" ; exit 1; }
 
 # Create lock file as a sign a config was run.

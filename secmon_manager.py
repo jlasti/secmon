@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
-import configparser
 import sys
 import os
 import time
+import yaml
 
 RED = '\033[0;31m'
 GREEN = '\033[0;32m'
@@ -12,9 +12,8 @@ YELLOW = '\033[0;33m'
 NORMAL = '\033[0m'
 MAGENTA = '\033[0;35m'
 
-SECMON_MAIN_CONF = './config/secmon_config.ini'
+SECMON_MAIN_CONF = './config/secmon_config.yaml'
 SECMON_AGGREGATOR_CONF = './config/aggregator_config.ini'
-
 
 def print_help():
     print("Available parameters are:\n")
@@ -22,77 +21,69 @@ def print_help():
     print("\"deploy\" - to deploy SecMon")
     print("\"start\" - to start stopped SecMon containers")
     print("\"stop\" - to stop running SecMon containers")
-    print("\"restart\" - to restart SecMon containers")
-    print("\"remove\" - to remove all SecMon enrichment containers")
+    print("\"restart\" - to restart all SecMon containers")
+    print("\"remove\" - to remove all SecMon containers with database")
     print("\"config\" - to run initial SecMon configuration")
     print("\"update-rules\" - to manually update default rules\n")
 
+#run specific enrichment module
+def run_enrichment_module(module):
+    command = f'docker run -d {" ".join(module["args"])} --restart unless-stopped --name secmon_{module["name"].lower()} --network secmon_app-network -v ${{PWD}}:/var/www/html/secmon secmon_{module["name"].lower()}'
+    if os.system(command) == 0:
+        os.system(f'echo -e "\r\033[1A\033[0KCreating secmon_{module["name"].lower()} ... {GREEN}done{NORMAL}"')
+    else:
+        os.system(f'echo -e "\r\033[1A\033[0KCreating secmon_{module["name"].lower()} ... {RED}failed{NORMAL}"')
 
-# Return all enabled enrichment modules in "secmon_config.ini"
-def get_enabled_enr_modules():
-    config = configparser.ConfigParser()
-    config.read(SECMON_MAIN_CONF)
-
-    enabled_enrichment_modules = []
-    for module in all_enrichment_modules:
-        if config.get('ENRICHMENT', module) == 'true':
-            enabled_enrichment_modules.append(module)
-
-    return enabled_enrichment_modules
-
-
-# Run specific enrichment module
-def create_enrichment_modules():
-    print(YELLOW, '\nCreating secmon enrichment modules:', NORMAL)
-
-    enabled_enrichment_modules = get_enabled_enr_modules()
-    for module in enabled_enrichment_modules:
-        command = f'docker run -d --restart unless-stopped --name secmon_{module} --network secmon_app-network \
-                    -v ${{PWD}}:/var/www/html/secmon secmon_{module}'
-        if os.system(command) == 0:
-            os.system(f'echo -e "\r\033[1A\033[0KCreating secmon_{module} ... {GREEN}done{NORMAL}"')
-        else:
-            os.system(f'echo -e "\r\033[1A\033[0KCreating secmon_{module} ... {RED}failed{NORMAL}"')
-
+def run_correlator_module():
+    command = f'docker run -d --restart unless-stopped --name secmon_correlator --network secmon_app-network -v ${{PWD}}:/var/www/html/secmon secmon_correlator'
+    if os.system(command) == 0:
+        os.system(f'echo -e "\r\033[1A\033[0KCreating secmon_correlator ... {GREEN}done{NORMAL}"')
+    else:
+        os.system(f'echo -e "\r\033[1A\033[0KCreating secmon_correlator ... {RED}failed{NORMAL}"')
 
 # Method for starting stopped containers
-def start_secmon_containers():
-    print(YELLOW, '\nStarting secmon modules:', NORMAL)
+def start_secmon_containers(enabled_enrichment_modules):
+    print(YELLOW,'\nStarting secmon modules:', NORMAL)
+    os.system('docker compose -p secmon start')
 
-    enabled_enrichment_modules = get_enabled_enr_modules()
     for module in enabled_enrichment_modules:
-        if os.system(f'docker container inspect secmon_{module} > /dev/null 2>&1') == 0:
-            if os.system(f'docker start secmon_{module}') == 0:
-                os.system(f'echo -e "\r\033[1A\033[0KStarting secmon_{module} ... {GREEN}done{NORMAL}"')
+        if os.system(f'docker container inspect secmon_{module["name"].lower()} > /dev/null 2>&1') == 0:
+            if os.system(f'docker start secmon_{module["name"].lower()}') == 0:
+                os.system(f'echo -e "\r\033[1A\033[0KStarting secmon_{module["name"].lower()} ... {GREEN}done{NORMAL}"')
             else:
-                os.system(f'echo -e "\r\033[1A\033[0KStarting secmon_{module} ... {RED}failed{NORMAL}"')
-    os.system('docker compose start')
+                os.system(f'echo -e "\r\033[1A\033[0KStarting secmon_{module["name"].lower()} ... {RED}failed{NORMAL}"')
 
+#method for restarting running/stopped containers
+def restart_secmon_containers(all_modules, enabled_enrichment_modules):
+    stop_secmon_containers(all_modules)
+    remove_secmon_containers(all_modules)
+
+    os.system('docker compose -p secmon restart')
+
+    print(YELLOW,'\nCreating SecMon enrichment modules:', NORMAL)
+    for module in enabled_enrichment_modules:
+        run_enrichment_module(module)
 
 # Method for stopping running containers
-def stop_secmon_containers():
+def stop_secmon_containers(all_modules):
     print(YELLOW, '\nStopping secmon modules:', NORMAL)
-
-    for module in all_enrichment_modules:
-        if os.system(f'docker container inspect secmon_{module} > /dev/null 2>&1') == 0:
-            if os.system(f'docker stop secmon_{module}') == 0:
-                os.system(f'echo -e "\r\033[1A\033[0KStopping secmon_{module} ... {GREEN}done{NORMAL}"')
+    for module in all_modules:
+        if os.system(f'docker container inspect secmon_{module["name"].lower()} > /dev/null 2>&1') == 0:
+            if os.system(f'docker stop secmon_{module["name"].lower()}') == 0:
+                os.system(f'echo -e "\r\033[1A\033[0KStopping secmon_{module["name"].lower()} ... {GREEN}done{NORMAL}"')
             else:
-                os.system(f'echo -e "\r\033[1A\033[0KStopping secmon_{module} ... {RED}failed{NORMAL}"')
-    os.system('docker compose stop')
-
+                os.system(f'echo -e "\r\033[1A\033[0KStopping secmon_{module["name"].lower()} ... {RED}failed{NORMAL}"')
+    os.system('docker compose -p secmon stop')
 
 # Method for removing stopped containers
-def remove_secmon_containers():
+def remove_secmon_containers(all_modules):
     print(YELLOW, '\nRemoving secmon modules:', NORMAL)
-
-    for module in all_enrichment_modules:
-        if os.system(f'docker container inspect secmon_{module} > /dev/null 2>&1') == 0:
-            if os.system(f'docker rm secmon_{module}') == 0:
-                os.system(f'echo -e "\r\033[1A\033[0KRemoving secmon_{module} ... {GREEN}done{NORMAL}"')
+    for module in all_modules:
+        if os.system(f'docker container inspect secmon_{module["name"].lower()} > /dev/null 2>&1') == 0:
+            if os.system(f'docker rm secmon_{module["name"].lower()}') == 0:
+                os.system(f'echo -e "\r\033[1A\033[0KRemoving secmon_{module["name"].lower()} ... {GREEN}done{NORMAL}"')
             else:
-                os.system(f'echo -e "\r\033[1A\033[0KRemoving secmon_{module} ... {RED}failed{NORMAL}"')
-
+                os.system(f'echo -e "\r\033[1A\033[0KRemoving secmon_{module["name"].lower()} ... {RED}failed{NORMAL}"')
 
 def path_validation(path, input_data):
     return path in input_data
@@ -110,22 +101,18 @@ def log_input_device_name_validation(name, input_data, index):
 
 
 # Create temp config for deployment
-def create_temp_config():
-    # Read configuration file
-    config = configparser.ConfigParser()
-    config.read(SECMON_MAIN_CONF)
-
-    # Validate secmon_config.ini
-    if not validate(config):
+def create_temp_config(secmon_config):
+    # Validate secmon_config.yaml
+    if not validate(secmon_config):
         sys.exit()
 
     # Write data to temp config for system services
     port = 9000
     aggregator_conf_file = open(SECMON_AGGREGATOR_CONF, "w+")
+    aggregator_conf_file.write("Log_input: %s\nName: %s\n" % (secmon_config['DEVICE']['log_input'], secmon_config['DEVICE']['name']))
 
-    aggregator_conf_file.write(f"Log_input: {config.get('DEVICE', 'log_input')}\nName: {config.get('DEVICE', 'name')}\n")
-    aggregator_conf_file.write(f"Nor_input_NP: {config.get('NORMALIZATION', 'input_NP')}\nNor_output_NP: {config.get('NORMALIZATION', 'output_NP')}\n")
-    aggregator_conf_file.write(f"Cor_input_NP: {config.get('CORRELATION', 'input_NP')}\nCor_output_NP: {config.get('CORRELATION', 'output_NP')}\n")
+    aggregator_conf_file.write("Nor_input_NP: %s\nNor_output_NP: %s\n" % (secmon_config['NORMALIZATION']['input_NP'], secmon_config['NORMALIZATION']['output_NP']))
+    aggregator_conf_file.write("Cor_input_NP: %s\nCor_output_NP: %s\n" % (secmon_config['CORRELATION']['input_NP'], secmon_config['CORRELATION']['output_NP']))
 
     # Write 0MQ port for aggregator
     aggregator_conf_file.write("Aggregator: %d\n" % port)
@@ -133,19 +120,11 @@ def create_temp_config():
     # Write 0MQ port for normalizer
     aggregator_conf_file.write("Normalizer: %d\n" % port)
 
-    # Write 0MQ port for geoip and 
-    if config.get('ENRICHMENT', 'geoip').lower() == "true":
-        aggregator_conf_file.write("Geoip: %d\n" % port)
-
-    # Write 0MQ port for network_model
-    if config.get('ENRICHMENT', 'network_model').lower() == "true":
-        aggregator_conf_file.write("Network_model: %d\n" % port)
-
-    # !!! ADD HERE ANY NEW ENRICHMENT MODULE 0MQ port CONFIG !!!
-
-    # if config.get('ENRICHMENT', 'rep_ip').lower() == "true":
-    #     #write 0MQ port for rep_ip
-    #     aggregator_conf_file.write("Rep_ip: %d\n" % port)
+    # Write 0MQ ports for every enrichment module in the config
+    for module in secmon_config["ENRICHMENT"]:
+        if module["enabled"] and module["name"] != "correlator":
+            aggregator_conf_file.write(f'{module["name"]}: {port}\n')
+        print(module["name"])
 
     aggregator_conf_file.close()
 
@@ -156,60 +135,60 @@ def validate(config):
     error = 0
 
     # log_input path validation
-    if not path_validation("/var/log/", config.get('DEVICE', 'log_input')):
+    if not path_validation("/var/log/", config['DEVICE']['log_input']):
         error_msg += '\n' + "Log input must contain /var/log/ path! Please change the path."
         error = 1
 
     # device name in log_input path validation
-    if not log_input_device_name_validation(config.get('DEVICE', 'name'), config.get('DEVICE', 'log_input'), 3):
+    if not log_input_device_name_validation(config['DEVICE']['name'], config['DEVICE']['log_input'], 3):
         error_msg += '\n' + ("Source directory of log input path must have a same name as device name! Please rename \
                              source directory on log input path.")
         error = 1
 
     # normalization input named pipe path validation
-    if not path_validation("/var/log/", config.get('NORMALIZATION', 'input_NP')):
+    if not path_validation("/var/log/", config['NORMALIZATION']['input_NP']):
         error_msg += '\n' + ("Path of normalization INPUT naped pipe must contain /var/log/ path! Please change the \
                              path.")
         error = 1
 
     # device name in normalization input named pipe validation
-    if not log_input_device_name_validation(config.get('DEVICE', 'name'), config.get('NORMALIZATION', 'input_NP'), 3):
+    if not log_input_device_name_validation(config['DEVICE']['name'], config['NORMALIZATION']['input_NP'], 3):
         error_msg += '\n' + ("Source directory of normalization INPUT named pipe must have a same name as device name! \
                              Please rename source directory on log input path.")
         error = 1
 
     # normalization output named pipe path validation
-    if not path_validation("/var/log/", config.get('NORMALIZATION', 'output_NP')):
+    if not path_validation("/var/log/", config['NORMALIZATION']['output_NP']):
         error_msg += '\n' + ("Path of normalization OUTPUT naped pipe must contain /var/log/ path! Please change the \
                              path.")
         error = 1
 
     # device name in normalization output named pipe validation
-    if not log_input_device_name_validation(config.get('DEVICE', 'name'), config.get('NORMALIZATION', 'output_NP'), 3):
+    if not log_input_device_name_validation(config['DEVICE']['name'], config['NORMALIZATION']['output_NP'], 3):
         error_msg += '\n' + ("Source directory of normalization OUTPUT named pipe must have a same name as device name! \
                              Please rename source directory on log input path.")
         error = 1
 
     # correlation input named pipe path validation
-    if not path_validation("/var/www/html/", config.get('CORRELATION', 'input_NP')):
+    if not path_validation("/var/www/html/", config['CORRELATION']['input_NP']):
         error_msg += '\n' + ("Path of correlation INPUT named pipe must contain /var/www/html/ path! Please change the \
                              path.")
         error = 1
 
     # device name in correlation input named pipe validation
-    if not log_input_device_name_validation(config.get('DEVICE', 'name'), config.get('CORRELATION', 'input_NP'), 4):
+    if not log_input_device_name_validation(config['DEVICE']['name'], config['CORRELATION']['input_NP'], 4):
         error_msg += '\n' + ("Source directory of correlation INPUT named pipe must have a same name as device name! \
                              Please rename source directory on log input path.")
         error = 1
 
     # correlation output named pipe path validation
-    if not path_validation("/var/www/html/", config.get('CORRELATION', 'output_NP')):
+    if not path_validation("/var/www/html/", config['CORRELATION']['output_NP']):
         error_msg += '\n' + ("Path of correlation OUTPUT named pipe must contain /var/www/html/ path! Please change \
                              the path.")
         error = 1
 
     # device name in correlation output named pipe validation
-    if not log_input_device_name_validation(config.get('DEVICE', 'name'), config.get('CORRELATION', 'output_NP'), 4):
+    if not log_input_device_name_validation(config['DEVICE']['name'], config['CORRELATION']['output_NP'], 4):
         error_msg += '\n' + ("Source directory of correlation OUTPUT named pipe must have a same name as device name! \
                              Please rename source directory on log input path.")
         error = 1
@@ -220,40 +199,51 @@ def validate(config):
     else:
         return True
 
+ALL_MODULES = []
+ENABLED_ENRICHMENT_MODULES = []
 
-# Script main entry point
+def get_config():
+    global ENABLED_ENRICHMENT_MODULES
+    global ALL_MODULES
+    with open(SECMON_MAIN_CONF) as secmon_config_file:
+        secmon_config = yaml.safe_load(secmon_config_file)
+
+        for module in secmon_config["ENRICHMENT"]:
+            if module["enabled"]:
+                ENABLED_ENRICHMENT_MODULES.append(module)
+            ALL_MODULES.append(module)
+        return secmon_config
 
 if len(sys.argv) < 2 or sys.argv[1] == "help":
     print_help()
     sys.exit()
 
-all_enrichment_modules = ['geoip', 'network_model', 'correlator']
-
 # Start stopped containers
 if sys.argv[1] == "start":
-    start_secmon_containers()
+    get_config()
+    start_secmon_containers(ENABLED_ENRICHMENT_MODULES)
     sys.exit()
 
 # Stop running containers
 if sys.argv[1] == "stop":
-    stop_secmon_containers()
+    get_config()
+    stop_secmon_containers(ALL_MODULES)
     sys.exit()
 
 # Stop and remove all secmon containers
 if sys.argv[1] == "remove":
-    stop_secmon_containers()
-    remove_secmon_containers()
-    os.system('docker compose down')
+    get_config()
+    stop_secmon_containers(ALL_MODULES)
+    remove_secmon_containers(ALL_MODULES)
+    os.system('docker compose -p secmon down')
     sys.exit()
 
 # Restart running containers
 if sys.argv[1] == "restart":
+    secmon_config = get_config()
     print(YELLOW, '\nRestarting SecMon modules:', NORMAL)
-    create_temp_config()
-    stop_secmon_containers()
-    remove_secmon_containers()
-    create_enrichment_modules()
-    os.system('docker compose restart')
+    create_temp_config(secmon_config)
+    restart_secmon_containers(ALL_MODULES, ENABLED_ENRICHMENT_MODULES)
     sys.exit()
 
 # Manually run secmon configuration
@@ -282,7 +272,8 @@ if sys.argv[1] == "deploy":
     else:
         print(YELLOW, "Initial configuration already executed. Skipping step.", NORMAL)
 
-    create_temp_config()
+    secmon_config = get_config()
+    create_temp_config(secmon_config)
 
     answer = input("Deploying SecMon will remove all existing SecMon containers and existing SecMon database.\n"
                    "This process also includes setting up different config files and creating new SecMon containers.\n"
@@ -291,9 +282,9 @@ if sys.argv[1] == "deploy":
         sys.exit()
     elif answer.lower() == "y":
         # Stop and remove enrichment modules
-        stop_secmon_containers()
-        remove_secmon_containers()
-        os.system('docker compose down')
+        stop_secmon_containers(ALL_MODULES)
+        remove_secmon_containers(ALL_MODULES)
+        os.system('docker compose -p secmon down')
 
         # Auto execute 'secmon_deploy.sh'
         if os.system('sudo bash ./secmon_deploy.sh') != 0: # set sudo
@@ -301,7 +292,9 @@ if sys.argv[1] == "deploy":
             sys.exit()
 
         os.system('docker compose -p secmon up -d')
-        create_enrichment_modules()
+
+        for module in ENABLED_ENRICHMENT_MODULES:
+            run_enrichment_module(module)
 
         # Check the status of the database and wait until it is ready to receive connections
         os.system( 'docker logs secmon_db 2>&1 | grep -q "listening on IPv4 address \\"0.0.0.0\\", port 5432" && echo \
@@ -317,6 +310,7 @@ if sys.argv[1] == "deploy":
         os.system(f'echo -n "Initializing SecMon admin user ... {GREEN}"')
         os.system('curl 127.0.0.1:8080/secmon/web/user/init')
 
+        restart_secmon_containers(ALL_MODULES, ENABLED_ENRICHMENT_MODULES)
         print(MAGENTA, "\nDeployment successful. SecMon is now live.", NORMAL)
         sys.exit()
     else:

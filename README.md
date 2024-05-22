@@ -37,13 +37,7 @@ cd secmon
 sudo python3 secmon_manager.py deploy
 
 # Create password for database user 'secmon' during installation
-
-# Default login credentials user:secmon, password:password
-# !!! Change password after first login !!!
-https://<host_machine_IP_address>:8443/secmon/web
 ```
-
-After successful installation configure logs forwarding on clients using [rsyslog service](./README.md#how-to-configure-clients-for-logs-forwarding).
 
 ---
 
@@ -74,13 +68,7 @@ cd secmon
 sudo python3 secmon_manager.py deploy
 
 # Create password for database user 'secmon' during installation
-
-# Default login credentials user:secmon, password:password
-# !!! Change password after first login !!!
-https://<host_machine_IP_address>:8443/secmon/web
 ```
-
-After successful installation configure logs forwarding on clients using [rsyslog service](./README.md#how-to-configure-clients-for-logs-forwarding).
 
 ---
 
@@ -112,14 +100,8 @@ cd secmon
 sudo python3 secmon_manager.py deploy
 
 # Create password for database user 'secmon' during installation
-
-# Default login credentials user:secmon, password:password
-# !!! Change password after first login !!!
-https://<host_machine_IP_address>:8443/secmon/web
 ```
 Installation of Docker on Rocky Linux 9: [installation help](./docs/docker_installation_RL9.md).
-
-After successful installation configure logs forwarding on clients using [rsyslog service](./README.md#how-to-configure-clients-for-logs-forwarding).
 
 ---
 
@@ -131,7 +113,7 @@ sudo apt clean all
 sudo apt -y update
 
 # Install git, firewall & rsyslog
-sudo apt install -y git ufw rsyslog
+sudo apt install -y git ufw firewalld rsyslog
 
 # Install python packages
 sudo apt-get install -y make build-essential libssl-dev zlib1g-dev \
@@ -143,6 +125,7 @@ sudo tar -xzf Python-3.6.15.tgz
 cd Python-3.6.15
 sudo ./configure --enable-optimizations  -with-lto  --with-pydebug
 sudo make altinstall
+cd ..
 
 # Setting up firewall
 sudo ufw allow 8080/tcp
@@ -157,19 +140,25 @@ cd secmon
 sudo python3 secmon_manager.py deploy
 
 # Create password for database user 'secmon' during installation
-
-# Default login credentials user:secmon, password:password
-# !!! Change password after first login !!!
-https://<host_machine_IP_address>:8443/secmon/web
 ```
-
-After successful installation configure logs forwarding on clients using [rsyslog service](./README.md#how-to-configure-clients-for-logs-forwarding).
 
 ---
 
 ## How to Use
+
+### Before first usage
+After successful installation configure logs forwarding on clients using [rsyslog service](./README.md#how-to-configure-clients-for-logs-forwarding).
+
+### Login info
+Application URL: `https://<host_machine_IP_address>:8443/secmon/web`
+
+Default login credentials: \
+`user: secmon` \
+`password: password`\
+Credentials should be changed after first login!
+
 ### SecMon Manager
-SecMon manager (*secmon_manager.py*) is a python script  located in root directory of SecMon repository. It is used for managing SecMon services as docker containers.
+SecMon manager (`secmon_manager.py`) is a python script  located in root directory of SecMon repository. It is used for managing SecMon services as docker containers.
 ```bash
 # Show list of all available parameters
 python3 secmon_manager.py help
@@ -183,7 +172,7 @@ python3 secmon_manager.py start
 # Restart running/stopped SecMon system
 python3 secmon_manager.py restart
 
-# Remove SecMon enrichment containers
+# Remove SecMon containers
 python3 secmon_manager.py remove
 
 # Manually run configuration script
@@ -197,13 +186,28 @@ python3 secmon_manager.py update-rules
 ```
 ## Configuration
 ### Turn on/off enrichment module
-Set value `true` /`false` in the file `./config/secmon_config.ini` for a particular enrichment module which you want to turn on/off:
-```ini
-[ENRICHMENT]
-correlation = true
-geoip = true
-network_model = true
+Set value `true` /`false` in the file `./config/secmon_config.yaml` for a particular enrichment module which you want to turn on/off:
+```yaml
+- name: Network_model
+  enabled: true
+  args: []
+- name: correlator
+  enabled: true
+  args: []
 ```
+
+### Pass Docker run arguments to an enrichment module
+Add `swith` and a following `argument` if needed in the file `./config/secmon_config.yaml` for a particular enrichment module which you want to modify:
+```yaml
+- name: CTI
+  enabled: true
+  args:
+  - "-e"
+  - NERD_API_KEY
+  - "-e"
+  - CROWD_API_KEY
+```
+
 After any changes in configuration or rule states, restart the SecMon system with the command:
 ```bash
 python3 secmon_manager.py restart

@@ -3,6 +3,7 @@
 use macgyer\yii2materializecss\widgets\data\DetailView;
 use yii\helpers\Html;
 use app\models\NetworkModel;
+use app\models\CtiModel;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\SecurityEvents */
@@ -10,6 +11,8 @@ use app\models\NetworkModel;
 $this->params['title'] = 'Security Event ID: ' . $model->id;
 $this->params['src_device'] = NetworkModel::getNetworkDevice($model->source_ip_network_model);
 $this->params['dst_device'] = NetworkModel::getNetworkDevice($model->destination_ip_network_model);
+$this->params['src_cti_model'] = CtiModel::getCtiInfo($model->source_cti_id);
+$this->params['dst_cti_model'] = CtiModel::getCtiInfo($model->destination_cti_id);
 ?>
 
 <div class="main-actions centered-horizontal">
@@ -92,6 +95,282 @@ $this->params['dst_device'] = NetworkModel::getNetworkDevice($model->destination
         </ul>
         <ul class="collapsible">
           <li>
+            <div class="collapsible-header light-blue accent-4" style="font-size:20px; color: white;"><i class="material-icons">security</i>CTI information: <?=$this->params["src_cti_model"]['crowdsec']->classification ?? null ?></div>
+            <div class="collapsible-body"><?= DetailView::widget([
+              'model' => $this->params["src_cti_model"],
+              'attributes' => [
+                [
+                  "label" => 'IP',
+                  'value' => $this->params["src_cti_model"]['ip']
+                ],
+                [
+                  "label" => 'FMP',
+                  'value' => $this->params["src_cti_model"]['nerd']->fmp ?? null
+                ],
+                [
+                  "label" => 'Reputational score',
+                  'format' => 'raw',
+                  'value' => function () {
+                    $tag = null;
+                    $reputationNerd = null;
+                    $scoreCrowd = null;
+                    if ($this->params["src_cti_model"]['reputation'] !== null) {
+                      $reputationNerd = $this->params["src_cti_model"]['reputation'];
+                      $iconNameNerd = 'dangerous';
+                      $colorClassNerd = "danger";
+
+                      if ($reputationNerd < 0.50) {
+                          $iconNameNerd = 'check_circle';
+                          $colorClassNerd = "safe";
+                      } elseif ($reputationNerd < 0.75) {
+                          $iconNameNerd = 'warning';
+                          $colorClassNerd = "warning";
+                      }
+                    }
+                    if ($this->params["src_cti_model"]['crowdsec'] !== null) {
+                      $scoreCrowd = $this->params["src_cti_model"]['crowdsec']->score_overall;
+                      $iconNameCrowd = 'dangerous';
+                      $colorClassCrowd = "danger";
+
+                      if ($scoreCrowd < 1) {
+                          $iconNameCrowd = 'check_circle';
+                          $colorClassCrowd = "safe";
+                      } elseif ($scoreCrowd < 4) {
+                          $iconNameCrowd = 'warning';
+                          $colorClassCrowd = "warning";
+                      }
+                    }
+                    $reputationNerdDiv = null;
+                    if ($reputationNerd !== null) {
+                      $reputationNerdDiv = Html::tag('i', $iconNameNerd, ['class' => "material-icons vertical-top " . $colorClassNerd]) ."&nbsp;". Html::tag('div', $reputationNerd, ['class' => "vertical-top"]) . "&nbsp;" . Html::tag('p', '[NERD]', ['class' => "vertical-top gray"]) . "<br>";
+                    }
+                    $scoreCrowdDiv = null;
+                    if ($scoreCrowd !== null){
+                      $scoreCrowdDiv = Html::tag('i', $iconNameCrowd, ['class' => "material-icons vertical-top " . $colorClassCrowd]) ."&nbsp;". Html::tag('div', $scoreCrowd, ['class' => "vertical-top"]) . "&nbsp;" . Html::tag('p', '[Crowdsec]', ['class' => "vertical-top gray"]);
+                    }
+                    $tag = $reputationNerdDiv . $scoreCrowdDiv;
+                    if ($tag) {
+                      return Html::tag('div', $tag);
+                    }
+                  },
+                ],
+                [
+                  "label" => 'Blacklists',
+                  'format' => 'raw',
+                  'value' => function () {
+                    if ($this->params["src_cti_model"]['nerd']?->blacklists === '' || $this->params["src_cti_model"]['nerd']?->blacklists === null)
+                      return null;
+                    return $this->params["src_cti_model"]['nerd']->blacklists ?? null;
+                  }
+                ],
+                [
+                  "label" => 'Classification',
+                  'format' => 'raw',
+                  'value' => function () {
+                    if ($this->params["src_cti_model"]['crowdsec']?->classification === '' || $this->params["src_cti_model"]['crowdsec']?->classification === null)
+                      return null;
+                    return $this->params["src_cti_model"]['crowdsec']->classification ?? null;
+                  }
+                ],
+                [
+                  "label" => 'False positives',
+                  'format' => 'raw',
+                  'value' => function () {
+                    if ($this->params["src_cti_model"]['crowdsec']?->false_pos === '' || $this->params["src_cti_model"]['crowdsec']?->false_pos === null)
+                      return null;
+                    return $this->params["src_cti_model"]['crowdsec']->false_pos ?? null;
+                  }
+                ],
+                [
+                  "label" => "Recorded events",
+                  'format' => 'raw',
+                  'value' => function(){
+                    $tag = null;
+                    if($this->params["src_cti_model"]["events"]?->nerd != null){
+                      $tag = $tag . Html::tag('div', $this->params["src_cti_model"]["events"]->nerd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[NERD]', ['class' => "vertical-top gray"]) . "<br>";
+                    }
+                    if($this->params["src_cti_model"]["events"]?->crowd != null){
+                      $tag = $tag . Html::tag('div', $this->params["src_cti_model"]["events"]->crowd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[Crowdsec]', ['class' => "vertical-top gray"]);
+                    }
+                    if ($tag){
+                      return Html::tag('div', $tag);
+                    }
+                    return null;
+                  }
+                ],
+                [
+                  "label" => "Geolocation",
+                  'format' => 'raw',
+                  'value' => function(){
+                    $tag = null;
+                    $crowd = null;
+                    $nerd = null;
+                    if($this->params["src_cti_model"]["city"]?->nerd != null){
+                      $nerd = $nerd . Html::tag('div', $this->params["src_cti_model"]["city"]->nerd . ", ", ['class' => "vertical-top"]);
+                    }
+                    if($this->params["src_cti_model"]["country"]?->nerd != null){
+                      $nerd = $nerd . Html::tag('div', $this->params["src_cti_model"]["country"]->nerd, ['class' => "vertical-top"]);
+                    }
+                    if ($nerd){
+                      $nerd = $nerd ."&nbsp;". Html::tag('p', '[NERD]', ['class' => "vertical-top gray"]) . "<br>";
+                    }
+
+                    if($this->params["src_cti_model"]["city"]?->crowd != null){
+                      $crowd = $crowd . Html::tag('div', $this->params["src_cti_model"]["city"]->crowd . ", ", ['class' => "vertical-top"]);
+                    }
+                    if($this->params["src_cti_model"]["country"]?->crowd != null){
+                      $crowd = $crowd . Html::tag('div', $this->params["src_cti_model"]["country"]->crowd, ['class' => "vertical-top"]);
+                    }
+                    if ($crowd){
+                      $crowd = $crowd ."&nbsp;". Html::tag('p', '[Crowdsec]', ['class' => "vertical-top gray"]);
+                    }
+
+                    $tag = $nerd . $crowd;
+                    if ($tag){
+                      return Html::tag('div', $tag);
+                    }
+                  }
+                ],
+                [
+                  "label" => "IP range",
+                  'format' => 'raw',
+                  'value' => function(){
+                    $tag = null;
+                    if ($this->params["src_cti_model"]["ip_range"]?->nerd != null && ($this->params["src_cti_model"]["ip_range"]->nerd == $this->params["src_cti_model"]["ip_range"]->crowd)){
+                      return Html::tag('div', $this->params["src_cti_model"]["ip_range"]->nerd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[NERD, Crowdsec]', ['class' => "vertical-top gray"]);
+                    }
+                    if($this->params["src_cti_model"]["ip_range"]?->nerd != null){
+                      $tag = $tag . Html::tag('div', $this->params["src_cti_model"]["ip_range"]->nerd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[NERD]', ['class' => "vertical-top gray"]) . "<br>";
+                    }
+                    if($this->params["src_cti_model"]["ip_range"]?->crowd != null){
+                      $tag = $tag . Html::tag('div', $this->params["src_cti_model"]["ip_range"]->crowd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[Crowdsec]', ['class' => "vertical-top gray"]);
+                    }
+                    if ($tag){
+                      return Html::tag('div', $tag);
+                    }
+                  }
+                ],
+                [
+                  "label" => "IP range reputational score",
+                  'format' => 'raw',
+                  'value' => function(){
+                    $tag = null;
+                    if($this->params["src_cti_model"]["ip_range_rep"]?->nerd != null){
+                      $tag = $tag . Html::tag('div', $this->params["src_cti_model"]["ip_range_rep"]->nerd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[NERD]', ['class' => "vertical-top gray"]) . "<br>";
+                    }
+                    if($this->params["src_cti_model"]["ip_range_rep"]?->crowd != null && $this->params["src_cti_model"]["ip_range_rep"]?->crowd !== ' '){
+                      $tag = $tag . Html::tag('div', $this->params["src_cti_model"]["ip_range_rep"]->crowd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[Crowdsec]', ['class' => "vertical-top gray"]);
+                    }
+                    if ($tag){
+                      return Html::tag('div', $tag);
+                    }
+                  }
+                ],
+                [
+                  "label" => "Hostname",
+                  'format' => 'raw',
+                  'value' => function(){
+                    $tag = null;
+                    if ($this->params["src_cti_model"]["hostname"]?->nerd != null && ($this->params["src_cti_model"]["hostname"]->nerd == $this->params["src_cti_model"]["hostname"]->crowd)){
+                      return Html::tag('div', $this->params["src_cti_model"]["hostname"]->nerd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[NERD, Crowdsec]', ['class' => "vertical-top gray"]);
+                    }
+
+                    if($this->params["src_cti_model"]["hostname"]?->nerd != null){
+                      $tag = $tag . Html::tag('div', $this->params["src_cti_model"]["hostname"]->nerd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[NERD]', ['class' => "vertical-top gray"]) . "<br>";
+                    }
+                    if($this->params["src_cti_model"]["hostname"]?->crowd != null){
+                      $tag = $tag . Html::tag('div', $this->params["src_cti_model"]["hostname"]->crowd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[Crowdsec]', ['class' => "vertical-top gray"]);
+                    }
+                    if ($tag){
+                      return Html::tag('div', $tag);
+                    }
+                  }
+                ],
+                [
+                  "label" => "AS name (AS number)",
+                  'format' => 'raw',
+                  'value' => function(){
+                    $tag = null;
+                    $nerd = null;
+                    $crowd = null;
+                    if($this->params["src_cti_model"]["as_name"]?->nerd != null){
+                      $nerd = $nerd . Html::tag('div', $this->params["src_cti_model"]["as_name"]->nerd . " ", ['class' => "vertical-top"]);
+                    }
+                    if($this->params["src_cti_model"]["as_num"]?->nerd != null){
+                      $nerd = $nerd . Html::tag('div', "(".$this->params["src_cti_model"]["as_num"]->nerd.")", ['class' => "vertical-top"]);
+                    }
+                    if ($nerd){
+                      $nerd = $nerd ."&nbsp;". Html::tag('p', '[NERD]', ['class' => "vertical-top gray"]) . "<br>";
+                    }
+                    if($this->params["src_cti_model"]["as_name"]?->crowd != null){
+                      $crowd = $crowd . Html::tag('div', $this->params["src_cti_model"]["as_name"]->crowd . " ", ['class' => "vertical-top"]);
+                    }
+                    if($this->params["src_cti_model"]["as_num"]?->crowd != null){
+                      $crowd = $crowd . Html::tag('div', "(".$this->params["src_cti_model"]["as_num"]->crowd.")", ['class' => "vertical-top"]);
+                    }
+                    if ($crowd){
+                      $crowd = $crowd . "&nbsp;". Html::tag('p', '[Crowdsec]', ['class' => "vertical-top gray"]);
+                    }
+                    $tag = $nerd . $crowd;
+                    if ($tag){
+                      return Html::tag('div', $tag);
+                    }
+                  }
+                ],
+                [
+                  "label" => "First seen",
+                  'format' => 'raw',
+                  'value' => function(){
+                    $tag = null;
+                    if($this->params["src_cti_model"]["first_seen"]?->nerd != null){
+                      $tag = $tag . Html::tag('div', $this->params["src_cti_model"]["first_seen"]->nerd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[NERD]', ['class' => "vertical-top gray"]) . "<br>";
+                    }
+                    if($this->params["src_cti_model"]["first_seen"]?->crowd != null){
+                      $tag = $tag . Html::tag('div', $this->params["src_cti_model"]["first_seen"]->crowd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[Crowdsec]', ['class' => "vertical-top gray"]);
+                    }
+                    if ($tag){
+                      return Html::tag('div', $tag);
+                    }
+                  }
+                ],
+                [
+                  "label" => "Last seen",
+                  'format' => 'raw',
+                  'value' => function(){
+                    $tag = null;
+                    if($this->params["src_cti_model"]["last_seen"]?->nerd != null){
+                      $tag = $tag . Html::tag('div', $this->params["src_cti_model"]["last_seen"]->nerd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[NERD]', ['class' => "vertical-top gray"]) . "<br>";
+                    }
+                    if($this->params["src_cti_model"]["last_seen"]?->crowd != null){
+                      $tag = $tag . Html::tag('div', $this->params["src_cti_model"]["last_seen"]->crowd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[Crowdsec]', ['class' => "vertical-top gray"]);
+                    }
+                    if ($tag){
+                      return Html::tag('div', $tag);
+                    }
+                  }
+                ],
+                [
+                  "label" => 'Last API update',
+                  'format' => 'raw',
+                  'value' => function(){
+                    $tag = null;
+                    if($this->params["src_cti_model"]['nerd'] != null){
+                      $tag = $tag . Html::tag('div', $this->params["src_cti_model"]['nerd']->last_checked_at, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[NERD]', ['class' => "vertical-top gray"]) . "<br>";
+                    }
+                    if($this->params["src_cti_model"]['crowdsec'] != null){
+                      $tag = $tag . Html::tag('div', $this->params["src_cti_model"]['crowdsec']->last_checked_at, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[Crowdsec]', ['class' => "vertical-top gray"]);
+                    }
+                    if ($tag){
+                      return Html::tag('div', $tag);
+                    }
+                  }
+                ],
+              ],
+            ]) ?></div>
+          </li>
+        </ul>
+        <ul class="collapsible">
+          <li>
             <div class="collapsible-header light-blue accent-4" style="font-size:20px; color: white;"><i class="material-icons">laptop</i>Network model information: <?= $this->params['src_device']->description?></div>
             <div class="collapsible-body"><?= DetailView::widget([
               'model' => NetworkModel::getNetworkDevice($model->source_ip_network_model),
@@ -151,6 +430,283 @@ $this->params['dst_device'] = NetworkModel::getNetworkDevice($model->destination
                   'destination_geo_longitude',
               ],
           ]) ?></div>
+          </li>
+        </ul>
+        <ul class="collapsible">
+          <li>
+            <div class="collapsible-header light-blue accent-4" style="font-size:20px; color: white;"><i class="material-icons">security</i>CTI information: <?= $this->params["dst_cti_model"]['crowdsec']->classification ?? null ?> </div>
+            <div class="collapsible-body"><?= DetailView::widget([
+              'model' => $this->params["dst_cti_model"],
+              'attributes' => [
+                [
+                  "label" => 'IP',
+                  'value' => $this->params["dst_cti_model"]['ip']
+                ],
+                [
+                  "label" => 'FMP',
+                  'value' => $this->params["dst_cti_model"]['nerd']->fmp ?? null
+                ],
+                [
+                  "label" => 'Reputational score',
+                  'format' => 'raw',
+                  'value' => function () {
+                    $tag = null;
+                    $reputationNerd = null;
+                    $scoreCrowd = null;
+
+                    if ($this->params["dst_cti_model"]['reputation'] !== null) {
+                      $reputationNerd = $this->params["dst_cti_model"]['reputation'];
+                      $iconNameNerd = 'dangerous';
+                      $colorClassNerd = "danger";
+
+                      if ($reputationNerd < 0.50) {
+                          $iconNameNerd = 'check_circle';
+                          $colorClassNerd = "safe";
+                      } elseif ($reputationNerd < 0.75) {
+                          $iconNameNerd = 'warning';
+                          $colorClassNerd = "warning";
+                      }
+                    }
+                    if ($this->params["dst_cti_model"]['crowdsec'] !== null) {
+                      $scoreCrowd = $this->params["dst_cti_model"]['crowdsec']->score_overall;
+                      $iconNameCrowd = 'dangerous';
+                      $colorClassCrowd = "danger";
+
+                      if ($scoreCrowd < 1) {
+                          $iconNameCrowd = 'check_circle';
+                          $colorClassCrowd = "safe";
+                      } elseif ($scoreCrowd < 4) {
+                          $iconNameCrowd = 'warning';
+                          $colorClassCrowd = "warning";
+                      }
+                    }
+                    $reputationNerdDiv = null;
+                    if ($reputationNerd !== null) {
+                      $reputationNerdDiv = Html::tag('i', $iconNameNerd, ['class' => "material-icons vertical-top " . $colorClassNerd]) ."&nbsp;". Html::tag('div', $reputationNerd, ['class' => "vertical-top"]) . "&nbsp;" . Html::tag('p', '[NERD]', ['class' => "vertical-top gray"]) . "<br>";
+                    }
+                    $scoreCrowdDiv = null;
+                    if ($scoreCrowd !== null){
+                      $scoreCrowdDiv = Html::tag('i', $iconNameCrowd, ['class' => "material-icons vertical-top " . $colorClassCrowd]) ."&nbsp;". Html::tag('div', $scoreCrowd, ['class' => "vertical-top"]) . "&nbsp;" . Html::tag('p', '[Crowdsec]', ['class' => "vertical-top gray"]);
+                    }
+                    $tag = $reputationNerdDiv . $scoreCrowdDiv;
+                    if ($tag) {
+                      return Html::tag('div', $tag);
+                    }
+                  },
+                ],
+                [
+                  "label" => 'Blacklists',
+                  'format' => 'raw',
+                  'value' => function () {
+                    if ($this->params["dst_cti_model"]['nerd']?->blacklists === '' || $this->params["dst_cti_model"]['nerd']?->blacklists === null)
+                      return null;
+                    return $this->params["dst_cti_model"]['nerd']->blacklists ?? null;
+                  }
+                ],
+                [
+                  "label" => 'Classification',
+                  'format' => 'raw',
+                  'value' => function () {
+                    if ($this->params["dst_cti_model"]['crowdsec']?->classification === '' || $this->params["dst_cti_model"]['crowdsec']?->classification === null)
+                      return null;
+                    return $this->params["dst_cti_model"]['crowdsec']->classification ?? null;
+                  }
+                ],
+                [
+                  "label" => 'False positives',
+                  'format' => 'raw',
+                  'value' => function () {
+                    if ($this->params["dst_cti_model"]['crowdsec']?->false_pos === '' || $this->params["dst_cti_model"]['crowdsec']?->false_pos === null)
+                      return null;
+                    return $this->params["dst_cti_model"]['crowdsec']->false_pos ?? null;
+                  }
+                ],
+                [
+                  "label" => "Recorded events",
+                  'format' => 'raw',
+                  'value' => function(){
+                    $tag = null;
+                    if($this->params["dst_cti_model"]["events"]?->nerd != null){
+                      $tag = $tag . Html::tag('div', $this->params["dst_cti_model"]["events"]->nerd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[NERD]', ['class' => "vertical-top gray"]) . "<br>";
+                    }
+                    if($this->params["dst_cti_model"]["events"]?->crowd != null){
+                      $tag = $tag . Html::tag('div', $this->params["dst_cti_model"]["events"]->crowd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[Crowdsec]', ['class' => "vertical-top gray"]);
+                    }
+                    if ($tag){
+                      return Html::tag('div', $tag);
+                    }
+                    return null;
+                  }
+                ],
+                [
+                  "label" => "Geolocation",
+                  'format' => 'raw',
+                  'value' => function(){
+                    $tag = null;
+                    $crowd = null;
+                    $nerd = null;
+                    if($this->params["dst_cti_model"]["city"]?->nerd != null){
+                      $nerd = $nerd . Html::tag('div', $this->params["dst_cti_model"]["city"]->nerd . ", ", ['class' => "vertical-top"]);
+                    }
+                    if($this->params["dst_cti_model"]["country"]?->nerd != null){
+                      $nerd = $nerd . Html::tag('div', $this->params["dst_cti_model"]["country"]->nerd, ['class' => "vertical-top"]);
+                    }
+                    if ($nerd){
+                      $nerd = $nerd ."&nbsp;". Html::tag('p', '[NERD]', ['class' => "vertical-top gray"]) . "<br>";
+                    }
+
+                    if($this->params["dst_cti_model"]["city"]?->crowd != null){
+                      $crowd = $crowd . Html::tag('div', $this->params["dst_cti_model"]["city"]->crowd . ", ", ['class' => "vertical-top"]);
+                    }
+                    if($this->params["dst_cti_model"]["country"]?->crowd != null){
+                      $crowd = $crowd . Html::tag('div', $this->params["dst_cti_model"]["country"]->crowd, ['class' => "vertical-top"]);
+                    }
+                    if ($crowd){
+                      $crowd = $crowd ."&nbsp;". Html::tag('p', '[Crowdsec]', ['class' => "vertical-top gray"]);
+                    }
+
+                    $tag = $nerd . $crowd;
+                    if ($tag){
+                      return Html::tag('div', $tag);
+                    }
+                  }
+                ],
+                [
+                  "label" => "IP range",
+                  'format' => 'raw',
+                  'value' => function(){
+                    $tag = null;
+                    if ($this->params["dst_cti_model"]["ip_range"]?->nerd != null && ($this->params["dst_cti_model"]["ip_range"]->nerd == $this->params["dst_cti_model"]["ip_range"]->crowd)){
+                      return Html::tag('div', $this->params["dst_cti_model"]["ip_range"]->nerd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[NERD, Crowdsec]', ['class' => "vertical-top gray"]);
+                    }
+                    if($this->params["dst_cti_model"]["ip_range"]?->nerd != null){
+                      $tag = $tag . Html::tag('div', $this->params["dst_cti_model"]["ip_range"]->nerd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[NERD]', ['class' => "vertical-top gray"]) . "<br>";
+                    }
+                    if($this->params["dst_cti_model"]["ip_range"]?->crowd != null){
+                      $tag = $tag . Html::tag('div', $this->params["dst_cti_model"]["ip_range"]->crowd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[Crowdsec]', ['class' => "vertical-top gray"]);
+                    }
+                    if ($tag){
+                      return Html::tag('div', $tag);
+                    }
+                  }
+                ],
+                [
+                  "label" => "IP range reputational score",
+                  'format' => 'raw',
+                  'value' => function(){
+                    $tag = null;
+                    if($this->params["dst_cti_model"]["ip_range_rep"]?->nerd != null){
+                      $tag = $tag . Html::tag('div', $this->params["dst_cti_model"]["ip_range_rep"]->nerd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[NERD]', ['class' => "vertical-top gray"]) . "<br>";
+                    }
+                    if($this->params["dst_cti_model"]["ip_range_rep"]?->crowd != null && $this->params["dst_cti_model"]["ip_range_rep"]?->crowd !== ' '){
+                      $tag = $tag . Html::tag('div', $this->params["dst_cti_model"]["ip_range_rep"]->crowd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[Crowdsec]', ['class' => "vertical-top gray"]);
+                    }
+                    if ($tag){
+                      return Html::tag('div', $tag);
+                    }
+                  }
+                ],
+                [
+                  "label" => "Hostname",
+                  'format' => 'raw',
+                  'value' => function(){
+                    $tag = null;
+                    if ($this->params["dst_cti_model"]["hostname"]?->nerd != null && ($this->params["dst_cti_model"]["hostname"]->nerd == $this->params["dst_cti_model"]["hostname"]->crowd)){
+                      return Html::tag('div', $this->params["dst_cti_model"]["hostname"]->nerd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[NERD, Crowdsec]', ['class' => "vertical-top gray"]);
+                    }
+
+                    if($this->params["dst_cti_model"]["hostname"]?->nerd != null){
+                      $tag = $tag . Html::tag('div', $this->params["dst_cti_model"]["hostname"]->nerd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[NERD]', ['class' => "vertical-top gray"]) . "<br>";
+                    }
+                    if($this->params["dst_cti_model"]["hostname"]?->crowd != null){
+                      $tag = $tag . Html::tag('div', $this->params["dst_cti_model"]["hostname"]->crowd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[Crowdsec]', ['class' => "vertical-top gray"]);
+                    }
+                    if ($tag){
+                      return Html::tag('div', $tag);
+                    }
+                  }
+                ],
+                [
+                  "label" => "AS name (AS number)",
+                  'format' => 'raw',
+                  'value' => function(){
+                    $tag = null;
+                    $nerd = null;
+                    $crowd = null;
+                    if($this->params["dst_cti_model"]["as_name"]?->nerd != null){
+                      $nerd = $nerd . Html::tag('div', $this->params["dst_cti_model"]["as_name"]->nerd . " ", ['class' => "vertical-top"]);
+                    }
+                    if($this->params["dst_cti_model"]["as_num"]?->nerd != null){
+                      $nerd = $nerd . Html::tag('div', "(".$this->params["dst_cti_model"]["as_num"]->nerd.")", ['class' => "vertical-top"]);
+                    }
+                    if ($nerd){
+                      $nerd = $nerd ."&nbsp;". Html::tag('p', '[NERD]', ['class' => "vertical-top gray"]) . "<br>";
+                    }
+                    if($this->params["dst_cti_model"]["as_name"]?->crowd != null){
+                      $crowd = $crowd . Html::tag('div', $this->params["dst_cti_model"]["as_name"]->crowd . " ", ['class' => "vertical-top"]);
+                    }
+                    if($this->params["dst_cti_model"]["as_num"]?->crowd != null){
+                      $crowd = $crowd . Html::tag('div', "(".$this->params["dst_cti_model"]["as_num"]->crowd.")", ['class' => "vertical-top"]);
+                    }
+                    if ($crowd){
+                      $crowd = $crowd . "&nbsp;". Html::tag('p', '[Crowdsec]', ['class' => "vertical-top gray"]);
+                    }
+                    $tag = $nerd . $crowd;
+                    if ($tag){
+                      return Html::tag('div', $tag);
+                    }
+                  }
+                ],
+                [
+                  "label" => "First seen",
+                  'format' => 'raw',
+                  'value' => function(){
+                    $tag = null;
+                    if($this->params["dst_cti_model"]["first_seen"]?->nerd != null){
+                      $tag = $tag . Html::tag('div', $this->params["dst_cti_model"]["first_seen"]->nerd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[NERD]', ['class' => "vertical-top gray"]) . "<br>";
+                    }
+                    if($this->params["dst_cti_model"]["first_seen"]?->crowd != null){
+                      $tag = $tag . Html::tag('div', $this->params["dst_cti_model"]["first_seen"]->crowd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[Crowdsec]', ['class' => "vertical-top gray"]);
+                    }
+                    if ($tag){
+                      return Html::tag('div', $tag);
+                    }
+                  }
+                ],
+                [
+                  "label" => "Last seen",
+                  'format' => 'raw',
+                  'value' => function(){
+                    $tag = null;
+                    if($this->params["dst_cti_model"]["last_seen"]?->nerd != null){
+                      $tag = $tag . Html::tag('div', $this->params["dst_cti_model"]["last_seen"]->nerd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[NERD]', ['class' => "vertical-top gray"]) . "<br>";
+                    }
+                    if($this->params["dst_cti_model"]["last_seen"]?->crowd != null){
+                      $tag = $tag . Html::tag('div', $this->params["dst_cti_model"]["last_seen"]->crowd, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[Crowdsec]', ['class' => "vertical-top gray"]);
+                    }
+                    if ($tag){
+                      return Html::tag('div', $tag);
+                    }
+                  }
+                ],
+                [
+                  "label" => 'Last API update',
+                  'format' => 'raw',
+                  'value' => function(){
+                    $tag = null;
+                    if($this->params["dst_cti_model"]['nerd'] != null){
+                      $tag = $tag . Html::tag('div', $this->params["dst_cti_model"]['nerd']->last_checked_at, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[NERD]', ['class' => "vertical-top gray"]) . "<br>";
+                    }
+                    if($this->params["dst_cti_model"]['crowdsec'] != null){
+                      $tag = $tag . Html::tag('div', $this->params["dst_cti_model"]['crowdsec']->last_checked_at, ['class' => "vertical-top"]) ."&nbsp;". Html::tag('p', '[Crowdsec]', ['class' => "vertical-top gray"]);
+                    }
+                    if ($tag){
+                      return Html::tag('div', $tag);
+                    }
+                  }
+                ],
+              ],
+            ]) ?></div>
           </li>
         </ul>
         <ul class="collapsible">

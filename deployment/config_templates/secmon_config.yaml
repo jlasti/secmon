@@ -1,0 +1,39 @@
+---
+DATABASE:
+  database: secmon
+  user: secmon
+  password: <password>
+  max_size: 10000000
+  max_days: 30
+  sleep_interval: 600
+  host: secmon_db
+DEVICE:
+  name: secmon
+  log_input: "/var/log/secmon"
+NORMALIZATION:
+  input_NP: "/var/log/secmon/__secOutput"
+  output_NP: "/var/log/secmon/__secInput"
+CORRELATION:
+  input_NP: "/var/www/html/secmon/__secOutput"
+  output_NP: "/var/www/html/secmon/__secInput"
+RULES_REPOSITORY:
+  url: https://github.com/jlasti/secmon-rules.git
+ENRICHMENT:
+- name: Geoip
+  enabled: true
+  args: []
+- name: CTI
+  enabled: true
+  args:
+  - "-e"
+  - NERD_API_KEY
+  #- NERD_API_KEY="INSERT_YOUR_KEY_THERE"
+  - "-e"
+  - CROWD_API_KEY
+  #- CROWD_API_KEY="INSERT_YOUR_KEY_THERE"
+- name: Network_model
+  enabled: true
+  args: []
+- name: correlator
+  enabled: true
+  args: []
