@@ -192,6 +192,9 @@ python3 secmon_manager.py config
 # Deploy SecMon system on a host machine
 python3 secmon_manager.py deploy
 
+# Update SecMon while preserving database data
+python3 secmon_manager.py update
+
 # Update standard rules set
 python3 secmon_manager.py update-rules
 ```

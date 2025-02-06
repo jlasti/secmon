@@ -25,6 +25,7 @@ def print_help():
     print("\"restart\" - to restart SecMon containers")
     print("\"remove\" - to remove all SecMon enrichment containers")
     print("\"config\" - to run initial SecMon configuration")
+    print("\"update\" - update SecMon while preserving database data")
     print("\"update-rules\" - to manually update default rules\n")
 
 
@@ -274,6 +275,44 @@ if sys.argv[1] == "update-rules":
     print(GREEN, 'Download successful', NORMAL)
     sys.exit()
 
+if sys.argv[1] == "update":
+    print(YELLOW, "Starting soft update of SecMon. Database data will be preserved.", NORMAL)
+
+    if os.system('sudo bash ./secmon_preconfig.sh') != 0: # set sudo
+        print(RED, '\nError occurred during SecMon configuration, SecMon configuration process was unsuccessful.', NORMAL)
+        sys.exit()
+
+    create_temp_config()
+
+    # Stop and remove enrichment modules
+    stop_secmon_containers()
+    remove_secmon_containers()
+    os.system('docker compose down')
+
+    # Auto execute 'secmon_deploy.sh'
+    if os.system('sudo bash ./secmon_deploy.sh') != 0: # set sudo
+        print(RED, '\nError occurred during script secmon_deploy.sh execution, SecMon deploying process was unsuccessful.', NORMAL)
+        sys.exit()
+    
+    # Build and start SecMon containers
+    os.system('docker compose -p secmon up -d')
+    create_enrichment_modules()
+
+    # Check the status of the database and wait until it is ready to receive connections
+    os.system('docker logs secmon_db 2>&1 | grep -q "listening on IPv4 address \\"0.0.0.0\\", port 5432" && echo \
+        "Database is ready to receive connections" || echo "Database is not ready to receive connections..."')
+    time.sleep(1)
+    while os.system('docker logs secmon_db 2>&1 | grep -q "listening on IPv4 address \\"0.0.0.0\\", port 5432"') != 0:
+        print('Waiting for database to be ready to receive connections...')
+        time.sleep(5)
+
+    os.system('docker exec -it secmon_app chgrp -R www-data .') # Ensure the web-app files are accessible to web server
+
+    # Initialize admin user 
+    print(MAGENTA, "\nSoft update successful. SecMon is now live.", NORMAL)
+
+    sys.exit()
+
 if sys.argv[1] == "deploy":
     if not os.path.isfile('./config/.lock'):
         if os.system('sudo bash ./secmon_preconfig.sh') != 0: # set sudo
@@ -304,7 +343,7 @@ if sys.argv[1] == "deploy":
         create_enrichment_modules()
 
         # Check the status of the database and wait until it is ready to receive connections
-        os.system( 'docker logs secmon_db 2>&1 | grep -q "listening on IPv4 address \\"0.0.0.0\\", port 5432" && echo \
+        os.system('docker logs secmon_db 2>&1 | grep -q "listening on IPv4 address \\"0.0.0.0\\", port 5432" && echo \
             "Database is ready to receive connections" || echo "Database is not ready to receive connections..."')
         time.sleep(1)
         while os.system('docker logs secmon_db 2>&1 | grep -q "listening on IPv4 address \\"0.0.0.0\\", port 5432"') != 0:
