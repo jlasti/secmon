@@ -25,7 +25,7 @@ def print_help():
     print("\"restart\" - to restart SecMon containers")
     print("\"remove\" - to remove all SecMon enrichment containers")
     print("\"config\" - to run initial SecMon configuration")
-    print("\"soft-update\" - update SecMon while preserving database data")
+    print("\"update\" - update SecMon while preserving database data")
     print("\"update-rules\" - to manually update default rules\n")
 
 
@@ -275,7 +275,7 @@ if sys.argv[1] == "update-rules":
     print(GREEN, 'Download successful', NORMAL)
     sys.exit()
 
-if sys.argv[1] == "soft-update":
+if sys.argv[1] == "update":
     print(YELLOW, "Starting soft update of SecMon. Database data will be preserved.", NORMAL)
 
     if os.system('sudo bash ./secmon_preconfig.sh') != 0: # set sudo
