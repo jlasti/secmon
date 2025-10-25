@@ -472,7 +472,7 @@ foreach($chartData as $key => $record)
                 selectedColumns.push(columnsList[i].getAttribute('data-sort').replace('-', ''))
             }
 
-            $.post("/secmon/web/security-events/update-selected-columns", {value:selectedColumns});
+            $.post("/security-events/update-selected-columns", {value:selectedColumns});
         }
     });
     
@@ -526,7 +526,7 @@ foreach($chartData as $key => $record)
     // Save selected columns into database
     $("#saveSelectedColumns").on("click", function (event, ui) {
         var selectedColumns = extractColumnsFromChips()
-        $.post("/secmon/web/security-events/update-selected-columns", {value:selectedColumns});
+        $.post("/security-events/update-selected-columns", {value:selectedColumns});
     });
 
     // Validation of input values which should be added to filter
@@ -619,7 +619,7 @@ foreach($chartData as $key => $record)
 
         $('<div class="table-cell-window">\
             <p>Add to filter:</p>\
-            <form id="addAttributeToFilterForm-1-' + index + '" action="/secmon/web/security-events/add-attribute-to-filter" method="post">\
+            <form id="addAttributeToFilterForm-1-' + index + '" action="/security-events/add-attribute-to-filter" method="post">\
             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />\
             <input type="hidden" name="operator" value="AND">\
             <input type="hidden" name="negation" value=false>\
@@ -627,7 +627,7 @@ foreach($chartData as $key => $record)
             <input type="hidden" name="column" value="' + column + '">\
             <input type="submit" value="+ AND is ' + cellContent + '">\
             </form>\
-            <form id="addAttributeToFilterForm-2-' + index + '" action="/secmon/web/security-events/add-attribute-to-filter" method="post">\
+            <form id="addAttributeToFilterForm-2-' + index + '" action="/security-events/add-attribute-to-filter" method="post">\
             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />\
             <input type="hidden" name="operator" value="AND">\
             <input type="hidden" name="negation" value=true>\
@@ -635,7 +635,7 @@ foreach($chartData as $key => $record)
             <input type="hidden" name="column" value="' + column + '">\
             <input type="submit" value="+ AND is NOT ' + cellContent + '">\
             </form>\
-            <form id="addAttributeToFilterForm-3-' + index + '" action="/secmon/web/security-events/add-attribute-to-filter" method="post">\
+            <form id="addAttributeToFilterForm-3-' + index + '" action="/security-events/add-attribute-to-filter" method="post">\
             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />\
             <input type="hidden" name="operator" value="OR">\
             <input type="hidden" name="negation" value=false>\
@@ -688,7 +688,7 @@ foreach($chartData as $key => $record)
 
     function updateAbsoluteTimeFilter(from, to){
         $.ajax({
-            url: "/secmon/web/security-events/update-time-filter",
+            url: "/security-events/update-time-filter",
             method: "POST",
             data:
             {
@@ -712,7 +712,7 @@ foreach($chartData as $key => $record)
         var e = document.getElementById("numberOfRecords");
         var value = e.value;
         $.ajax({
-            url: "/secmon/web/security-events/update-number-of-records",
+            url: "/security-events/update-number-of-records",
             method: "POST",
             data:
             {

@@ -334,7 +334,7 @@ $(function () {
                 $(e).attr("class", "component-row");
                 $(e).attr(
                   "data-key",
-                  "/secmon/web/security-events/view?id=" +
+                  "/security-events/view?id=" +
                     $(e).find("td")[0].innerHTML
                 );
                 $($(e).find("td")[0]).css("display", "none");
@@ -406,7 +406,7 @@ $(function () {
               $(e).attr("class", "component-row");
               $(e).attr(
                 "data-key",
-                "/secmon/web/security-events/view?id=" +
+                "/security-events/view?id=" +
                   $(e).find("td")[0].innerHTML
               );
               $($(e).find("td")[0]).css("display", "none");
@@ -553,7 +553,7 @@ $(function () {
               $(e).attr("class", "component-row");
               $(e).attr(
                 "data-key",
-                "/secmon/web/security-events/view?id=" +
+                "/security-events/view?id=" +
                   $(e).find("td")[0].innerHTML
               );
               $($(e).find("td")[0]).css("display", "none");

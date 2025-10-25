@@ -40,7 +40,7 @@ sudo python3 secmon_manager.py deploy
 
 # Default login credentials user:secmon, password:password
 # !!! Change password after first login !!!
-https://<host_machine_IP_address>:8443/secmon/web
+https://<host_machine_IP_address>:8443/
 ```
 
 After successful installation configure logs forwarding on clients using [rsyslog service](./README.md#how-to-configure-clients-for-logs-forwarding).
@@ -77,7 +77,7 @@ sudo python3 secmon_manager.py deploy
 
 # Default login credentials user:secmon, password:password
 # !!! Change password after first login !!!
-https://<host_machine_IP_address>:8443/secmon/web
+https://<host_machine_IP_address>:8443/
 ```
 
 After successful installation configure logs forwarding on clients using [rsyslog service](./README.md#how-to-configure-clients-for-logs-forwarding).
@@ -115,7 +115,7 @@ sudo python3 secmon_manager.py deploy
 
 # Default login credentials user:secmon, password:password
 # !!! Change password after first login !!!
-https://<host_machine_IP_address>:8443/secmon/web
+https://<host_machine_IP_address>:8443/
 ```
 Installation of Docker on Rocky Linux 9: [installation help](./docs/docker_installation_RL9.md).
 
@@ -160,7 +160,7 @@ sudo python3 secmon_manager.py deploy
 
 # Default login credentials user:secmon, password:password
 # !!! Change password after first login !!!
-https://<host_machine_IP_address>:8443/secmon/web
+https://<host_machine_IP_address>:8443/
 ```
 
 After successful installation configure logs forwarding on clients using [rsyslog service](./README.md#how-to-configure-clients-for-logs-forwarding).
