@@ -11,17 +11,18 @@ RUN apt-get install -y git zip curl gcc build-essential net-tools apt-utils libp
     && docker-php-ext-install pdo pdo_pgsql pgsql
 
 # Install python
-RUN apt-get install -y python3 python3-dev python3-pip
-RUN mv /usr/lib/python3.11/EXTERNALLY-MANAGED /usr/lib/python3.11/EXTERNALLY-MANAGED.old
-RUN pip3 install numpy pandas psycopg2-binary minisom python-libnmap
+RUN apt-get install -y python3 python3-dev python3-pip python3-venv
+RUN python3 -m venv /opt/venv
 
-RUN pip3 install -U configparser
-RUN alias python="/usr/bin/python3"
+ENV PATH="/opt/venv/bin:$PATH"
+
+RUN pip install --upgrade pip
+RUN pip install numpy pandas psycopg2-binary minisom python-libnmap
 
 # Cleanup
 RUN apt-get -y autoremove --purge
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-RUN pip3 cache purge
+RUN pip cache purge
 
 WORKDIR /var/www/html/secmon
 
