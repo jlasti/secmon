@@ -382,9 +382,9 @@ foreach($chartData as $key => $record)
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
-<script src="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.js"></script>
+<?= Html::jsFile('@web/js/jquery-editable-select.min.js') ?>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-<link href="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.css" rel="stylesheet">
+<?= Html::cssFile('@web/css/jquery-editable-select.min.css') ?>
 
 <script>
     $(".container");
