@@ -9,6 +9,7 @@ use yii\console\Exception;
 use ZMQ;
 use ZMQContext;
 use ZMQSocketException;
+use Symfony\Component\Yaml\Yaml;
 
 require '/var/www/html/secmon/vendor/autoload.php';
 
@@ -39,32 +40,27 @@ class NetworkController extends Controller{
 		     throw new Exception('Could not open a config file');
 		}
 
-		$middleware_config_file = $this->openNonBlockingStream("/var/www/html/secmon/config/secmon_config.ini");
-		if($middleware_config_file){
-			while(($line = fgets($middleware_config_file)) !== false){
-				if(strpos($line, "host =") !== FALSE){
-					$parts = explode("=", $line);
-					$host = trim($parts[1]);
-				}
-				if(strpos($line, "database =") !== FALSE){
-					$parts = explode("=", $line);
-					$database = trim($parts[1]);
-				}
-				if(strpos($line, "user =") !== FALSE){
-					$parts = explode("=", $line);
-					$user = trim($parts[1]);
-				}
-				if(strpos($line, "password =") !== FALSE){
-					$parts = explode("=", $line);
-					$password = trim($parts[1]);
-				}
+		$yaml_secmon = file_get_contents('/var/www/html/secmon/config/secmon_config.yaml');
+		$yaml_secmon_data = Yaml::parse($yaml_secmon);
+		$db_config = $yaml_secmon_data["DATABASE"];
+		if ($db_config) {
+			if ($db_config["host"] !== FALSE) {
+				$host = $db_config["host"];
 			}
-		}else{
-		     throw new Exception('Not all arguments were specified');
+			if ($db_config["database"] !== FALSE) {
+				$database = $db_config["database"];
+			}
+			if ($db_config["user"] !== FALSE) {
+				$user = $db_config["user"];
+			}
+			if ($db_config["password"] !== FALSE) {
+				$password = $db_config["password"];
+			}
+		} else {
+			throw new Exception('Not all arguments were specified');
 		}
 
 		fclose($aggregator_config_file);
-		fclose($middleware_config_file);
 		$aggregator_config_file = escapeshellarg("/var/www/html/secmon/config/aggregator_config.ini");
 		$last_line = `tail -n 1 $aggregator_config_file`; 		#get last line of temp file
 

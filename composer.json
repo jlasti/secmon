@@ -34,7 +34,9 @@
     "ext-json": "*",
     "geoip2/geoip2": "~2.0",
     "beaten-sect0r/yii2-flatpickr": "*",
-    "onmotion/yii2-widget-apexcharts": "1.0.7"
+    "onmotion/yii2-widget-apexcharts": "1.0.7",
+    "yiisoft/yii2-httpclient": "*",
+    "symfony/yaml": "5.4.*"
   },
   "require-dev": {
     "codeception/codeception": "*",

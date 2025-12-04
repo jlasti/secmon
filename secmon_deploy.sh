@@ -41,7 +41,7 @@ echo -e "${GREEN}Password successfully created${NORMAL}"
 echo -e "Updating passwords in configuration files"
 sed -i "s/<password>/$password1/g" config/db.php \
 && sed -i "s/<password>/$password1/g" config/anomaly_config.ini \
-&& sed -i "s/<password>/$password1/g" config/secmon_config.ini \
+&& sed -i "s/<password>/$password1/g" config/secmon_config.yaml \
 && sed -i "s/<password>/$password1/g" docker-compose.yml \
 || { echo "${RED}Updating passwords in configuration file templates failed${NORMAL}" ; exit 1; }
 echo -e "${GREEN}Done${NORMAL}"
@@ -54,6 +54,7 @@ docker build -t secmon_base -f deployment/dockerfiles/secmon_base.Dockerfile ./ 
 && docker build -t secmon_network_model -f deployment/dockerfiles/secmon_network_model.Dockerfile ./deployment \
 && docker build -t secmon_correlator -f deployment/dockerfiles/secmon_correlator.Dockerfile ./deployment \
 && docker build -t secmon_db_retention -f deployment/dockerfiles/secmon_db_retention.Dockerfile ./deployment \
+&& docker build -t secmon_cti -f deployment/dockerfiles/secmon_cti.Dockerfile ./deployment \
 || { echo "${RED}Building docker images failed${NORMAL}" ; exit 1; }
 
 docker compose build || { echo "${RED}Docker compose build failed${NORMAL}" ; exit 1; }

@@ -182,6 +182,8 @@ use app\models\BaseEvent;
  * @property int|null $source_ip_network_model
  * @property string|null $source_code
  * @property string|null $destination_code
+ * @property float|null $source_cti_id
+ * @property float|null $destination_cti_id
  * @property string|null $parent_events
  * @property bool|null $analyzed
  * @property string|null $cef_extensions
@@ -208,8 +210,8 @@ class SecurityEvents extends BaseEvent //\yii\db\ActiveRecord
     {
         return [
             [['datetime', 'device_custom_date1', 'device_custom_date2', 'end_time', 'file_create_time', 'file_modification_time', 'old_file_create_time', 'old_file_modification_time', 'flex_date1', 'device_receipt_time', 'start_time'], 'safe'],
-            [['cef_severity', 'device_custom_number1', 'device_custom_number2', 'device_custom_number3', 'baseEventCount', 'device_direction', 'device_process_id', 'destination_translated_port', 'destination_process_id', 'destination_port', 'file_size', 'old_file_size', 'bytes_in', 'bytes_out', 'source_translated_port', 'source_process_id', 'source_port', 'agent_translated_zone_key', 'agent_zone_key', 'customer_key', 'destination_translated_zone_key', 'destination_zone_key', 'device_translated_zone_key', 'device_zone_key', 'source_translated_zone_key', 'source_zone_key', 'reported_duration', 'destination_ip_network_model', 'source_ip_network_model'], 'default', 'value' => null],
-            [['cef_severity', 'device_custom_number1', 'device_custom_number2', 'device_custom_number3', 'baseEventCount', 'device_direction', 'device_process_id', 'destination_translated_port', 'destination_process_id', 'destination_port', 'file_size', 'old_file_size', 'bytes_in', 'bytes_out', 'source_translated_port', 'source_process_id', 'source_port', 'agent_translated_zone_key', 'agent_zone_key', 'customer_key', 'destination_translated_zone_key', 'destination_zone_key', 'device_translated_zone_key', 'device_zone_key', 'source_translated_zone_key', 'source_zone_key', 'reported_duration', 'destination_ip_network_model', 'source_ip_network_model'], 'integer'],
+            [['cef_severity', 'device_custom_number1', 'device_custom_number2', 'device_custom_number3', 'baseEventCount', 'device_direction', 'device_process_id', 'destination_translated_port', 'destination_process_id', 'destination_port', 'file_size', 'old_file_size', 'bytes_in', 'bytes_out', 'source_translated_port', 'source_process_id', 'source_port', 'agent_translated_zone_key', 'agent_zone_key', 'customer_key', 'destination_translated_zone_key', 'destination_zone_key', 'device_translated_zone_key', 'device_zone_key', 'source_translated_zone_key', 'source_zone_key', 'reported_duration', 'destination_ip_network_model', 'source_ip_network_model', 'source_cti_id', 'destination_cti_id'], 'default', 'value' => null],
+            [['cef_severity', 'device_custom_number1', 'device_custom_number2', 'device_custom_number3', 'baseEventCount', 'device_direction', 'device_process_id', 'destination_translated_port', 'destination_process_id', 'destination_port', 'file_size', 'old_file_size', 'bytes_in', 'bytes_out', 'source_translated_port', 'source_process_id', 'source_port', 'agent_translated_zone_key', 'agent_zone_key', 'customer_key', 'destination_translated_zone_key', 'destination_zone_key', 'device_translated_zone_key', 'device_zone_key', 'source_translated_zone_key', 'source_zone_key', 'reported_duration', 'destination_ip_network_model', 'source_ip_network_model', 'source_cti_id', 'destination_cti_id'], 'integer'],
             [['cef_version', 'cef_severity', 'cef_event_class_id', 'cef_device_product', 'cef_vendor', 'cef_device_version', 'cef_name'], 'required'],
             [['device_custom_floating_point1', 'device_custom_floating_point2', 'device_custom_floating_point3', 'device_custom_floating_point4', 'source_geo_longitude', 'source_geo_latitude', 'destination_geo_longitude', 'destination_geo_latitude'], 'number'],
             [['parent_events', 'cef_extensions', 'raw_event'], 'string'],
@@ -400,6 +402,8 @@ class SecurityEvents extends BaseEvent //\yii\db\ActiveRecord
                     'destination_geo_latitude' => [ FilterTypeEnum::COMPARE ],
                     'destination_ip_network_model' => [ FilterTypeEnum::COMPARE ],
                     'source_ip_network_model' => [ FilterTypeEnum::COMPARE ],
+                    'destination_cti_id' => [ FilterTypeEnum::COMPARE ],
+                    'source_cti_id' => [ FilterTypeEnum::COMPARE ],
                     'source_code' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
                     'destination_code' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
                     'parent_events' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
@@ -581,6 +585,8 @@ class SecurityEvents extends BaseEvent //\yii\db\ActiveRecord
             'destination_geo_latitude' => 'Destination Geo Latitude',
             'destination_ip_network_model' => 'Destination Ip Network Model',
             'source_ip_network_model' => 'Source Ip Network Model',
+            'destination_cti_id' => 'Destination Ip CTI Model',
+            'source_cti_id' => 'Source Ip CTI Model',
             'source_code' => 'Source Code',
             'destination_code' => 'Destination Code',
             'parent_events' => 'Parent Events',
@@ -890,6 +896,22 @@ class SecurityEvents extends BaseEvent //\yii\db\ActiveRecord
 		if($position != FALSE){
             $event->destination_ip_network_model = $cefString[$position + strlen("dst_network_model_id=")];
 		}
+
+        //map CTI model for src IP
+		$position = strpos($cefString, "src_cti_id=");
+        if($position != FALSE){
+            $start_position = $position + strlen("src_cti_id=");
+            $end_position = strpos($cefString, " ", $start_position);
+            $event->source_cti_id = substr($cefString, $start_position, $end_position - $start_position);
+		}
+        
+		//map CTI model for dst IP
+		$position = strpos($cefString, "dst_cti_id=");
+        if($position != FALSE){
+            $start_position = $position + strlen("dst_cti_id=");
+            $end_position = strpos($cefString, " ", $start_position);
+            $event->destination_cti_id = substr($cefString, $start_position, $end_position - $start_position);
+		}
 		
 		//map geoIP for src IP
 		$position = strpos($cefString, "src_country_isoCode=");
@@ -963,7 +985,6 @@ class SecurityEvents extends BaseEvent //\yii\db\ActiveRecord
             $end_position = strpos($cefString, " ", $start_position);
             $event->destination_geo_longitude = substr($cefString, $start_position, $end_position - $start_position);
 		}
-
 		return $event;
 	}
 }
