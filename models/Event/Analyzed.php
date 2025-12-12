@@ -133,7 +133,7 @@ class Analyzed extends \yii\db\ActiveRecord
             for ($i = 0; $i< $max;$i++){
                 $analyzedSecurityEventsList = new AnalyzedSecurityEventsList;
                 $analyzedSecurityEventsList->events_analyzed_iteration = $fieldVal2;
-                $analyzedSecurityEventsList->analyzed_security_events_id = pg_escape_string($securityEvents[$i]["id"]);
+                $analyzedSecurityEventsList->analyzed_security_events_id = $securityEvents[$i]["id"];
                 $analyzedSecurityEventsList->security_events_id = $id;
                 $analyzedSecurityEventsList->save(true);
             }
