@@ -25,6 +25,7 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN pip cache purge
 
 WORKDIR /var/www/html/secmon
+RUN mkdir /var/www/html/secmon/web
 
 # Copy apache config files
 COPY deployment/config_files/000-default.conf /etc/apache2/sites-available/

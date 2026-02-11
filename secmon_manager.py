@@ -354,8 +354,7 @@ if sys.argv[1] == "deploy":
 
         # Initialize admin user 
         os.system(f'echo -n "Initializing SecMon admin user ... {GREEN}"')
-        os.system('curl 127.0.0.1:8080/secmon/web/user/init')
-
+        os.system('curl 127.0.0.1:8080/user/init')
         print(MAGENTA, "\nDeployment successful. SecMon is now live.", NORMAL)
         sys.exit()
     else:
