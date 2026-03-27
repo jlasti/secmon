@@ -134,7 +134,7 @@ class AggregatorController extends Controller
             $fullPath = $dirPath . '/' . $file;
             $index = $dirName . '/' . $file;
 
-            if ($file != "messages" && $file != 'secure') {
+            if ($file != "messages" && $file != 'secure' && $file != 'cron') {
                 continue;
             }
 

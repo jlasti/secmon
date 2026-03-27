@@ -1,0 +1,63 @@
+version: '3'
+
+services:
+  web:
+    image: uglyz4rd/dp_backend:1.0.0
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - web-ansible_hosts:/etc/ansible/secmon_hosts
+      - data-volume:/data
+      - web-known_hosts:/data-known_hosts
+      - web-execution-outputs:/data-execution-outputs
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+
+  frontend:
+    image: uglyz4rd/dp_frontend:1.0.0
+    restart: always
+    ports:
+      - "8085:8080"
+    depends_on:
+      - web
+
+  db:
+    image: postgres:15.2
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+
+  python:
+    image: uglyz4rd/dp_populate_db:1.0.0
+    env_file:
+      - .env
+    volumes:
+      - data-volume:/data
+    depends_on:
+      - db
+      - web
+
+  # Exposes vulnerable Apache server on port 8080.
+  test-target-debian:
+    image: uglyz4rd/dp_debian_target:1.0.0
+    ports:
+      - "8086:80"
+
+  test-target-centos:
+    image: uglyz4rd/dp_centos_target:1.0.0
+
+volumes:
+  db-data:
+  data-volume:
+  web-known_hosts:
+  web-ansible_hosts:
+  web-execution-outputs:
+
+
