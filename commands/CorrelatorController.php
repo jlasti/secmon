@@ -73,9 +73,9 @@ class CorrelatorController extends Controller
 			if (!empty($msg)) {
 				// echo "Received Message:" . $msg . PHP_EOL;
 				fwrite($corrInputStream, $msg);
-				fflush($corrInputStream);
+				flush();
 			}
-			while (($line = fgets($corrOutputStream)) !== false) {
+			while (($line = fgets($corrOutputStream)) != FALSE) {
 				$line = trim($line);
 				if (!empty($line)) {
 					Yii::info(sprintf("Correlated:\n%s\n", $line));
