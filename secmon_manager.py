@@ -134,9 +134,13 @@ def create_temp_config():
     # Write 0MQ port for normalizer
     aggregator_conf_file.write("Normalizer: %d\n" % port)
 
-    # Write 0MQ port for geoip and 
+    # Write 0MQ port for geoip 
     if config.get('ENRICHMENT', 'geoip').lower() == "true":
         aggregator_conf_file.write("Geoip: %d\n" % port)
+
+    # Write 0MQ port for MISP
+    if config.get('ENRICHMENT', 'misp').lower() == "true":
+        aggregator_conf_file.write("Misp: %d\n" % port)
 
     # Write 0MQ port for network_model
     if config.get('ENRICHMENT', 'network_model').lower() == "true":
@@ -228,7 +232,7 @@ if len(sys.argv) < 2 or sys.argv[1] == "help":
     print_help()
     sys.exit()
 
-all_enrichment_modules = ['geoip', 'network_model', 'correlator']
+all_enrichment_modules = ['geoip', 'misp', 'network_model', 'correlator']
 
 # Start stopped containers
 if sys.argv[1] == "start":

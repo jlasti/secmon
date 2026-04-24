@@ -185,6 +185,7 @@ use app\models\BaseEvent;
  * @property string|null $parent_events
  * @property bool|null $analyzed
  * @property string|null $cef_extensions
+ * @property int|null $misp_attribute_id
  * @property string|null $raw_event
  *
  * @property AnalyzedEvents[] $analyzedEvents
@@ -228,6 +229,7 @@ class SecurityEvents extends BaseEvent //\yii\db\ActiveRecord
             [['reported_resource_id', 'framework_name'], 'string', 'max' => 256],
             [['reported_resource_name', 'reported_resource_type', 'attack_type', 'source_country', 'source_city', 'destination_country', 'destination_city'], 'string', 'max' => 64],
             [['threat_attack_id'], 'string', 'max' => 32],
+            [['misp_attribute_id'], 'integer'],
         ];
     }
 
@@ -405,6 +407,7 @@ class SecurityEvents extends BaseEvent //\yii\db\ActiveRecord
                     'parent_events' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
                     'analyzed' => [ FilterTypeEnum::COMPARE ],
                     'cef_extensions' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
+                    'misp_attribute_id' => [ FilterTypeEnum::COMPARE ],
                     'raw_event' => [ FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE ],
             ];
       }
@@ -586,6 +589,7 @@ class SecurityEvents extends BaseEvent //\yii\db\ActiveRecord
             'parent_events' => 'Parent Events',
             'analyzed' => 'Analyzed',
             'cef_extensions' => 'Cef Extensions',
+            'misp_attribute_id' => 'MISP Attribute ID',
             'raw_event' => 'Raw Event',
         ];
     }
@@ -870,6 +874,7 @@ class SecurityEvents extends BaseEvent //\yii\db\ActiveRecord
         $event->threat_attack_id = $values['threatAttackID'] ?? "";
         $event->attack_type = $values['att'] ?? "";
         $event->parent_events = $values['cs1'] ?? "";
+        $event->misp_attribute_id = $values['misp_attr_id'] ?? null;
         //$event->cef_extensions = $values[''] ?? "";
 
         if($event->type == 'normalized'){

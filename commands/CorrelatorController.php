@@ -55,6 +55,11 @@ class CorrelatorController extends Controller
 		$recSocket = $zmq->getSocket(ZMQ::SOCKET_PULL);
 		$recSocket->bind("tcp://*:" . $port);
 
+		$next_module = "synchronizer";
+
+		$sendSocket = $zmq->getSocket(ZMQ::SOCKET_PUSH);
+		$sendSocket->connect("tcp://secmon_" . $next_module . ":" . $port);
+
 		date_default_timezone_set("Europe/Bratislava");
 		echo "[" . date("Y-m-d H:i:s") . "] Worker correlator started!" . PHP_EOL;
 
@@ -68,14 +73,16 @@ class CorrelatorController extends Controller
 			if (!empty($msg)) {
 				// echo "Received Message:" . $msg . PHP_EOL;
 				fwrite($corrInputStream, $msg);
-				flush();
+				fflush($corrInputStream);
 			}
-
-			while (($line = fgets($corrOutputStream)) != FALSE) {
+			while (($line = fgets($corrOutputStream)) !== false) {
+				$line = trim($line);
 				if (!empty($line)) {
 					Yii::info(sprintf("Correlated:\n%s\n", $line));
 					$event = SecurityEvents::extractCefFields($line, 'correlated');
 					$event->save();
+					
+					$sendSocket->send($line);
 				}
 			}
 		}

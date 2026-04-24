@@ -83,6 +83,25 @@ services:
       - db_data:/var/lib/postgresql
     networks:
       - app-network
+
+  synchronizer:
+    build:
+      context: .
+      dockerfile: deployment/dockerfiles/secmon_synchronizer.Dockerfile
+    image: secmon_synchronizer
+    container_name: secmon_synchronizer
+    restart: unless-stopped
+    command: ./yii synchronizer/daemon
+    volumes:
+      - .:/var/www/html/secmon
+      - /var/log/secmon:/var/log/secmon
+    depends_on:
+      - db
+      - app
+    networks:
+      - app-network
+    environment:
+      - WAIT_HOSTS=secmon_db:5432
     
 volumes:
   db_data:
