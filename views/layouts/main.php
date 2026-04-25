@@ -123,7 +123,7 @@ $menuItems = $isGuest ? [] : Yii::$app->navigation->getItems();
 			<div class="container">
 				<div class="row">
 					<div class="col l4 s12">
-						&copy; Tallented otters
+						&copy; FIIT STU
 						<?= date('Y') ?>
 					</div>
 					<div class="col l4 s12">

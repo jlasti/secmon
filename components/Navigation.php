@@ -28,9 +28,9 @@ class Navigation extends \yii\base\Component
 				],
 				[
 					'label' => 'Dashboard',
-					'url' => ['/view'],
+					'url' => ['/dashboard'],
 					'visible' => true,
-					'active' => 'view',
+					'active' => 'dashboard',
 					'icon' => 'dashboard'
 				],
 				[
