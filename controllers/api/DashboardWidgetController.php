@@ -23,6 +23,8 @@ class DashboardWidgetController extends Controller
 
     private $chartDataService;
 
+    public $enableCsrfValidation = true;
+
     public function __construct($id, $module, ChartDataService $chartDataService, $config = [])
     {
         $this->chartDataService = $chartDataService;
