@@ -1,0 +1,145 @@
+.widget-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+  animation: fadeInScale 0.4s ease-out;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.widget-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fafafa;
+  transition: all 0.2s ease;
+}
+
+.widget-header.view-mode {
+  background: white;
+  border-bottom: none;
+}
+
+.widget-drag-handle {
+  flex: 1;
+  cursor: move;
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+}
+
+.widget-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.widget-actions {
+  display: flex;
+  gap: 8px;
+  padding: 16px 20px;
+}
+
+.widget-action-btn {
+  background: transparent;
+  border: 1px solid #d1d5db;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3075ff;
+}
+
+.widget-action-btn:hover {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+  color: #374151;
+}
+
+.widget-content {
+  flex: 1;
+  padding: 8px;
+  overflow: auto;
+  min-height: 300px;
+}
+
+.widget-empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 250px;
+}
+
+.add-content-btn {
+  padding: 20px 40px;
+  background: #26a69a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.add-content-btn:hover {
+  background: #1f8f85;
+}
+
+.widget-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 250px;
+  color: #666;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #039be5;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.widget-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #f44336;
+  font-size: 14px;
+}
+

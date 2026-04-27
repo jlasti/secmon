@@ -18,6 +18,8 @@ use app\models\Filter;
 
 class DashboardController extends Controller
 {
+    public $enableCsrfValidation = true;
+
     public function behaviors()
     {
         $behaviors = parent::behaviors();
