@@ -59,5 +59,11 @@ docker build -t secmon_base -f deployment/dockerfiles/secmon_base.Dockerfile ./ 
 docker compose build || { echo "${RED}Docker compose build failed${NORMAL}" ; exit 1; }
 
 docker run -d --rm --name secmon_app -v "${PWD}":/var/www/html/secmon secmon_app && echo -e "\r\033[1A\033[0KCreating temporary container ... ${GREEN}done${NORMAL}"
+
+# Build React SPA inside the Docker container
+echo -e "Building React dashboard SPA"
+docker exec secmon_app bash -c "cd react/dashboard && npm install && npm run build" || { echo "${RED}Building React SPA failed${NORMAL}" ; exit 1; }
+echo -e "${GREEN}React dashboard build completed${NORMAL}"
+
 docker exec secmon_app composer update
 docker stop secmon_app && echo -e "\r\033[1A\033[0KRemoving temporary container ... ${GREEN}done${NORMAL}"
