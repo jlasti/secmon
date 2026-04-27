@@ -19,6 +19,10 @@ ENV PATH="/opt/venv/bin:$PATH"
 RUN pip install --upgrade pip
 RUN pip install numpy pandas psycopg2-binary minisom python-libnmap
 
+# Install Node.js and npm
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+RUN apt-get install -y nodejs
+
 # Cleanup
 RUN apt-get -y autoremove --purge
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
