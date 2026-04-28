@@ -106,7 +106,6 @@
   font-weight: 600;
   transition: all 0.2s ease;
   font-size: 16px;
-  aspect-ratio: 5 / 3;
 }
 
 .add-dashboard-tab:hover {

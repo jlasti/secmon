@@ -1,3 +1,5 @@
+@charset "UTF-8";
+
 .widget-settings-modal-content {
   background: white;
   border-radius: 8px;
@@ -176,24 +178,29 @@
   color: #2563eb;
 }
 
+/* 📊 is U+1F4CA */
 .chart-icon-bar::before {
-  content: "📊";
+  content: "\1F4CA";
 }
 
+/* ⭕ is U+2B55 */
 .chart-icon-pie::before {
-  content: "⭕";
+  content: "\2B55";
 }
 
+/* 📈 is U+1F4C8 */
 .chart-icon-line::before {
-  content: "📈";
+  content: "\1F4C8";
 }
 
+/* 📋 is U+1F4CB */
 .chart-icon-table::before {
-  content: "📋";
+  content: "\1F4CB";
 }
 
+/* 🗺️ is U+1F5FA */
 .chart-icon-map::before {
-  content: "🗺️";
+  content: "\1F5FA";
 }
 
 .timeframe-mode-toggle {
