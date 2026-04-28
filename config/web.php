@@ -10,6 +10,13 @@ $config = [
 		'@npm' => '@vendor/npm-asset',
 	],
 	'components' => [
+		'session' => [
+        'class' => 'yii\web\Session',
+        'cookieParams' => [
+            'httpOnly' => true,
+            'sameSite' => 'Lax',
+        	],
+    	],
 		'request' => [
 			// !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
 			'cookieValidationKey' => 'UZyP0w5IDbB3WQMCK8dnXLs8dziwrSs7',
@@ -47,6 +54,11 @@ $config = [
 	],
 	'params' => $params,
 	'timeZone' => 'Europe/Bratislava',
+	'container' => [
+    'singletons' => [
+        \app\services\ChartDataService::class, 
+    ],
+],
 ];
 
 if (YII_ENV_DEV) {

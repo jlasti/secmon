@@ -823,7 +823,7 @@ class SecurityEvents extends BaseEvent //\yii\db\ActiveRecord
         $event->bytes_out = $values['out'] ?? "";
         $event->message = $values['msg'] ?? "";
         $event->event_outcome = $values['outcome'] ?? "";
-        $event->transport_protocol = $values['proto'] ?? $values['app'] ?? "";
+        $event->transport_protocol = $values['proto'] ?? "";
         $event->reason = $values['reason'] ?? "";
         $event->request_method = $values['requestMethod'] ?? "";
 		$event->request_url = $request_url ?? "";
