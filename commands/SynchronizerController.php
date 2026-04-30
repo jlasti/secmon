@@ -200,38 +200,38 @@ class SynchronizerController extends Controller
     private function storeCorrelationEvent($cefLine)
     {
         $srcIp = $this->extractField($cefLine, "src=");
-        if (!$srcIp) {
-            return;
-        }
+    if (!$srcIp) {
+        return;
+    }
 
-        if (strpos($cefLine, 'misp_src_hit=true') !== false || 
-            strpos($cefLine, 'misp_dst_hit=true') !== false) {
-            
-            $mispAttrId = null;
-            if (preg_match('/misp_src_id=(\d+)/', $cefLine, $matches)) {
-                $mispAttrId = $matches[1];
-            } elseif (preg_match('/misp_dst_id=(\d+)/', $cefLine, $matches)) {
-                $mispAttrId = $matches[1];
-            }
-            
-            if ($mispAttrId) {
-                $attribute = MispAttributes::findOne($mispAttrId);
-                if ($attribute) {
-                    $existingEvent = MispEvents::findOne($attribute->event_id);
-                    if ($existingEvent) {
-                        $this->stdout("Event already exists (ID: {$existingEvent->event_id}), skipping creation.\n");
-                        
-                        $existingEvent->threat_level = min($existingEvent->threat_level ?? 4, 2);
-                        $existingEvent->timestamp = time();
-                        $existingEvent->save(false);
-                        
-                        return;
-                    }
+    if (strpos($cefLine, 'SecmonMispSrcHit=true') !== false || 
+        strpos($cefLine, 'SecmonMispDstHit=true') !== false) {
+        
+        $mispAttrId = null;
+        if (preg_match('/SecmonMispSrcId=(\d+)/', $cefLine, $matches)) {
+            $mispAttrId = $matches[1];
+        } elseif (preg_match('/SecmonMispDstId=(\d+)/', $cefLine, $matches)) {
+            $mispAttrId = $matches[1];
+        }
+        
+        if ($mispAttrId) {
+            $attribute = MispAttributes::findOne($mispAttrId);
+            if ($attribute) {
+                $existingEvent = MispEvents::findOne($attribute->event_id);
+                if ($existingEvent) {
+                    $this->stdout("Event already exists (ID: {$existingEvent->event_id}), skipping creation.\n");
+                    
+                    $existingEvent->threat_level = min($existingEvent->threat_level ?? 4, 2);
+                    $existingEvent->timestamp = time();
+                    $existingEvent->save(false);
+                    
+                    return;
                 }
             }
-            
-            $this->stdout("MISP hit found but event not located, creating new event anyway.\n");
         }
+        
+        $this->stdout("MISP hit found but event not located, creating new event anyway.\n");
+    }
 
         $event = new MispEvents();
         $event->creator_org = $this->organizationName;

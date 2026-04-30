@@ -140,11 +140,11 @@ class MispController extends Controller
                     if ($ipType !== false) {
                         $threatLevel = $hit->mispEvent->threat_level ?? 4;
                         
-                        $hitInfo .= " misp_{$ipType}_hit=true"
-                                . " misp_{$ipType}_id=" . $hit->attribute_id
-                                . " misp_{$ipType}_tl=" . $threatLevel;
-                                . " misp_attr_id=" . $hit->attribute_id;
-                        
+                        $hitInfo .= " SecmonMisp" . ucfirst($ipType) . "Hit=true"
+                                . " SecmonMisp" . ucfirst($ipType) . "Id=" . $hit->attribute_id
+                                . " SecmonMisp" . ucfirst($ipType) . "Tl=" . $threatLevel
+                                . " SecmonMispAttributeId=" . $hit->attribute_id;
+
                         $isSecmon = false;
                         if ($hit->mispEvent && $hit->mispEvent->tags) {
                             $eventTags = @json_decode($hit->mispEvent->tags, true);
@@ -153,7 +153,7 @@ class MispController extends Controller
                             }
                         }
                         if ($isSecmon) {
-                            $hitInfo .= " misp_{$ipType}_secmon=true";
+                            $hitInfo .= " SecmonMisp" . ucfirst($ipType) . "Secmon=true";
                         }
                     }
                 }
