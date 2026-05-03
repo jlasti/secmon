@@ -691,16 +691,20 @@ class SecurityEvents extends BaseEvent //\yii\db\ActiveRecord
 			$raw = $matches[1];
 		}
 
-		$exData = explode(" ", $data);
 		$values = [];
-		foreach($exData as $val) {
-			$tmp = explode("=", $val);
-			if($tmp[0] == "rawEvent" || $tmp[0] == "reason")
-			{
-				break;
-			}
-            		$values[$tmp[0]] = isset($tmp[1]) ? $tmp[1] : "";
-		}
+        
+        preg_match_all('/(\w+)=([^=]*?)(?=\s+\w+=|$)/', $data, $matches, PREG_SET_ORDER);
+
+        foreach ($matches as $match) {
+            $key = $match[1];
+            $value = trim($match[2]);
+
+            if ($key === "rawEvent" || $key === "reason") {
+                break;
+            }
+
+            $values[$key] = $value;
+        }
 		
 		//get HTTP Request from event
 		if(preg_match('/request=/', $data)){
