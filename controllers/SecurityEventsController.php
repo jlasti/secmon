@@ -581,9 +581,15 @@ class SecurityEventsController extends Controller
                     break;
                 case 'analyzed':
                     array_push($replaceDataColumns, [
-                        'class' => '\dosamigos\grid\columns\BooleanColumn',
-                        'attribute' => 'analyzed',
-                        'treatEmptyAsFalse' => true
+                        //'class' => '\dosamigos\grid\columns\BooleanColumn',
+                        //'attribute' => 'analyzed',
+			    //'treatEmptyAsFalse' => true
+			'class' => 'yii\grid\DataColumn',
+    			'attribute' => 'analyzed',
+    			'format' => 'boolean',
+    			'value' => static function ($model) {
+        			return !empty($model->analyzed);
+    			}
                     ]);
                     break;
                 default:
