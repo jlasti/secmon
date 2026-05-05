@@ -387,6 +387,76 @@ $this->params['dst_device'] = NetworkModel::getNetworkDevice($model->destination
       ]) ?></div>
     </li>
   </ul>
+
+<ul class="collapsible">
+    <li>
+        <div class="collapsible-header light-blue accent-4" style="font-size:20px; color: white;">
+            <i class="material-icons">security</i>MISP Information
+        </div>
+        <div class="collapsible-body">
+            <?php 
+                $mispModel = \app\models\MispAttributes::getMispAttribute($model->misp_attribute_id);
+                $mispEvent = $mispModel->mispEvent;
+            ?>
+            
+            <!-- MISP Attribute Details -->
+            <ul class="collapsible">
+                <li>
+                    <div class="collapsible-header light-blue accent-4" style="font-size:20px; color: white;">
+                        <i class="material-icons">list</i>MISP Attribute Details
+                    </div>
+                    <div class="collapsible-body">
+                        <?= DetailView::widget([
+                            'model' => $mispModel,
+                            'attributes' => [
+                                'attribute_id',
+                                'attribute_uuid',
+                                'event_id',
+                                'category',
+                                'type',
+                                'value',
+                                'to_ids:boolean',
+                                'comment',
+                                'disable_correlation:boolean',
+                                'object_relation',
+                                'galaxy_clusters',
+                            ],
+                        ]) ?>
+                    </div>
+                </li>
+            </ul>
+            
+            <!-- MISP Event Details -->
+            <ul class="collapsible">
+                <li>
+                    <div class="collapsible-header light-blue accent-4" style="font-size:20px; color: white;">
+                        <i class="material-icons">event</i>MISP Event Details
+                    </div>
+                    <div class="collapsible-body">
+                        <?= DetailView::widget([
+                            'model' => $mispEvent ?? new \app\models\MispEvents(),
+                            'attributes' => [
+                                'event_id',
+                                'event_uuid',
+                                'creator_org',
+                                'threat_level',
+                                'analysis',
+                                [
+                                    'attribute' => 'timestamp',
+                                    'format' => 'datetime',
+                                ],
+                                'tags',
+                                'is_sent:boolean',
+                                'sent_at',
+                                'created_at',
+                            ],
+                        ]) ?>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </li>
+</ul>
   
   <ul class="collapsible">
     <li>

@@ -51,8 +51,10 @@ echo -e "Building docker images"
 docker pull php:7.4-fpm || { echo "${RED}Pulling docker image failed${NORMAL}" ; exit 1; }
 docker build -t secmon_base -f deployment/dockerfiles/secmon_base.Dockerfile ./ \
 && docker build -t secmon_geoip -f deployment/dockerfiles/secmon_geoip.Dockerfile ./deployment \
+&& docker build -t secmon_misp -f deployment/dockerfiles/secmon_misp.Dockerfile ./deployment \
 && docker build -t secmon_network_model -f deployment/dockerfiles/secmon_network_model.Dockerfile ./deployment \
 && docker build -t secmon_correlator -f deployment/dockerfiles/secmon_correlator.Dockerfile ./deployment \
+&& docker build -t secmon_synchronizer -f deployment/dockerfiles/secmon_synchronizer.Dockerfile ./deployment \
 && docker build -t secmon_db_retention -f deployment/dockerfiles/secmon_db_retention.Dockerfile ./deployment \
 || { echo "${RED}Building docker images failed${NORMAL}" ; exit 1; }
 

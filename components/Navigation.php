@@ -70,6 +70,13 @@ class Navigation extends \yii\base\Component
 					'icon' => 'laptop'
 				],
 				[
+					'label' => 'Synchronizer',
+					'url' => ['/synchronizer'],
+					'visible' => Yii::$app->user->identity->can('create_users'),
+					'active' => 'synchronizer',
+					'icon' => 'share'
+				],
+				[
 					'label' => 'Users',
 					'url' => ['/user'],
 					'visible' => Yii::$app->user->identity->can('create_users'),
