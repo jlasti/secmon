@@ -48,16 +48,6 @@ setupAxiosInterceptors() {
     }
   }
 
-  async getDashboard(id) {
-    try {
-      const response = await this.apiClient.get(`/dashboard/dashboard/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error getting dashboard ${id}:`, error);
-      throw error;
-    }
-  }
-
   async createDashboard(data) {
     try {
       const response = await this.apiClient.post('/dashboard/create', data);

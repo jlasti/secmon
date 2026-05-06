@@ -36,7 +36,6 @@ class DashboardController extends Controller
             'class' => VerbFilter::class,
             'actions' => [
                 'dashboards' => ['GET'],
-                'view' => ['GET'],
                 'create' => ['POST'],
                 'update' => ['PUT', 'PATCH'],
                 'delete' => ['DELETE'],
@@ -86,12 +85,6 @@ class DashboardController extends Controller
         }, $dashboards);
 
         return $safeDashboards;
-    }
-
-    public function actionDashboard($id)
-    {
-        $this->checkAccess();
-        return $this->findModel($id);
     }
 
     public function actionCreate()
