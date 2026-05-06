@@ -6,32 +6,13 @@ use Yii;
 use app\models\Dashboard\DashboardWidget;
 use app\models\User;
 
-    /**
-     * This is the model class for table "dashboards".
-     *
-     * @property integer $id
-     * @property string $name
-     * @property integer $user_id
-     * @property integer $active
-     * @property string $config
-     * @property string $refresh_time
-     *
-     * @property Dashboard\DashboardWidget[] $dashboardWidgets
-     * @property User $user
-     */
 class Dashboard extends \yii\db\ActiveRecord
 {
-    /**
-     * @inheritdoc
-     */
     public static function tableName()
     {
         return 'dashboards';
     }
 
-    /**
-     * @inheritdoc
-     */
     public function rules()
     {
         return [
@@ -44,9 +25,6 @@ class Dashboard extends \yii\db\ActiveRecord
         ];
     }
 
-    /**
-     * @inheritdoc
-     */
     public function attributeLabels()
     {
         return [
@@ -59,18 +37,12 @@ class Dashboard extends \yii\db\ActiveRecord
         ];
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
     public function getDashboardWidgets()
     {
         return $this->hasMany(DashboardWidget::className(), ['dashboard_id' => 'id'])
                     ->orderBy(['order' => SORT_ASC]);
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
     public function getUser()
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);

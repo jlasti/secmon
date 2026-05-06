@@ -1,9 +1,6 @@
 <?php
-/* @var $this \yii\web\View */
-/* @var $content string */
 use yii\helpers\Html;
 
-// NOTE: DO NOT register your default AppAsset here!
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>

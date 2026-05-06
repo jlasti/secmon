@@ -17,7 +17,6 @@ use yii\rest\Controller;
 use yii\helpers\Json;
 use app\services\ChartDataService;
 
-
 class DashboardWidgetController extends Controller
 {
 
@@ -52,10 +51,6 @@ class DashboardWidgetController extends Controller
         return $behaviors;
     }
 
-    /**
-     * Helper to check if the current user is authenticated.
-     * @throws ForbiddenHttpException if the user is a guest.
-     */
     protected function checkAccess()
     {
         if (Yii::$app->user->isGuest) {
@@ -63,13 +58,6 @@ class DashboardWidgetController extends Controller
         }
     }
 
-    /**
-     * Get dashboard widget with filter applied content
-     * @param integer $widgetId
-     * @param integer $pagination
-     * @param integer|string|null $lastId
-     * @return array
-     */
     public function actionContent($widgetId, $pagination = 1, $lastId = null)
     {
         $this->checkAccess();
@@ -159,11 +147,6 @@ class DashboardWidgetController extends Controller
         ];
     }
 
-    /**
-     * Update dashboard widget filter and configuration
-     * @param integer $widgetId
-     * @return array
-     */
     public function actionUpdateSettings()
     {
         $widgetId = Yii::$app->request->post('widget_id');
@@ -257,23 +240,6 @@ class DashboardWidgetController extends Controller
         ];
     }
 
-    /**
-     * Determine appropriate time unit for aggregation
-     * @param Filter $timeFilter
-     * @return string
-     */
-    protected function determineTimeUnit($timeFilter)
-    {
-        // Implementation would depend on your time filter structure
-        // For now, return a sensible default
-        return 'hour';
-    }
-
-    /**
-     * Check if the current user owns the dashboard that contains this widget
-     * @param DashboardWidget $widget
-     * @throws ForbiddenHttpException
-     */
     protected function checkWidgetOwnership($widget)
     {
         $dashboard = Dashboard::findOne(['id' => $widget->dashboard_id]);
@@ -283,12 +249,6 @@ class DashboardWidgetController extends Controller
         }
     }
 
-    /**
-     * Finds the DashboardWidget model based on its primary key value.
-     * @param integer $id
-     * @return DashboardWidget the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     protected function findModel($id)
     {
         if (($model = DashboardWidget::findOne($id)) !== null) {

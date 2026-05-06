@@ -52,10 +52,6 @@ class DashboardController extends Controller
         return $behaviors;
     }
 
-    /**
-     * Helper to check if the current user is authenticated.
-     * @throws ForbiddenHttpException if the user is a guest.
-     */
     protected function checkAccess()
     {
         if (Yii::$app->user->isGuest) {
@@ -63,13 +59,6 @@ class DashboardController extends Controller
         }
     }
 
-    /**
-     * Retrieves all Dashboards for the current user.
-     * If no dashboards exist, a default one is created.
-     *
-     * @return array|Dashboard[] The list of Dashboard models.
-     * @throws ForbiddenHttpException if not authenticated.
-     */
     public function actionDashboards()
     {
         $this->checkAccess();
@@ -99,26 +88,12 @@ class DashboardController extends Controller
         return $safeDashboards;
     }
 
-    /**
-     * Returns a single Dashboard model by ID.
-     *
-     * @param int $id The ID of the dashboard.
-     * @return Dashboard The loaded dashboard model.
-     * @throws NotFoundHttpException if the dashboard does not exist.
-     * @throws ForbiddenHttpException if not authenticated or not owned by user.
-     */
     public function actionDashboard($id)
     {
         $this->checkAccess();
         return $this->findModel($id);
     }
 
-    /**
-     * Creates a new Dashboard model.
-     *
-     * @return Dashboard|array The created Dashboard model or validation errors.
-     * @throws ForbiddenHttpException if not authenticated.
-     */
     public function actionCreate()
     {
         $this->checkAccess();
@@ -126,34 +101,21 @@ class DashboardController extends Controller
         $model = new Dashboard();
         $model->user_id = Yii::$app->user->getId();
 
-        // The old controller logic handled setting the new one as active and deactivating others.
-        // We will keep this logic here for consistency.
-
         // Deactivate all current active dashboards for the user
         Dashboard::updateAll(['active' => 0], ['user_id' => $model->user_id, 'active' => 1]);
 
-        // Load POST data, set new dashboard as active
         $model->load(Yii::$app->request->post(), '');
-        $model->active = 1; // Set new one as active
+        $model->active = 1;
 
         if ($model->save()) {
-            Yii::$app->response->statusCode = 201; // Created
+            Yii::$app->response->statusCode = 201;
             return $model;
         }
 
-        // Return errors on failure
-        Yii::$app->response->statusCode = 422; // Unprocessable Entity
+        Yii::$app->response->statusCode = 422;
         return $model->errors;
     }
 
-    /**
-     * Updates an existing Dashboard model.
-     *
-     * @param int $id The ID of the dashboard.
-     * @return Dashboard|array The updated Dashboard model or validation errors.
-     * @throws NotFoundHttpException if the dashboard is not found.
-     * @throws ForbiddenHttpException if not authenticated or not owned by user.
-     */
     public function actionUpdate($id)
     {
         $this->checkAccess();
@@ -167,29 +129,20 @@ class DashboardController extends Controller
             return $model;
         }
 
-        // Return errors on failure
-        Yii::$app->response->statusCode = 422; // Unprocessable Entity
+        Yii::$app->response->statusCode = 422;
         return $model->errors;
     }
 
-    /**
-     * Deletes an existing Dashboard model.
-     *
-     * @param int $id The ID of the dashboard.
-     * @return bool True on successful deletion.
-     * @throws NotFoundHttpException if the dashboard is not found.
-     * @throws ForbiddenHttpException if not authenticated or not owned by user.
-     */
     public function actionDelete($id)
     {
         $this->checkAccess();
         $model = $this->findModel($id); // This checks ownership
 
         if ($model->delete()) {
-            Yii::$app->response->statusCode = 204; // No Content
+            Yii::$app->response->statusCode = 204;
             return true;
         }
-        // Should rarely happen if findModel and delete() work correctly, but good practice.
+
         Yii::$app->response->statusCode = 500;
         return false;
     }
@@ -197,36 +150,22 @@ class DashboardController extends Controller
 
     public function actionChangeActive()
     {
-        // 1. Get the parameter from the POST body (raw data)
         $newDashboardId = Yii::$app->request->post('newDashboardId');
 
         if (!$newDashboardId) {
-            // Throw a bad request exception if the ID is missing
             throw new \yii\web\BadRequestHttpException('Missing newDashboardId parameter in POST request.');
         }
         $this->checkAccess();
         $userId = Yii::$app->user->getId();
         Dashboard::updateAll(['active' => 0], ['user_id' => $userId]);
         $dashboard = $this->findModel($newDashboardId); 
-        // Activate the requested dashboard
+
         $dashboard->active = 1;
         $dashboard->save(false); 
 
         return $this->getWidgetsOfDashboard($newDashboardId);
     }
 
-    /**
-     * Creates a new Widget for a specific Dashboard.
-     *
-     * Endpoint: POST /dashboards/create-widget
-     * Body: { "dashboard_id": 1, "config": "{...}", "order": 1 }
-     *
-     * NOTE: The original action accepted parameters via query string, REST prefers body data.
-     * This implementation uses body data for config and order, and assumes dashboard_id is also in the body or route.
-     *
-     * @return array|bool The created widget model or validation errors.
-     * @throws ForbiddenHttpException if not authenticated.
-     */
     public function actionCreateWidget()
     {
         $this->checkAccess();
@@ -237,7 +176,6 @@ class DashboardController extends Controller
         $config = $request->post('config');
         $chartType = $request->post('chart_type');
 
-        // Verify the dashboard exists and belongs to the user
         $this->findModel($dashboardId);
 
         $widget = new DashboardWidget();
@@ -247,12 +185,9 @@ class DashboardController extends Controller
         $widget->config = $config;
 
         if ($widget->save()) {
-            Yii::$app->response->statusCode = 201; // Created
-            // Note: Returning the full widget HTML is non-RESTful, but kept for compatibility with the old controller's intended usage.
-            // A pure API would just return the widget model.
+            Yii::$app->response->statusCode = 201;
             return [
                 'widget' => $widget,
-                // 'html' => \app\widgets\ComponentWidget::widget(['data' => compact('widget')]), // Removed to keep it RESTful, return data only.
                 'id' => $widget->id,
             ];
         }
@@ -271,7 +206,6 @@ class DashboardController extends Controller
             throw new NotFoundHttpException('The requested widget does not exist.');
         }
 
-        // Basic check: ensure widget's parent dashboard belongs to the user
         $this->findModel($widget->dashboard_id);
 
         $transaction = Yii::$app->db->beginTransaction();
@@ -282,10 +216,9 @@ class DashboardController extends Controller
                 $widget->layout->delete();
             }
             
-            // Now delete the widget
             if ($widget->delete()) {
                 $transaction->commit();
-                Yii::$app->response->statusCode = 204; // No Content
+                Yii::$app->response->statusCode = 204;
                 return true;
             }
             
@@ -365,14 +298,8 @@ class DashboardController extends Controller
                 'message' => 'Failed to update widget layouts: ' . $e->getMessage()
             ];
         }
-    }    /**
-     * Retrieves all Filters for the current user.
-     *
-     * Endpoint: GET /dashboards/filters
-     *
-     * @return array|Filter[] The list of Filter models.
-     * @throws ForbiddenHttpException if not authenticated.
-     */
+    }
+
     public function actionFilters()
     {
         $this->checkAccess();
@@ -383,7 +310,6 @@ class DashboardController extends Controller
             ->orderBy(['name' => SORT_ASC])
             ->all();
 
-        // Return safe array without user_id
         $safeFilters = array_map(function (Filter $filter) {
             return [
                 'id' => $filter->id,
@@ -395,13 +321,6 @@ class DashboardController extends Controller
         return $safeFilters;
     }
 
-    /**
-     * Finds the Dashboard model based on its primary key value and checks ownership.
-     *
-     * @param int $id
-     * @return Dashboard The loaded model
-     * @throws NotFoundHttpException if the model cannot be found or does not belong to the user.
-     */
     protected function findModel($id)
     {
         $model = Dashboard::findOne($id);

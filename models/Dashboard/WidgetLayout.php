@@ -4,31 +4,13 @@ namespace app\models\Dashboard;
 
 use Yii;
 
-/**
- * This is the model class for table "widget_layout".
- *
- * @property integer $id
- * @property integer $widget_id
- * @property integer $x
- * @property integer $y
- * @property integer $w
- * @property integer $h
- *
- * @property DashboardWidget $widget
- */
 class WidgetLayout extends \yii\db\ActiveRecord
 {
-    /**
-     * @inheritdoc
-     */
     public static function tableName()
     {
         return 'widget_layout';
     }
 
-    /**
-     * @inheritdoc
-     */
     public function rules()
     {
         return [
@@ -38,9 +20,6 @@ class WidgetLayout extends \yii\db\ActiveRecord
         ];
     }
 
-    /**
-     * @inheritdoc
-     */
     public function attributeLabels()
     {
         return [
@@ -53,9 +32,6 @@ class WidgetLayout extends \yii\db\ActiveRecord
         ];
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
     public function getWidget()
     {
         return $this->hasOne(DashboardWidget::className(), ['id' => 'widget_id']);
