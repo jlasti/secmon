@@ -1,0 +1,44 @@
+.geomap-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff;
+  position: relative;
+}
+
+.geomap-map {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.geomap-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.geomap-svg svg {
+  width: 100%;
+  height: 100%;
+}
+
+.geomap-tooltip {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 1000;
+  white-space: nowrap;
+  bottom: 20px;
+  right: 20px;
+}
+
+.geomap-tooltip strong {
+  color: #fff;
+}
