@@ -57,7 +57,7 @@ const PieChart = ({ data, config }) => {
             {data.name}
           </p>
           <p style={{ margin: '0', color: '#666' }}>
-            Počet: {data.value}
+            Count: {data.value}
           </p>
           <p style={{ margin: '0', color: '#666' }}>
             {percentage}%
