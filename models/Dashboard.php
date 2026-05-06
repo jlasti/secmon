@@ -37,6 +37,16 @@ class Dashboard extends \yii\db\ActiveRecord
         ];
     }
 
+    public function fields()
+    {
+        return [
+            'id',
+            'name',
+            'active' => function() { return (bool)$this->active; },
+            'refresh_time'
+        ];
+    }
+
     public function getDashboardWidgets()
     {
         return $this->hasMany(DashboardWidget::className(), ['dashboard_id' => 'id'])

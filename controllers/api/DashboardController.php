@@ -78,13 +78,7 @@ class DashboardController extends Controller
                 Yii::error('Failed to create default dashboard: ' . print_r($dashboard->errors, true));
             }
         }
-            $safeDashboards = array_map(function (Dashboard $dashboard) {
-            $dashboardArray = $dashboard->toArray();
-            unset($dashboardArray['user_id']);
-            return $dashboardArray;
-        }, $dashboards);
-
-        return $safeDashboards;
+            return $dashboards;
     }
 
     public function actionCreate()
@@ -181,7 +175,6 @@ class DashboardController extends Controller
             Yii::$app->response->statusCode = 201;
             return [
                 'widget' => $widget,
-                'id' => $widget->id,
             ];
         }
 
