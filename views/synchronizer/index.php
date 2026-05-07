@@ -10,6 +10,15 @@ $settings = MispSettings::getSettings();
 $mispUrl = $settings->misp_url ?? '';
 $isLocal = Yii::$app->request->get('local');
 
+$triggerSync = (bool)$settings->trigger_sync;
+$triggerFullSync = (bool)$settings->trigger_full_sync;
+$triggerExport = (bool)$settings->trigger_export;
+$anyTrigger = $triggerSync || $triggerFullSync || $triggerExport;
+$statusText = '';
+if ($triggerFullSync) $statusText = 'Full sync in progress...';
+elseif ($triggerSync) $statusText = 'Sync in progress...';
+elseif ($triggerExport) $statusText = 'Export in progress...';
+
 $this->registerCss("
 .module-title {
     font-size: 1.5rem;
@@ -21,6 +30,27 @@ $this->registerCss("
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+    align-items: center;
+}
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #f0f0f0;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    margin-left: 10px;
+}
+.status-indicator i {
+    font-size: 1.2rem;
+}
+.spinning {
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 .bulk-actions {
     margin: 15px 0;
@@ -111,6 +141,13 @@ $this->registerCss("
                 'title' => Yii::t('app', 'All'),
             ]
         ) ?>
+
+        <?php if ($anyTrigger): ?>
+            <div class="status-indicator">
+                <i class="material-icons spinning">autorenew</i>
+                <span><?= Html::encode($statusText) ?></span>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -251,6 +288,28 @@ $this->registerCss("
 
 <?php
 $this->registerJs(<<<JS
+    $('.sync-btn, .sync-full-btn, .export-btn').on('click', function(e) {
+        e.preventDefault();
+        var indicatorHtml = '<div class="status-indicator"><i class="material-icons spinning">autorenew</i><span>Processing...</span></div>';
+        if ($('.status-indicator').length === 0) {
+            $('.module-actions').append(indicatorHtml);
+        }
+        var url = $(this).attr('href');
+        $.post(url)
+            .done(function(response) {
+                M.toast({html: response.message, classes: 'green'});
+                if ($(this).hasClass('sync-full-btn')) {
+                    setTimeout(function() { location.reload(); }, 2000);
+                } else {
+                    location.reload();
+                }
+            })
+            .fail(function(xhr) {
+                var msg = xhr.responseJSON?.message || 'Request failed';
+                M.toast({html: msg, classes: 'red'});
+                location.reload();
+            });
+    });
     $(document).on('click', '.bulk-action-btn', function(e) {
         e.preventDefault();
         var action = $(this).data('action');

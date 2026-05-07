@@ -138,7 +138,7 @@ $connColor = $connStatus['success'] ? 'green' : 'red';
 
     <div class="row">
         <label>IP filters (excluded from export)</label>
-        <p class="hint-block">Enter IP addresses or CIDR networks (e.g., 192.168.1.1, 10.0.0.0/8).</p>
+        <p class="hint-block">Enter 1 IP address per line (e.g., 192.168.1.5/32, 192.168.1.0/24).</p>
 
         <div id="ip-filters-list">
             <?php foreach ($model->getIpFiltersArray() as $filter): ?>
@@ -164,10 +164,6 @@ $connColor = $connStatus['success'] ? 'green' : 'red';
             $allTypes = [
                 'ip-src'      => 'IP Source',
                 'ip-dst'      => 'IP Destination',
-                'ip'          => 'IP (any)',
-                'ip-dst|port' => 'IP Destination + Port',
-                'ip-src|port' => 'IP Source + Port',
-                'domain|ip'   => 'Domain + IP',
                 'domain'      => 'Domain',
                 'hostname'    => 'Hostname',
                 'url'         => 'URL',

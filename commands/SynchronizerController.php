@@ -291,6 +291,9 @@ class SynchronizerController extends Controller
     /** Download new or updated IP attributes from MISP. */
     public function actionSync($full = false)
     {
+        $this->loadConfig();
+        $settings = MispSettings::getSettings();
+
         $settings = MispSettings::getSettings();
         if (!$this->syncEnabled && !$settings->trigger_sync) {
             $this->stdout("Sync is off.\n");
@@ -324,12 +327,11 @@ class SynchronizerController extends Controller
                 'timestamp'    => $lastSync,
                 'to_ids'       => 1,
                 'published'    => 1,
+                'includeEventTags' => 1,
             ];
 
             if (!empty($this->attributeTypes)) {
-                foreach ($this->attributeTypes as $type) {
-                    $requestData['type[]'] = $type;
-                }
+                $requestData['type'] = $this->attributeTypes;
             } else {
                 $this->stdout("No attribute types selected in settings. Nothing to sync.\n");
                 break;
@@ -337,7 +339,6 @@ class SynchronizerController extends Controller
 
             $requestData['tags'][] = '!secmon:exported';
 
-            // Odoslanie POST (x-www-form-urlencoded)
             try {
                 $response = $client->createRequest()
                     ->setMethod('POST')
@@ -410,6 +411,9 @@ class SynchronizerController extends Controller
         $eventGroups = [];
         foreach ($attributes as $attr) {
             $attrType = $attr['type'] ?? '';
+            if (!empty($this->attributeTypes) && !in_array($attrType, $this->attributeTypes)) {
+                continue;
+            }
             $eventGroups[$attr['event_id']][] = $attr;
         }
 

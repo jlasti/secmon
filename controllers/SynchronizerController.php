@@ -226,11 +226,21 @@ class SynchronizerController extends Controller
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         try {
             Yii::info('=== FULL SYNC NOW triggered ===', 'misp');
-            MispSettings::triggerFullSync();  // túto metódu ešte dopíšeme v modeli
+            MispSettings::triggerFullSync();
             return ['success' => true, 'message' => 'Full sync queued. Daemon will process it.'];
         } catch (\Exception $e) {
             Yii::error('=== FULL SYNC NOW FAILED: ' . $e->getMessage(), 'misp');
             return ['success' => false, 'message' => 'Error: ' . $e->getMessage()];
         }
+    }
+    public function actionGetStatus()
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $settings = MispSettings::getSettings();
+        return [
+            'sync' => (bool)$settings->trigger_sync,
+            'fullSync' => (bool)$settings->trigger_full_sync,
+            'export' => (bool)$settings->trigger_export,
+        ];
     }
 }
