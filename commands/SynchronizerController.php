@@ -27,6 +27,7 @@ class SynchronizerController extends Controller
     private $ipFilters = [];
     private $organizationName;
     private $attributeTypes = [];
+    private $exportTags = [];
 
     /** Initialize controller and load configuration. */
     public function init()
@@ -48,6 +49,7 @@ class SynchronizerController extends Controller
         $this->ipFilters = $settings->getIpFiltersArray();
         $this->organizationName = $settings->organization_name ?? null;
         $this->attributeTypes = $settings->getAttributeTypesArray();
+        $this->exportTags = $settings->getExportTagsArray();
 
         $configPath = Yii::getAlias('@app/config/aggregator_config.ini');
         $config = parse_ini_file($configPath, false, INI_SCANNER_RAW);
@@ -233,13 +235,7 @@ class SynchronizerController extends Controller
         $event->threat_level = 2;
         $event->analysis = 0;
         $event->timestamp = time();
-        $event->tags = Json::encode([
-            'secmon',
-            'correlated',
-            'tlp:amber',
-            'type:OSINT',
-            'workflow:state="complete"'
-        ]);
+        $event->tags = Json::encode(['secmon', 'correlated']);
         $event->is_sent = false;
 
         if (!$event->save()) {
@@ -544,17 +540,18 @@ class SynchronizerController extends Controller
     }
 
     /** Send a single event to MISP after IP filtering. */
+    /** Send a single event to MISP after IP filtering. */
     private function sendEventToMisp(MispEvents $event)
     {
         try {
             $attributes = $event->mispAttributes ?? [];
             $filteredAttributes = [];
-            
+
             $ipLikeTypes = ['ip-src', 'ip-dst', 'ip', 'domain|ip', 'ip-src|port', 'ip-dst|port'];
-            
+
             foreach ($attributes as $attr) {
                 $ip = $this->extractIpFromValue($attr->value);
-                
+
                 if (in_array($attr->type, $ipLikeTypes) && $this->isIpFiltered($ip)) {
                     Yii::info("Attribute omitted (IP filter): " . $attr->value);
                     $this->stdout("Filtered out: {$attr->value}\n");
@@ -585,6 +582,11 @@ class SynchronizerController extends Controller
 
             $eventInfo = $event->info ?? 'SecMon Correlation Event';
 
+            $tags = [];
+            foreach ($this->exportTags as $tag) {
+                $tags[] = ['name' => trim($tag)];
+            }
+
             $client = new Client();
             $response = $client->createRequest()
                 ->setMethod('POST')
@@ -602,11 +604,7 @@ class SynchronizerController extends Controller
                     'date'            => date('Y-m-d'),
                     'published'       => false,
                     'Attribute'       => $attributeData,
-                    'Tag'             => [
-                        ['name' => 'tlp:amber'],
-                        ['name' => 'type:OSINT'],
-                        ['name' => 'workflow:state="complete"'],
-                    ],
+                    'Tag'             => $tags,   // Dynamické tagy
                 ])
                 ->send();
 

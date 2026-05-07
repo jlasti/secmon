@@ -195,7 +195,11 @@ $connColor = $connStatus['success'] ? 'green' : 'red';
                 </div>
             <?php endforeach; ?>
         </div>
-        <!-- skrytý input úplne odstránený – kontrolér si poradí s chýbajúcim kľúčom -->
+        <div class="row">
+            <label>Export tags (added to each event exported to MISP)</label>
+            <p class="hint-block">Enter one tag per line. Example: tlp:amber, type:OSINT, workflow:state="complete"</p>
+            <textarea name="MispSettings[export_tags]" id="export-tags" class="materialize-textarea" rows="5"><?= implode("\n", $model->getExportTagsArray()) ?></textarea>
+        </div>
     </div>
 
     <?php ActiveForm::end(); ?>

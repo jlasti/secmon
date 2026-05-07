@@ -25,6 +25,7 @@ class MispSettings extends ActiveRecord
             [['trigger_sync', 'trigger_export', 'trigger_full_sync'], 'boolean'],
             [['attribute_types'], 'safe'],
             [['organization_name'], 'string', 'max' => 255],
+            [['export_tags'], 'safe'],
         ];
     }
 
@@ -180,5 +181,19 @@ class MispSettings extends ActiveRecord
         } else {
             parent::__set($name, $value);
         }
+    }
+    public function getExportTagsArray()
+    {
+        $tags = $this->export_tags;
+        if (is_string($tags)) {
+            $decoded = json_decode($tags, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+        return is_array($tags) ? $tags : [];
+    }
+
+    public function setExportTagsArray(array $tags)
+    {
+        $this->export_tags = json_encode(array_values($tags));
     }
 }

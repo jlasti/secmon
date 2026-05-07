@@ -109,6 +109,12 @@ class SynchronizerController extends Controller
                 $model->setAttributeTypesArray([]);
             }
 
+            if (isset($post['export_tags'])) {
+                $tags = preg_split('/\r\n|\r|\n/', $post['export_tags']);
+                $tags = array_filter(array_map('trim', $tags));
+                $model->setExportTagsArray($tags);
+            }
+
             $model->setSyncIntervalMinutes($model->sync_interval);
 
             if (!empty($model->misp_url) xor !empty($model->misp_api_key)) {
