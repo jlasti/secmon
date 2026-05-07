@@ -117,18 +117,21 @@ $attributesCount = $attributesProvider->getTotalCount();
                 ],
                 [
                     'attribute' => 'tags',
-                    'format' => 'ntext',
-                    'value' => function($model) {
-                        if (empty($model->tags)) return null;
-                        $tags = @json_decode($model->tags, true);
-                        return is_array($tags) ? implode(', ', $tags) : $model->tags;
+                    'format' => 'raw',
+                    'value' => function ($model) {
+                        if (empty($model->tags)) {
+                            return '';
+                        }
+                        $tagsArray = @json_decode($model->tags, true);
+                        if (json_last_error() !== JSON_ERROR_NONE || !is_array($tagsArray)) {
+                            return 'Invalid tag data';
+                        }
+                        $tagLabels = [];
+                        foreach ($tagsArray as $tag) {
+                            $tagLabels[] = '<span class="chip">' . Html::encode($tag) . '</span>';
+                        }
+                        return implode('', $tagLabels);
                     },
-                    'contentOptions' => ['style' => 'max-width:200px;'],
-                    'visible' => false,
-                ],
-                [
-                    'class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn',
-                    'controller' => 'misp-attributes',
                 ],
             ],
         ]); ?>

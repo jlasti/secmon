@@ -26,15 +26,7 @@ class SynchronizerController extends Controller
     private $zmqReceiver;
     private $ipFilters = [];
     private $organizationName;
-
-    private $ipAttributeTypes = [
-        'ip-src',
-        'ip-dst',
-        'ip',
-        'ip-dst|port',
-        'ip-src|port',
-        'domain|ip',
-    ];
+    private $attributeTypes = [];
 
     /** Initialize controller and load configuration. */
     public function init()
@@ -55,6 +47,7 @@ class SynchronizerController extends Controller
         $this->syncInterval = (int)$settings->sync_interval;
         $this->ipFilters = $settings->getIpFiltersArray();
         $this->organizationName = $settings->organization_name ?? null;
+        $this->attributeTypes = $settings->getAttributeTypesArray();
 
         $configPath = Yii::getAlias('@app/config/aggregator_config.ini');
         $config = parse_ini_file($configPath, false, INI_SCANNER_RAW);
@@ -164,6 +157,7 @@ class SynchronizerController extends Controller
     {
         $event = new MispEvents();
         $event->creator_org = $this->organizationName;
+        $event->info = $data['info'] ?? null;
         $event->threat_level = $data['threat_level'] ?? 4;
         $event->analysis = $data['analysis'] ?? 0;
         $event->timestamp = time();
@@ -200,45 +194,52 @@ class SynchronizerController extends Controller
     private function storeCorrelationEvent($cefLine)
     {
         $srcIp = $this->extractField($cefLine, "src=");
-    if (!$srcIp) {
-        return;
-    }
-
-    if (strpos($cefLine, 'SecmonMispSrcHit=true') !== false || 
-        strpos($cefLine, 'SecmonMispDstHit=true') !== false) {
-        
-        $mispAttrId = null;
-        if (preg_match('/SecmonMispSrcId=(\d+)/', $cefLine, $matches)) {
-            $mispAttrId = $matches[1];
-        } elseif (preg_match('/SecmonMispDstId=(\d+)/', $cefLine, $matches)) {
-            $mispAttrId = $matches[1];
+        if (!$srcIp) {
+            return;
         }
-        
-        if ($mispAttrId) {
-            $attribute = MispAttributes::findOne($mispAttrId);
-            if ($attribute) {
-                $existingEvent = MispEvents::findOne($attribute->event_id);
-                if ($existingEvent) {
-                    $this->stdout("Event already exists (ID: {$existingEvent->event_id}), skipping creation.\n");
-                    
-                    $existingEvent->threat_level = min($existingEvent->threat_level ?? 4, 2);
-                    $existingEvent->timestamp = time();
-                    $existingEvent->save(false);
-                    
-                    return;
+
+        if (strpos($cefLine, 'SecmonMispSrcHit=true') !== false || 
+            strpos($cefLine, 'SecmonMispDstHit=true') !== false) {
+            
+            $mispAttrId = null;
+            if (preg_match('/SecmonMispSrcId=(\d+)/', $cefLine, $matches)) {
+                $mispAttrId = $matches[1];
+            } elseif (preg_match('/SecmonMispDstId=(\d+)/', $cefLine, $matches)) {
+                $mispAttrId = $matches[1];
+            }
+            
+            if ($mispAttrId) {
+                $attribute = MispAttributes::findOne($mispAttrId);
+                if ($attribute) {
+                    $existingEvent = MispEvents::findOne($attribute->event_id);
+                    if ($existingEvent) {
+                        $this->stdout("Event already exists (ID: {$existingEvent->event_id}), skipping creation.\n");
+                        
+                        $existingEvent->threat_level = min($existingEvent->threat_level ?? 4, 2);
+                        $existingEvent->timestamp = time();
+                        $existingEvent->save(false);
+                        
+                        return;
+                    }
                 }
             }
+            
+            $this->stdout("MISP hit found but event not located, creating new event anyway.\n");
         }
-        
-        $this->stdout("MISP hit found but event not located, creating new event anyway.\n");
-    }
 
         $event = new MispEvents();
         $event->creator_org = $this->organizationName;
+        $event->info = 'Correlation from CEF: ' . $srcIp;
         $event->threat_level = 2;
         $event->analysis = 0;
         $event->timestamp = time();
-        $event->tags = Json::encode(['secmon', 'correlated']);
+        $event->tags = Json::encode([
+            'secmon',
+            'correlated',
+            'tlp:amber',
+            'type:OSINT',
+            'workflow:state="complete"'
+        ]);
         $event->is_sent = false;
 
         if (!$event->save()) {
@@ -300,36 +301,52 @@ class SynchronizerController extends Controller
             return ExitCode::UNSPECIFIED_ERROR;
         }
 
+        if ($full) {
+            $this->stdout("Full sync requested. Purging all remote events & attributes...\n");
+            $this->purgeRemoteEvents();
+        }
+
         $stateFile = Yii::getAlias('@runtime/misp_last_sync.txt');
         $lastSync = $full ? 0 : (int)(file_exists($stateFile) ? file_get_contents($stateFile) : 0);
         $this->stdout("Requesting attributes modified since: " . date('Y-m-d H:i:s', $lastSync) . " (timestamp $lastSync)\n");
-        
+
         $client = new Client();
         $page = 1;
         $limit = 500;
         $totalProcessed = 0;
         $syncSuccess = true;
-        
+
         while (true) {
+            $requestData = [
+                'returnFormat' => 'json',
+                'limit'        => $limit,
+                'page'         => $page,
+                'timestamp'    => $lastSync,
+                'to_ids'       => 1,
+                'published'    => 1,
+            ];
+
+            if (!empty($this->attributeTypes)) {
+                foreach ($this->attributeTypes as $type) {
+                    $requestData['type[]'] = $type;
+                }
+            } else {
+                $this->stdout("No attribute types selected in settings. Nothing to sync.\n");
+                break;
+            }
+
+            $requestData['tags'][] = '!secmon:exported';
+
+            // Odoslanie POST (x-www-form-urlencoded)
             try {
                 $response = $client->createRequest()
                     ->setMethod('POST')
                     ->setUrl($this->mispUrl . '/attributes/restSearch')
-                    ->setFormat(Client::FORMAT_JSON)
                     ->addHeaders([
                         'Authorization' => $this->apiKey,
                         'Accept'        => 'application/json',
                     ])
-                    ->setData([
-                        'returnFormat' => 'json',
-                        'limit'        => $limit,
-                        'page'         => $page,
-                        'timestamp'    => $lastSync,
-                        'to_ids'       => true,
-                        'published'    => true,
-                        'type'         => $this->ipAttributeTypes,
-                        'tags'         => ['!secmon:exported'],
-                    ])
+                    ->setData($requestData)
                     ->send();
             } catch (\Exception $e) {
                 Yii::error("MISP Sync: Connection error: " . $e->getMessage());
@@ -374,11 +391,11 @@ class SynchronizerController extends Controller
         Yii::info("MISP Sync: Total downloaded $totalProcessed attributes.");
 
         if ($syncSuccess) {
-            if (!$full) {
-                file_put_contents($stateFile, time());
-                $this->stdout("Sync successful. Last sync timestamp updated.\n");
+            file_put_contents($stateFile, time());
+            if ($full) {
+                $this->stdout("Full sync successful. Last sync timestamp updated.\n");
             } else {
-                $this->stdout("Full sync successful. Timestamp file NOT updated (manual full sync).\n");
+                $this->stdout("Sync successful. Last sync timestamp updated.\n");
             }
         } else {
             $this->stdout("Sync failed. Timestamp NOT updated.\n");
@@ -393,9 +410,6 @@ class SynchronizerController extends Controller
         $eventGroups = [];
         foreach ($attributes as $attr) {
             $attrType = $attr['type'] ?? '';
-            if (!in_array($attrType, $this->ipAttributeTypes)) {
-                continue;
-            }
             $eventGroups[$attr['event_id']][] = $attr;
         }
 
@@ -415,6 +429,7 @@ class SynchronizerController extends Controller
                 $mispEvent = new MispEvents();
                 $mispEvent->event_uuid   = $eventUuid;
                 $mispEvent->creator_org  = $eventData['Orgc']['name'] ?? null;
+                $mispEvent->info         = $eventData['info'] ?? null;
                 $mispEvent->threat_level = $eventData['threat_level_id'] ?? 4;
                 $mispEvent->analysis     = $eventData['analysis'] ?? 0;
                 $mispEvent->timestamp    = $eventData['timestamp'] ?? time();
@@ -564,6 +579,8 @@ class SynchronizerController extends Controller
                 ];
             }
 
+            $eventInfo = $event->info ?? 'SecMon Correlation Event';
+
             $client = new Client();
             $response = $client->createRequest()
                 ->setMethod('POST')
@@ -577,7 +594,7 @@ class SynchronizerController extends Controller
                     'distribution'    => 1,
                     'threat_level_id' => $event->threat_level ?? 4,
                     'analysis'        => $event->analysis ?? 0,
-                    'info'            => 'SecMon Correlation Event',
+                    'info'            => $eventInfo,
                     'date'            => date('Y-m-d'),
                     'published'       => false,
                     'Attribute'       => $attributeData,
@@ -659,8 +676,33 @@ class SynchronizerController extends Controller
             $changed = true;
         }
 
+        if ($settings->trigger_full_sync) {
+            $this->stdout("Starting FULL synchronization...\n");
+            $this->actionSync(true);
+            $settings->trigger_full_sync = false;
+            $changed = true;
+        }
+
         if ($changed) {
             $settings->save(false);
+        }
+    }
+    
+    /** Delete all remote (downloaded) events and their attributes. */
+    private function purgeRemoteEvents()
+    {
+        $remoteEventIds = MispEvents::find()
+            ->select('event_id')
+            ->where(['not', ['event_uuid' => null]])
+            ->column();
+
+        if (!empty($remoteEventIds)) {
+            $count = count($remoteEventIds);
+            MispAttributes::deleteAll(['event_id' => $remoteEventIds]);
+            MispEvents::deleteAll(['event_id' => $remoteEventIds]);
+            $this->stdout("Purged $count remote events and their attributes.\n");
+        } else {
+            $this->stdout("No remote events to purge.\n");
         }
     }
 }

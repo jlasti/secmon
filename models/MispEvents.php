@@ -38,6 +38,7 @@ class MispEvents extends ActiveRecord
             'event_id' => [FilterTypeEnum::COMPARE],
             'event_uuid' => [FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE],
             'creator_org' => [FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE],
+            'info' => [FilterTypeEnum::REGEX, FilterTypeEnum::COMPARE],
             'threat_level' => [FilterTypeEnum::COMPARE],
             'analysis' => [FilterTypeEnum::COMPARE],
             'timestamp' => [FilterTypeEnum::DATE],

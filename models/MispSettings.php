@@ -21,7 +21,9 @@ class MispSettings extends ActiveRecord
             [['sync_interval'], 'default', 'value' => 3600],
             [['ip_filters'], 'default', 'value' => '[]'],
             [['sync_enabled'], 'default', 'value' => true],
-            [['trigger_sync', 'trigger_export'], 'boolean'],
+            [['export_enabled'], 'boolean'],
+            [['trigger_sync', 'trigger_export', 'trigger_full_sync'], 'boolean'],
+            [['attribute_types'], 'safe'],
             [['organization_name'], 'string', 'max' => 255],
         ];
     }
@@ -71,6 +73,8 @@ class MispSettings extends ActiveRecord
             $settings->id = 1;
             $settings->sync_interval = 3600;
             $settings->ip_filters = json_encode([]);
+            $settings->attribute_types = json_encode([]);   // <-- pridaj
+            $settings->trigger_full_sync = false;           // <-- pridaj
             $settings->save();
         }
         return $settings;
@@ -147,5 +151,34 @@ class MispSettings extends ActiveRecord
         $settings = self::getSettings();
         $settings->trigger_export = true;
         $settings->save(false);
+    }
+
+    public function getAttributeTypesArray()
+    {
+        $types = $this->attribute_types;
+        if (is_string($types)) {
+            $decoded = json_decode($types, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+        return is_array($types) ? $types : [];
+    }
+
+    public function setAttributeTypesArray(array $types)
+    {
+        $this->attribute_types = json_encode(array_values($types));
+    }
+    public static function triggerFullSync()
+    {
+        $settings = self::getSettings();
+        $settings->trigger_full_sync = true;
+        $settings->save(false);
+    }
+    public function __set($name, $value)
+    {
+        if (in_array($name, ['attribute_types', 'trigger_full_sync'])) {
+            $this->setAttribute($name, $value);
+        } else {
+            parent::__set($name, $value);
+        }
     }
 }

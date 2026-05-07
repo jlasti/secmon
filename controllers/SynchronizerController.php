@@ -97,8 +97,18 @@ class SynchronizerController extends Controller
         $model = MispSettings::getSettings();
 
         if ($model->load(Yii::$app->request->post())) {
-            $json = Yii::$app->request->post('MispSettings')['ip_filters_json'] ?? '[]';
-            $model->ip_filters = $json;
+            $post = Yii::$app->request->post('MispSettings', []);
+
+            $model->ip_filters = $post['ip_filters_json'] ?? '[]';
+
+            $attributeTypes = $post['attribute_types'] ?? [];
+            if (is_array($attributeTypes)) {
+                $attributeTypes = array_filter($attributeTypes, 'strlen');
+                $model->setAttributeTypesArray(array_values($attributeTypes));
+            } else {
+                $model->setAttributeTypesArray([]);
+            }
+
             $model->setSyncIntervalMinutes($model->sync_interval);
 
             if (!empty($model->misp_url) xor !empty($model->misp_api_key)) {
@@ -130,7 +140,10 @@ class SynchronizerController extends Controller
             }
 
             if (!$model->hasErrors() && $model->save()) {
+                Yii::$app->session->setFlash('success', 'Settings saved successfully.');
                 return $this->redirect(['index']);
+            } else {
+                Yii::$app->session->setFlash('error', 'Please fix the errors below.');
             }
         }
 
@@ -206,5 +219,18 @@ class SynchronizerController extends Controller
             return ['success' => true, 'message' => "Event $status."];
         }
         return ['success' => false, 'message' => 'Failed to update event.'];
+    }
+    
+    public function actionSyncFullNow()
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        try {
+            Yii::info('=== FULL SYNC NOW triggered ===', 'misp');
+            MispSettings::triggerFullSync();  // túto metódu ešte dopíšeme v modeli
+            return ['success' => true, 'message' => 'Full sync queued. Daemon will process it.'];
+        } catch (\Exception $e) {
+            Yii::error('=== FULL SYNC NOW FAILED: ' . $e->getMessage(), 'misp');
+            return ['success' => false, 'message' => 'Error: ' . $e->getMessage()];
+        }
     }
 }

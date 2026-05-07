@@ -66,7 +66,7 @@ class CorrelatorController extends Controller
 		while (true) {
 			$this->checkRestartSec();
 			$msg = $recSocket->recv(ZMQ::MODE_NOBLOCK);
-			if (empty($msq)) {
+			if (empty($msg)) {
 				usleep(100000);
 			}
 
