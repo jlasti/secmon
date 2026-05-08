@@ -878,7 +878,7 @@ class SecurityEvents extends BaseEvent //\yii\db\ActiveRecord
         $event->threat_attack_id = $values['threatAttackID'] ?? "";
         $event->attack_type = $values['att'] ?? "";
         $event->parent_events = $values['cs1'] ?? "";
-        $event->misp_attribute_id = $values['misp_attr_id'] ?? null;
+        $event->misp_attribute_id = $values['SecmonMispAttributeId'] ?? "";
         //$event->cef_extensions = $values[''] ?? "";
 
         if($event->type == 'normalized'){

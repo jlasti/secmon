@@ -29,7 +29,6 @@ $attributesCount = $attributesProvider->getTotalCount();
         'model' => $model,
         'attributes' => [
             'event_id',
-            'event_uuid',
             'creator_org',
             [
                 'attribute' => 'event_uuid',

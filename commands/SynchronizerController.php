@@ -231,7 +231,7 @@ class SynchronizerController extends Controller
 
         $event = new MispEvents();
         $event->creator_org = $this->organizationName;
-        $event->info = 'Correlation from CEF: ' . $srcIp;
+        $event->info = 'Correlation from Secmon: ' . $srcIp;
         $event->threat_level = 2;
         $event->analysis = 0;
         $event->timestamp = time();
@@ -249,7 +249,7 @@ class SynchronizerController extends Controller
         $attribute->type = 'ip-src';
         $attribute->value = $this->normalizeIp($srcIp);
         $attribute->to_ids = true;
-        $attribute->comment = 'Generated from correlation (CEF)';
+        $attribute->comment = 'Generated from correlation';
         $attribute->timestamp = time();
 
         if (!$attribute->save()) {
