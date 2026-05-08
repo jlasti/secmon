@@ -71,7 +71,7 @@ class CorrelatorController extends Controller
 			}
 
 			if (!empty($msg)) {
-				echo "Received Message:" . $msg . PHP_EOL;
+				// echo "Received Message:" . $msg . PHP_EOL;
 				fwrite($corrInputStream, $msg);
 				flush();
 			}
