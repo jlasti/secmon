@@ -399,32 +399,63 @@ $this->params['dst_device'] = NetworkModel::getNetworkDevice($model->destination
                 $mispEvent = $mispModel->mispEvent;
             ?>
             
-            <!-- MISP Attribute Details -->
-            <ul class="collapsible">
-                <li>
-                    <div class="collapsible-header light-blue accent-4" style="font-size:20px; color: white;">
-                        <i class="material-icons">list</i>MISP Attribute Details
-                    </div>
-                    <div class="collapsible-body">
-                        <?= DetailView::widget([
-                            'model' => $mispModel,
-                            'attributes' => [
-                                'attribute_id',
-                                'attribute_uuid',
-                                'event_id',
-                                'category',
-                                'type',
-                                'value',
-                                'to_ids:boolean',
-                                'comment',
-                                'disable_correlation:boolean',
-                                'object_relation',
-                                'galaxy_clusters',
-                            ],
-                        ]) ?>
-                    </div>
-                </li>
-            </ul>
+          <!-- MISP Attribute Details -->
+          <ul class="collapsible">
+              <li>
+                  <div class="collapsible-header light-blue accent-4" style="font-size:20px; color: white;">
+                      <i class="material-icons">list</i>MISP Attribute Details
+                  </div>
+                  <div class="collapsible-body">
+                      <?= DetailView::widget([
+                          'model' => $mispModel,
+                          'attributes' => [
+                              'attribute_id',
+                              'attribute_uuid',
+                              'event_id',
+                              'category',
+                              'type',
+                              'value',
+                              'to_ids:boolean',
+                              'comment',
+                              'disable_correlation:boolean',
+                              [
+                                  'attribute' => 'tags',
+                                  'format' => 'html',
+                                  'value' => function ($model) {
+                                      $tags = $model->tags;
+                                      if (empty($tags)) {
+                                          return '<em class="text-muted">No tags</em>';
+                                      }
+                                      if (is_string($tags)) {
+                                          $decoded = json_decode($tags, true);
+                                          if (is_array($decoded)) {
+                                              $tags = $decoded;
+                                          } else {
+                                              return '<code>' . Html::encode($tags) . '</code>';
+                                          }
+                                      }
+                                      if (is_array($tags)) {
+                                          if (empty($tags)) {
+                                              return '<em class="text-muted">No tags</em>';
+                                          }
+                                          $items = array_map(function ($tag) {
+                                              if (is_array($tag)) {
+                                                  return Html::encode($tag['name'] ?? json_encode($tag));
+                                              }
+                                              return Html::encode((string)$tag);
+                                          }, $tags);
+                                          return '<ul class="browser-default" style="margin:0; padding-left:20px;"><li>'
+                                              . implode('</li><li>', $items)
+                                              . '</li></ul>';
+                                      }
+                                      return Html::encode((string)$tags);
+                                  },
+                              ],
+                          ],
+                      ]) ?>
+                  </div>
+              </li>
+          </ul>
             
             <!-- MISP Event Details -->
             <ul class="collapsible">
@@ -445,7 +476,6 @@ $this->params['dst_device'] = NetworkModel::getNetworkDevice($model->destination
                                     'attribute' => 'timestamp',
                                     'format' => 'datetime',
                                 ],
-                                'tags',
                                 'is_sent:boolean',
                                 'sent_at',
                                 'created_at',
