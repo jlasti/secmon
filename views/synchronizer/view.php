@@ -54,7 +54,24 @@ $attributesCount = $attributesProvider->getTotalCount();
                 }
             ],
             'timestamp:datetime',
-            'tags:ntext',
+            [
+                'attribute' => 'tags',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    if (empty($model->tags)) {
+                        return '<span class="grey-text">No tags</span>';
+                    }
+                    $tagsArray = @json_decode($model->tags, true);
+                    if (json_last_error() !== JSON_ERROR_NONE || !is_array($tagsArray)) {
+                        return Html::encode($model->tags);
+                    }
+                    $chips = [];
+                    foreach ($tagsArray as $tag) {
+                        $chips[] = '<span class="chip">' . Html::encode($tag) . '</span>';
+                    }
+                    return implode(' ', $chips);
+                }
+            ],
             'is_sent:boolean',
             'sent_at:datetime',
             'created_at:datetime',
@@ -117,18 +134,21 @@ $attributesCount = $attributesProvider->getTotalCount();
                 ],
                 [
                     'attribute' => 'tags',
-                    'format' => 'ntext',
-                    'value' => function($model) {
-                        if (empty($model->tags)) return null;
-                        $tags = @json_decode($model->tags, true);
-                        return is_array($tags) ? implode(', ', $tags) : $model->tags;
+                    'format' => 'raw',
+                    'value' => function ($model) {
+                        if (empty($model->tags)) {
+                            return '';
+                        }
+                        $tagsArray = @json_decode($model->tags, true);
+                        if (json_last_error() !== JSON_ERROR_NONE || !is_array($tagsArray)) {
+                            return 'Invalid tag data';
+                        }
+                        $tagLabels = [];
+                        foreach ($tagsArray as $tag) {
+                            $tagLabels[] = '<span class="chip">' . Html::encode($tag) . '</span>';
+                        }
+                        return implode('', $tagLabels);
                     },
-                    'contentOptions' => ['style' => 'max-width:200px;'],
-                    'visible' => false,
-                ],
-                [
-                    'class' => 'macgyer\yii2materializecss\widgets\grid\ActionColumn',
-                    'controller' => 'misp-attributes',
                 ],
             ],
         ]); ?>
