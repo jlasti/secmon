@@ -67,7 +67,7 @@ const LineChart = ({ data }) => {
         strokeWidth={2}
         dot={{ r: 4 }}
         activeDot={{ r: 6 }}
-        name="Value"
+        name="Count"
         {...animationConfig}
       />
     </RechartsLineChart>
