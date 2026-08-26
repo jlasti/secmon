@@ -19,8 +19,12 @@ use yii\helpers\Html;
     <div id="root"><?= $content ?></div>
     
     <?php
-    $this->registerCssFile('@web/js/dist/dashboard-bundle.css');
-    $this->registerJsFile('@web/js/dist/dashboard-bundle.js', [
+    // Use file modification time to bust the browser cache on each new build
+    $bundleBase = Yii::getAlias('@webroot/js/dist');
+    $cssVersion = @filemtime($bundleBase . '/dashboard-bundle.css');
+    $jsVersion = @filemtime($bundleBase . '/dashboard-bundle.js');
+    $this->registerCssFile('@web/js/dist/dashboard-bundle.css?v=' . $cssVersion);
+    $this->registerJsFile('@web/js/dist/dashboard-bundle.js?v=' . $jsVersion, [
         'position' => \yii\web\View::POS_END,
         'depends' => [] 
     ]);

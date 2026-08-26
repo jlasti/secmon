@@ -245,6 +245,18 @@ SecMon root directory contains a few important directories:
 - **web** - root directory of the web application
 - **widgets** - common UI components or functionalities
 
+### Editing Dashboard UI
+
+The SecMon dashboard UI is written in React and lives in `./react/dashboard`. After making changes to the React source code, rebuild the frontend inside the running container with:
+
+```bash
+docker exec secmon_app bash -c "cd react/dashboard && npm install && npm run build"
+```
+
+This compiles the React app into the JS/CSS bundles located at `./web/js/dist/`, which are then served by the SecMon web application. Refresh the dashboard in your browser to see the changes.
+
+For information about the available dashboard API endpoints used by the React dashboard, see the [Dashboard API Documentation](./docs/dashboard_api.md).
+
 ### Docker commands
 Run command inside container:
 - `docker exec <container_name> <command>`
